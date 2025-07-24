@@ -1,40 +1,9 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# 루트 디렉토리의 application.properties만 무시
+/application.properties
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-# application 설정 파일 무시
-/src/main/resources/application.properties
-/src/main/resources/application.yml
+# 환경별 설정 파일 무시
+.env
+application.yml
 
 # 빌드 결과물
 /build/
@@ -55,10 +24,31 @@ Thumbs.db
 # 로그 파일
 *.log
 
-# 환경 설정
-.env
-application.properties
-application.yml
-
 # 테스트 결과
 /test-output/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+*.iws
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### 제외 규칙 확인
+!src/main/resources/application.properties
