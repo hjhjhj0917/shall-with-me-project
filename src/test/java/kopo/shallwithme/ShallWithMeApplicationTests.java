@@ -1,0 +1,13 @@
+package kopo.shallwithme;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class ShallWithMeApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}

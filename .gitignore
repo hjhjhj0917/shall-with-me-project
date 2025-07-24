@@ -1,0 +1,64 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# application 설정 파일 무시
+/src/main/resources/application.properties
+/src/main/resources/application.yml
+
+# 빌드 결과물
+/build/
+target/
+out/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VSCode (혹시 팀원이 vscode 쓴다면)
+.vscode/
+
+# OS별 숨김 파일
+.DS_Store
+Thumbs.db
+
+# 로그 파일
+*.log
+
+# 환경 설정
+.env
+application.properties
+application.yml
+
+# 테스트 결과
+/test-output/
