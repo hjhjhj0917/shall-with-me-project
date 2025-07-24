@@ -1,0 +1,155 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #f8faff;
+    background-image: url("../images/kpaas-background.png");
+
+}
+
+.slider-container {
+    display: flex;
+    width: 200%;
+    transition: transform 0.5s ease;
+}
+
+.slide {
+    width: 100vw;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.header {
+    text-align: center;
+    margin-top: 100px;
+}
+
+h1 {
+    font-size: 48px;
+    margin-top: 60px;
+    margin-bottom: 0;
+}
+
+h2 {
+    font-size: 18px;
+    margin-top: 5px;
+    color: #555;
+    margin-bottom: 50px;
+}
+
+.subtitle {
+    color: #3a7bff;
+    font-size: 22px;
+    margin: 30px 0 0;
+}
+
+.section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 60px auto 0;
+}
+
+.box {
+    background: #f0f2f5;
+    border: 2px solid #3a7bff;
+    border-radius: 20px;
+    padding: 20px;
+    width: calc(33.333% - 40px);
+    min-width: 280px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media (max-width: 900px) {
+    .box {
+        width: calc(50% - 40px);
+    }
+}
+
+@media (max-width: 600px) {
+    .box {
+        width: 100%;
+    }
+}
+
+.box legend {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.button-group button {
+    padding: 8px 18px;
+    border: 1.5px solid #3a7bff;
+    background: #fff;
+    border-radius: 20px;
+    color: #3a7bff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.button-group button:hover {
+    background: #3a7bff;
+    color: white;
+}
+
+.button-group button.selected {
+    background: #3a7bff;
+    color: white;
+}
+
+.arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 60px;
+    cursor: pointer;
+    z-index: 10;
+    color: #3a7bff;
+    user-select: none;
+}
+
+.arrow.left {
+    left: 50px;
+}
+
+.arrow.right {
+    right: 50px;
+}
+
+.restore button {
+    position: fixed;
+    top: 80%;
+    right: 5%;
+    border-radius: 30px;
+    font-size: 20px;
+    color: white;
+    width: 200px;
+    height: 60px;
+    background-color: #3a7bff;
+    border: solid 2px white;
+}
+
+.restore button:hover {
+    background: white;
+    color: #3a7bff;
+}
+
+button.selected {
+    background-color: #3c82f6;
+    color: white;
+}
