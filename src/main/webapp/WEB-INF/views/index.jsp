@@ -32,7 +32,7 @@
             left: 0;
             width: 100%;
             height: 200px;
-            background: url('/mnt/data/3cd2464c-c857-4492-99d0-4a18f660e670.png') no-repeat center bottom;
+            /*background: url('/mnt/data/3cd2464c-c857-4492-99d0-4a18f660e670.png') no-repeat center bottom;*/
             background-size: cover;
             z-index: 1;
         }
@@ -62,7 +62,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 5%;
-            background-image: url("kpaas-background.png");
+            /*background-image: url("kpaas-background.png");*/
         }
 
         .left-text {
