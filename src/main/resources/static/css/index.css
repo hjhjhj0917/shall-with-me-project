@@ -1,0 +1,120 @@
+.logo {
+    color: black;
+    font-size: 50px;
+    font-weight: 250;
+}
+
+.logo-2 {
+    font-size: 18px;
+    margin-top: 5px;
+    color: #555;
+    margin-bottom: 50px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-image: url("../images/kpaas-background.png");
+}
+
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.left-panel {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-image: url("../images/kpaas-background.png");
+}
+
+.text-box {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 100px;
+    overflow: hidden;
+}
+
+.slide-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    color: #444;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.right-panel {
+    width: 40%;
+    background-color: #f4f9fe;
+    transform: skewX(-10deg);
+    transition: width 0.5s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.right-panel:hover {
+    width: 60%;
+}
+
+.right-inner {
+    transform: skewX(10deg);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-inner h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.right-inner span {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.start-button {
+    background-color: #3399ff;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 999px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: background 0.3s ease;
+}
+
+.start-button:hover {
+    background-color: #1a73e8;
+}
+
+.city-img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 0;
+}

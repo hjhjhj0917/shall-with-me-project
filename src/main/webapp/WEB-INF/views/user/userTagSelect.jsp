@@ -18,12 +18,12 @@
 <body>
 
 <!-- 슬라이드 화살표 -->
-<div class="arrow left" onclick="moveSlide(-1)">&#10094;</div>
-<div class="arrow right" onclick="moveSlide(1)">&#10095;</div>
+<div class="arrow left" onclick="moveSlide(-1)">&#10092;</div>
+<div class="arrow right" onclick="moveSlide(1)">&#10093;</div>
 
 <div class="header">
-    <h1>살며시</h1>
-    <h2>Shall With Me</h2>
+    <div class="logo">살며시</div>
+    <div class="logo-2">Shall With Me</div>
     <div class="subtitle">홍길동님의 라이프 스타일을 한가지 씩 선택하여 주세요</div>
 </div>
 

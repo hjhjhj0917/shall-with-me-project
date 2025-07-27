@@ -24,19 +24,12 @@ body {
 .header {
     text-align: center;
     margin-top: 100px;
-}
 
-h1 {
-    font-size: 48px;
-    margin-top: 60px;
-    margin-bottom: 0;
-}
-
-h2 {
-    font-size: 18px;
-    margin-top: 5px;
-    color: #555;
-    margin-bottom: 50px;
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .subtitle {
@@ -55,7 +48,7 @@ h2 {
 }
 
 .box {
-    background: #f0f2f5;
+    background: #F6F6F6;
     border: 2px solid #3a7bff;
     border-radius: 20px;
     padding: 20px;
@@ -81,7 +74,14 @@ h2 {
 
 .box legend {
     font-size: 18px;
+    font-weight: 330;
     margin-bottom: 10px;
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .button-group {
@@ -100,6 +100,12 @@ h2 {
     font-size: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .button-group button:hover {
@@ -114,7 +120,7 @@ h2 {
 
 .arrow {
     position: fixed;
-    top: 50%;
+    top: 52%;
     transform: translateY(-50%);
     font-size: 60px;
     cursor: pointer;
@@ -124,11 +130,11 @@ h2 {
 }
 
 .arrow.left {
-    left: 50px;
+    left: 120px;
 }
 
 .arrow.right {
-    right: 50px;
+    right: 120px;
 }
 
 .restore button {
@@ -142,6 +148,13 @@ h2 {
     height: 60px;
     background-color: #3a7bff;
     border: solid 2px white;
+    cursor: pointer;
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .restore button:hover {
@@ -152,4 +165,17 @@ h2 {
 button.selected {
     background-color: #3c82f6;
     color: white;
+}
+
+.logo {
+    color: black;
+    font-size: 50px;
+    font-weight: 250;
+}
+
+.logo-2 {
+    font-size: 18px;
+    margin-top: 5px;
+    color: #555;
+    margin-bottom: 50px;
 }

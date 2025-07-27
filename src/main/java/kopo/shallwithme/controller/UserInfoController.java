@@ -15,14 +15,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Controller
 public class UserInfoController {
-    // public static void main(String[] args) {}
-    //
 
     private final UserInfoService userInfoService;
 
-    @GetMapping(value = "userTagSelect")
+    @GetMapping(value = "userTagSelect") // /WEB-INF/views/user/index.jsp 로 이동
     public String userTagSelect() {
+
         return "user/userTagSelect";
+    }
+
+    @GetMapping("/") // /WEB-INF/views/index.jsp 로 이동
+    public String index() {
+
+        return "index";
     }
 
     @PostMapping("saveTags")
