@@ -16,6 +16,12 @@
         </div>
     </div>
 
+    <div class="wave-left">
+        <svg viewBox="0 0 800 800" preserveAspectRatio="none">
+            <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#f4f9fe" />
+        </svg>
+    </div>
+
     <!-- 오른쪽 비스듬한 영역 -->
     <div class="right-panel">
         <div class="right-inner">
@@ -27,8 +33,6 @@
         </div>
     </div>
 
-    <!-- 도시 배경 이미지 -->
-    <img src="${pageContext.request.contextPath}/static/images/city-bg.png" alt="city" class="city-img">
 </div>
 
 <script>
@@ -55,7 +59,7 @@
     setInterval(() => {
         idx = (idx + 1) % texts.length;
         showText(idx);
-    }, 3000);
+    }, 4000);
 </script>
 
 </body>
