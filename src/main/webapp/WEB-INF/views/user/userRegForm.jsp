@@ -213,13 +213,122 @@
 
     </script>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            font-family: 'Noto Sans KR', sans-serif;
+            text-align: center;
+        }
 
+        h2 {
+            font-size: 28px;
+            margin-top: 40px;
+        }
+
+        hr {
+            width: 60%;
+            margin: 10px auto 30px auto;
+            border: 1px solid #ccc;
+        }
+
+        #f {
+            width: 400px;
+            margin: 0 auto;
+            background-color: #b3d4fc;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        .divTable {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .divTableRow {
+            display: table-row;
+            margin-bottom: 10px;
+        }
+
+        .divTableCell {
+            display: table-cell;
+            padding: 10px 5px;
+            vertical-align: middle;
+            font-weight: bold;
+            text-align: left;
+            width: 35%;
+            align-items: center;          /* 수직 정렬 */
+            gap: 5px;                     /* 버튼과 input 사이 간격 */
+        }
+
+        .divTableCell input,
+        .divTableCell select {
+            padding: 6px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 12px);
+            padding: 8px;
+            margin: 2px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 6px 12px;
+            background-color: #316B95;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        button:hover {
+            background-color: #25587a;
+        }
+
+        #btnSend {
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .logo {
+            color: black;
+            font-size: 50px;
+            font-weight: 250;
+
+            user-select: none;       /* 텍스트 드래그 금지 */
+            pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+            -webkit-user-select: none; /* 크로스브라우징 */
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .logo-2 {
+            font-size: 18px;
+            margin-top: 5px;
+            color: #555;
+            margin-bottom: 50px;
+
+            user-select: none;       /* 텍스트 드래그 금지 */
+            pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+            -webkit-user-select: none; /* 크로스브라우징 */
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
     </style>
 </head>
 <body>
-<h2>회원 가입하기</h2>
-<hr/>
-<br/>
+<div class="logo">살며시</div>
+<div class="logo-2">Shall With Me</div>
 <form id="f">
     <div class="divTable minimalistBlack">
         <div class="divTableBody">

@@ -4,6 +4,7 @@ package kopo.shallwithme.service.impl;
 import kopo.shallwithme.dto.MailDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.mapper.IUserInfoMapper;
+import kopo.shallwithme.mapper.UserInfoMapper;
 import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.service.IUserInfoService;
 import kopo.shallwithme.util.CmmUtil;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -98,25 +100,6 @@ public class UserInfoService implements IUserInfoService {
     }
 }
 
-import kopo.shallwithme.mapper.UserInfoMapper;
-import kopo.shallwithme.service.IUserInfoService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
-public class UserInfoService implements IUserInfoService {
-
-    private final UserInfoMapper userInfoMapper;
-
-    @Override
-    public void saveUserTags(String userId, Map<String, String> tags) {
-        for (Map.Entry<String, String> entry : tags.entrySet()) {
-            userInfoMapper.insertUserTag(userId, entry.getKey(), entry.getValue());
-        }
-    }
-}
 

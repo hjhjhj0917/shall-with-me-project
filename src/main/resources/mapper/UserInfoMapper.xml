@@ -38,12 +38,5 @@
                 NOW(),
                 #{userId},
                 NOW())
-
-<mapper namespace="kopo.shallwithme.mapper.UserInfoMapper">
-
-    <insert id="insertUserTag">
-        INSERT INTO user_tag (user_id, tag_id, tag_type)
-        VALUES (#{userId}, #{tagId}, #{tagType})
-
     </insert>
 </mapper>

@@ -132,7 +132,7 @@ public class UserInfoController {
 
             log.info("회원가입 결과(res) : " + res);
 
-            if (res == 1 ) {
+            if (res == 1) {
                 msg = "회원가입되었습니다.";
 
             } else if (res == 2) {
@@ -158,8 +158,8 @@ public class UserInfoController {
         }
 
         return dto;
+    }
 
-    private final UserInfoService userInfoService;
 
     @GetMapping(value = "userTagSelect") // /WEB-INF/views/user/index.jsp 로 이동
     public String userTagSelect() {
@@ -171,22 +171,5 @@ public class UserInfoController {
     public String index() {
 
         return "index";
-    }
-
-    @PostMapping("saveTags")
-    @ResponseBody
-    public Map<String, Object> saveUserTags(@RequestBody Map<String, String> tags, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-
-            String userId = "test";
-
-            userInfoService.saveUserTags(userId, tags); // Service에 위임
-            response.put("message", "태그가 성공적으로 저장되었습니다.");
-        } catch (Exception e) {
-            response.put("message", "저장 실패: " + e.getMessage());
-        }
-        return response;
-
     }
 }
