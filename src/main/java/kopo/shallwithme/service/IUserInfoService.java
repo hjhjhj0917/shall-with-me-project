@@ -13,6 +13,6 @@ public interface IUserInfoService {
 
     int insertUserInfo(UserInfoDTO pDTO) throws Exception;
 
+    void saveUserTags(String userId, Map<String, String> tags);
 
 }
-
