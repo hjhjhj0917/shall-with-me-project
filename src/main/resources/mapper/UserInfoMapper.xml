@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+
 <mapper namespace="kopo.shallwithme.mapper.IUserInfoMapper">
 
     <select id="getUserIdExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
@@ -37,5 +38,12 @@
                 NOW(),
                 #{userId},
                 NOW())
+
+<mapper namespace="kopo.shallwithme.mapper.UserInfoMapper">
+
+    <insert id="insertUserTag">
+        INSERT INTO user_tag (user_id, tag_id, tag_type)
+        VALUES (#{userId}, #{tagId}, #{tagType})
+
     </insert>
 </mapper>
