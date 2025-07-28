@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -96,21 +97,6 @@ public class UserInfoService implements IUserInfoService {
         log.info("{}.insertUserInfo End!", this.getClass().getName());
         return res;
     }
-}
-
-import kopo.shallwithme.mapper.UserInfoMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
-
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class UserInfoService {
-
-    private final UserInfoMapper userInfoMapper;
 
     public void saveUserTags(String userId, Map<String, String> tags) {
 

@@ -1,7 +1,6 @@
 package kopo.shallwithme.controller;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletRequest;
 import kopo.shallwithme.dto.MsgDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
@@ -19,10 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpSession;
-import kopo.shallwithme.service.impl.UserInfoService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -132,7 +127,7 @@ public class UserInfoController {
 
             log.info("회원가입 결과(res) : " + res);
 
-            if (res == 1 ) {
+            if (res == 1) {
                 msg = "회원가입되었습니다.";
 
             } else if (res == 2) {
@@ -158,8 +153,7 @@ public class UserInfoController {
         }
 
         return dto;
-
-    private final UserInfoService userInfoService;
+    }
 
     @GetMapping(value = "userTagSelect") // /WEB-INF/views/user/index.jsp 로 이동
     public String userTagSelect() {
