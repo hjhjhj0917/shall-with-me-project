@@ -18,8 +18,9 @@ public class UserInfoDTO {
     private String regDt;
     private String chgId;
     private String chgDt;
-    private int age;
-    private String gender;
     private String existsYn; // 중복 가입을 방지하기 위해 사용할 변수
     private int authNumber; // 메일 중복체크를 위한 인증번호
+
+    private int age; // kpaas 추가
+    private String gender; // kpaas 추가
 }
