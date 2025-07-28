@@ -44,6 +44,7 @@ public class EncryptUtil {
 
             res = sb.toString();
 
+            // 자바에서 제공하는 알고리즘이 아닌경우, 에러 발생
         } catch (Exception e) {
             res = "";
         }
