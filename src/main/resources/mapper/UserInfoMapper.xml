@@ -38,8 +38,7 @@
                 NOW(),
                 #{userId},
                 NOW())
-
-<mapper namespace="kopo.shallwithme.mapper.UserInfoMapper">
+    </insert>
 
     <!-- tag_name으로 tag_id 조회 -->
     <select id="findTagIdByName" parameterType="string" resultType="int">
