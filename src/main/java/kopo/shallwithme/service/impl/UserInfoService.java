@@ -1,23 +1,31 @@
 package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.mapper.UserInfoMapper;
-import kopo.shallwithme.service.IUserInfoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class UserInfoService implements IUserInfoService {
+@Transactional
+public class UserInfoService {
 
     private final UserInfoMapper userInfoMapper;
 
-    @Override
     public void saveUserTags(String userId, Map<String, String> tags) {
+
         for (Map.Entry<String, String> entry : tags.entrySet()) {
-            userInfoMapper.insertUserTag(userId, entry.getKey(), entry.getValue());
+            String tagType = entry.getKey();     // 예: "ME", "PREF"
+            String tagName = entry.getValue();   // 예: "아침형", "프리랜서/무직" 등
+
+            Integer tagId = userInfoMapper.findTagIdByName(tagName);
+            if (tagId == null) {
+                throw new IllegalArgumentException("해당 태그를 찾을 수 없습니다: " + tagName);
+            }
+
+            userInfoMapper.insertUserTag(userId, tagId, tagType);
         }
     }
 }

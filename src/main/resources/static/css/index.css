@@ -78,7 +78,7 @@ body {
 .right-panel {
     width: 40%;
     background-color: #f4f9fe;
-    transform: skewX(-10deg);
+    /*transform: skewX(-10deg);*/
     transition: width 0.5s ease;
     position: relative;
     z-index: 1;
@@ -90,7 +90,7 @@ body {
 }
 
 .right-inner {
-    transform: skewX(10deg);
+    /*transform: skewX(10deg);*/
     position: absolute;
     top: 0;
     bottom: 0;

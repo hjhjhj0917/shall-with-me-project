@@ -35,10 +35,11 @@ public class UserInfoController {
     public Map<String, Object> saveUserTags(@RequestBody Map<String, String> tags, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // 예제: 세션에서 로그인된 사용자 ID 가져오기 (임시로 test 사용 중)
+            String userId = (String) session.getAttribute("userId");
+            if (userId == null) userId = "test"; // 테스트용
 
-            String userId = "test";
-
-            userInfoService.saveUserTags(userId, tags); // Service에 위임
+            userInfoService.saveUserTags(userId, tags);
             response.put("message", "태그가 성공적으로 저장되었습니다.");
         } catch (Exception e) {
             response.put("message", "저장 실패: " + e.getMessage());
@@ -46,3 +47,4 @@ public class UserInfoController {
         return response;
     }
 }
+
