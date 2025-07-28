@@ -41,8 +41,14 @@
 
 <mapper namespace="kopo.shallwithme.mapper.UserInfoMapper">
 
+    <!-- tag_name으로 tag_id 조회 -->
+    <select id="findTagIdByName" parameterType="string" resultType="int">
+        SELECT tag_id FROM TAG WHERE tag_name = #{tagName}
+    </select>
+
+    <!-- USER_TAG 테이블에 데이터 삽입 -->
     <insert id="insertUserTag">
-        INSERT INTO user_tag (user_id, tag_id, tag_type)
+        INSERT INTO USER_TAG (user_id, tag_id, tag_type)
         VALUES (#{userId}, #{tagId}, #{tagType})
 
     </insert>
