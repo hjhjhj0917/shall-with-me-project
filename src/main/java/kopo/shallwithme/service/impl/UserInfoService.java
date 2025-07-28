@@ -4,7 +4,6 @@ package kopo.shallwithme.service.impl;
 import kopo.shallwithme.dto.MailDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.mapper.IUserInfoMapper;
-import kopo.shallwithme.mapper.UserInfoMapper;
 import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.service.IUserInfoService;
 import kopo.shallwithme.util.CmmUtil;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -100,6 +98,33 @@ public class UserInfoService implements IUserInfoService {
     }
 }
 
+import kopo.shallwithme.mapper.UserInfoMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class UserInfoService {
+
+    private final UserInfoMapper userInfoMapper;
+
+    public void saveUserTags(String userId, Map<String, String> tags) {
+
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
+            String tagType = entry.getKey();     // 예: "ME", "PREF"
+            String tagName = entry.getValue();   // 예: "아침형", "프리랜서/무직" 등
+
+            Integer tagId = userInfoMapper.findTagIdByName(tagName);
+            if (tagId == null) {
+                throw new IllegalArgumentException("해당 태그를 찾을 수 없습니다: " + tagName);
+            }
+
+            userInfoMapper.insertUserTag(userId, tagId, tagType);
+        }
+    }
+}
 

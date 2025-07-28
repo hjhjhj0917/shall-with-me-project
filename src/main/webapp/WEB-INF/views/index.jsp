@@ -24,6 +24,11 @@
 
     <!-- 오른쪽 비스듬한 영역 -->
     <div class="right-panel">
+        <div class="wave-left">
+            <svg viewBox="0 0 800 800" preserveAspectRatio="none">
+                <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#ffffff" />
+            </svg>
+        </div>
         <div class="right-inner">
             <div class="logo">살며시</div>
             <div class="logo-2">Shall With Me</div>
