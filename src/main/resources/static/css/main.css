@@ -1,0 +1,75 @@
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+
+.right-panel {
+    width: 50%;
+    background-color: #f4f9fe;
+    /*transform: skewX(-10deg);*/
+    transition: width 0.5s ease;
+    position: relative;
+    z-index: 1;
+    clip-path: url(#wave-right);
+    cursor: pointer;
+    background-image: url("../images/kpaas-background.png");
+}
+
+.right-panel:hover {
+    width: 60%;
+}
+
+.left-panel {
+    width: 50%;
+    background-color: white;
+    /*transform: skewX(-10deg);*/
+    transition: width 0.5s ease;
+    position: relative;
+    z-index: 1;
+    clip-path: url(#wave-left);
+    cursor: pointer;
+}
+
+.left-panel:hover {
+    width: 60%;
+}
+
+.left {
+    position: relative;
+    width: 50%;
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;  /* 아래 정렬 */
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    background-color: transparent; /* 배경 투명하게 */
+}
+
+.left-image {
+    width: 190%;     /* 비율 유지하며 확대 */
+    height: auto;
+}
+
+.start-button:hover {
+    background-color: #1a73e8;
+}
+
+.city-img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 0;
+}
+
+.main-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+}
+
+

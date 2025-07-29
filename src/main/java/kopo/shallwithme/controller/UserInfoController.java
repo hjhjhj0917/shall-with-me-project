@@ -161,7 +161,13 @@ public class UserInfoController {
         return "user/userTagSelect";
     }
 
-    @GetMapping(value = "main") // /WEB-INF/views/user/main.jsp 로 이동
+    @GetMapping(value = "navBar") // /WEB-INF/views/user/navBar.jsp 로 이동
+    public String navBarPage() {
+
+        return "user/navBar";
+    }
+
+    @GetMapping(value = "main") // /WEB-INF/views/user/navBar.jsp 로 이동
     public String mainPage() {
 
         return "user/main";
