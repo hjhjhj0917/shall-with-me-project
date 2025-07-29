@@ -1,0 +1,378 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    position: relative;
+    align-items: center;
+}
+
+.header-icon-stack {
+    display: flex;
+    align-items: center;
+    position: relative;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    font-size: 40px;
+}
+
+.header-logo {
+    position: absolute;
+    bottom: 25px;
+    left: 140px;
+    transform: translateX(-50%);
+    font-size: 25px;
+    color: #1c407d;
+    font-weight: 400;
+}
+
+.header-logo:hover {
+    cursor: pointer;
+}
+
+.header-user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.header-dropdown {
+    position: relative;
+}
+
+.header-dropdown-toggle {
+    background-color: #E3E3E3;
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.header-dropdown-toggle:hover {
+    background-color: #E5F2FF;
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.header-dropdown-menu li {
+    padding: 15px 20px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 24px;
+}
+
+.header-dropdown-menu li:hover {
+    background-color: #E5F2FF;
+    color: white;
+}
+
+* {
+    box-sizing: border-box;
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+body {
+    background-color: #F5F5F5;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.change-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 30px;
+    color: #1c407d;
+    font-weight: 400;
+}
+
+.change-menu button {
+    width: 120px;
+    height: 70px;
+    cursor: pointer;
+    background-color: #E5F2FF;
+    font-size: 20px;
+    color: #1c407d;
+    border: solid 0;
+}
+
+/* 둥글고 기다란 배경 */
+.slide-bg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-120%);
+    width: 80px;
+    height: 30px;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    z-index: 0;
+    opacity: 0;
+}
+
+/* 이름 박스 기본 스타일 */
+.header-user-name-container {
+    display: flex;
+    align-items: center;
+    height: 47px;
+    width: 47px; /* 원형 */
+    background-color: white;
+    border-radius: 50%;
+    padding-left: 0;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    justify-content: center;
+}
+
+/* hover 시 펼쳐짐 */
+.header-user-name-container:hover:not(.pinned),
+.header-user-name-container.pinned {
+    width: 150px;             /* 펼쳐진 크기 */
+    border-radius: 40px;      /* 타원형 */
+    padding-left: 30px;
+    justify-content: flex-start;
+}
+
+/* 이름 텍스트 */
+.user-name-text {
+    margin-right: 10px;
+    opacity: 0;
+    transform: translateX(20px);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 16px;
+    color: #000;
+    position: relative;
+    z-index: 1;
+}
+
+/* hover 또는 고정일 때 글씨 보임 */
+.header-user-name-container:hover:not(.pinned) .user-name-text,
+.header-user-name-container.pinned .user-name-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 반스도 효과도 같이 슬라이드 */
+.header-user-name-container:hover:not(.pinned) .slide-bg,
+.header-user-name-container.pinned .slide-bg {
+    transform: translateX(0) translateY(-50%);
+    opacity: 1;
+}
+
+/* 아이콘은 항상 가운데 */
+.header-user-name-container .header-dropdown-toggle {
+    z-index: 1;
+    margin-left: auto;
+    margin-right: 10px;
+    background-color: transparent;
+}
+
+#userIconToggle {
+    margin-top: 2px;
+    margin-right: 69px;
+}
+
+#headerDropdownToggle {
+    margin-top: 2px;
+    margin-right: 176px;
+}
+
+#switchToggle {
+    margin-top: 2px;
+    margin-right: 176px;
+}
+
+/* 둥글고 기다란 배경 */
+.slide-bg2 {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-120%);
+    width: 80px;
+    height: 30px;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    z-index: 0;
+    opacity: 0;
+}
+
+/* 이름 박스 기본 스타일 */
+.header-menu-container {
+    display: flex;
+    align-items: center;
+    height: 47px;
+    width: 47px; /* 원형 */
+    background-color: white;
+    border-radius: 50%;
+    padding-left: 0;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    justify-content: center;
+}
+
+/* hover 시 펼쳐짐 */
+.header-menu-container:hover:not(.pinned),
+.header-menu-container.pinned {
+    width: 250px;             /* 펼쳐진 크기 */
+    border-radius: 40px;      /* 타원형 */
+    padding-left: 30px;
+    justify-content: flex-start;
+}
+
+/* 메뉴 리스트 */
+.menu-list {
+    margin-right: 10px;
+    opacity: 0;
+    transform: translateX(20px);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 16px;
+    color: #000;
+    position: relative;
+    z-index: 1;
+}
+
+/* hover 또는 고정일 때 글씨 보임 */
+.header-menu-container:hover:not(.pinned) .menu-list,
+.header-menu-container.pinned .menu-list {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 반스도 효과도 같이 슬라이드 */
+.header-menu-container:hover:not(.pinned) .slide-bg2,
+.header-menu-container.pinned .slide-bg2 {
+    transform: translateX(0) translateY(-50%);
+    opacity: 1;
+}
+
+/* 아이콘은 항상 가운데 */
+.header-menu-container .header-dropdown-toggle {
+    z-index: 1;
+    margin-left: auto;
+    margin-right: 10px;
+    background-color: transparent;
+}
+
+.menu-list {
+    background-color: white;
+    border: 0 ;
+    cursor: pointer;
+}
+
+/* 둥글고 기다란 배경 */
+.slide-bg3 {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-120%);
+    width: 80px;
+    height: 30px;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    z-index: 0;
+    opacity: 0;
+}
+
+/* 이름 박스 기본 스타일 */
+.header-switch-container {
+    display: flex;
+    align-items: center;
+    height: 47px;
+    width: 47px; /* 원형 */
+    background-color: white;
+    border-radius: 50%;
+    padding-left: 0;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    justify-content: center;
+}
+
+/* hover 시 펼쳐짐 */
+.header-switch-container:hover:not(.pinned),
+.header-switch-container.pinned {
+    width: 250px;             /* 펼쳐진 크기 */
+    border-radius: 40px;      /* 타원형 */
+    padding-left: 30px;
+    justify-content: flex-start;
+}
+
+/* 메뉴 리스트 */
+.switch-list {
+    margin-right: 10px;
+    opacity: 0;
+    transform: translateX(20px);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 16px;
+    color: #000;
+    position: relative;
+    z-index: 1;
+}
+
+/* hover 또는 고정일 때 글씨 보임 */
+.header-switch-container:hover:not(.pinned) .switch-list,
+.header-switch-container.pinned .switch-list {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 반스도 효과도 같이 슬라이드 */
+.header-switch-container:hover:not(.pinned) .slide-bg3,
+.header-switch-container.pinned .slide-bg3 {
+    transform: translateX(0) translateY(-50%);
+    opacity: 1;
+}
+
+/* 아이콘은 항상 가운데 */
+.header-switch-container .header-dropdown-toggle {
+    z-index: 1;
+    margin-left: auto;
+    margin-right: 10px;
+    background-color: transparent;
+}
+
+.switch-list {
+    background-color: white;
+    border: 0 ;
+    cursor: pointer;
+}
+
+.home-logo {
+    cursor: pointer;
+}
