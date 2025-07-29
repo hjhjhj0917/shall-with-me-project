@@ -4,6 +4,7 @@ header {
     padding: 15px 30px;
     position: relative;
     align-items: center;
+    background-color: rgba(255, 255, 255, 0); /* 완전 투명 */
 }
 
 .header-icon-stack {
@@ -22,7 +23,7 @@ header {
     left: 140px;
     transform: translateX(-50%);
     font-size: 25px;
-    color: #1c407d;
+    color: #3399ff;
     font-weight: 400;
 }
 
@@ -90,7 +91,7 @@ header {
 }
 
 body {
-    background-color: #F5F5F5;
+    background-color: rgba(255, 255, 255, 0); /* 완전 투명 */
     font-size: 20px;
     margin: 0;
     padding: 0;
