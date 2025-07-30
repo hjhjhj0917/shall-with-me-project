@@ -4,6 +4,7 @@ package kopo.shallwithme.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import kopo.shallwithme.dto.MsgDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.IUserInfoService;
 import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
@@ -14,14 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import java.util.Optional;
-
-import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.Map;
+
 
 
 @Slf4j
@@ -179,22 +176,15 @@ public class UserInfoController {
         return "index";
     }
 
-    @PostMapping("saveTags")
+    // POST /saveUserTags 핸들러 예시 (Spring MVC)
+    @PostMapping("/saveUserTags")
     @ResponseBody
-    public Map<String, Object> saveUserTags(@RequestBody Map<String, String> tags, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // 예제: 세션에서 로그인된 사용자 ID 가져오기 (임시로 test 사용 중)
-            String userId = (String) session.getAttribute("userId");
-            if (userId == null) userId = "test"; // 테스트용
-
-            userInfoService.saveUserTags(userId, tags);
-            response.put("message", "태그가 성공적으로 저장되었습니다.");
-        } catch (Exception e) {
-            response.put("message", "저장 실패: " + e.getMessage());
-        }
-        return response;
-
+    public Map<String, Object> saveUserTags(@RequestBody UserTagDTO dto) throws Exception{
+        log.info("Received saveUserTags request - userId: {}, tagType: {}, tagList: {}",
+                dto.getUserId(), dto.getTagType(), dto.getTagList());
+        boolean success = userInfoService.saveUserTags(dto);
+        return Map.of("success", success);
     }
+
 }
 

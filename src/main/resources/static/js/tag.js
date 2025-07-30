@@ -25,42 +25,37 @@ function selectButton(button) {
     button.classList.add("selected");
 }
 
+
 // 태그 선택
-const selectedTags = {};
 
-function selectButton(button) {
-    const group = button.closest('.button-group');
-    const groupKey = group.getAttribute('data-group');
-
-    // 한 그룹 내에서 중복 선택 방지
-    const buttons = group.querySelectorAll('button');
-    buttons.forEach(btn => btn.classList.remove('selected'));
-
-    button.classList.add('selected');
-    selectedTags[groupKey] = button.innerText;  // 예: lifestyle → '아침형'
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    const saveButton = document.getElementById("saveButton");
-
-    saveButton.addEventListener("click", function () {
-        console.log("선택된 태그:", selectedTags);
-
-        fetch("/user/saveTags", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(selectedTags)
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-            })
-            .catch(error => {
-                console.error("에러 발생:", error);
-                alert("저장 중 오류가 발생했습니다.");
-            });
+document.getElementById('saveButton').addEventListener('click', () => {
+    const selectedTags = [];
+    document.querySelectorAll('.button-group').forEach(group => {
+        const selectedBtn = group.querySelector('button.selected');
+        if (selectedBtn) {
+            selectedTags.push(parseInt(selectedBtn.getAttribute('data-tag'), 10));
+        }
     });
+
+    // user_id와 tag_type은 예시로 하드코딩. 실제로는 서버에서 세션 등으로 받아서 처리
+    const userId = 'test';  // 예: 세션에서 로그인한 user_id
+    const tagType = 'ME';   // 예: 'ME' 혹은 'PREF'
+
+    fetch('/user/saveUserTags', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, tagType, tagList: selectedTags })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) alert('저장 완료!');
+            else alert('저장 실패');
+        })
+        .catch(err => {
+            console.error(err);
+            alert('저장 중 오류 발생');
+        });
 });
 

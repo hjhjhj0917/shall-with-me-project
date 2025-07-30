@@ -40,15 +40,13 @@
                 NOW())
     </insert>
 
-    <!-- tag_name으로 tag_id 조회 -->
-    <select id="findTagIdByName" parameterType="string" resultType="int">
-        SELECT tag_id FROM TAG WHERE tag_name = #{tagName}
-    </select>
-
-    <!-- USER_TAG 테이블에 데이터 삽입 -->
-    <insert id="insertUserTag">
+    <!-- tag 삽입-->
+    <insert id="insertUserTags" parameterType="UserTagDTO" >
         INSERT INTO USER_TAG (user_id, tag_id, tag_type)
-        VALUES (#{userId}, #{tagId}, #{tagType})
-
+        VALUES
+        <foreach collection="tagList" item="tag" separator=",">
+            (#{userId}, #{tag}, #{tagType})
+        </foreach>
+        ON DUPLICATE KEY UPDATE user_id=user_id
     </insert>
 </mapper>

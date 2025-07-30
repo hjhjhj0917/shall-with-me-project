@@ -3,6 +3,7 @@ package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.dto.MailDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.mapper.IUserInfoMapper;
 import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.service.IUserInfoService;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -98,19 +101,11 @@ public class UserInfoService implements IUserInfoService {
         return res;
     }
 
-    public void saveUserTags(String userId, Map<String, String> tags) {
-
-        for (Map.Entry<String, String> entry : tags.entrySet()) {
-            String tagType = entry.getKey();     // 예: "ME", "PREF"
-            String tagName = entry.getValue();   // 예: "아침형", "프리랜서/무직" 등
-
-            Integer tagId = userInfoMapper.findTagIdByName(tagName);
-            if (tagId == null) {
-                throw new IllegalArgumentException("해당 태그를 찾을 수 없습니다: " + tagName);
-            }
-
-            userInfoMapper.insertUserTag(userId, tagId, tagType);
-        }
+    @Override
+    public boolean saveUserTags(UserTagDTO dto) {
+        int insertedCount = userInfoMapper.insertUserTags(dto);
+        return insertedCount == dto.getTagList().size();
     }
+
 }
 

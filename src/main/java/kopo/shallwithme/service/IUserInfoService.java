@@ -2,7 +2,9 @@ package kopo.shallwithme.service;
 
 
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IUserInfoService {
@@ -13,6 +15,6 @@ public interface IUserInfoService {
 
     int insertUserInfo(UserInfoDTO pDTO) throws Exception;
 
-    void saveUserTags(String userId, Map<String, String> tags);
+    boolean saveUserTags(UserTagDTO dto) throws Exception;
 
 }

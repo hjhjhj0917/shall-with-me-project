@@ -56,12 +56,27 @@
 <div class="main-container">
     <!-- 왼쪽 텍스트 -->
     <div class="left-panel" onclick="location.href='/roommate.html'">
+        <div class="left-text">
+            자신과 비슷한 성향의 룸메이트를 찾아보세요
+        </div>
+        <div class="roommate-start">
+            룸메이트 찾기
+        </div>
         <div class="left">
             <img src="/images/roommate.png" class="left-image" alt="왼쪽 이미지" />
         </div>
     </div>
     <!-- 오른쪽 비스듬한 영역 -->
     <div class="right-panel" onclick="location.href='/sharehouse.html'">
+        <div class="right-text">
+            자신의 새로운 보금자리를 찾아보세요
+        </div>
+        <div class="right-start">
+            쉐어하우스 찾기
+        </div>
+        <div class="right">
+            <img src="/images/sharehouse.png" class="right-image" alt="오른쪽 이미지" />
+        </div>
     </div>
 </div>
 
