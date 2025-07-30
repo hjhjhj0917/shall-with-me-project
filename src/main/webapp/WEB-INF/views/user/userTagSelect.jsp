@@ -85,7 +85,7 @@
     </div>
 
     <!-- 슬라이드 2 -->
-    <div class="slide">
+    <div class="slide four-boxes">
 
         <div class="section">
             <fieldset class="box">
@@ -124,7 +124,7 @@
     </div>
 
     <!-- 슬라이드 3-->
-    <div class="slide">
+    <div class="slide four-boxes">
 
         <div class="section">
             <fieldset class="box">
@@ -165,7 +165,7 @@
     </div>
 
     <!-- 슬라이드 4-->
-    <div class="slide">
+    <div class="slide four-boxes">
 
         <div class="section">
             <fieldset class="box">
