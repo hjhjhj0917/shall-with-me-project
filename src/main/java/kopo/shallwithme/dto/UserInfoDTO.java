@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -23,4 +25,5 @@ public class UserInfoDTO {
 
     private int age; // kpaas 추가
     private String gender; // kpaas 추가
+    private Date birthDate;
 }
