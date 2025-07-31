@@ -6,6 +6,8 @@
     <title>회원가입 화면</title>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/regform.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <script type="text/javascript">
 
         // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
@@ -212,120 +214,12 @@
         }
 
     </script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: white;
-            font-family: 'Noto Sans KR', sans-serif;
-            text-align: center;
-            background-repeat: no-repeat;
-            background-position: bottom;
-            background-size: cover;
-            height: 100vh;
-        }
-
-        .logo {
-            font-size: 48px;
-            font-weight: 700;
-            margin-top: 40px;
-            color: black;
-            user-select: none;
-        }
-
-        .logo-2 {
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 20px;
-            user-select: none;
-        }
-
-        /* ✅ 파란색 큰 네모는 크기 그대로 유지 */
-        #f {
-            width: 350px;
-            margin: 0 auto;
-            background-color: #A4CCF4;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-logo {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px auto;
-        }
-
-        /* ✅ 입력칸 간격만 줄임 */
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        select {
-            width: 100%;
-            padding: 6px 8px;     /* 패딩 줄임 */
-            margin: 3px 0;        /* 위아래 간격 줄임 */
-            border: none;
-            border-radius: 5px;
-            font-size: 13.5px;
-        }
-
-        .divTable {
-            display: table;
-            width: 100%;
-        }
-
-        .divTableBody {
-            display: table-row-group;
-        }
-
-        .divTableRow {
-            display: table-row;
-            margin-bottom: 2px; /* 🔽 줄 사이 간격 최소화 */
-        }
-
-        .divTableCell {
-            display: table-cell;
-            padding: 4px 4px;     /* 셀 내부 여백도 최소화 */
-            vertical-align: middle;
-            font-weight: bold;
-            text-align: left;
-        }
-
-        .divTableCell input,
-        .divTableCell select {
-            margin-top: 1px;
-            margin-bottom: 1px;
-        }
-
-        button {
-            padding: 6px 10px;
-            background-color: #316B95;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12.5px;
-            margin-left: 3px;
-        }
-
-        button:hover {
-            background-color: #25587a;
-        }
-
-        #btnSend {
-            width: 100%;
-            margin-top: 12px;
-            padding: 10px;
-            font-size: 15px;
-            font-weight: bold;
-        }
-    </style>
-
-
 </head>
 <body>
-<div class="logo">살며시</div>
-<div class="logo-2">Shall With Me</div>
+<div class="header">
+    <div class="logo">살며시</div>
+    <div class="logo-2">Shall With Me</div>
+</div>
 <form id="f" style="width:250px;">
     <div class="divTable minimalistBlack">
         <div class="divTableBody">
