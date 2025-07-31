@@ -251,6 +251,30 @@
                 return;
             }
 
+            if (f.birthYear.value === "") {
+                alert("생년월일을 선택해주세요");
+                f.birthYear.focus();
+                return;
+            }
+
+            if (f.birthMonth.value === "") {
+                alert("생년월일을 선택해주세요");
+                f.birthMonth.focus();
+                return;
+            }
+
+            if (f.birthDay.value === "") {
+                alert("생년월일을 선택해주세요");
+                f.birthDay.focus();
+                return;
+            }
+
+            if (f.gender.value === "") {
+                alert("성별을 선택해주세요");
+                f.gender.focus();
+                return;
+            }
+
             // Ajax 호출해서 회원가입하기
             $.ajax({
                     url: "/user/insertUserInfo",
