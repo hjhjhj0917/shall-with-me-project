@@ -219,75 +219,94 @@
             background-color: white;
             font-family: 'Noto Sans KR', sans-serif;
             text-align: center;
+            background-image: url('/images/kpaasbackground.png'); /* ✅ static은 생략 */
+            background-repeat: no-repeat;
+            background-position: bottom;
+            background-size: cover;
+            height: 100vh;
         }
 
-        h2 {
-            font-size: 28px;
+        .logo {
+            font-size: 48px;
+            font-weight: 700;
             margin-top: 40px;
+            color: black;
+            user-select: none;
         }
 
-        hr {
-            width: 60%;
-            margin: 10px auto 30px auto;
-            border: 1px solid #ccc;
+        .logo-2 {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+            user-select: none;
         }
 
+        /* ✅ 파란색 큰 네모는 크기 그대로 유지 */
         #f {
-            width: 400px;
+            width: 350px;
             margin: 0 auto;
-            background-color: #b3d4fc;
+            background-color: #A4CCF4;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px auto;
+        }
+
+        /* ✅ 입력칸 간격만 줄임 */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 6px 8px;     /* 패딩 줄임 */
+            margin: 3px 0;        /* 위아래 간격 줄임 */
+            border: none;
+            border-radius: 5px;
+            font-size: 13.5px;
         }
 
         .divTable {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+        }
+
+        .divTableBody {
+            display: table-row-group;
         }
 
         .divTableRow {
             display: table-row;
-            margin-bottom: 10px;
+            margin-bottom: 2px; /* 🔽 줄 사이 간격 최소화 */
         }
 
         .divTableCell {
             display: table-cell;
-            padding: 10px 5px;
+            padding: 4px 4px;     /* 셀 내부 여백도 최소화 */
             vertical-align: middle;
             font-weight: bold;
             text-align: left;
-            width: 35%;
-            align-items: center;          /* 수직 정렬 */
-            gap: 5px;                     /* 버튼과 input 사이 간격 */
         }
 
         .divTableCell input,
         .divTableCell select {
-            padding: 6px;
-            border: none;
-            border-radius: 4px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
-            width: calc(100% - 12px);
-            padding: 8px;
-            margin: 2px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            margin-top: 1px;
+            margin-bottom: 1px;
         }
 
         button {
-            padding: 6px 12px;
+            padding: 6px 10px;
             background-color: #316B95;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            margin-left: 5px;
+            font-size: 12.5px;
+            margin-left: 3px;
         }
 
         button:hover {
@@ -296,90 +315,98 @@
 
         #btnSend {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 12px;
             padding: 10px;
-            font-size: 16px;
-        }
-        .logo {
-            color: black;
-            font-size: 50px;
-            font-weight: 250;
-
-            user-select: none;       /* 텍스트 드래그 금지 */
-            pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
-            -webkit-user-select: none; /* 크로스브라우징 */
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .logo-2 {
-            font-size: 18px;
-            margin-top: 5px;
-            color: #555;
-            margin-bottom: 50px;
-
-            user-select: none;       /* 텍스트 드래그 금지 */
-            pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
-            -webkit-user-select: none; /* 크로스브라우징 */
-            -moz-user-select: none;
-            -ms-user-select: none;
+            font-size: 15px;
+            font-weight: bold;
         }
     </style>
+
+
 </head>
 <body>
 <div class="logo">살며시</div>
 <div class="logo-2">Shall With Me</div>
-<form id="f">
+<form id="f" style="width:250px;">
     <div class="divTable minimalistBlack">
         <div class="divTableBody">
+            <!-- 이름 -->
             <div class="divTableRow">
-                <div class="divTableCell">* 아이디
-                </div>
                 <div class="divTableCell">
-                    <input type="text" name="userId" style="width:80%" placeholder="아이디"/>
-                    <button id="btnUserId" type="button">아이디 중복체크</button>
-                </div>
-            </div>
-            <div class="divTableRow">
-                <div class="divTableCell">* 이름
                 </div>
                 <div class="divTableCell">
                     <input type="text" name="userName" style="width:95%" placeholder="이름"/>
                 </div>
             </div>
+
+            <!-- 아이디 + 중복 확인 버튼 -->
             <div class="divTableRow">
-                <div class="divTableCell">* 비밀번호
+                <div class="divTableCell">
+                </div>
+                <div class="divTableCell" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" name="userId" style="flex: 1;" placeholder="아이디"/>
+                    <button id="btnUserId" type="button" style="flex-shrink: 0;">중복 확인</button>
+                </div>
+            </div>
+
+            <!-- 비밀번호 -->
+            <div class="divTableRow">
+                <div class="divTableCell">
                 </div>
                 <div class="divTableCell">
                     <input type="password" name="password" style="width:95%" placeholder="비밀번호"/>
                 </div>
             </div>
+
+            <!-- 비밀번호 확인 -->
             <div class="divTableRow">
-                <div class="divTableCell">* 비밀번호확인
+                <div class="divTableCell">
                 </div>
                 <div class="divTableCell">
                     <input type="password" name="password2" style="width:95%" placeholder="비밀번호 확인"/>
                 </div>
             </div>
+
+            <!-- 이메일 + 요청 버튼 (아이디 밑에 한 줄로) -->
             <div class="divTableRow">
-                <div class="divTableCell">* 이메일
-                </div>
-                <div class="divTableCell">
-                    <input type="email" name="email" style="width:40%" placeholder="이메일주소"/>
-                    <input type="text" name="authNumber" style="width:30%" placeholder="메일로 발송된 인증번호"/>
-                    <button id="btnEmail" type="button">이메일 중복체크</button>
+                <div class="divTableCell"></div>
+                <div class="divTableCell" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="email" name="email" style="flex: 1;" placeholder="이메일"/>
+                    <button id="btnEmail" type="button" style="flex-shrink: 0;"> 요청 </button>
                 </div>
             </div>
+
+            <!-- 인증번호 + 승인 버튼 -->
             <div class="divTableRow">
-                <div class="divTableCell">* 주소
-                </div>
-                <div class="divTableCell">
-                    <input type="text" name="addr1" style="width:85%" placeholder="주소"/>
-                    <button id="btnAddr" type="button">우편번호</button>
+                <div class="divTableCell"></div>
+                <div class="divTableCell" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" name="authNumber" style="flex: 1;" placeholder="인증번호"/>
                 </div>
             </div>
+
+            <!-- 아이디 + 중복 확인 버튼 -->
             <div class="divTableRow">
-                <div class="divTableCell">* 상세 주소
+                <div class="divTableCell">
+                </div>
+                <div class="divTableCell" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" name="addr1" style="flex: 1;" placeholder="주소"/>
+                    <button id="btnAddr" type="button" style="flex-shrink: 0;">우편번호</button>
+                </div>
+            </div>
+
+<%--            <!-- 주소 -->--%>
+<%--            <div class="divTableRow">--%>
+<%--                <div class="divTableCell">--%>
+<%--                </div>--%>
+<%--                <div class="divTableCell">--%>
+<%--                    <input type="text" name="addr1" style="width:85%" placeholder="주소"/>--%>
+<%--                    <button id="btnAddr" type="button">우편번호</button>--%>
+<%--                </div>--%>
+<%--            </div>--%>
+
+            <!-- 상세주소 -->
+            <div class="divTableRow">
+                <div class="divTableCell">
                 </div>
                 <div class="divTableCell">
                     <input type="text" name="addr2" style="width:95%" placeholder="상세주소"/>
@@ -387,6 +414,8 @@
             </div>
         </div>
     </div>
+
+    <!-- 회원가입 버튼 -->
     <div>
         <button id="btnSend" type="button">회원가입</button>
     </div>
