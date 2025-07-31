@@ -219,7 +219,6 @@
             background-color: white;
             font-family: 'Noto Sans KR', sans-serif;
             text-align: center;
-            background-image: url('/images/kpaasbackground.png'); /* ✅ static은 생략 */
             background-repeat: no-repeat;
             background-position: bottom;
             background-size: cover;
