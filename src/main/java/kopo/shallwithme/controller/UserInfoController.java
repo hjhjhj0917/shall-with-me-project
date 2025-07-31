@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Date;
 import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
@@ -27,6 +32,22 @@ import java.util.Map;
 @Controller
 public class UserInfoController {
 
+    private int calculateAge(String birthYear, String birthMonth, String birthDay) {
+        int year = Integer.parseInt(birthYear);
+        int month = Integer.parseInt(birthMonth);
+        int day = Integer.parseInt(birthDay);
+
+        LocalDate birth = LocalDate.of(year, month, day);
+        LocalDate today = LocalDate.now();
+
+        int age = Period.between(birth, today).getYears();
+
+        LocalDate birthdayThisYear = birth.withYear(today.getYear());
+        if (today.isBefore(birthdayThisYear)) {
+            age--;
+        }
+        return age;
+    }
 
     private final IUserInfoService userInfoService;
 
@@ -98,6 +119,10 @@ public class UserInfoController {
             String email = CmmUtil.nvl(request.getParameter("email"));
             String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
             String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
+            String birthYear = CmmUtil.nvl(request.getParameter("birthYear"));
+            String birthMonth = CmmUtil.nvl(request.getParameter("birthMonth"));
+            String birthDay = CmmUtil.nvl(request.getParameter("birthDay"));
+            String gender = CmmUtil.nvl(request.getParameter("gender"));
 
             log.info("userId : " + userId);
             log.info("userName : " + userName);
@@ -105,6 +130,14 @@ public class UserInfoController {
             log.info("email : " + email);
             log.info("addr1 : " + addr1);
             log.info("addr2 : " + addr2);
+            log.info("birth : " + birthYear, birthMonth, birthDay);
+            log.info("gender : " + gender);
+
+            String birthDateStr = birthYear + "-" + birthMonth + "-" + birthDay;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date birthDate = sdf.parse(birthDateStr);
+
+            int age = calculateAge(birthYear, birthMonth, birthDay);
 
             pDTO = new UserInfoDTO();
 
@@ -119,6 +152,9 @@ public class UserInfoController {
             pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
             pDTO.setAddr1(addr1);
             pDTO.setAddr2(addr2);
+            pDTO.setAge(age);
+            pDTO.setBirthDate(birthDate);
+            pDTO.setGender(gender);
 
             res = userInfoService.insertUserInfo(pDTO);
 
