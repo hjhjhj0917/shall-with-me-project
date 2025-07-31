@@ -60,7 +60,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ userId, tagType, tags: selectedTags })
+        body: JSON.stringify({ userId, tagType, tagList: selectedTags })
     })
         .then(res => res.json())
         .then(data => {
