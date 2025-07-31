@@ -20,7 +20,7 @@
 <body>
 
 <header>
-    <div class="home-logo" onclick="location.href='/home.html'">
+    <div class="home-logo" onclick="location.href='/user/'">
         <div class="header-icon-stack">
             <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
         </div>
@@ -245,6 +245,16 @@
 <div class="restore">
     <button id="saveButton">저장</button>
 </div>
+
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
 
 <script src="${pageContext.request.contextPath}/js/tag.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
