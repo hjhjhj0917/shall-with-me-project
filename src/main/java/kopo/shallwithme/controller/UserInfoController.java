@@ -22,8 +22,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.Map;
 
 
@@ -412,5 +415,27 @@ public class UserInfoController {
         return Map.of("success", success);
     }
 
+    // 로그아웃
+    @GetMapping("/logout")
+    @ResponseBody
+    public MsgDTO logout(HttpSession session) {
+        int res = 1; // 기본 성공
+        String msg = "";
+
+        MsgDTO dto = new MsgDTO();
+
+        try {
+            session.invalidate();
+            msg = "성공적으로 로그아웃되었습니다.";
+        } catch (Exception e) {
+            res = 0;
+            msg = "로그아웃 중 오류가 발생했습니다.";
+        }
+
+        dto.setResult(res);
+        dto.setMsg(msg);
+
+        return dto;
+    }
 }
 
