@@ -53,7 +53,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
 
     // user_id와 tag_type은 예시로 하드코딩. 실제로는 서버에서 세션 등으로 받아서 처리
     const userId = 'test';  // 예: 세션에서 로그인한 user_id
-    const tagType = 'ME';   // 예: 'ME' 혹은 'PREF'
+    const tagType = 'PREF';   // 예: 'ME' 혹은 'PREF'
 
     fetch('/user/saveUserTags', {
         method: 'POST',
@@ -66,7 +66,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
         .then(data => {
             if (data.success) {
                 alert('저장 완료!');
-                window.location.href = '/user/preTagSelect';  // 저장 후 이동할 페이지 경로
+                window.location.href = '/user/main';  // 저장 후 이동할 페이지 경로
             } else {
                 alert('저장 실패');
             }
