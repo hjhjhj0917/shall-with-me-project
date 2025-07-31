@@ -32,7 +32,7 @@
         <div class="right-inner">
             <div class="logo">살며시</div>
             <div class="logo-2">Shall With Me</div>
-            <form action="${pageContext.request.contextPath}/start" method="get">
+            <form action="/user/login" method="get">
                 <button type="submit" class="start-button">시작하기</button>
             </form>
         </div>

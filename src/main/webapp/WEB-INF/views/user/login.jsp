@@ -52,7 +52,7 @@
 
                             if (json.result === 1) { // 로그인 성공
                                 alert(json.msg); // 메시지 띄우기
-                                location.href = "/user/loginResult"; // 로그인 성공 페이지 이동
+                                location.href = "/user/main"; // 로그인 성공 페이지 이동
 
                             } else { // 로그인 실패
                                 alert(json.msg); // 메시지 띄우기
