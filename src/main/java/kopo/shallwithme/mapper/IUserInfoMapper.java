@@ -2,8 +2,11 @@ package kopo.shallwithme.mapper;
 
 
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
 
 @Mapper
 public interface IUserInfoMapper {
@@ -14,11 +17,7 @@ public interface IUserInfoMapper {
 
     UserInfoDTO getEmailExists(UserInfoDTO pDTO) throws Exception;
 
-    Integer findTagIdByName(@Param("tagName") String tagName);
-
-    void insertUserTag(@Param("userId") String userId,
-                       @Param("tagId") int tagId,
-                       @Param("tagType") String tagType);
+    int insertUserTags(UserTagDTO dto);
 }
 
 
