@@ -36,8 +36,9 @@
         </div>
         <div class="header-user-name-container pinned" id="userNameBox">
             <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-            <span class="user-name-text" id="userNameText">홍길동님</span>
-            <!-- <span class="user-name-text"><%= session.getAttribute("userName") %>님</span> -->
+            <span class="user-name-text" id="userNameText">
+                <%= session.getAttribute("SS_USER_NAME") %>님
+            </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
                 <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
             </button>
