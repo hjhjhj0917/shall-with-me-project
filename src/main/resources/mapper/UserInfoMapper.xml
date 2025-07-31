@@ -17,7 +17,7 @@
         WHERE EMAIL = #{email}
     </select>
     <insert id="insertUserInfo" parameterType="UserInfoDTO">
-        INSERT INTO USER_INFO
+        INSERT INTO USER_INFO2
         (USER_ID,
          USER_NAME,
          PASSWORD,
@@ -27,7 +27,11 @@
          REG_ID,
          REG_DT,
          CHG_ID,
-         CHG_DT)
+         CHG_DT,
+         AGE,
+         GENDER,
+         BIRTH_DATE)
+
         VALUES (#{userId},
                 #{userName},
                 #{password},
@@ -37,7 +41,10 @@
                 #{userId},
                 NOW(),
                 #{userId},
-                NOW())
+                NOW(),
+                #{age},
+                #{gender},
+                #{birthDate})
     </insert>
 
     <!-- tag 삽입-->
