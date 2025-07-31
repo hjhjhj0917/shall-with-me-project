@@ -308,6 +308,30 @@
         </div>
     </div>
 
+    <!-- 나이(생년월일) 입력: 연/월/일 3개 입력 -->
+    <div class="divTableRow">
+        <div class="divTableCell"></div>
+        <div class="divTableCell" style="display:flex; gap:10px;">
+            <input type="text" name="birthYear" maxlength="4" style="width:33%;" placeholder="2025"/>
+            <input type="text" name="birthMonth" maxlength="2" style="width:30%;" placeholder="01"/>
+            <input type="text" name="birthDay" maxlength="2" style="width:30%;" placeholder="01"/>
+        </div>
+    </div>
+
+    <!-- 성별 라디오 버튼 -->
+    <div class="divTableRow">
+        <div class="divTableCell"></div>
+        <div class="divTableCell gender-select" style="display:flex; align-items:center; gap:20px;">
+            <span>성별</span>
+            <label for="genderMale" style="display:flex; align-items:center; gap:3px;">
+                <input type="radio" id="genderMale" name="gender" value="M"/> 남성
+            </label>
+            <label for="genderFemale" style="display:flex; align-items:center; gap:3px;">
+                <input type="radio" id="genderFemale" name="gender" value="F"/> 여성
+            </label>
+        </div>
+    </div>
+
     <!-- 회원가입 버튼 -->
     <div>
         <button id="btnSend" type="button">회원가입</button>
