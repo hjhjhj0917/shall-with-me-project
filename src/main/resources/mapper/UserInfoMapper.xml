@@ -7,13 +7,13 @@
     <select id="getUserIdExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
-        FROM USER_INFO
+        FROM USER_INFO2
         WHERE USER_ID = #{userId}
     </select>
     <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserinfoDTO">
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
-        FROM USER_INFO
+        FROM USER_INFO2
         WHERE EMAIL = #{email}
     </select>
     <insert id="insertUserInfo" parameterType="UserInfoDTO">
@@ -60,7 +60,7 @@
 <!-- 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 -->
     <select id="getLogin" parameterType="UserInfoDTO" resultType="UserInfoDTO">
             SELECT USER_ID, USER_NAME, EMAIL
-            FROM USER_INFO
+            FROM USER_INFO2
             WHERE USER_ID = #{userId}
               AND PASSWORD = #{password}
     </select>
@@ -74,7 +74,7 @@
         USER_ID,
         USER_NAME,
         EMAIL
-        FROM USER_INFO
+        FROM USER_INFO2
         WHERE 1=1
         <if test="userId neq null and userId neq '' "> <!-- 비밀번호 찾기라면, user_id 조회 추가 -->
             AND USER_ID = #{userId}
@@ -85,7 +85,7 @@
 
     <!-- 비밀번호 재설설 -->
     <update id="updatePassword" parameterType="UserInfoDTO">
-        UPDATE USER_INFO
+        UPDATE USER_INFO2
         SET PASSWORD = #{password}
         WHERE USER_ID  = #{userId}
     </update>

@@ -184,16 +184,16 @@ public class UserInfoController {
         try {
 
             String userId = CmmUtil.nvl(request.getParameter("userId"));
-            String passeord = CmmUtil.nvl(request.getParameter("passeord"));
+            String password = CmmUtil.nvl(request.getParameter("password"));
 
-            log.info("userId : {} / password : {}", userId, passeord);
+            log.info("userId : {} / password : {}", userId, password);
 
             pDTO = new UserInfoDTO();
 
             pDTO.setUserId(userId);
 
             //비밀번호는 절대!!!!!!!!!!!로 복호화되지 않도록 해시 알고리즘으로 암호화함!!!!!!!
-            pDTO.setPassword(EncryptUtil.encHashSHA256(passeord));
+            pDTO.setPassword(EncryptUtil.encHashSHA256(password));
 
             //로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 위한 userIngoService 호출하기
             UserInfoDTO rDTO = userInfoService.getLogin(pDTO);
