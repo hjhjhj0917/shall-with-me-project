@@ -5,6 +5,12 @@ body {
     overflow-x: hidden;
     background-color: #f8faff;
     background-image: url("../images/kpaas-background.png");
+
+    user-select: none;       /* 텍스트 드래그 금지 */
+    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
+    -webkit-user-select: none; /* 크로스브라우징 */
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .logo {
@@ -101,3 +107,10 @@ button:hover {
     font-size: 15px;
     font-weight: bold;
 }
+
+.gender-select label,span {
+    color: #316B95;   /* 파란색(원하는 색으로 바꿀 수 있음) */
+    font-weight: bold;
+}
+
+
