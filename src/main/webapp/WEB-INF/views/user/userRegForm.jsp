@@ -6,6 +6,30 @@
     <title>회원가입 화면</title>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        $.datepicker.regional['ko'] = {
+            closeText: '닫기',
+            prevText: '이전달',
+            nextText: '다음달',
+            currentText: '오늘',
+            monthNames: ['1월','2월','3월','4월','5월','6월',
+                '7월','8월','9월','10월','11월','12월'],
+            monthNamesShort: ['1월','2월','3월','4월','5월','6월',
+                '7월','8월','9월','10월','11월','12월'],
+            dayNames: ['일','월','화','수','목','금','토'],
+            dayNamesShort: ['일','월','화','수','목','금','토'],
+            dayNamesMin: ['일','월','화','수','목','금','토'],
+            weekHeader: 'Wk',
+            dateFormat: 'yy-mm-dd',
+            firstDay: 0,
+            isRTL: false,
+            showMonthAfterYear: true,
+            yearSuffix: '년'
+        };
+        $.datepicker.setDefaults($.datepicker.regional['ko']);
+    </script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/regform.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <script type="text/javascript">
@@ -18,6 +42,8 @@
 
         // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
+
+            $.datepicker.setDefaults($.datepicker.regional['ko']); // 이 줄을 꼭 추가
 
             let f = document.getElementById("f"); // form 태그
 
@@ -43,7 +69,40 @@
                 doSubmit(f);
             })
 
-        })
+            // 생년월일 3칸 중 아무거나 클릭하면 달력 팝업
+            $('.birth-input').on('click', function(){
+                $('#birth-datepicker').datepicker('show');
+            });
+
+            // jQuery UI datepicker 초기화
+            $("#birth-datepicker").datepicker({
+                changeYear: true,
+                changeMonth: true,
+                yearRange: "1900:2025",
+                dateFormat: "yy-mm-dd",
+                onSelect: function(dateText) {
+                    let parts = dateText.split('-');
+                    $('input[name="birthYear"]').val(parts[0]);
+                    $('input[name="birthMonth"]').val(parts[1]);
+                    $('input[name="birthDay"]').val(parts[2]);
+                },
+
+                beforeShow: function(input, inst) {
+                    // 1. 생년월일 input을 감싸는 div의 위치를 구함
+                    var $row = $('#birth-row');
+                    var offset = $row.offset();
+                    // 2. 달력 popup을 해당 div 아래에 맞춰 위치 지정
+                    setTimeout(function() {
+                        $(inst.dpDiv).css({
+                            top: offset.top + $row.outerHeight(), // row의 아래에 딱 붙여줌
+                            left: offset.left -25,
+                            position: 'absolute',
+                            zIndex: 9999
+                        });
+                    }, 0);
+                }
+            });
+        });
 
         // 회원아이디 중복 체크
         function userIdExists(f) {
@@ -287,16 +346,6 @@
                 </div>
             </div>
 
-<%--            <!-- 주소 -->--%>
-<%--            <div class="divTableRow">--%>
-<%--                <div class="divTableCell">--%>
-<%--                </div>--%>
-<%--                <div class="divTableCell">--%>
-<%--                    <input type="text" name="addr1" style="width:85%" placeholder="주소"/>--%>
-<%--                    <button id="btnAddr" type="button">우편번호</button>--%>
-<%--                </div>--%>
-<%--            </div>--%>
-
             <!-- 상세주소 -->
             <div class="divTableRow">
                 <div class="divTableCell">
@@ -311,10 +360,10 @@
     <!-- 나이(생년월일) 입력: 연/월/일 3개 입력 -->
     <div class="divTableRow">
         <div class="divTableCell"></div>
-        <div class="divTableCell" style="display:flex; gap:10px;">
-            <input type="text" name="birthYear" maxlength="4" style="width:33%;" placeholder="2025"/>
-            <input type="text" name="birthMonth" maxlength="2" style="width:30%;" placeholder="01"/>
-            <input type="text" name="birthDay" maxlength="2" style="width:30%;" placeholder="01"/>
+        <div class="divTableCell" id="birth-row" style="display:flex; gap:10px;">
+            <input type="text" name="birthYear" maxlength="4" style="width:33%;" placeholder="2025" class="birth-input" readonly/>
+            <input type="text" name="birthMonth" maxlength="2" style="width:30%;" placeholder="01" class="birth-input" readonly/>
+            <input type="text" name="birthDay" maxlength="2" style="width:30%;" placeholder="01" class="birth-input" readonly/>
         </div>
     </div>
 
@@ -337,5 +386,7 @@
         <button id="btnSend" type="button">회원가입</button>
     </div>
 </form>
+<input type="text" id="birth-datepicker" style="position:absolute; left:-9999px; top:-9999px;">
+
 </body>
 </html>
