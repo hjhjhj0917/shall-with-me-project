@@ -54,7 +54,12 @@
                                 alert(json.msg); // 메시지 띄우기
                                 location.href = "/user/main"; // 로그인 성공 페이지 이동
 
-                            } else { // 로그인 실패
+                            } else if (json.result === 3) {
+                                alert(json.msg); // 메시지 띄우기
+                                alert("회원님의 성향태그를 선택하여주세요");
+                                location.href = "/user/userTagSelect"; // 로그인 성공 페이지 이동
+                            }
+                            else { // 로그인 실패
                                 alert(json.msg); // 메시지 띄우기
                                 $("#userId").focus(); // 아이디 입력 항목에 마우스 커서 이동
                             }

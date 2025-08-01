@@ -43,7 +43,7 @@
 </head>
 <body>
 <header>
-    <div class="home-logo" onclick="location.href='/user/'">
+    <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
             <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
         </div>
