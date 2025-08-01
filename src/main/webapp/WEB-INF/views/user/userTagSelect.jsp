@@ -20,7 +20,7 @@
 <body>
 
 <header>
-    <div class="home-logo" onclick="location.href='/user/'">
+    <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
             <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
         </div>
@@ -37,8 +37,9 @@
         </div>
         <div class="header-user-name-container pinned" id="userNameBox">
             <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-            <span class="user-name-text" id="userNameText">홍길동님</span>
-            <!-- <span class="user-name-text"><%= session.getAttribute("userName") %>님</span> -->
+            <span class="user-name-text" id="userNameText">
+                <%= session.getAttribute("SS_USER_NAME") %>님
+            </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
                 <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
             </button>
@@ -61,7 +62,9 @@
 <div class="header">
     <div class="logo">살며시</div>
     <div class="logo-2">Shall With Me</div>
-    <div class="subtitle">홍길동님의 라이프 스타일을 한가지 씩 선택하여 주세요</div>
+    <div class="subtitle">
+        <%= session.getAttribute("SS_USER_NAME") %>님의 라이프 스타일을 한가지 씩 선택하여 주세요
+    </div>
 </div>
 
 <div class="slider-container" id="slider">
@@ -254,6 +257,15 @@
 %>
 <script>
     const userName = "<%= ssUserName %>";
+</script>
+<%
+    String ssUserId = (String) session.getAttribute("SS_USER_ID");
+    if (ssUserId == null) {
+        ssUserId = "";
+    }
+%>
+<script>
+    const userId = "<%= ssUserId %>";
 </script>
 
 <script src="${pageContext.request.contextPath}/js/tag.js"></script>

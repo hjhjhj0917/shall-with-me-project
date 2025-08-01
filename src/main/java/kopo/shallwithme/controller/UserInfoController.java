@@ -203,11 +203,27 @@ public class UserInfoController {
 
             if (!CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {// 로그인 성공
 
-                res = 1;
+                UserTagDTO tagDTO = new UserTagDTO();
+                tagDTO.setUserId(userId);
+
                 msg = "로그인을 성공했습니다.";
 
                 session.setAttribute("SS_USER_ID", userId);
-                session.setAttribute("SS_USER_NAME", CmmUtil.nvl(rDTO.getUserName()));
+
+                if (CmmUtil.nvl(rDTO.getUserName()).length() == 2) {
+                    session.setAttribute("SS_USER_NAME", "ㅤ" + CmmUtil.nvl(rDTO.getUserName()));
+                } else {
+                    session.setAttribute("SS_USER_NAME", CmmUtil.nvl(rDTO.getUserName()));
+                }
+                int existingCount = userInfoService.countUserTags(tagDTO);
+                log.info("User tag count: {}", existingCount);
+
+                if (existingCount < 36) {
+                    res = 3;
+                } else {
+                    res = 1;
+                }
+
             } else {
                 msg = "아이디와 비밀번호가 올바르지 않습니다.";
             }
@@ -263,7 +279,7 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".getUserIdExists End!");
 
-        return pDTO;
+        return rDTO;
     }
 
     @ResponseBody
@@ -408,11 +424,28 @@ public class UserInfoController {
     // POST /saveUserTags 핸들러 예시 (Spring MVC)
     @PostMapping("/saveUserTags")
     @ResponseBody
-    public Map<String, Object> saveUserTags(@RequestBody UserTagDTO dto) throws Exception{
-        log.info("Received saveUserTags request - userId: {}, tagType: {}, tagList: {}",
-                dto.getUserId(), dto.getTagType(), dto.getTagList());
-        boolean success = userInfoService.saveUserTags(dto);
-        return Map.of("success", success);
+    public Map<String, Object> saveUserTags(@RequestBody UserTagDTO dto, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            int existingCount = userInfoService.countUserTags(dto);
+
+            if (existingCount + dto.getTagList().size() > 36) {
+                response.put("success", false);
+                response.put("message", "이미 태그 선택이 완료된 상태입니다.");
+                return response;
+            }
+
+            userInfoService.saveUserTags(dto);
+            response.put("success", true);
+
+        } catch (Exception e) {
+            log.error("태그 저장 실패", e);
+            response.put("success", false);
+            response.put("message", "서버 오류 발생");
+        }
+
+        return response;
     }
 
     // 로그아웃

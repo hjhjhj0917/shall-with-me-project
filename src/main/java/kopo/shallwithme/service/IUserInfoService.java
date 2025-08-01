@@ -26,4 +26,6 @@ public interface IUserInfoService {
 
     boolean saveUserTags(UserTagDTO dto) throws Exception;
 
+    int countUserTags(UserTagDTO dto) throws Exception;
+
 }
