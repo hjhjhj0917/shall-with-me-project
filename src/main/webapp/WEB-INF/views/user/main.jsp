@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script>
@@ -68,53 +69,6 @@
                 });
         });
     </script>
-<%-- 모달창 css --%>
-    <style>
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            background: #fff;
-            border-radius: 8px;
-            max-width: 400px;
-            padding: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: left;
-        }
-
-        .modal h2 {
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
-        .modal p {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        .modal-buttons button {
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .deactivate-btn {
-            background: #3399ff;
-            color: white;
-        }
-
-    </style>
 
 </head>
 <body>
@@ -183,7 +137,10 @@
 
 <div id="customAlertOverlay" class="modal-overlay" style="display: none;">
     <div class="modal">
-        <h2>알림</h2>
+        <div class="modal-title">
+            <i class="fa-solid fa-circle-exclamation fa-bounce fa-lg" style="color: #3399ff;"></i>
+            <h2>살며시</h2>
+        </div>
         <p id="customAlertMessage">메시지 내용</p>
         <div class="modal-buttons" style="text-align: right;">
             <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
@@ -202,25 +159,8 @@
 </script>
 
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
-
 <%-- 모달창 js --%>
-<script>
-    let customAlertCallback = null;
-
-    function showCustomAlert(message, callback) {
-        document.getElementById("customAlertMessage").innerText = message;
-        document.getElementById("customAlertOverlay").style.display = "flex";
-        customAlertCallback = callback || null;
-    }
-
-    function closeCustomAlert() {
-        document.getElementById("customAlertOverlay").style.display = "none";
-        if (customAlertCallback) {
-            customAlertCallback(); // 확인 후 실행
-            customAlertCallback = null; // 재사용 방지
-        }
-    }
-</script>
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
 
 
 </body>
