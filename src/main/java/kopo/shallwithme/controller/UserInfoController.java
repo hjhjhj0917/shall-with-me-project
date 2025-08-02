@@ -245,6 +245,29 @@ public class UserInfoController {
 
     }
 
+    @GetMapping(value = "loginCheck")
+    @ResponseBody
+    public int loginCheck(HttpSession session) {
+        log.info("{}.loginCheck Start!", this.getClass().getName());
+
+        int res = 0;
+        if (!CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")).isEmpty()) {
+            res = 1;
+        }
+
+        return res;
+    }
+
+    @GetMapping("/roommateMain")
+    public String roommateMain() {
+        return "user/roommateMain"; // 세션 체크는 인터셉터에서 이미 처리
+    }
+
+    @GetMapping("/sharehouseMain")
+    public String sharehouseMain() {
+        return "user/sharehouseMain";
+    }
+
     @GetMapping(value ="loginResult")
     public String loginSuccess() {
         log.info("{}.user/loginResult Start!", this.getClass().getName());
