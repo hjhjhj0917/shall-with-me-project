@@ -19,6 +19,25 @@
     <script>
             $(document).ready(function () {
 
+                function checkLoginAndRedirect(url) {
+                    $.ajax({
+                        url: "/user/loginCheck",
+                        type: "GET",
+                        dataType: "json",
+                        success: function (res) {
+                            if (res === 1) {
+                                location.href = url;
+                            } else {
+                                alert("로그인이 필요한 서비스입니다.");
+                                location.href = "/user/login";
+                            }
+                        },
+                        error: function () {
+                            alert("서버 통신 오류가 발생했습니다.");
+                        }
+                    });
+                }
+
             $("#logout").on("click", function () {
                 $.ajax({
                     url: "/user/logout",
@@ -37,6 +56,14 @@
                     }
                 });
             });
+
+                $("#roommateBtn").on("click", function () {
+                    checkLoginAndRedirect("/user/roommateMain");
+                });
+
+                $("#sharehouseBtn").on("click", function () {
+                    checkLoginAndRedirect("/user/sharehouseMain");
+                });
         });
     </script>
 
@@ -79,8 +106,8 @@
 </header>
 
 <div class="main-container">
-    <!-- 왼쪽 텍스트 -->
-    <div class="left-panel" onclick="location.href='/roommate.html'">
+
+    <div class="left-panel" id="roommateBtn">
         <div class="left-text">
             자신과 비슷한 성향의 룸메이트를 찾아보세요
         </div>
@@ -91,8 +118,8 @@
             <img src="/images/roommate.png" class="left-image" alt="왼쪽 이미지" />
         </div>
     </div>
-    <!-- 오른쪽 비스듬한 영역 -->
-    <div class="right-panel" onclick="location.href='/sharehouse.html'">
+
+    <div class="right-panel" id="sharehouseBtn">
         <div class="right-text">
             자신의 새로운 보금자리를 찾아보세요
         </div>
