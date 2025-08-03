@@ -287,7 +287,7 @@
 
                         if (json.result === 1) { // 회원가입 성공
                             alert(json.msg); // 메시지 띄우기
-                            location.href = "/user/login"; // 로그인 페이지 이동
+                            location.href = "/user/userTagSelect"; // 로그인 페이지 이동
 
                         } else { // 회원가입 실패
                             alert(json.msg); // 메시지 띄우기

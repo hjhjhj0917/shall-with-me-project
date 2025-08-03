@@ -218,7 +218,7 @@ public class UserInfoController {
                 int existingCount = userInfoService.countUserTags(tagDTO);
                 log.info("User tag count: {}", existingCount);
 
-                if (existingCount < 36) {
+                if (existingCount < 18) {
                     res = 3;
                 } else {
                     res = 1;
@@ -327,7 +327,7 @@ public class UserInfoController {
 
     @ResponseBody
     @PostMapping(value = "insertUserInfo")
-    public MsgDTO insertUserInfo(HttpServletRequest request) throws Exception {
+    public MsgDTO insertUserInfo(HttpServletRequest request, HttpSession session) throws Exception {
 
         log.info(this.getClass().getName() + ".insertUserInfo Start!");
 
@@ -387,6 +387,13 @@ public class UserInfoController {
             log.info("회원가입 결과(res) : " + res);
 
             if (res == 1) {
+                if (pDTO.getUserName().length() == 2) {
+                    session.setAttribute("SS_USER_NAME", "ㅤ" + userName);
+                } else {
+                    session.setAttribute("SS_USER_NAME", userName);
+                }
+                session.setAttribute("SS_USER_NAME", userName);
+                session.setAttribute("SS_USER_ID", userId);
                 msg = "회원가입되었습니다.";
 
             } else if (res == 2) {
@@ -451,9 +458,20 @@ public class UserInfoController {
         Map<String, Object> response = new HashMap<>();
 
         try {
+            // 여기 추가! 세션에서 userId 꺼내서 dto에 넣기
+            String userId = (String) session.getAttribute("SS_USER_ID");
+
+            if (userId == null || userId.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "로그인 정보가 없습니다.");
+                return response;
+            }
+
+            dto.setUserId(userId);
+
             int existingCount = userInfoService.countUserTags(dto);
 
-            if (existingCount + dto.getTagList().size() > 36) {
+            if (existingCount == 18) {
                 response.put("success", false);
                 response.put("message", "이미 태그 선택이 완료된 상태입니다.");
                 return response;
