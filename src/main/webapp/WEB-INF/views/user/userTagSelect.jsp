@@ -17,6 +17,58 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <style>
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            gap: 10px;
+        }
+
+        .step-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .step {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background-color: #f1f1f1;
+            color: #999;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .step.active {
+            background-color: #3399ff;
+            color: white;
+            border-color: #3399ff;
+        }
+
+        .step.completed {
+            background-color: #3399ff;
+            color: white;
+            border-color: #3399ff;
+        }
+
+        .line {
+            flex: none;
+            width: 100px;
+            height: 2px;
+            background-color: #ccc;
+            margin: 0 5px;
+        }
+
+    </style>
 </head>
 <body>
 
@@ -57,14 +109,32 @@
 </header>
 
 <!-- 슬라이드 화살표 -->
-<div class="arrow left" onclick="moveSlide(-1)">&#10092;</div>
-<div class="arrow right" onclick="moveSlide(1)">&#10093;</div>
+<%--<div class="arrow left" onclick="moveSlide(-1)">&#10092;</div>--%>
+<%--<div class="arrow right" onclick="moveSlide(1)">&#10093;</div>--%>
 
 <div class="header">
     <div class="logo">살며시</div>
     <div class="logo-2">Shall With Me</div>
     <div class="subtitle">
         <%= session.getAttribute("SS_USER_NAME") %>님의 라이프 스타일을 한가지 씩 선택하여 주세요
+    </div>
+</div>
+
+<div class="progress-indicator">
+    <div class="step-wrapper" onclick="goToSlide(0)">
+        <div class="step" data-index="0">1</div>
+    </div>
+    <div class="line"></div>
+    <div class="step-wrapper" onclick="goToSlide(1)">
+        <div class="step" data-index="1">2</div>
+    </div>
+    <div class="line"></div>
+    <div class="step-wrapper" onclick="goToSlide(2)">
+        <div class="step" data-index="2">3</div>
+    </div>
+    <div class="line"></div>
+    <div class="step-wrapper" onclick="goToSlide(3)">
+        <div class="step" data-index="3">4</div>
     </div>
 </div>
 
