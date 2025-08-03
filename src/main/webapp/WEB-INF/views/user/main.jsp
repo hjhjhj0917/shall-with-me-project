@@ -40,25 +40,26 @@
                     });
                 }
 
-            $("#logout").on("click", function () {
-                $.ajax({
-                    url: "/user/logout",
-                    type: "GET",
-                    dataType: "json",
-                    success: function (res) {
-                        if (res.result === 1) {
-                            showCustomAlert(res.msg, function() {
-                                location.href = "/user/main";
-                            });
-                        } else {
-                            showCustomAlert("실패: " + res.msg);
-                        }
-                    },
-                    error: function () {
-                        showCustomAlert("서버 통신 중 오류가 발생했습니다.");
-                    }
+                $("#logout").on("click", function () {
+                    showCustomAlert("로그아웃 하시겠습니까?", function () {
+                        $.ajax({
+                            url: "/user/logout",
+                            type: "GET",
+                            dataType: "json",
+                            success: function (res) {
+                                if (res.result === 1) {
+                                    location.href = "/user/main";
+
+                                } else {
+                                    showCustomAlert("실패: " + res.msg);
+                                }
+                            },
+                            error: function () {
+                                showCustomAlert("서버 통신 중 오류가 발생했습니다.");
+                            }
+                        });
+                    });
                 });
-            });
 
                 $("#roommateBtn").on("click", function () {
                     checkLoginAndRedirect("/user/roommateMain");

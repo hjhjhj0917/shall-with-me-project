@@ -47,12 +47,13 @@ document.getElementById('saveButton').addEventListener('click', () => {
         // 을/를 조사 자동 처리
         const lastChar = firstMissingLegend.charAt(firstMissingLegend.length - 1);
         const isBatchim = (lastChar.charCodeAt(0) - 44032) % 28 !== 0;
-        alert(`${firstMissingLegend} 항목을 선택하세요`);
+        showCustomAlert(`${firstMissingLegend} 항목을 선택하세요`);
         return;
     }
 
     // user_id와 tag_type은 예시로 하드코딩. 실제로는 서버에서 세션 등으로 받아서 처리
     const tagType = 'ME';   // 예: 'ME' 혹은 'PREF'
+    console.log(userId)
 
     fetch('/user/saveUserTags', {
         method: 'POST',
@@ -64,15 +65,18 @@ document.getElementById('saveButton').addEventListener('click', () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert('저장 완료!');
-                window.location.href = '/user/preTagSelect';  // 저장 후 이동할 페이지 경로
+                showCustomAlert("저장 완료!", function() {
+                    location.href = "/user/main";
+                });
             } else {
-                alert(data.message);
+                showCustomAlert(data.message, function() {
+                    location.href = "/user/main";
+                });
             }
         })
         .catch(err => {
             console.error(err);
-            alert('저장 중 오류 발생');
+            showCustomAlert('저장 중 오류 발생');
         });
 });
 

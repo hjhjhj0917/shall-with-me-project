@@ -14,6 +14,7 @@
     <title>살며시</title>
     <link rel="stylesheet" href="/css/tag.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 </head>
@@ -249,6 +250,19 @@
     <button id="saveButton">저장</button>
 </div>
 
+<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <div class="modal-title">
+            <i class="fa-solid fa-circle-exclamation fa-bounce fa-lg" style="color: #3399ff;"></i>
+            <h2>살며시</h2>
+        </div>
+        <p id="customAlertMessage">메시지 내용</p>
+        <div class="modal-buttons" style="text-align: right;">
+            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
+        </div>
+    </div>
+</div>
+
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
     if (ssUserName == null) {
@@ -266,10 +280,12 @@
 %>
 <script>
     const userId = "<%= ssUserId %>";
+    console.log(userId);
 </script>
 
 <script src="${pageContext.request.contextPath}/js/tag.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
 
 </body>
 </html>
