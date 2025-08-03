@@ -7,6 +7,7 @@ window.moveSlide = function (direction) {
     const totalSlides = slider.children.length;
     currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
     slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+    updateStepIndicator(currentSlide);
 };
 
 window.selectButton = function (button) {
@@ -106,7 +107,59 @@ window.selectButton = function (button) {
             moveSlide(1);
         }
     }
+
+    updateProgressIndicator();
 };
+
+function updateStepIndicator(index) {
+    const steps = document.querySelectorAll('.progress-indicator .step');
+    steps.forEach((step, i) => {
+        if (i === index) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+}
+
+window.goToSlide = function (index) {
+    const slider = document.getElementById('slider');
+    const totalSlides = slider.children.length;
+    if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+        updateProgressIndicator();
+    }
+};
+
+function updateProgressIndicator() {
+    const steps = document.querySelectorAll('.step');
+
+    steps.forEach((step, idx) => {
+        step.classList.remove('active', 'completed');
+
+        if (idx === currentSlide) {
+            step.classList.add('active');
+        } else if (isSlideComplete(idx)) {
+            step.classList.add('completed');
+        }
+    });
+}
+
+// 해당 슬라이드에 있는 모든 fieldset에 선택된 버튼이 있는지 확인
+function isSlideComplete(slideIndex) {
+    const slider = document.getElementById('slider');
+    const slide = slider.children[slideIndex];
+    const fieldsets = slide.querySelectorAll('fieldset');
+
+    for (let fs of fieldsets) {
+        if (!fs.querySelector('button.selected')) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 
 
