@@ -5,6 +5,7 @@ body {
     overflow-x: hidden;
     background-color: #f8faff;
     background-image: url("../images/kpaas-background.png");
+    z-index: 1;
 }
 
 .slider-container {
@@ -22,7 +23,7 @@ body {
 
 .header {
     text-align: center;
-    margin-top: 100px;
+    margin-top: 10px;
 
     user-select: none;       /* 텍스트 드래그 금지 */
     pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
@@ -142,11 +143,11 @@ body {
 }
 
 .arrow.left {
-    left: 120px;
+    left: 140px;
 }
 
 .arrow.right {
-    right: 120px;
+    right: 140px;
 }
 
 .restore button {

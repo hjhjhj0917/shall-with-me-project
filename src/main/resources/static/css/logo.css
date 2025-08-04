@@ -13,7 +13,7 @@
 
 .header {
     text-align: center;
-    margin-top: 100px;
+    margin-top: 10px;
 
     user-select: none;       /* 텍스트 드래그 금지 */
     pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */

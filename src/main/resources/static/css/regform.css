@@ -13,21 +13,6 @@ body {
     -ms-user-select: none;
 }
 
-.logo {
-    font-size: 48px;
-    font-weight: 700;
-    margin-top: 40px;
-    color: black;
-    user-select: none;
-}
-
-.logo-2 {
-    font-size: 18px;
-    color: #555;
-    margin-bottom: 20px;
-    user-select: none;
-}
-
 /* ✅ 파란색 큰 네모는 크기 그대로 유지 */
 #f {
     width: 350px;

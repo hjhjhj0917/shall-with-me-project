@@ -19,6 +19,7 @@
     align-items: center;      /* 수직 중앙 */
     justify-content: center;  /* 수평 중앙 */
     border-radius: 50px;
+    font-size: 20px;
 }
 
 .right-panel:hover {
@@ -38,6 +39,7 @@
     align-items: center;      /* 수직 중앙 */
     justify-content: center;  /* 수평 중앙 */
     border-radius: 50px;
+    font-size: 20px;
 }
 
 .left-panel:hover {

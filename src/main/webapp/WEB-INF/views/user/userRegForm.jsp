@@ -6,6 +6,8 @@
     <title>회원가입 화면</title>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="//code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script>
@@ -285,7 +287,7 @@
 
                         if (json.result === 1) { // 회원가입 성공
                             alert(json.msg); // 메시지 띄우기
-                            location.href = "/user/login"; // 로그인 페이지 이동
+                            location.href = "/user/userTagSelect"; // 로그인 페이지 이동
 
                         } else { // 회원가입 실패
                             alert(json.msg); // 메시지 띄우기
@@ -299,6 +301,41 @@
     </script>
 </head>
 <body>
+<header>
+    <div class="home-logo" onclick="location.href='/user/main'">
+        <div class="header-icon-stack">
+            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
+        </div>
+        <div class="header-logo">살며시</div>
+    </div>
+    <div class="header-user-area">
+        <div class="header-switch-container pinned" id="switchBox">
+            <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
+            <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
+            <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
+            <button class="header-dropdown-toggle" id="switchToggle">
+                <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
+            </button>
+        </div>
+        <div class="header-user-name-container pinned" id="userNameBox">
+            <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
+            <span class="user-name-text" id="userNameText">
+        <%= session.getAttribute("SS_USER_NAME") %>님
+      </span>
+            <button class="header-dropdown-toggle" id="userIconToggle">
+                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
+            </button>
+        </div>
+        <div class="header-menu-container pinned" id="menuBox">
+            <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
+            <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
+            <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
+            <button class="header-dropdown-toggle" id="headerDropdownToggle">
+                <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
+            </button>
+        </div>
+    </div>
+</header>
 <div class="header">
     <div class="logo">살며시</div>
     <div class="logo-2">Shall With Me</div>
@@ -411,6 +448,8 @@
     </div>
 </form>
 <input type="text" id="birth-datepicker" style="position:absolute; left:-9999px; top:-9999px;">
+
+<script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
 </body>
 </html>
