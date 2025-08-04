@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인하기</title>
+    <link rel="stylesheet" href="/css/user/userRegForm.css"/>
     <link rel="stylesheet" href="/css/table.css"/>
+
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
 
