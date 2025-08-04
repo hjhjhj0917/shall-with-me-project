@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="/css/table.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/regform.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="text/javascript">
 
         // HTML로딩이 완료되고, 실행됨
@@ -73,10 +77,45 @@
         })
     </script>
 </head>
-<body>
-<h2>로그인하기</h2>
-<hr/>
-<br/>
+<header>
+    <div class="home-logo" onclick="location.href='/user/main'">
+        <div class="header-icon-stack">
+            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
+        </div>
+        <div class="header-logo">살며시</div>
+    </div>
+    <div class="header-user-area">
+        <div class="header-switch-container pinned" id="switchBox">
+            <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
+            <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
+            <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
+            <button class="header-dropdown-toggle" id="switchToggle">
+                <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
+            </button>
+        </div>
+        <div class="header-user-name-container pinned" id="userNameBox">
+            <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
+            <span class="user-name-text" id="userNameText">
+        <%= session.getAttribute("SS_USER_NAME") %>님
+      </span>
+            <button class="header-dropdown-toggle" id="userIconToggle">
+                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
+            </button>
+        </div>
+        <div class="header-menu-container pinned" id="menuBox">
+            <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
+            <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
+            <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
+            <button class="header-dropdown-toggle" id="headerDropdownToggle">
+                <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
+            </button>
+        </div>
+    </div>
+</header>
+<div class="header">
+    <div class="logo">살며시</div>
+    <div class="logo-2">Shall With Me</div>
+</div>
 <form id="f">
     <div class="divTable minimalistBlack">
         <div class="divTableBody">
@@ -103,5 +142,7 @@
         <button id="btnSearchPassword" type="button">비밀번호 찾기</button>
     </div>
 </form>
+
+<script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 </body>
 </html>
