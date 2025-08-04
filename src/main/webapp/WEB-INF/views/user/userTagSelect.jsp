@@ -37,13 +37,13 @@
             width: 35px;
             height: 35px;
             border-radius: 50%;
-            border: 2px solid #ccc;
+            border: 2px solid #3a7bff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            background-color: #f1f1f1;
-            color: #999;
+            background-color: white;
+            color: #3a7bff;
             transition: all 0.3s ease;
             text-align: center;
         }
@@ -62,9 +62,9 @@
 
         .line {
             flex: none;
-            width: 100px;
+            width: 130px;
             height: 2px;
-            background-color: #ccc;
+            background-color: #3a7bff;
             margin: 0 5px;
         }
 
@@ -323,7 +323,7 @@
 <div id="customAlertOverlay" class="modal-overlay" style="display: none;">
     <div class="modal">
         <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-bounce fa-lg" style="color: #3399ff;"></i>
+            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
             <h2>살며시</h2>
         </div>
         <p id="customAlertMessage">메시지 내용</p>
