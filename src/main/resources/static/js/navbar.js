@@ -133,6 +133,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const path = window.location.pathname;
     const pageName = path.split('/').pop(); // ex: 'main'
 
+    if (pageName === 'login') {
+        const switchBox = document.getElementById('userNameBox');
+        if (switchBox) {
+            switchBox.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'login') {
+        const switchBox = document.getElementById('switchBox');
+        if (switchBox) {
+            switchBox.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'login') {
+        const switchBox = document.getElementById('menuBox');
+        if (switchBox) {
+            switchBox.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
     if (pageName === 'userRegForm') {
         const switchBox = document.getElementById('userNameBox');
         if (switchBox) {
