@@ -28,7 +28,11 @@ public interface IUserInfoMapper {
 
     UserInfoDTO getEmailExists(UserInfoDTO pDTO) throws Exception;
 
+    // 태그 삽입
     int insertUserTags(UserTagDTO dto);
+
+    // DB에 저장된 태그 개수 확인
+    int countUserTags(UserTagDTO dto);
 }
 
 

@@ -162,5 +162,10 @@ public class UserInfoService implements IUserInfoService {
         return insertedCount == dto.getTagList().size();
     }
 
+    @Override
+    public int countUserTags(UserTagDTO dto) throws Exception {
+        return userInfoMapper.countUserTags(dto);
+    }
+
 }
 

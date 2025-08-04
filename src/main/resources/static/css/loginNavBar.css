@@ -82,8 +82,6 @@ header {
 }
 
 * {
-    box-sizing: border-box;
-
     user-select: none;       /* 텍스트 드래그 금지 */
     pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
     -webkit-user-select: none; /* 크로스브라우징 */

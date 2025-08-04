@@ -18,7 +18,7 @@
 <body>
 
 <header>
-  <div class="home-logo" onclick="location.href='/home.html'">
+  <div class="home-logo" onclick="location.href='/user/main'">
     <div class="header-icon-stack">
       <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
     </div>
@@ -35,7 +35,9 @@
     </div>
     <div class="header-user-name-container pinned" id="userNameBox">
       <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-      <span class="user-name-text"><%= session.getAttribute("userName") %>님</span>
+      <span class="user-name-text" id="userNameText">
+        <%= session.getAttribute("SS_USER_NAME") %>님
+      </span>
       <button class="header-dropdown-toggle" id="userIconToggle">
         <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
       </button>
@@ -50,6 +52,16 @@
     </div>
   </div>
 </header>
+
+<%
+  String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+  if (ssUserName == null) {
+    ssUserName = "";
+  }
+%>
+<script>
+  const userName = "<%= ssUserName %>";
+</script>
 
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 

@@ -7,6 +7,7 @@ window.moveSlide = function (direction) {
     const totalSlides = slider.children.length;
     currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
     slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+    updateStepIndicator(currentSlide);
 };
 
 window.selectButton = function (button) {
@@ -47,13 +48,13 @@ document.getElementById('saveButton').addEventListener('click', () => {
         // 을/를 조사 자동 처리
         const lastChar = firstMissingLegend.charAt(firstMissingLegend.length - 1);
         const isBatchim = (lastChar.charCodeAt(0) - 44032) % 28 !== 0;
-        alert(`${firstMissingLegend} 항목을 선택하세요`);
+        showCustomAlert(`${firstMissingLegend} 항목을 선택하세요`);
         return;
     }
 
     // user_id와 tag_type은 예시로 하드코딩. 실제로는 서버에서 세션 등으로 받아서 처리
-    const userId = 'test';  // 예: 세션에서 로그인한 user_id
     const tagType = 'ME';   // 예: 'ME' 혹은 'PREF'
+    console.log(userId)
 
     fetch('/user/saveUserTags', {
         method: 'POST',
@@ -65,17 +66,101 @@ document.getElementById('saveButton').addEventListener('click', () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert('저장 완료!');
-                window.location.href = '/user/preTagSelect';  // 저장 후 이동할 페이지 경로
+                showCustomAlert("저장 완료!", function() {
+                    location.href = "/user/main";
+                });
             } else {
-                alert('저장 실패');
+                showCustomAlert(data.message, function() {
+                    location.href = "/user/main";
+                });
             }
         })
         .catch(err => {
             console.error(err);
-            alert('저장 중 오류 발생');
+            showCustomAlert('저장 중 오류 발생');
         });
 });
+
+// 태그 선택되면 자동으로 넘어감
+window.selectButton = function (button) {
+    const group = button.parentNode;
+    const buttons = group.querySelectorAll("button");
+    buttons.forEach(btn => btn.classList.remove("selected"));
+    button.classList.add("selected");
+
+    // 현재 슬라이드 내 모든 fieldset이 선택됐는지 체크
+    const slider = document.getElementById('slider');
+    const slides = slider.children;
+    const currentSlideDiv = slides[currentSlide];
+    const fieldsets = currentSlideDiv.querySelectorAll('fieldset');
+
+    let allSelected = true;
+    fieldsets.forEach(fs => {
+        if (!fs.querySelector('button.selected')) {
+            allSelected = false;
+        }
+    });
+
+    if (allSelected) {
+        // 다음 슬라이드로 이동, 마지막 슬라이드면 이동 안 함
+        if (currentSlide < slides.length - 1) {
+            moveSlide(1);
+        }
+    }
+
+    updateProgressIndicator();
+};
+
+function updateStepIndicator(index) {
+    const steps = document.querySelectorAll('.progress-indicator .step');
+    steps.forEach((step, i) => {
+        if (i === index) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+}
+
+window.goToSlide = function (index) {
+    const slider = document.getElementById('slider');
+    const totalSlides = slider.children.length;
+    if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+        updateProgressIndicator();
+    }
+};
+
+function updateProgressIndicator() {
+    const steps = document.querySelectorAll('.step');
+
+    steps.forEach((step, idx) => {
+        step.classList.remove('active', 'completed');
+
+        if (idx === currentSlide) {
+            step.classList.add('active');
+        } else if (isSlideComplete(idx)) {
+            step.classList.add('completed');
+        }
+    });
+}
+
+// 해당 슬라이드에 있는 모든 fieldset에 선택된 버튼이 있는지 확인
+function isSlideComplete(slideIndex) {
+    const slider = document.getElementById('slider');
+    const slide = slider.children[slideIndex];
+    const fieldsets = slide.querySelectorAll('fieldset');
+
+    for (let fs of fieldsets) {
+        if (!fs.querySelector('button.selected')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
 
 
 

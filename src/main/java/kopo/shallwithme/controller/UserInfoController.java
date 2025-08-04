@@ -22,8 +22,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.Map;
 
 
@@ -200,11 +203,27 @@ public class UserInfoController {
 
             if (!CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {// 로그인 성공
 
-                res = 1;
+                UserTagDTO tagDTO = new UserTagDTO();
+                tagDTO.setUserId(userId);
+
                 msg = "로그인을 성공했습니다.";
 
                 session.setAttribute("SS_USER_ID", userId);
-                session.setAttribute("SS_USER_NAME", CmmUtil.nvl(rDTO.getUserName()));
+
+                if (CmmUtil.nvl(rDTO.getUserName()).length() == 2) {
+                    session.setAttribute("SS_USER_NAME", "ㅤ" + CmmUtil.nvl(rDTO.getUserName()));
+                } else {
+                    session.setAttribute("SS_USER_NAME", CmmUtil.nvl(rDTO.getUserName()));
+                }
+                int existingCount = userInfoService.countUserTags(tagDTO);
+                log.info("User tag count: {}", existingCount);
+
+                if (existingCount < 18) {
+                    res = 3;
+                } else {
+                    res = 1;
+                }
+
             } else {
                 msg = "아이디와 비밀번호가 올바르지 않습니다.";
             }
@@ -224,6 +243,29 @@ public class UserInfoController {
             }
             return dto;
 
+    }
+
+    @GetMapping(value = "loginCheck")
+    @ResponseBody
+    public int loginCheck(HttpSession session) {
+        log.info("{}.loginCheck Start!", this.getClass().getName());
+
+        int res = 0;
+        if (!CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")).isEmpty()) {
+            res = 1;
+        }
+
+        return res;
+    }
+
+    @GetMapping("/roommateMain")
+    public String roommateMain() {
+        return "user/roommateMain"; // 세션 체크는 인터셉터에서 이미 처리
+    }
+
+    @GetMapping("/sharehouseMain")
+    public String sharehouseMain() {
+        return "user/sharehouseMain";
     }
 
     @GetMapping(value ="loginResult")
@@ -260,7 +302,7 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".getUserIdExists End!");
 
-        return pDTO;
+        return rDTO;
     }
 
     @ResponseBody
@@ -285,7 +327,7 @@ public class UserInfoController {
 
     @ResponseBody
     @PostMapping(value = "insertUserInfo")
-    public MsgDTO insertUserInfo(HttpServletRequest request) throws Exception {
+    public MsgDTO insertUserInfo(HttpServletRequest request, HttpSession session) throws Exception {
 
         log.info(this.getClass().getName() + ".insertUserInfo Start!");
 
@@ -345,6 +387,13 @@ public class UserInfoController {
             log.info("회원가입 결과(res) : " + res);
 
             if (res == 1) {
+                if (pDTO.getUserName().length() == 2) {
+                    session.setAttribute("SS_USER_NAME", "ㅤ" + userName);
+                } else {
+                    session.setAttribute("SS_USER_NAME", userName);
+                }
+                session.setAttribute("SS_USER_NAME", userName);
+                session.setAttribute("SS_USER_ID", userId);
                 msg = "회원가입되었습니다.";
 
             } else if (res == 2) {
@@ -405,12 +454,62 @@ public class UserInfoController {
     // POST /saveUserTags 핸들러 예시 (Spring MVC)
     @PostMapping("/saveUserTags")
     @ResponseBody
-    public Map<String, Object> saveUserTags(@RequestBody UserTagDTO dto) throws Exception{
-        log.info("Received saveUserTags request - userId: {}, tagType: {}, tagList: {}",
-                dto.getUserId(), dto.getTagType(), dto.getTagList());
-        boolean success = userInfoService.saveUserTags(dto);
-        return Map.of("success", success);
+    public Map<String, Object> saveUserTags(@RequestBody UserTagDTO dto, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // 여기 추가! 세션에서 userId 꺼내서 dto에 넣기
+            String userId = (String) session.getAttribute("SS_USER_ID");
+
+            if (userId == null || userId.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "로그인 정보가 없습니다.");
+                return response;
+            }
+
+            dto.setUserId(userId);
+
+            int existingCount = userInfoService.countUserTags(dto);
+
+            if (existingCount == 18) {
+                response.put("success", false);
+                response.put("message", "이미 태그 선택이 완료된 상태입니다.");
+                return response;
+            }
+
+            userInfoService.saveUserTags(dto);
+            response.put("success", true);
+
+        } catch (Exception e) {
+            log.error("태그 저장 실패", e);
+            response.put("success", false);
+            response.put("message", "서버 오류 발생");
+        }
+
+        return response;
     }
 
+    // 로그아웃
+    @GetMapping("/logout")
+    @ResponseBody
+    public MsgDTO logout(HttpSession session) {
+        int res = 1; // 기본 성공
+        String msg = "";
+
+        MsgDTO dto = new MsgDTO();
+
+        try {
+            session.invalidate();
+            msg = "성공적으로 로그아웃되었습니다.";
+        } catch (Exception e) {
+            res = 0;
+            msg = "로그아웃 중 오류가 발생했습니다.";
+        }
+
+        dto.setResult(res);
+        dto.setMsg(msg);
+
+        return dto;
+    }
 }
 

@@ -52,7 +52,6 @@ document.getElementById('saveButton').addEventListener('click', () => {
     }
 
     // user_id와 tag_type은 예시로 하드코딩. 실제로는 서버에서 세션 등으로 받아서 처리
-    const userId = 'test';  // 예: 세션에서 로그인한 user_id
     const tagType = 'PREF';   // 예: 'ME' 혹은 'PREF'
 
     fetch('/user/saveUserTags', {
@@ -68,7 +67,7 @@ document.getElementById('saveButton').addEventListener('click', () => {
                 alert('저장 완료!');
                 window.location.href = '/user/main';  // 저장 후 이동할 페이지 경로
             } else {
-                alert('저장 실패');
+                alert(data.message);
             }
         })
         .catch(err => {
@@ -77,5 +76,32 @@ document.getElementById('saveButton').addEventListener('click', () => {
         });
 });
 
+// 태그 선택되면 자동으로 넘어감
+window.selectButton = function (button) {
+    const group = button.parentNode;
+    const buttons = group.querySelectorAll("button");
+    buttons.forEach(btn => btn.classList.remove("selected"));
+    button.classList.add("selected");
+
+    // 현재 슬라이드 내 모든 fieldset이 선택됐는지 체크
+    const slider = document.getElementById('slider');
+    const slides = slider.children;
+    const currentSlideDiv = slides[currentSlide];
+    const fieldsets = currentSlideDiv.querySelectorAll('fieldset');
+
+    let allSelected = true;
+    fieldsets.forEach(fs => {
+        if (!fs.querySelector('button.selected')) {
+            allSelected = false;
+        }
+    });
+
+    if (allSelected) {
+        // 다음 슬라이드로 이동, 마지막 슬라이드면 이동 안 함
+        if (currentSlide < slides.length - 1) {
+            moveSlide(1);
+        }
+    }
+};
 
 
