@@ -169,6 +169,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const path = window.location.pathname;
     const pageName = path.split('/').pop(); // ex: 'main'
 
+    if (pageName === 'searchUserId') {
+        const switchBox1 = document.getElementById('menuBox');
+        const switchBox2 = document.getElementById('switchBox');
+        const switchBox3 = document.getElementById('userNameBox');
+        if (switchBox1) {
+            switchBox1.style.display = 'none';
+        }
+        if (switchBox2) {
+            switchBox2.style.display = 'none';
+        }
+        if (switchBox3) {
+            switchBox3.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'searchPassword') {
+        const switchBox1 = document.getElementById('menuBox');
+        const switchBox2 = document.getElementById('switchBox');
+        const switchBox3 = document.getElementById('userNameBox');
+        if (switchBox1) {
+            switchBox1.style.display = 'none';
+        }
+        if (switchBox2) {
+            switchBox2.style.display = 'none';
+        }
+        if (switchBox3) {
+            switchBox3.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
     if (pageName === 'userRegForm') {
         const switchBox = document.getElementById('userNameBox');
         if (switchBox) {
