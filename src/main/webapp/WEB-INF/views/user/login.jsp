@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인하기</title>
-    <link rel="stylesheet" href="/css/table.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/regform.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="text/javascript">
 
@@ -56,16 +56,18 @@
                         success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
 
                             if (json.result === 1) { // 로그인 성공
-                                alert(json.msg); // 메시지 띄우기
-                                location.href = "/user/main"; // 로그인 성공 페이지 이동
+                                showCustomAlert(json.msg, function() {
+                                    location.href = "/user/main";
+                                });
 
                             } else if (json.result === 3) {
-                                alert(json.msg); // 메시지 띄우기
-                                alert("회원님의 성향태그를 선택하여주세요");
-                                location.href = "/user/userTagSelect"; // 로그인 성공 페이지 이동
+                                showCustomAlert(json.msg); // 메시지 띄우기
+                                showCustomAlert("회원님의 성향태그를 선택하여주세요", function () {
+                                    location.href = "/user/userTagSelect";
+                                });
                             }
                             else { // 로그인 실패
-                                alert(json.msg); // 메시지 띄우기
+                                showCustomAlert(json.msg); // 메시지 띄우기
                                 $("#userId").focus(); // 아이디 입력 항목에 마우스 커서 이동
                             }
 
@@ -143,6 +145,20 @@
     </div>
 </form>
 
+<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <div class="modal-title">
+            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
+            <h2>살며시</h2>
+        </div>
+        <p id="customAlertMessage">메시지 내용</p>
+        <div class="modal-buttons" style="text-align: right;">
+            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
+        </div>
+    </div>
+</div>
+
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 </body>
 </html>
