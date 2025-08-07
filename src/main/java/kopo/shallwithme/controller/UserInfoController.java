@@ -174,6 +174,7 @@ public class UserInfoController {
     }
 
     @ResponseBody
+
     @PostMapping(value = "loginProc")
     public MsgDTO loginProc(HttpServletRequest request, HttpSession session) {
         log.info("{}.loginProc Start!", this.getClass().getName());
