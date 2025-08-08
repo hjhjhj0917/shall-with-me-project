@@ -209,6 +209,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const path = window.location.pathname;
     const pageName = path.split('/').pop(); // ex: 'main'
 
+    if (pageName === 'chatRoom') {
+        const switchBox2 = document.getElementById('switchBox');
+        if (switchBox2) {
+            switchBox2.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
     if (pageName === 'userRegForm') {
         const switchBox = document.getElementById('userNameBox');
         if (switchBox) {
