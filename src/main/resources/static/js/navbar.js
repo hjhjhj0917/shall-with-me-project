@@ -245,5 +245,18 @@ document.addEventListener("DOMContentLoaded", function () {
             menuButtons[1].setAttribute("id", "loginBtn");
             menuButtons[1].setAttribute("onclick", "location.href='/user/login'");
         }
+        // 세 번째 버튼(로그아웃) 숨기기
+        if (menuButtons.length >= 3) {
+            menuButtons[2].style.display = "none";
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .header-menu-container:hover:not(.pinned),
+            .header-menu-container.pinned {
+                width: 250px !important;
+            }
+        `;
+        document.head.appendChild(style);
     }
 });
