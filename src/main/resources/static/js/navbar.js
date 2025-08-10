@@ -2,10 +2,10 @@
 const userNameBox = document.getElementById('userNameBox');
 
 // 클릭시 줄어드는거
-// userNameBox.addEventListener('click', function (e) {
-//     e.stopPropagation(); // 외부 클릭 방지
-//     userNameBox.classList.toggle('pinned'); // toggle 고정
-// });
+userNameBox.addEventListener('click', function (e) {
+    e.stopPropagation(); // 외부 클릭 방지
+    userNameBox.classList.toggle('pinned'); // toggle 고정
+});
 //
 // const userMenuBox = document.getElementById('menuBox');
 //
@@ -25,9 +25,9 @@ const userNameBox = document.getElementById('userNameBox');
 //     this.classList.toggle('pinned');
 // });
 //
-// document.getElementById('userIconToggle').addEventListener('click', function () {
-//     this.classList.toggle('pinned');
-// });
+document.getElementById('userIconToggle').addEventListener('click', function () {
+    this.classList.toggle('pinned');
+});
 //
 // document.getElementById('headerDropdownToggle').addEventListener('click', function () {
 //     this.classList.toggle('pinned');
