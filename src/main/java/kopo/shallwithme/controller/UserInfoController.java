@@ -259,10 +259,6 @@ public class UserInfoController {
         return res;
     }
 
-    @GetMapping("/roommateReg")
-    public String roommateReg() {
-        return "roommate/roommateReg";
-    }
 
     @GetMapping("/roommateMain")
     public String roommateMain() {

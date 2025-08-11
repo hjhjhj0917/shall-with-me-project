@@ -10,21 +10,27 @@
           href="${pageContext.request.contextPath}/css/modal.css"/>
 
     <style>
-        /* 컨테이너 중앙 정렬 및 크기 확대 유지 */
+        * { box-sizing: border-box; }
+
+        /* 바깥 컨테이너: 가운데 정렬 */
         .roommate-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 60px;
-            padding: 60px;
+            padding: 60px 20px;
             width: 90%;
-            max-width: 3200px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
-        /* 좌/우 박스 공통 스타일 */
-        .roommate-left,
+        /* 폼을 가로 플렉스로 만들어 좌/우 수평 정렬 */
+        #roommateForm {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: stretch;
+            gap: 60px;
+            width: 100%;
+        }
+
+        /* 좌/우 박스 */
         .roommate-right {
             background: #fff;
             border: 1px solid #ddd;
@@ -32,30 +38,38 @@
             padding: 48px;
             display: flex;
             flex-direction: column;
+            min-height: 600px;
+        }
+        .roommate-left {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
         }
 
-        /* 너비 비율: 왼쪽 35%, 오른쪽 50% */
-        .roommate-left { flex: 0 0 35%; }
-        .roommate-right { flex: 0 0 50%; }
-
-        /* 내부 요소 스타일 */
-        .form-group { margin-bottom: 48px; }
+        /* 내부 요소 */
+        .form-group { margin-bottom: 32px; }
         .form-group label {
             display: block;
-            font-weight: 500;
-            margin-bottom: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
         }
         .form-group input[type="text"] {
             width: 100%;
-            padding: 20px;
+            padding: 16px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
         }
+
+        /* 이미지 업로드 */
         .image-upload-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 32px;
-            margin-bottom: 48px;
+            gap: 20px;
+            margin-bottom: 32px;
         }
         .upload-box {
             position: relative;
@@ -65,43 +79,94 @@
             justify-content: center;
             border: 2px dashed #bbb;
             border-radius: 8px;
-            padding: 48px;
+            /* ⬇️ 고정 크기 */
+            width: 180px;
+            height: 180px;
+            padding: 0;
+            overflow: hidden;
             cursor: pointer;
+            transition: border-color .2s ease, background-color .2s ease;
+            text-align: center;
         }
-        .upload-box i { color: #999; margin-bottom: 20px; }
-        .upload-box span { font-size: 16px; color: #666; }
+        .upload-box:hover {
+            border-color: #3399ff;
+            background-color: #f7fbff;
+        }
+        .upload-box i { color: #999; margin-bottom: 12px; }
+        .upload-box span { font-size: 14px; color: #666; }
         .upload-box input[type="file"] {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            inset: 0;
             opacity: 0;
             cursor: pointer;
         }
 
-        /* 자기소개 버튼 크기 축소 */
+        /* 미리보기 상태 */
+        .upload-box.has-image {
+            border-color: #3399ff;
+            background: #f7fbff;
+        }
+        .upload-box.has-image i,
+        .upload-box.has-image span {
+            display: none;
+        }
+        .upload-box img.preview {
+            /* ⬇️ 박스 꽉 채우는 고정 표시 */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+        }
+        /* 삭제 버튼을 항상 위로 */
+        .upload-box .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 3;
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #fff;
+            font-size: 0.85rem;
+        }
+        /* 파일 인풋 클릭 막기 (삭제 버튼 클릭 가능) */
+        .upload-box.has-image input[type="file"] {
+            pointer-events: none;
+        }
+
+        /* 자기소개 버튼 */
         .intro-btn {
             align-self: flex-start;
-            margin-bottom: 32px;
-            padding: 10px 20px;
+            margin-bottom: 16px;
+            padding: 10px 18px;
             background-color: #3399ff;
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
-        /* textarea 높이 조정 */
+        /* textarea */
         textarea#introTextarea {
             flex: 1;
-            width: 100%;
-            min-height: 370px;
-            padding: 32px;
+            width: 500px;
+            min-height: 100px;
+            padding: 20px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
             resize: vertical;
             font-family: inherit;
             line-height: 1.5;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1100px) {
+            #roommateForm { flex-direction: column; }
+            .roommate-left,
+            .roommate-right { flex: 1 1 auto; min-height: 520px; }
         }
     </style>
 </head>
@@ -147,43 +212,32 @@
           action="/roommate/register"
           method="post"
           enctype="multipart/form-data">
-        <!-- 왼쪽 섹션: 이미지 업로드 등 -->
+        <!-- 왼쪽 -->
         <section class="roommate-left">
             <div class="form-group name-group">
-                <label for="userNameInput">이름 :</label>
-                <input type="text"
-                       id="userNameInput"
-                       name="userName"
-                       placeholder="이름을 입력하세요" />
+                <label>이름 : <span><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span></label>
             </div>
+
             <div class="image-upload-grid">
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file"
-                           name="images"
-                           accept="image/*" />
+                    <input type="file" name="images" accept="image/*" />
                 </div>
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file"
-                           name="images"
-                           accept="image/*" />
+                    <input type="file" name="images" accept="image/*" />
                 </div>
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file"
-                           name="images"
-                           accept="image/*" />
+                    <input type="file" name="images" accept="image/*" />
                 </div>
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file"
-                           name="images"
-                           accept="image/*" />
+                    <input type="file" name="images" accept="image/*" />
                 </div>
             </div>
             <div class="form-group tag-group">
@@ -195,7 +249,7 @@
             </div>
         </section>
 
-        <!-- 오른쪽 섹션: 자기소개 -->
+        <!-- 오른쪽 -->
         <section class="roommate-right">
             <button type="button" class="intro-btn">자기 소개</button>
             <textarea id="introTextarea"
@@ -205,19 +259,15 @@
     </form>
 </main>
 
-<div id="customAlertOverlay"
-     class="modal-overlay"
-     style="display: none;">
+<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
     <div class="modal">
         <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg"
-               style="color: #3399ff;"></i>
+            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
             <h2>살며시</h2>
         </div>
         <p id="customAlertMessage">메시지 내용</p>
         <div class="modal-buttons" style="text-align: right;">
-            <button class="deactivate-btn"
-                    onclick="closeCustomAlert()">확인</button>
+            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
         </div>
     </div>
 </div>
@@ -228,9 +278,58 @@
         ssUserName = "";
     }
 %>
+
+<!-- JS: 미리보기 + 삭제 기능 -->
 <script>
-    const userName = "<%= ssUserName %>";
+    document.querySelectorAll('.upload-box input[type="file"]').forEach((input) => {
+        input.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            const box  = e.target.closest('.upload-box');
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('이미지 파일만 업로드할 수 있어요.');
+                e.target.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('파일 용량이 너무 커요. (최대 5MB)');
+                e.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                box.classList.add('has-image');
+
+                let img = box.querySelector('img.preview');
+                if (!img) {
+                    img = document.createElement('img');
+                    img.className = 'preview';
+                    box.appendChild(img);
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'remove-btn';
+                    btn.textContent = '이미지 삭제';
+                    btn.addEventListener('click', () => {
+                        // 파일 선택 해제
+                        input.value = '';
+                        // 프리뷰/버튼 제거
+                        img.remove();
+                        btn.remove();
+                        // 상태 복원
+                        box.classList.remove('has-image');
+                    });
+                    box.appendChild(btn);
+                }
+                img.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    });
 </script>
+
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 </body>
