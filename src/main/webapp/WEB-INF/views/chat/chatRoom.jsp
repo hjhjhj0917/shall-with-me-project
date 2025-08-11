@@ -16,7 +16,6 @@
     <script>
         $(document).ready(function () {
 
-
         $("#logout").on("click", function () {
             showCustomAlert("로그아웃 하시겠습니까?", function () {
                 $.ajax({
@@ -147,6 +146,7 @@
 
         stompClient.connect({}, function () {
             stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
+                console.log("📥 수신:", message.body);
                 const msg = JSON.parse(message.body);
                 appendMessage(msg.senderId, msg.message, msg.timestamp || new Date());
             });
@@ -209,11 +209,6 @@
 
         const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         messageBubble.textContent = safeText;
-
-        // if (text.length >= 20) {
-        //     messageBubble.classList.add("long-text");
-        // }
-        // messageBubble.textContent = text;
 
         const timeElem = document.createElement("div");
         timeElem.className = "message-time";
