@@ -449,6 +449,16 @@
 </form>
 <input type="text" id="birth-datepicker" style="position:absolute; left:-9999px; top:-9999px;">
 
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
+
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
 </body>

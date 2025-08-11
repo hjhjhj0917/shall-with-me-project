@@ -2,10 +2,10 @@
 const userNameBox = document.getElementById('userNameBox');
 
 // 클릭시 줄어드는거
-// userNameBox.addEventListener('click', function (e) {
-//     e.stopPropagation(); // 외부 클릭 방지
-//     userNameBox.classList.toggle('pinned'); // toggle 고정
-// });
+userNameBox.addEventListener('click', function (e) {
+    e.stopPropagation(); // 외부 클릭 방지
+    userNameBox.classList.toggle('pinned'); // toggle 고정
+});
 //
 // const userMenuBox = document.getElementById('menuBox');
 //
@@ -25,9 +25,9 @@ const userNameBox = document.getElementById('userNameBox');
 //     this.classList.toggle('pinned');
 // });
 //
-// document.getElementById('userIconToggle').addEventListener('click', function () {
-//     this.classList.toggle('pinned');
-// });
+document.getElementById('userIconToggle').addEventListener('click', function () {
+    this.classList.toggle('pinned');
+});
 //
 // document.getElementById('headerDropdownToggle').addEventListener('click', function () {
 //     this.classList.toggle('pinned');
@@ -133,6 +133,94 @@ document.addEventListener('DOMContentLoaded', function () {
     const path = window.location.pathname;
     const pageName = path.split('/').pop(); // ex: 'main'
 
+    if (pageName === 'login') {
+        const switchBox = document.getElementById('userNameBox');
+        if (switchBox) {
+            switchBox.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'login') {
+        const switchBox = document.getElementById('switchBox');
+        if (switchBox) {
+            switchBox.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'login') {
+        const switchBox = document.getElementById('menuBox');
+        if (switchBox) {
+            switchBox.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'searchUserId') {
+        const switchBox1 = document.getElementById('menuBox');
+        const switchBox2 = document.getElementById('switchBox');
+        const switchBox3 = document.getElementById('userNameBox');
+        if (switchBox1) {
+            switchBox1.style.display = 'none';
+        }
+        if (switchBox2) {
+            switchBox2.style.display = 'none';
+        }
+        if (switchBox3) {
+            switchBox3.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'searchPassword') {
+        const switchBox1 = document.getElementById('menuBox');
+        const switchBox2 = document.getElementById('switchBox');
+        const switchBox3 = document.getElementById('userNameBox');
+        if (switchBox1) {
+            switchBox1.style.display = 'none';
+        }
+        if (switchBox2) {
+            switchBox2.style.display = 'none';
+        }
+        if (switchBox3) {
+            switchBox3.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
+    if (pageName === 'chatRoom') {
+        const switchBox2 = document.getElementById('switchBox');
+        if (switchBox2) {
+            switchBox2.style.display = 'none';
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop(); // ex: 'main'
+
     if (pageName === 'userRegForm') {
         const switchBox = document.getElementById('userNameBox');
         if (switchBox) {
@@ -157,5 +245,18 @@ document.addEventListener("DOMContentLoaded", function () {
             menuButtons[1].setAttribute("id", "loginBtn");
             menuButtons[1].setAttribute("onclick", "location.href='/user/login'");
         }
+        // 세 번째 버튼(로그아웃) 숨기기
+        if (menuButtons.length >= 3) {
+            menuButtons[2].style.display = "none";
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .header-menu-container:hover:not(.pinned),
+            .header-menu-container.pinned {
+                width: 250px !important;
+            }
+        `;
+        document.head.appendChild(style);
     }
 });
