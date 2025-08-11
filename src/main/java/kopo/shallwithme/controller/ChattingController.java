@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +31,12 @@ public class ChattingController {
 
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatDTO chatMessage) {
-        // 메시지 저장
-        chatService.saveMessage(chatMessage);
+        // timestamp가 비어 있으면 현재 시간으로 설정
+        if (chatMessage.getTimestamp() == null) {
+            chatMessage.setTimestamp(LocalDateTime.now().toString());
+        }
 
-        // 해당 채팅방 구독자에게 메시지 전달
+        chatService.saveMessage(chatMessage);
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatMessage.getRoomId(), chatMessage);
     }
 
