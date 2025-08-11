@@ -144,24 +144,32 @@
         const socket = new SockJS("/ws-chat");
         stompClient = Stomp.over(socket);
 
+        // 디버깅용 로그
+        stompClient.debug = function (str) {
+            console.log('[STOMP DEBUG]', str);
+        };
+
         stompClient.connect({}, function () {
-            stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
-                console.log("📥 수신:", message.body);
 
-                try {
-                    const msg = JSON.parse(message.body);
-                    console.log("✅ appendMessage 호출:", msg);
-                    appendMessage(msg.senderId, msg.message, msg.timestamp || msg.sentAt || new Date());
-                } catch (e) {
-                    console.error("❌ JSON 파싱 에러:", e);
-                }
-            });
-
+            // 1. 메시지 먼저 로드
             fetch(`/chat/messages?roomId=${roomId}`)
                 .then(res => res.json())
                 .then(messages => {
                     messages.forEach(msg => {
                         appendMessage(msg.senderId, msg.message, msg.timestamp || new Date());
+                    });
+                })
+                .catch(err => console.error("메시지 로딩 실패:", err))
+                .finally(() => {
+                    // 2. subscribe는 마지막에!
+                    stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
+                        console.log("📥 수신:", message.body);
+                        try {
+                            const msg = JSON.parse(message.body);
+                            appendMessage(msg.senderId, msg.message, msg.timestamp || msg.sentAt || new Date());
+                        } catch (e) {
+                            console.error("❌ JSON 파싱 에러:", e);
+                        }
                     });
                 });
         });
