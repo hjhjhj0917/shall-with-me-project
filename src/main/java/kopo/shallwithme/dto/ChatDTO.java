@@ -11,4 +11,5 @@ public class ChatDTO {
     private String senderId;
     private String message;
     private String sentAt; // DB에서 불러올 때 사용됨
+    private String timestamp;
 }
