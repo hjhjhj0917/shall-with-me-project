@@ -265,7 +265,7 @@ public class UserInfoController {
 
     @GetMapping("/sharehouseMain")
     public String sharehouseMain() {
-        return "user/sharehouseMain";
+        return "sharehouse/sharehouseMain";
     }
 
     @GetMapping(value ="loginResult")
