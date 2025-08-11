@@ -245,7 +245,7 @@ header {
 /* hover 시 펼쳐짐 */
 .header-menu-container:hover:not(.pinned),
 .header-menu-container.pinned {
-    width: 250px;             /* 펼쳐진 크기 */
+    width: 320px;             /* 펼쳐진 크기 */
     border-radius: 40px;      /* 타원형 */
     padding-left: 30px;
     justify-content: flex-start;
