@@ -1,8 +1,0 @@
-secure:
-  datasource:
-    url: jdbc:mariadb://mariadb.czq0ac8mq2t6.ap-southeast-2.rds.amazonaws.com:3306/myDB
-    username: poly
-    password: 1234
-  mail:
-    username: jemmaumma@naver.com
-    password: NX5KEKQ6WWK9
