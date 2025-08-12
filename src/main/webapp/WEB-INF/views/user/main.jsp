@@ -66,7 +66,7 @@
                 });
 
                 $("#sharehouseBtn").on("click", function () {
-                    checkLoginAndRedirect("/user/sharehouseMain");
+                    checkLoginAndRedirect("/sharehouse/sharehouseMain");
                 });
         });
     </script>
