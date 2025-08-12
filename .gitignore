@@ -89,4 +89,10 @@ build/
 
 src/main/resources/application.yaml
 
-**/application.yaml
+# 모든 환경설정 파일 무시
+*.yml
+*.yaml
+
+# src/main/resources의 설정 파일은 추적
+!src/main/resources/*.yml
+!src/main/resources/*.yaml
