@@ -1,12 +1,12 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Roommate</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
+    <!-- ★ 변경: 룸메이트 전용 CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/roommate/roommateMain.css"/>
     <link rel="icon" href="${pageContext.request.contextPath}/images/noimg.png">
 </head>
 <body>
@@ -19,30 +19,25 @@
     </div>
     <div class="header-user-area">
         <div class="header-switch-container pinned" id="switchBox">
-            <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
-            <button class="switch-list"
-                    onclick="location.href='${pageContext.request.contextPath}/roommate/roommateMain'">
-                룸메이트</button>
-            <button class="switch-list"
-                    onclick="location.href='${pageContext.request.contextPath}/sharehouse/sharehouseMain'">
-                쉐어하우스
-            </button>
-
+            <span class="slide-bg3"></span>
+            <!-- ★ 변경: 토글 버튼 경로 -->
+            <button class="switch-list" onclick="location.href='${pageContext.request.contextPath}/roommate/roommateMain'">룸메이트</button>
+            <button class="switch-list" onclick="location.href='${pageContext.request.contextPath}/sharehouse/sharehouseMain'">쉐어하우스</button>
             <button class="header-dropdown-toggle" id="switchToggle">
                 <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
             </button>
         </div>
         <div class="header-user-name-container pinned" id="userNameBox">
-            <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
+            <span class="slide-bg"></span>
             <span class="user-name-text" id="userNameText">
-        <%= session.getAttribute("SS_USER_NAME") %>님
-      </span>
+                <%= session.getAttribute("SS_USER_NAME") %>님
+            </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
                 <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
             </button>
         </div>
         <div class="header-menu-container pinned" id="menuBox">
-            <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
+            <span class="slide-bg2"></span>
             <button class="menu-list" onclick="location.href='/chat/userListPage'">메세지</button>
             <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
             <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
@@ -52,7 +47,8 @@
         </div>
     </div>
 </header>
-<%--내가 프론트 만들부분--%>
+
+<%-- 내가 프론트 만들 부분 --%>
 <main id="sh-wrapper">
     <!-- 검색바 -->
     <div class="sh-searchbar">
@@ -62,9 +58,9 @@
         </button>
     </div>
 
-    <!-- 카드 그리드: 위 4개 + 아래 4개 = 총 8개 -->
+    <!-- 카드 그리드: 초기 8개 -->
     <section class="sh-grid">
-        <!-- 1 -->
+        <!-- 초기 샘플 카드들 (원한다면 삭제 가능) -->
         <article class="sh-card" data-id="101">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -74,7 +70,6 @@
             </div>
         </article>
 
-        <!-- 2 -->
         <article class="sh-card" data-id="102">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -84,7 +79,6 @@
             </div>
         </article>
 
-        <!-- 3 -->
         <article class="sh-card" data-id="103">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -94,7 +88,6 @@
             </div>
         </article>
 
-        <!-- 4 -->
         <article class="sh-card" data-id="104">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -104,7 +97,6 @@
             </div>
         </article>
 
-        <!-- 5 -->
         <article class="sh-card" data-id="105">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -114,7 +106,6 @@
             </div>
         </article>
 
-        <!-- 6 -->
         <article class="sh-card" data-id="106">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -124,7 +115,6 @@
             </div>
         </article>
 
-        <!-- 7 -->
         <article class="sh-card" data-id="107">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -134,7 +124,6 @@
             </div>
         </article>
 
-        <!-- 8 -->
         <article class="sh-card" data-id="108">
             <div class="sh-thumb"></div>
             <div class="sh-info">
@@ -145,16 +134,13 @@
         </article>
     </section>
 
-    <!-- (선택) 좌하단 등록 플로팅 버튼 -->
+    <!-- 좌하단 등록 플로팅 버튼 -->
     <button class="sh-fab" title="등록">
         <i class="fa-solid fa-plus"></i>
     </button>
 </main>
 
-
-
-
-<%--모달창부분--%>
+<%-- 모달창 부분 --%>
 <div id="customAlertOverlay" class="modal-overlay" style="display: none;">
     <div class="modal">
         <div class="modal-title">
@@ -168,10 +154,6 @@
     </div>
 </div>
 
-
-
-
-
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
     if (ssUserName == null) {
@@ -179,17 +161,13 @@
     }
 %>
 
-
-
-
-
 <script>
     const userName = "<%= ssUserName %>";
+    const ctx = '${pageContext.request.contextPath}';
 </script>
 
 <script>
-    const ctx = '${pageContext.request.contextPath}';
-    // 카드 클릭 → 상세 이동
+    // ★ 변경: 카드 클릭 → /roommate/detail
     (function () {
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
@@ -199,13 +177,13 @@
             if (!card || !grid.contains(card)) return;
             const id = card.dataset.id;
             if (!id) return;
-            location.href = ctx + '/sharehouse/detail?id=' + encodeURIComponent(id);
+            location.href = ctx + '/roommate/detail?id=' + encodeURIComponent(id);
         });
-
     })();
 </script>
 
 <script>
+    // ★ 변경: 무한스크롤 API → /roommate/list
     (function () {
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
@@ -226,7 +204,7 @@
             if (loading || last) return;
             loading = true; loader.style.display = 'block';
             try {
-                const url = ctx + '/sharehouse/list?page=' + (page + 1);  // ← 백틱 제거
+                const url = ctx + '/roommate/list?page=' + (page + 1);
                 const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
                 if (!res.ok) throw new Error('network error');
                 const data = await res.json();
@@ -246,8 +224,6 @@
         }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
 
         io.observe(sentinel);
-
-        // 초기 1회 강제 로드 (화면을 꽉 못 채울 때 대비)
         setTimeout(fetchNext, 0);
 
         function renderCards(items) {
@@ -259,22 +235,22 @@
 
                 const thumb = document.createElement('div');
                 thumb.className = 'sh-thumb';
-                thumb.style.backgroundImage = "url('" + (it.imageUrl || '/images/noimg.png') + "')"; // ← 백틱 제거
+                thumb.style.backgroundImage = "url('" + (it.imageUrl || '/images/noimg.png') + "')";
 
                 const info = document.createElement('div');
                 info.className = 'sh-info';
 
                 const t = document.createElement('p');
                 t.className = 'sh-title';
-                t.textContent = '위치 : ' + (it.location || ''); // ← 백틱 제거
+                t.textContent = '위치 : ' + (it.location || '');
 
                 const s = document.createElement('p');
                 s.className = 'sh-sub';
-                s.textContent = it.moveInText ? ('입주일 : ' + it.moveInText) : ''; // ← 백틱 제거
+                s.textContent = it.moveInText ? ('입주일 : ' + it.moveInText) : '';
 
                 const p = document.createElement('p');
                 p.className = 'sh-price';
-                p.textContent = it.priceText ? ('비용 : ' + it.priceText) : ''; // ← 백틱 제거
+                p.textContent = it.priceText ? ('비용 : ' + it.priceText) : '';
 
                 info.append(t, s, p);
                 article.append(thumb, info);
