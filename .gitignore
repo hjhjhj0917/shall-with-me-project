@@ -88,3 +88,5 @@ build/
 !src/main/resources/application.properties
 
 src/main/resources/application.yaml
+
+**/application.yaml
