@@ -3,6 +3,7 @@ package kopo.shallwithme.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 
