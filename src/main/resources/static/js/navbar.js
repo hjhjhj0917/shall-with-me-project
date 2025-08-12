@@ -6,32 +6,32 @@ userNameBox.addEventListener('click', function (e) {
     e.stopPropagation(); // 외부 클릭 방지
     userNameBox.classList.toggle('pinned'); // toggle 고정
 });
-//
-// const userMenuBox = document.getElementById('menuBox');
-//
-// userMenuBox.addEventListener('click', function (e) {
-//     e.stopPropagation(); // 외부 클릭 방지
-//     userMenuBox.classList.toggle('pinned'); // toggle 고정
-// });
-//
-// const userSwitchBox = document.getElementById('switchBox');
-//
-// userSwitchBox.addEventListener('click', function (e) {
-//     e.stopPropagation(); // 외부 클릭 방지
-//     userSwitchBox.classList.toggle('pinned'); // toggle 고정
-// });
-//
-// document.getElementById('switchToggle').addEventListener('click', function () {
-//     this.classList.toggle('pinned');
-// });
-//
+
+const userMenuBox = document.getElementById('menuBox');
+
+userMenuBox.addEventListener('click', function (e) {
+    e.stopPropagation(); // 외부 클릭 방지
+    userMenuBox.classList.toggle('pinned'); // toggle 고정
+});
+
+const userSwitchBox = document.getElementById('switchBox');
+
+userSwitchBox.addEventListener('click', function (e) {
+    e.stopPropagation(); // 외부 클릭 방지
+    userSwitchBox.classList.toggle('pinned'); // toggle 고정
+});
+
+document.getElementById('switchToggle').addEventListener('click', function () {
+    this.classList.toggle('pinned');
+});
+
 document.getElementById('userIconToggle').addEventListener('click', function () {
     this.classList.toggle('pinned');
 });
-//
-// document.getElementById('headerDropdownToggle').addEventListener('click', function () {
-//     this.classList.toggle('pinned');
-// });
+
+document.getElementById('headerDropdownToggle').addEventListener('click', function () {
+    this.classList.toggle('pinned');
+});
 
 // 룸메이트 쉐어하우스 전환하는 navbar 안보이게 설정
 document.addEventListener('DOMContentLoaded', function () {
@@ -255,6 +255,10 @@ document.addEventListener("DOMContentLoaded", function () {
             .header-menu-container:hover:not(.pinned),
             .header-menu-container.pinned {
                 width: 250px !important;
+            }
+            #headerDropdownToggle {
+                margin-top: 2px;
+                margin-right: 176px;
             }
         `;
         document.head.appendChild(style);

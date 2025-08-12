@@ -124,6 +124,7 @@
 <script>
     const roomId = "${roomId}";
     const userId = "<%= session.getAttribute("SS_USER_ID") %>";
+    const clientId = 'client-' + Math.random().toString(36).substring(2, 15);  // 고유 식별자
     let lastMessageDate = "";
 
     document.getElementById("messageInput").addEventListener("keydown", function (event) {
@@ -144,14 +145,13 @@
         const socket = new SockJS("/ws-chat");
         stompClient = Stomp.over(socket);
 
-        // 디버깅용 로그
         stompClient.debug = function (str) {
             console.log('[STOMP DEBUG]', str);
         };
 
         stompClient.connect({}, function () {
 
-            // 1. 메시지 먼저 로드
+            // 1. 이전 메시지 불러오기
             fetch(`/chat/messages?roomId=${roomId}`)
                 .then(res => res.json())
                 .then(messages => {
@@ -161,11 +161,18 @@
                 })
                 .catch(err => console.error("메시지 로딩 실패:", err))
                 .finally(() => {
-                    // 2. subscribe는 마지막에!
+                    // 2. WebSocket 구독
                     stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
                         console.log("📥 수신:", message.body);
                         try {
                             const msg = JSON.parse(message.body);
+
+                            // 🔒 같은 브라우저(탭)에서 보낸 메시지면 무시
+                            if (msg.clientId === clientId) {
+                                console.log("⚠️ 같은 클라이언트에서 보낸 메시지 무시됨");
+                                return;
+                            }
+
                             appendMessage(msg.senderId, msg.message, msg.timestamp || msg.sentAt || new Date());
                         } catch (e) {
                             console.error("❌ JSON 파싱 에러:", e);
@@ -184,27 +191,24 @@
             roomId: roomId,
             senderId: userId,
             message: message,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            clientId: clientId  // ✅ clientId 포함
         };
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(msg));
         messageInput.value = '';
     }
 
     function appendMessage(sender, text, time) {
-        console.log("📌 appendMessage 실행됨", { sender, text, time });
-        console.log("sender:", sender, "| userId:", userId);
-
         const chatBox = document.getElementById("chatBox");
         if (!chatBox) {
             console.error("❌ chatBox 요소를 찾을 수 없습니다.");
             return;
         }
-        // const chatBox = document.getElementById("chatBox");
+
         const msgDate = new Date(time);
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
         const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // 날짜 변경 시 구분선 추가
         if (lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
             dateSeparator.className = "date-separator";
