@@ -62,7 +62,7 @@
                 });
 
                 $("#roommateBtn").on("click", function () {
-                    checkLoginAndRedirect("/user/roommateMain");
+                    checkLoginAndRedirect("/roommate/roommateMain");
                 });
 
                 $("#sharehouseBtn").on("click", function () {
