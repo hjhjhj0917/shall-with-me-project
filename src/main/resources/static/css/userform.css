@@ -12,7 +12,6 @@ body {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
     box-shadow: 6px 5px 16px rgba(0, 0, 0, 0.25);
-
     position: relative;
     text-align: center;
     min-width: 300px;
@@ -98,7 +97,7 @@ body {
 
 .login-input:focus {
     border-color: #3399ff;
-    box-shadow: 0 0 0 2px rgba(123, 63, 228, 0.2);
+    box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
 }
 
 /* 자동 로그인 & 비밀번호 찾기 */
@@ -180,4 +179,21 @@ body {
 
 a {
     cursor: pointer;
+}
+
+.error-message {
+    color: #3399ff;
+    font-size: 14px;
+    text-align: left;          /* 왼쪽 정렬 */
+    height: 5px;              /* 고정 높이로 레이아웃 안정 */
+    padding-left: 10px;
+    visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+}
+
+.error-message.visible {
+    visibility: visible;       /* 메시지가 있을 때 표시 */
+}
+
+.input-error {
+    border: 2px solid #3399ff !important;
 }
