@@ -16,11 +16,62 @@
             $("#btnSearchUserId").on("click", function () { location.href = "/user/searchUserId"; });
             $("#btnSearchPassword").on("click", function () { location.href = "/user/searchPassword"; });
 
+            $(document).on("click", function (e) {
+                const $target = $(e.target);
+
+                // 클릭한 요소가 input이나 로그인 버튼이 아니면 에러 스타일 제거
+                if (
+                    !$target.is("#userId") &&
+                    !$target.is("#password") &&
+                    !$target.is("#btnLogin")
+                ) {
+                    $(".login-input").removeClass("input-error");
+                    $("#loginErrorMessage").removeClass("visible");
+                }
+            });
+
             $("#btnLogin").on("click", function () {
                 let f = document.getElementById("f");
+                let userId = f.userId.value.trim();
+                let password = f.password.value.trim();
+                let hasError = false;
 
-                if (f.userId.value === "") { alert("아이디를 입력하세요."); f.userId.focus(); return; }
-                if (f.password.value === "") { alert("비밀번호를 입력하세요."); f.password.focus(); return; }
+                // 초기화
+                $(".login-input").removeClass("input-error");
+                $("#loginErrorMessage").removeClass("visible").text("");
+
+                if (f.userId.value === "") {
+
+                    $("#userId").addClass("input-error");
+                    $("#loginErrorMessage")
+                        .text("아이디를 입력하세요.")
+                        .addClass("visible");
+
+                    // 2초 후 메시지 자동 숨김
+                    setTimeout(function () {
+                        $("#loginErrorMessage").removeClass("visible");
+                    }, 2000);
+
+                    $("#userId").focus();
+                    return;
+
+                } else if (f.password.value === "") {
+
+                    $("#password").addClass("input-error");
+                    $("#loginErrorMessage")
+                        .text("아이디를 입력하세요.")
+                        .addClass("visible");
+
+                    // 2초 후 메시지 자동 숨김
+                    setTimeout(function () {
+                        $("#loginErrorMessage").removeClass("visible");
+                    }, 2000);
+
+                    $("#password").focus();
+                    return;
+                }
+
+                if (hasError) return;
 
                 $.ajax({
                     url: "/user/loginProc",
@@ -29,7 +80,9 @@
                     data: $("#f").serialize(),
                     success: function (json) {
                         if (json.result === 1) {
-                            showCustomAlert(json.msg, function() { location.href = "/user/main"; });
+                            showCustomAlert(json.msg, function() {
+                                location.href = "/user/main";
+                            });
                         } else if (json.result === 3) {
                             showCustomAlert(json.msg);
                             showCustomAlert("회원님의 성향태그를 선택하여주세요", function () {
@@ -91,6 +144,7 @@
         <div class="logo">살며시</div>
         <div class="logo-2">Shall With Me</div>
     </div>
+    <div id="loginErrorMessage" class="error-message"></div>
     <form id="f">
         <input type="text" name="userId" id="userId" class="login-input" placeholder="아이디" />
         <input type="password" name="password" id="password" class="login-input" placeholder="비밀번호" />
