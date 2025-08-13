@@ -1,0 +1,183 @@
+body {
+    background-image: url("../images/kpaas-background.png");
+}
+
+.login-form-wrapper {
+    width: 360px;
+    margin: 80px auto;
+    margin-top: 100px;
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    box-shadow: 6px 5px 16px rgba(0, 0, 0, 0.25);
+
+    position: relative;
+    text-align: center;
+    min-width: 300px;
+}
+
+/* 세로 login 탭 */
+.login-tab {
+    position: absolute;
+    top: 17%;
+    right: -30px;
+    transform: translateY(-50%);
+    background-color: #4da3ff;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px 5px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: default;
+    height: 150px;
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 12px;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+}
+
+.login-tab1 {
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    transform: translateY(-50%);
+    background-color: #91C4FB;
+    width: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px 5px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: default;
+    height: 150px;
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 12px;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
+    z-index: 1;
+}
+
+.login-tab2 {
+    position: absolute;
+    top: 82.8%;
+    right: -20px;
+    transform: translateY(-50%);
+    background-color: #B1B1B1;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px 5px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: default;
+    width: 10px;
+    height: 150px;
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 12px;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
+}
+
+#f {
+    padding-top: 20px;
+}
+
+/* 입력 필드 */
+.login-input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    border-color: #3399ff;
+    box-shadow: 0 0 0 2px rgba(123, 63, 228, 0.2);
+}
+
+/* 자동 로그인 & 비밀번호 찾기 */
+.login-options {
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #666;
+    margin: 8px 0 16px;
+}
+
+.login-options input {
+    margin-right: 4px;
+}
+
+.login-options a {
+    text-decoration: none;
+    color: #3399ff;
+}
+
+/* 로그인 버튼 */
+.login-btn {
+    width: 100%;
+    background-color: #3399ff;
+    color: white;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login-btn:hover {
+    background-color: #3399ff;
+}
+
+/* 회원가입 링크 */
+.signup-link {
+    margin-top: 18px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.signup-link a {
+    color: #3399ff;
+    text-decoration: none;
+}
+
+/* 소셜 로그인 */
+.social-login {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.social-btn {
+    border: 1px solid #ddd;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: white;
+    transition: 0.2s;
+}
+
+.social-btn:hover {
+    background-color: #f9f9f9;
+}
+
+.social-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+a {
+    cursor: pointer;
+}
