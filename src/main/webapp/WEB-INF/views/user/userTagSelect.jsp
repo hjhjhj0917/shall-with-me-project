@@ -120,23 +120,23 @@
     </div>
 </div>
 
-<div class="progress-indicator">
-    <div class="step-wrapper" onclick="goToSlide(0)">
-        <div class="step" data-index="0">1</div>
-    </div>
-    <div class="line"></div>
-    <div class="step-wrapper" onclick="goToSlide(1)">
-        <div class="step" data-index="1">2</div>
-    </div>
-    <div class="line"></div>
-    <div class="step-wrapper" onclick="goToSlide(2)">
-        <div class="step" data-index="2">3</div>
-    </div>
-    <div class="line"></div>
-    <div class="step-wrapper" onclick="goToSlide(3)">
-        <div class="step" data-index="3">4</div>
-    </div>
-</div>
+<%--<div class="progress-indicator">--%>
+<%--    <div class="step-wrapper" onclick="goToSlide(0)">--%>
+<%--        <div class="step" data-index="0">1</div>--%>
+<%--    </div>--%>
+<%--    <div class="line"></div>--%>
+<%--    <div class="step-wrapper" onclick="goToSlide(1)">--%>
+<%--        <div class="step" data-index="1">2</div>--%>
+<%--    </div>--%>
+<%--    <div class="line"></div>--%>
+<%--    <div class="step-wrapper" onclick="goToSlide(2)">--%>
+<%--        <div class="step" data-index="2">3</div>--%>
+<%--    </div>--%>
+<%--    <div class="line"></div>--%>
+<%--    <div class="step-wrapper" onclick="goToSlide(3)">--%>
+<%--        <div class="step" data-index="3">4</div>--%>
+<%--    </div>--%>
+<%--</div>--%>
 
 <div class="slider-container" id="slider">
     <!-- 슬라이드 1 -->
