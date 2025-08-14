@@ -431,12 +431,6 @@ public class UserInfoController {
         return "user/userTagSelect";
     }
 
-    @GetMapping(value = "preTagSelect") // /WEB-INF/views/user/index.jsp 로 이동
-    public String preTagSelect() {
-
-        return "user/preTagSelect";
-    }
-
     @GetMapping(value = "navBar") // /WEB-INF/views/user/navBar.jsp 로 이동
     public String navBarPage() {
 
