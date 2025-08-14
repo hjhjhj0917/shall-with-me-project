@@ -41,10 +41,9 @@ body {
 .login-tab1 {
     position: absolute;
     top: 50%;
-    right: -20px;
+    right: -30px;
     transform: translateY(-50%);
     background-color: #91C4FB;
-    width: 10px;
     color: white;
     font-weight: bold;
     font-size: 14px;
@@ -61,8 +60,8 @@ body {
 
 .login-tab2 {
     position: absolute;
-    top: 82.8%;
-    right: -20px;
+    top: 83%;
+    right: -30px;
     transform: translateY(-50%);
     background-color: #B1B1B1;
     color: white;
@@ -72,7 +71,6 @@ body {
     writing-mode: vertical-rl;
     text-orientation: mixed;
     cursor: default;
-    width: 10px;
     height: 150px;
     border-bottom-right-radius: 30px;
     border-top-right-radius: 12px;
@@ -194,6 +192,26 @@ a {
     visibility: visible;       /* 메시지가 있을 때 표시 */
 }
 
-.input-error {
-    border: 2px solid #3399ff !important;
+/* 공통 hover 효과 */
+.login-tab,
+.login-tab1,
+.login-tab2 {
+    transition: transform 0.2s ease, background-color 0.3s;
+    transform-origin: left center; /* 왼쪽을 기준으로 확대 */
+    will-change: transform;
 }
+
+.login-tab:hover,
+.login-tab1:hover,
+.login-tab2:hover {
+    transform: translateY(-50%) scaleX(1.1); /* 오른쪽으로만 커짐 */
+    cursor: pointer;
+}
+
+/* 현재 활성화된 탭 스타일 */
+.active-tab {
+    right: -39px;
+    font-size: 20px !important;
+    z-index: 3 !important;
+}
+

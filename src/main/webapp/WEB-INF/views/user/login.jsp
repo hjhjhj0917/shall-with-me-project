@@ -4,17 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인하기</title>
-    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="text/javascript">
         $(document).ready(function () {
             $("#btnUserReg").on("click", function () { location.href = "/user/userRegForm"; });
             $("#btnSearchUserId").on("click", function () { location.href = "/user/searchUserId"; });
             $("#btnSearchPassword").on("click", function () { location.href = "/user/searchPassword"; });
+
+            // 탭 클릭 시 해당 페이지로 이동
+            $(".login-tab1").on("click", function () {
+                location.href = "/user/searchUserId";
+            });
+
+            $(".login-tab2").on("click", function () {
+                location.href = "/user/searchPassword";
+            });
 
             $(document).on("click", function (e) {
                 const $target = $(e.target);
@@ -59,7 +68,7 @@
 
                     $("#password").addClass("input-error");
                     $("#loginErrorMessage")
-                        .text("아이디를 입력하세요.")
+                        .text("비밀번호를 입력하세요.")
                         .addClass("visible");
 
                     // 2초 후 메시지 자동 숨김
@@ -137,9 +146,9 @@
 
 <!-- 로그인 폼 영역 -->
 <div class="login-form-wrapper">
-    <div class="login-tab">LOGIN</div>
-    <div class="login-tab1"></div>
-    <div class="login-tab2"></div>
+    <div class="login-tab active-tab">LOGIN</div>
+    <div class="login-tab1">FIND ID</div>
+    <div class="login-tab2">FIND PW</div>
     <div class="header">
         <div class="logo">살며시</div>
         <div class="logo-2">Shall With Me</div>
@@ -156,8 +165,8 @@
         </div>
 
         <div class="login-options">
-            <a href="#" id="btnSearchUserId">아이디 찾기</a>
-            <a href="#" id="btnSearchPassword">비밀번호 찾기</a>
+            <a>ㅤ</a>
+            <a>ㅤ</a>
         </div>
     </form>
 </div>
