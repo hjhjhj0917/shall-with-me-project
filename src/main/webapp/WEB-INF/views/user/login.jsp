@@ -64,7 +64,8 @@
                     $("#userId").focus();
                     return;
 
-                } else if (f.password.value === "") {
+                }
+                if (f.password.value === "") {
 
                     $("#password").addClass("input-error");
                     $("#loginErrorMessage")
@@ -165,7 +166,7 @@
         </div>
 
         <div class="login-options">
-            <a>ㅤ</a>
+            <a></a>
             <a>ㅤ</a>
         </div>
     </form>
