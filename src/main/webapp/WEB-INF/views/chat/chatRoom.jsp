@@ -167,6 +167,8 @@
                         try {
                             const msg = JSON.parse(message.body);
 
+                            console.log("appendMessage 호출 sender:", msg.senderId);  // 여기에 추가
+
                             // 🔒 같은 브라우저(탭)에서 보낸 메시지면 무시
                             if (msg.clientId === clientId) {
                                 console.log("⚠️ 같은 클라이언트에서 보낸 메시지 무시됨");
@@ -200,10 +202,7 @@
 
     function appendMessage(sender, text, time) {
         const chatBox = document.getElementById("chatBox");
-        if (!chatBox) {
-            console.error("❌ chatBox 요소를 찾을 수 없습니다.");
-            return;
-        }
+        if (!chatBox) return;
 
         const msgDate = new Date(time);
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
@@ -216,40 +215,68 @@
             chatBox.appendChild(dateSeparator);
             lastMessageDate = dateStr;
         }
+        console.log("fetch 시작, userId:", sender);
+        console.log("fetch URL: /user/profile-image/" + sender);
+        // 💡 프로필 이미지 URL 비동기 조회
+        fetch("/user/profile-image/" + sender)
+        fetch("/user/profile-image/" + sender)
+            .then(res => {
+                console.log("fetch 응답 상태:", res.status, res.statusText);
+                if (!res.ok) {
+                    throw new Error("네트워크 응답 상태가 정상적이지 않음: " + res.status);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("fetch 응답 데이터:", data);
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "message-wrapper " + (sender === userId ? "me" : "other");
+                const imageUrl = data.imageUrl || '/images/noimg.png';
 
-        const profileImg = document.createElement("div");
-        profileImg.className = "profile-img";
+                const wrapper = document.createElement("div");
+                wrapper.className = "message-wrapper " + (sender === userId ? "me" : "other");
 
-        const msgContent = document.createElement("div");
-        msgContent.className = "message-content";
+                const profileImg = document.createElement("div");
+                profileImg.className = "profile-img";
 
-        const senderElem = document.createElement("div");
-        senderElem.className = "sender-id";
-        senderElem.textContent = sender;
+                const img = document.createElement("img");
+                img.src = imageUrl;
+                img.alt = "profile";
+                profileImg.appendChild(img);
 
-        const messageBubble = document.createElement("div");
-        messageBubble.className = "message-bubble";
+                console.log(`이미지 url : ${imageUrl}`);
 
-        const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        messageBubble.textContent = safeText;
+                const msgContent = document.createElement("div");
+                msgContent.className = "message-content";
 
-        const timeElem = document.createElement("div");
-        timeElem.className = "message-time";
-        timeElem.textContent = timeStr;
+                const senderElem = document.createElement("div");
+                senderElem.className = "sender-id";
+                senderElem.textContent = sender;
 
-        msgContent.appendChild(senderElem);
-        msgContent.appendChild(messageBubble);
-        msgContent.appendChild(timeElem);
+                const messageBubble = document.createElement("div");
+                messageBubble.className = "message-bubble";
 
-        wrapper.appendChild(profileImg);
-        wrapper.appendChild(msgContent);
+                const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                messageBubble.textContent = safeText;
 
-        chatBox.appendChild(wrapper);
-        chatBox.scrollTop = chatBox.scrollHeight;
+                const timeElem = document.createElement("div");
+                timeElem.className = "message-time";
+                timeElem.textContent = timeStr;
+
+                msgContent.appendChild(senderElem);
+                msgContent.appendChild(messageBubble);
+                msgContent.appendChild(timeElem);
+
+                wrapper.appendChild(profileImg);
+                wrapper.appendChild(msgContent);
+
+                chatBox.appendChild(wrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(err => {
+                console.error("프로필 이미지 불러오기 실패:", err);
+            });
     }
+
 
     window.onload = connect;
 </script>

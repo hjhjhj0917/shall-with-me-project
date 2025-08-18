@@ -30,6 +30,18 @@ public class UserInfoService implements IUserInfoService {
     private final IMailService mailService;
 
     @Override
+    public String getImageUrlByUserId(String userId) {
+
+        log.info("{}.getImageUrlByUserId Start!", this.getClass().getName());
+
+        String url = userInfoMapper.selectProfileImageUrlByUserId(userId);
+
+        log.info("{}.getImageUrlByUserId end!", this.getClass().getName());
+
+        return url;
+    }
+
+    @Override
     public int newPasswordProc(UserInfoDTO pDTO) throws Exception {
         log.info("{}.newPasswordProc Start!", this.getClass().getName());
 
