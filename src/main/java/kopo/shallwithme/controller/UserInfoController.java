@@ -286,11 +286,6 @@ public class UserInfoController {
         return "user/userRegForm";
     }
 
-    @GetMapping(value = "sharehouseReg")
-    public String sharehouseReg() {
-
-        return "sharehouse/sharehouseReg";
-    }
 
     @ResponseBody
     @PostMapping(value = "getUserIdExists")

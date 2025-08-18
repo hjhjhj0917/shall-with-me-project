@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html>
 <head>
     <title>sample</title>
@@ -31,15 +33,7 @@
         }
 
         /* 좌/우 박스 */
-        .roommate-right {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 48px;
-            display: flex;
-            flex-direction: column;
-            min-height: 600px;
-        }
+        .roommate-right,
         .roommate-left {
             background: #fff;
             border: 1px solid #ddd;
@@ -66,9 +60,9 @@
 
         /* 이미지 업로드 */
         .image-upload-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 32px;
         }
         .upload-box {
@@ -78,10 +72,9 @@
             align-items: center;
             justify-content: center;
             border: 2px dashed #bbb;
-            border-radius: 8px;
-            /* ⬇️ 고정 크기 */
-            width: 180px;
-            height: 180px;
+            border-radius: 100%;
+            width: 200px;
+            height: 200px;
             padding: 0;
             overflow: hidden;
             cursor: pointer;
@@ -94,6 +87,8 @@
         }
         .upload-box i { color: #999; margin-bottom: 12px; }
         .upload-box span { font-size: 14px; color: #666; }
+
+        /* 파일 인풋이 박스 전체를 덮도록 */
         .upload-box input[type="file"] {
             position: absolute;
             inset: 0;
@@ -111,29 +106,16 @@
             display: none;
         }
         .upload-box img.preview {
-            /* ⬇️ 박스 꽉 채우는 고정 표시 */
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 100%;
             display: block;
-        }
-        /* 삭제 버튼을 항상 위로 */
-        .upload-box .remove-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            z-index: 3;
-            border: 1px solid #ddd;
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            background: #fff;
-            font-size: 0.85rem;
-        }
-        /* 파일 인풋 클릭 막기 (삭제 버튼 클릭 가능) */
-        .upload-box.has-image input[type="file"] {
             pointer-events: none;
+        }
+
+        .upload-box.has-image input[type="file"] {
+            pointer-events: auto;
         }
 
         /* 자기소개 버튼 */
@@ -162,11 +144,19 @@
             line-height: 1.5;
         }
 
-        /* 반응형 */
+        /* 태그 */
+        .tag-chip-wrap { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+        .tag-chip {
+            display:inline-flex; align-items:center; gap:4px;
+            padding:6px 10px; border-radius:999px; background:#f2f6ff; color:#1c407d;
+            font-size:0.9rem; border:1px solid #d9e6ff;
+        }
+        .tag-type { color:#6b7da6; font-size:0.78rem; }
+        .tag-empty { color:#888; margin-left:8px; }
+
         @media (max-width: 1100px) {
-            #roommateForm { flex-direction: column; }
-            .roommate-left,
-            .roommate-right { flex: 1 1 auto; min-height: 520px; }
+            #roommateForm { flex-direction: column; gap: 30px; }
+            .roommate-left, .roommate-right { padding: 24px; }
         }
     </style>
 </head>
@@ -198,6 +188,7 @@
         </div>
         <div class="header-menu-container pinned" id="menuBox">
             <span class="slide-bg2"></span>
+            <button class="menu-list" onclick="location.href='/chat/userListPage'">메세지</button>
             <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
             <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
             <button class="header-dropdown-toggle" id="headerDropdownToggle">
@@ -215,46 +206,60 @@
         <!-- 왼쪽 -->
         <section class="roommate-left">
             <div class="form-group name-group">
-                <label>이름 : <span><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span></label>
+                <label>이름 :
+                    <span><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span>
+                </label>
             </div>
 
             <div class="image-upload-grid">
-                <div class="upload-box">
+                <c:set var="profileUrl" value="${userProfile.profileImageUrl}" />
+                <div class="upload-box ${not empty profileUrl ? 'has-image' : ''}" id="profileUploadBox">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
-                </div>
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
-                </div>
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
-                </div>
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
+                    <span>프로필 사진 업로드</span>
+
+                    <!-- ✅ 파일 name을 컨트롤러와 일치 -->
+                    <input type="file" name="profileImage" accept="image/*" />
+
+                    <!-- ✅ 기존 이미지가 있으면 미리보기 표시 -->
+                    <c:if test="${not empty profileUrl}">
+                        <img class="preview" src="${profileUrl}" alt="profile preview"/>
+                    </c:if>
                 </div>
             </div>
+
+            <!-- 태그 표시 -->
             <div class="form-group tag-group">
-                <label for="tagInput">보여질 태그 :</label>
-                <input type="text"
-                       id="tagInput"
-                       name="tags"
-                       placeholder="#보여질 태그를 등록하세요" />
+                <label>보여질 태그 :</label>
+                <c:choose>
+                    <c:when test="${not empty userTags}">
+                        <div class="tag-chip-wrap">
+                            <c:forEach var="t" items="${userTags}">
+                                <span class="tag-chip">
+                                    <c:out value="${empty t.tagName ? t.tag_name : t.tagName}"/>
+                                </span>
+                            </c:forEach>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="tag-empty">등록된 태그가 없습니다.</span>
+                    </c:otherwise>
+                </c:choose>
             </div>
+            <!-- /태그 표시 -->
+
         </section>
 
         <!-- 오른쪽 -->
         <section class="roommate-right">
-            <button type="button" class="intro-btn">자기 소개</button>
+            <button type="button" class="intro-btn" id="introBtn">자기 소개</button>
+
+            <!-- ✅ 기존 소개글이 있으면 채워서 보여줌 -->
             <textarea id="introTextarea"
                       name="introduction"
-                      placeholder="소개글 시작"></textarea>
+                      placeholder="소개글 시작"><c:out value="${userProfile.introduction}"/></textarea>
+
+            <!-- ✅ 저장 버튼 추가 -->
+            <button type="submit" class="intro-btn" style="margin-top:16px;">저장</button>
         </section>
     </form>
 </main>
@@ -279,21 +284,28 @@
     }
 %>
 
-<!-- JS: 미리보기 + 삭제 기능 -->
+<!-- JS -->
 <script>
+    function showCustomAlert(msg) {
+        const overlay = document.getElementById('customAlertOverlay');
+        document.getElementById('customAlertMessage').textContent = msg;
+        overlay.style.display = 'flex';
+    }
+
     document.querySelectorAll('.upload-box input[type="file"]').forEach((input) => {
+        const box = input.closest('.upload-box');
+
         input.addEventListener('change', (e) => {
             const file = e.target.files && e.target.files[0];
-            const box  = e.target.closest('.upload-box');
             if (!file) return;
 
             if (!file.type.startsWith('image/')) {
-                alert('이미지 파일만 업로드할 수 있어요.');
+                showCustomAlert('이미지 파일만 업로드할 수 있어요.');
                 e.target.value = '';
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
-                alert('파일 용량이 너무 커요. (최대 5MB)');
+                showCustomAlert('파일 용량이 너무 커요. (최대 5MB)');
                 e.target.value = '';
                 return;
             }
@@ -307,26 +319,15 @@
                     img = document.createElement('img');
                     img.className = 'preview';
                     box.appendChild(img);
-
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'remove-btn';
-                    btn.textContent = '이미지 삭제';
-                    btn.addEventListener('click', () => {
-                        // 파일 선택 해제
-                        input.value = '';
-                        // 프리뷰/버튼 제거
-                        img.remove();
-                        btn.remove();
-                        // 상태 복원
-                        box.classList.remove('has-image');
-                    });
-                    box.appendChild(btn);
                 }
                 img.src = reader.result;
             };
             reader.readAsDataURL(file);
         });
+    });
+
+    document.getElementById('introBtn')?.addEventListener('click', () => {
+        document.getElementById('introTextarea')?.focus();
     });
 </script>
 

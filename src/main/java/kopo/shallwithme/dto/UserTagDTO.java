@@ -9,6 +9,8 @@ import java.util.List;
 @Setter
 public class UserTagDTO {
     private String userId;
+    private Long tagId;
     private String tagType;
     private List<Integer> tagList;
+    private String tagName;
 }

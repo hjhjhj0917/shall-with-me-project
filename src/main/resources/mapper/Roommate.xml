@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 반드시 현재 인터페이스와 일치 -->
+<mapper namespace="kopo.shallwithme.mapper.IUserInfoMapper">
+
+    <!-- resultMap 안 쓰고 resultType으로 간단 매핑 -->
+    <select id="findByUserId" resultType="UserTagDTO">
+        SELECT
+            ut.user_id  AS userId,
+            ut.tag_id   AS tagId,
+            ut.tag_type AS tagType,
+            t.tag_name  AS tagName  -- ← 반드시 AS tagName
+        FROM USER_TAG ut
+                 JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+        ORDER BY ut.tag_id DESC
+    </select>
+    <select id="getUserProfile" parameterType="string" resultType="kopo.shallwithme.dto.UserProfileDTO">
+        SELECT
+            user_id,
+            profile_image_url AS profileImageUrl,
+            introduction,
+            reg_dt AS regDt,
+            chg_dt AS chgDt
+        FROM USER_PROFILE
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="upsertUserProfile" parameterType="kopo.shallwithme.dto.UserProfileDTO">
+        INSERT INTO USER_PROFILE (user_id, profile_image_url, introduction, reg_dt)
+        VALUES (#{userId}, #{profileImageUrl}, #{introduction}, NOW())
+            ON DUPLICATE KEY UPDATE
+                                 profile_image_url = VALUES(profile_image_url),
+                                 introduction      = VALUES(introduction),
+                                 chg_dt            = NOW();
+    </insert>
+
+</mapper>
