@@ -6,12 +6,10 @@ import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.impl.RoommateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,9 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -104,6 +100,36 @@ public class RoommateController {
 
         // 브라우저에서 접근 가능한 URL
         return "/uploads/profile/" + filename;
+    }
+
+    @GetMapping("/roommateMain")
+    public String roommateMain() {
+        // 템플릿/뷰 파일: templates/roommate/roommateMain.html (Thymeleaf)
+        // 또는 /WEB-INF/views/roommate/roommateMain.jsp (JSP)
+        return "roommate/roommateMain";
+    }
+
+    // ★ 무한 스크롤 목록 API (JSON)
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
+
+        int safePage = Math.max(page, 1); // 음수/0 방지
+
+        List<Map<String, Object>> items = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            int id = safePage * 100 + (i + 1);
+            Map<String, Object> it = new HashMap<>();
+            it.put("id", id);
+            it.put("imageUrl", "/images/noimg.png"); // 공용 이미지 경로
+            it.put("location", "송파구");
+            it.put("moveInText", "즉시");
+            it.put("priceText", "월세 55");
+            items.add(it);
+        }
+
+        boolean lastPage = (safePage >= 3); // 동일 로직
+        return Map.of("items", items, "lastPage", lastPage);
     }
 
 }
