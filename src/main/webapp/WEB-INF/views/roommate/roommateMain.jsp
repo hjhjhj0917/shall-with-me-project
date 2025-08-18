@@ -8,6 +8,15 @@
     <!-- ★ 변경: 룸메이트 전용 CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/roommate/roommateMain.css"/>
     <link rel="icon" href="${pageContext.request.contextPath}/images/noimg.png">
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $("#roommateAdd").on("click", function () {
+                location.href = "/roommate/roommateReg";
+            });
+        });
+    </script>
 </head>
 <body>
 <header>
@@ -135,7 +144,7 @@
     </section>
 
     <!-- 좌하단 등록 플로팅 버튼 -->
-    <button class="sh-fab" title="등록">
+    <button class="sh-fab" title="등록"  id="roommateAdd">
         <i class="fa-solid fa-plus"></i>
     </button>
 </main>
