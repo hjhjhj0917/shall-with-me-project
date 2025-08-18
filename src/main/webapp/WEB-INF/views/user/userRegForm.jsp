@@ -32,7 +32,7 @@
         };
         $.datepicker.setDefaults($.datepicker.regional['ko']);
     </script>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/regform.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <script type="text/javascript">
 

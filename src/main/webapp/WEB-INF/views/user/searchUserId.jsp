@@ -4,45 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <title>아이디 찾기</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/regform.css"/>
-    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/> <!-- 로그인과 같은 스타일 적용 -->
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+
     <script type="text/javascript">
-
-        // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
+            // 에러 스타일 제거
+            $(document).on("click", function (e) {
+                const $target = $(e.target);
 
-            // 로그인 화면 이동
-            $("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                if (
+                    !$target.is("#userName") &&
+                    !$target.is("#email") &&
+                    !$target.is("#btnSearchUserId")
+                ) {
+                    $(".login-input").removeClass("input-error");
+                    $("#findIdErrorMessage").removeClass("visible");
+                }
+            });
+
+            $(".login-tab").on("click", function () {
                 location.href = "/user/login";
-            })
+            });
 
-            // 아이디 찾기
+            $(".login-tab2").on("click", function () {
+                location.href = "/user/searchPassword";
+            });
+
+            $("#btnLogin").on("click", function () {
+                location.href = "/user/login";
+            });
+
             $("#btnSearchUserId").on("click", function () {
-                let f = document.getElementById("f"); // form 태그
+                let f = document.getElementById("f");
+                let userName = f.userName.value.trim();
+                let email = f.email.value.trim();
 
-                if (f.userName.value === "") {
-                    alert("이름을 입력하세요.");
-                    f.userName.focus();
+                $(".login-input").removeClass("input-error");
+                $("#findIdErrorMessage").removeClass("visible").text("");
+
+                if (userName === "") {
+                    $("#userName").addClass("input-error");
+                    $("#findIdErrorMessage").text("이름을 입력하세요.").addClass("visible");
+                    setTimeout(() => {
+                        $("#findIdErrorMessage").removeClass("visible");
+                    }, 2000);
+                    $("#userName").focus();
                     return;
                 }
 
-                if (f.email.value === "") {
-                    alert("이메일을 입력하세요.");
-                    f.email.focus();
+                if (email === "") {
+                    $("#email").addClass("input-error");
+                    $("#findIdErrorMessage").text("이메일을 입력하세요.").addClass("visible");
+                    setTimeout(() => {
+                        $("#findIdErrorMessage").removeClass("visible");
+                    }, 2000);
+                    $("#email").focus();
                     return;
                 }
 
-                f.method = "post"; // 아이디 찾기 정보 전송 방식
-                f.action = "/user/searchUserIdProc" // 아이디 찾기 URL
-
-                f.submit(); // 아이디 찾기 정보 전송하기
-            })
-
-
-        })
+                // 전송
+                f.method = "post";
+                f.action = "/user/searchUserIdProc";
+                f.submit();
+            });
+        });
     </script>
 </head>
 <body>
@@ -55,7 +90,7 @@
     </div>
     <div class="header-user-area">
         <div class="header-switch-container pinned" id="switchBox">
-            <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
+            <span class="slide-bg3"></span>
             <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
             <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
             <button class="header-dropdown-toggle" id="switchToggle">
@@ -63,16 +98,16 @@
             </button>
         </div>
         <div class="header-user-name-container pinned" id="userNameBox">
-            <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
+            <span class="slide-bg"></span>
             <span class="user-name-text" id="userNameText">
-        <%= session.getAttribute("SS_USER_NAME") %>님
-      </span>
+                <%= session.getAttribute("SS_USER_NAME") %>님
+            </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
                 <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
             </button>
         </div>
         <div class="header-menu-container pinned" id="menuBox">
-            <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
+            <span class="slide-bg2"></span>
             <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
             <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
             <button class="header-dropdown-toggle" id="headerDropdownToggle">
@@ -81,35 +116,45 @@
         </div>
     </div>
 </header>
-<div class="header">
-    <div class="logo">살며시</div>
-    <div class="logo-2">Shall With Me</div>
-</div>
-<form id="f">
-    <div class="divTable minimalistBlack">
-        <div class="divTableBody">
-            <div class="divTableRow">
-                <div class="divTableCell">이름
-                </div>
-                <div class="divTableCell">
-                    <input type="text" name="userName" id="userId" style="width:95%"/>
-                </div>
-            </div>
-            <div class="divTableRow">
-                <div class="divTableCell">이메일
-                </div>
-                <div class="divTableCell">
-                    <input type="email" name="email" id="email" style="width:95%"/>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div>
-        <button id="btnSearchUserId" type="button">아이디 찾기</button>
-        <button id="btnLogin" type="button">로그인</button>
-    </div>
-</form>
 
+<!-- 아이디 찾기 폼 영역 -->
+<div class="login-form-wrapper">
+    <div class="login-tab">LOGIN</div>
+    <div class="login-tab1 active-tab">FIND ID</div>
+    <div class="login-tab2">FIND PW</div>
+
+    <div class="header">
+        <div class="logo">살며시</div>
+        <div class="logo-2">Shall With Me</div>
+    </div>
+
+    <div id="findIdErrorMessage" class="error-message"></div>
+
+    <form id="f">
+        <input type="text" name="userName" id="userName" class="login-input" placeholder="이름" />
+        <input type="email" name="email" id="email" class="login-input" placeholder="이메일" />
+
+        <button id="btnSearchUserId" type="button" class="login-btn">아이디 찾기</button>
+
+        <div class="signup-link">
+            이미 계정이 있으신가요? <a href="#" id="btnLogin">ㅤ로그인</a>
+        </div>
+
+        <div class="login-options">
+            <a>ㅤ</a>
+            <a>ㅤ</a>
+        </div>
+    </form>
+</div>
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 </body>
 </html>

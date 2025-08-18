@@ -265,10 +265,7 @@ public class UserInfoController {
         return "user/roommateMain"; // 세션 체크는 인터셉터에서 이미 처리
     }
 
-    @GetMapping("/sharehouseMain")
-    public String sharehouseMain() {
-        return "user/sharehouseMain";
-    }
+
 
     @GetMapping(value ="loginResult")
     public String loginSuccess() {
@@ -428,12 +425,6 @@ public class UserInfoController {
     public String userTagSelect() {
 
         return "user/userTagSelect";
-    }
-
-    @GetMapping(value = "preTagSelect") // /WEB-INF/views/user/index.jsp 로 이동
-    public String preTagSelect() {
-
-        return "user/preTagSelect";
     }
 
     @GetMapping(value = "navBar") // /WEB-INF/views/user/navBar.jsp 로 이동
