@@ -42,6 +42,8 @@ public interface IUserInfoMapper {
     //룸메이트 프로필 저장
     int upsertUserProfile(UserProfileDTO pDTO);
     UserProfileDTO getUserProfile(String userId);
+
+    String selectProfileImageUrlByUserId(String userId);
 }
 
 

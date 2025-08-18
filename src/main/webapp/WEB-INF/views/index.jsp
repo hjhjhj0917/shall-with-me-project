@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>살며시</title>
-    <link rel="stylesheet" href="/css/index.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css"/>
 </head>
 <body>
 
