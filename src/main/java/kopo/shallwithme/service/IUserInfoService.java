@@ -28,4 +28,6 @@ public interface IUserInfoService {
 
     int countUserTags(UserTagDTO dto) throws Exception;
 
+
+
 }

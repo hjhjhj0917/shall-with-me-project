@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class MailController {
 
+
     private final IMailService mailService;
 
     @GetMapping(value = "mailForm")

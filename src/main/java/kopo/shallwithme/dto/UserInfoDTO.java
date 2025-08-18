@@ -27,4 +27,9 @@ public class UserInfoDTO {
     private int age; // kpaas 추가
     private String gender; // kpaas 추가
     private Date birthDate;
+
+    // 룸메이트 태그 불러오가
+    private String tagId;
+    private String tagType; // 'ME'
+
 }

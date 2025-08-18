@@ -19,7 +19,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Controller
 public class SharehouseController {
+    @GetMapping(value = "sharehouseReg")
+    public String sharehouseReg() {
 
+        return "sharehouse/sharehouseReg";
+    }
     @GetMapping("/sharehouseMain") // 아무거나 가능 알아볼수있게 적을것 (만들때)
     public String sharehouseMain() {
         return "sharehouse/sharehouseMain"; // 실제경로

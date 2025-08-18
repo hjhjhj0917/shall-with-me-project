@@ -259,6 +259,7 @@ public class UserInfoController {
         return res;
     }
 
+
     @GetMapping("/roommateMain")
     public String roommateMain() {
         return "user/roommateMain"; // 세션 체크는 인터셉터에서 이미 처리
@@ -282,11 +283,6 @@ public class UserInfoController {
         return "user/userRegForm";
     }
 
-    @GetMapping(value = "sharehouseReg")
-    public String sharehouseReg() {
-
-        return "sharehouse/sharehouseReg";
-    }
 
     @ResponseBody
     @PostMapping(value = "getUserIdExists")
