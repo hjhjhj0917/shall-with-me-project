@@ -16,6 +16,12 @@
             $("#btnSearchUserId").on("click", function () { location.href = "/user/searchUserId"; });
             $("#btnSearchPassword").on("click", function () { location.href = "/user/searchPassword"; });
 
+            $("#password").on("keydown", function (e) {
+                if (e.key === "Enter") {
+                    $("#btnLogin").click();
+                }
+            });
+
             // 탭 클릭 시 해당 페이지로 이동
             $(".login-tab1").on("click", function () {
                 location.href = "/user/searchUserId";

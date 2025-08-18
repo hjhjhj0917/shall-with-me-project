@@ -137,7 +137,7 @@
         <button id="btnSearchUserId" type="button" class="login-btn">아이디 찾기</button>
 
         <div class="signup-link">
-            이미 계정이 있으신가요? <a href="#" id="btnLogin">ㅤ로그인</a>
+            계정이 없으신가요? <a href="#" id="btnUserReg">ㅤ회원가입</a>
         </div>
 
         <div class="login-options">
