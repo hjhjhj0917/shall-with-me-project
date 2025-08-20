@@ -428,16 +428,16 @@ public class UserInfoController {
         return "user/userTagSelect";
     }
 
-    @GetMapping(value = "navBar") // /WEB-INF/views/user/navBar.jsp 로 이동
-    public String navBarPage() {
-
-        return "user/navBar";
-    }
-
-    @GetMapping(value = "main") // /WEB-INF/views/user/navBar.jsp 로 이동
+    @GetMapping(value = "main") //
     public String mainPage() {
 
         return "user/main";
+    }
+
+    @GetMapping(value = "sample") //
+    public String sample() {
+
+        return "includes/sample";
     }
 
     @GetMapping("/") // /WEB-INF/views/index.jsp 로 이동
@@ -485,7 +485,7 @@ public class UserInfoController {
     }
 
     // 로그아웃
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     @ResponseBody
     public MsgDTO logout(HttpSession session) {
         int res = 1; // 기본 성공

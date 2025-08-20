@@ -1,251 +1,69 @@
-// 이름 보여주는 js
-const userNameBox = document.getElementById('userNameBox');
-
-// 클릭시 줄어드는거
-userNameBox.addEventListener('click', function (e) {
-    e.stopPropagation(); // 외부 클릭 방지
-    userNameBox.classList.toggle('pinned'); // toggle 고정
-});
-
-const userMenuBox = document.getElementById('menuBox');
-
-userMenuBox.addEventListener('click', function (e) {
-    e.stopPropagation(); // 외부 클릭 방지
-    userMenuBox.classList.toggle('pinned'); // toggle 고정
-});
-
-const userSwitchBox = document.getElementById('switchBox');
-
-userSwitchBox.addEventListener('click', function (e) {
-    e.stopPropagation(); // 외부 클릭 방지
-    userSwitchBox.classList.toggle('pinned'); // toggle 고정
-});
-
-document.getElementById('switchToggle').addEventListener('click', function () {
-    this.classList.toggle('pinned');
-});
-
-document.getElementById('userIconToggle').addEventListener('click', function () {
-    this.classList.toggle('pinned');
-});
-
-document.getElementById('headerDropdownToggle').addEventListener('click', function () {
-    this.classList.toggle('pinned');
-});
-
-// 룸메이트 쉐어하우스 전환하는 navbar 안보이게 설정
 document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
+    // ✅ 초기화 (접힘 상태 유지)
+    const ids = ['menuBox', 'headerDropdownToggle'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('pinned');
+    });
 
-    if (pageName === 'main') {
-        const switchBox = document.getElementById('switchBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
+    ['userNameBox', 'menuBox', 'switchBox'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', function (e) {
+                e.stopPropagation();
+                el.classList.toggle('pinned');
+            });
         }
-    }
-});
+    });
 
-// 룸메이트 쉐어하우스 전환하는 navbar 안보이게 설정
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'userTagSelect') {
-        const switchBox = document.getElementById('switchBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
+// toggle 대상 요소만 클릭 시 pinned 토글
+    ['switchToggle', 'userIconToggle', 'headerDropdownToggle'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', function () {
+                el.classList.toggle('pinned');
+            });
         }
-    }
-});
+    });
 
-document.addEventListener('DOMContentLoaded', function () {
+    // ✅ 숨겨야 할 페이지들 처리
     const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
+    const pageName = path.split('/').pop();
 
-    if (pageName === 'userTagSelect') {
-        const switchBox = document.getElementById('menuBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
+    const hideBoxByPage = {
+        main: ['switchBox'],
+        userTagSelect: ['switchBox', 'menuBox'],
+        preTagSelect: ['switchBox', 'menuBox'],
+        userRegForm: ['switchBox', 'menuBox', 'userNameBox'],
+        login: ['userNameBox', 'switchBox', 'menuBox'],
+        searchUserId: ['userNameBox', 'switchBox', 'menuBox'],
+        searchPassword: ['userNameBox', 'switchBox', 'menuBox'],
+        chatRoom: ['switchBox'],
+    };
+
+    if (hideBoxByPage[pageName]) {
+        hideBoxByPage[pageName].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
     }
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'preTagSelect') {
-        const switchBox = document.getElementById('switchBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'preTagSelect') {
-        const switchBox = document.getElementById('menuBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-// 로그인 정보가 없으면 회원 이름정보 안보이게 설정
-document.addEventListener("DOMContentLoaded", function () {
+    // ✅ 로그인 안 돼 있으면 이름 박스 및 메뉴 수정
     if (!userName || userName.trim() === "") {
         const userNameBox = document.getElementById("userNameBox");
-        if (userNameBox) {
-            userNameBox.style.display = "none";
-        }
-    }
-});
+        if (userNameBox) userNameBox.style.display = "none";
 
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'userRegForm') {
-        const switchBox = document.getElementById('switchBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'userRegForm') {
-        const switchBox = document.getElementById('menuBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'login') {
-        const switchBox = document.getElementById('userNameBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'login') {
-        const switchBox = document.getElementById('switchBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'login') {
-        const switchBox = document.getElementById('menuBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'searchUserId') {
-        const switchBox1 = document.getElementById('menuBox');
-        const switchBox2 = document.getElementById('switchBox');
-        const switchBox3 = document.getElementById('userNameBox');
-        if (switchBox1) {
-            switchBox1.style.display = 'none';
-        }
-        if (switchBox2) {
-            switchBox2.style.display = 'none';
-        }
-        if (switchBox3) {
-            switchBox3.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'searchPassword') {
-        const switchBox1 = document.getElementById('menuBox');
-        const switchBox2 = document.getElementById('switchBox');
-        const switchBox3 = document.getElementById('userNameBox');
-        if (switchBox1) {
-            switchBox1.style.display = 'none';
-        }
-        if (switchBox2) {
-            switchBox2.style.display = 'none';
-        }
-        if (switchBox3) {
-            switchBox3.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'chatRoom') {
-        const switchBox2 = document.getElementById('switchBox');
-        if (switchBox2) {
-            switchBox2.style.display = 'none';
-        }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop(); // ex: 'main'
-
-    if (pageName === 'userRegForm') {
-        const switchBox = document.getElementById('userNameBox');
-        if (switchBox) {
-            switchBox.style.display = 'none';
-        }
-    }
-});
-
-// 로그인 정보가 없으면 메뉴에 로그인 회원가입이 뜨게 설정
-document.addEventListener("DOMContentLoaded", function () {
-    if (!userName || userName.trim() === "") {
-        // 로그인 안 된 경우
         const menuButtons = document.querySelectorAll("#menuBox .menu-list");
 
         if (menuButtons.length >= 2) {
-            // 첫 번째 버튼: 회원가입
             menuButtons[0].textContent = "회원가입";
             menuButtons[0].setAttribute("onclick", "location.href='/user/userRegForm'");
 
-            // 두 번째 버튼: 로그인
             menuButtons[1].textContent = "ㅤ로그인ㅤ";
             menuButtons[1].setAttribute("id", "loginBtn");
             menuButtons[1].setAttribute("onclick", "location.href='/user/login'");
         }
-        // 세 번째 버튼(로그아웃) 숨기기
+
         if (menuButtons.length >= 3) {
             menuButtons[2].style.display = "none";
         }

@@ -5,14 +5,24 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>채팅방</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat/chat.css"/>
+    <title>살며시 | 채팅방</title>
+
+    <%-- 모달 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <%-- 네브바 css --%>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
+    <%-- 채팅방 css --%>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat/chat.css"/>
+
+    <%-- js --%>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <%-- 웹소캣 관련 js --%>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+
+    <%-- 무료 아이콘 --%>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <script>
         $(document).ready(function () {
 
@@ -95,6 +105,7 @@
     </button>
 </div>
 
+<%-- 모달창 --%>
 <div id="customAlertOverlay" class="modal-overlay" style="display: none;">
     <div class="modal">
         <div class="modal-title">
@@ -276,7 +287,6 @@
                 console.error("프로필 이미지 불러오기 실패:", err);
             });
     }
-
 
     window.onload = connect;
 </script>

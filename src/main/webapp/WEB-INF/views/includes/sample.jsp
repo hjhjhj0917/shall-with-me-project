@@ -12,6 +12,32 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+  <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      $("#logout").on("click", function () {
+        showCustomAlert("로그아웃 하시겠습니까?", function () {
+          $.ajax({
+            url: "/user/logout",
+            type: "GET",
+            dataType: "json",
+            success: function (res) {
+              if (res.result === 1) {
+                location.href = "/user/main";
+
+              } else {
+                showCustomAlert("실패: " + res.msg);
+              }
+            },
+            error: function () {
+              showCustomAlert("서버 통신 중 오류가 발생했습니다.");
+            }
+          });
+        });
+      });
+    });
+  </script>
 </head>
 <body>
 <header>
@@ -41,8 +67,9 @@
     </div>
     <div class="header-menu-container pinned" id="menuBox">
       <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
+      <button class="menu-list" onclick="location.href='/chat/userListPage'">메세지</button>
       <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
-      <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
+      <button class="menu-list" id="logout">로그아웃</button>
       <button class="header-dropdown-toggle" id="headerDropdownToggle">
         <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
       </button>
