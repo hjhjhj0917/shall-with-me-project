@@ -13,13 +13,11 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
     <%-- 채팅방 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat/chat.css"/>
-
     <%-- js --%>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <%-- 웹소캣 관련 js --%>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-
     <%-- 무료 아이콘 --%>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
