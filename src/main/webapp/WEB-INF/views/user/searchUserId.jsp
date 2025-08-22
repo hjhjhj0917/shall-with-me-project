@@ -44,6 +44,10 @@
                 location.href = "/user/login";
             });
 
+            $("#btnUserReg").on("click", function () {
+                location.href = "/user/userRegForm";
+            });
+
             $("#btnSearchUserId").on("click", function () {
                 let f = document.getElementById("f");
                 let userName = f.userName.value.trim();

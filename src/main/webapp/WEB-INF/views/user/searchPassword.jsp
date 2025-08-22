@@ -39,6 +39,10 @@
                 location.href = "/user/login";
             });
 
+            $("#btnUserReg").on("click", function () {
+                location.href = "/user/userRegForm";
+            });
+
             $("#btnSearchPassword").on("click", function () {
                 let f = document.getElementById("f");
                 let userId = f.userId.value.trim();
