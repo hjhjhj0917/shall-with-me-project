@@ -33,6 +33,35 @@
             yearSuffix: '년'
         };
         $.datepicker.setDefaults($.datepicker.regional['ko']);
+
+        $("#birth-datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2025",
+            dateFormat: "yy-mm-dd",
+            beforeShow: function(input, inst) {
+                setTimeout(function() {
+                    const $container = $('.input-container');
+                    const offset = $container.offset();
+                    const width = $container.outerWidth();
+                    const height = $container.outerHeight();
+
+                    const dpWidth = $(inst.dpDiv).outerWidth();
+                    const dpHeight = $(inst.dpDiv).outerHeight();
+
+                    const top = offset.top + (height / 2) - (dpHeight / 2);
+                    const left = offset.left + (width / 2) - (dpWidth / 2);
+
+                    $(inst.dpDiv).css({
+                        position: 'absolute',
+                        top: top + 'px',
+                        left: left + 'px',
+                        transform: 'none',
+                        zIndex: 9999
+                    });
+                }, 0);
+            }
+        });
     </script>
     <style>
         body {
@@ -42,16 +71,16 @@
             /* ✅ 등록 폼 컨테이너 */
         .register-form-wrapper {
             width: 1100px;
+            margin: 0 auto;
             padding: 24px 32px;
             background-color: #FFFFFF;
             border-radius: 12px;
             border-top-right-radius: 0;
-            box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1),  /* 왼쪽 위쪽 그림자 진하게 */
-            6px 5px 16px rgba(0, 0, 0, 0.27);  /* 기존 그림자 유지 */
+            box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1), 6px 5px 16px rgba(0, 0, 0, 0.27);
             position: relative;
             text-align: center;
             box-sizing: border-box;
-            left: 410px;
+            overflow: visible; /* 중요 */
         }
         /*/////////////////////////////////////////*/
         /* form-row 내부의 input과 버튼들을 유연하게 배치 */
@@ -157,7 +186,7 @@
 
         .register-tab {
             position: absolute;
-            top: 10.6%;
+            top: 10.34%;
             right: -30px;
             transform: translateY(-50%);
             background-color: #4da3ff;
@@ -177,7 +206,7 @@
 
         .prefer-tab {
             position: absolute;
-            top: 31.5%;
+            top: 30.5%;
             right: -30px;
             transform: translateY(-50%);
             background-color: #91C4FB;
@@ -197,7 +226,7 @@
 
         .profile-tab {
             position: absolute;
-            top: 52.5%;
+            top: 51%;
             right: -30px;
             transform: translateY(-50%);
             background-color: #B1B1B1;
@@ -256,6 +285,170 @@
             border-color: #3399ff;
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
         }
+
+
+        /* ======================= */
+        /* 달력 전체 박스 */
+        .ui-datepicker {
+            width: 320px;
+            padding: 10px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+
+
+
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                z-index: 9999 !important;     /* 위로 띄우기 */
+
+        }
+
+        /* ======================= */
+        /* 헤더 (연/월 표시 부분) */
+        .ui-datepicker-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: none;
+            border: none;
+            padding: 10px 0;
+            gap: 6px;
+            position: relative;
+        }
+
+        .ui-datepicker-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 연도/월 select 스타일 */
+        .ui-datepicker select.ui-datepicker-month,
+        .ui-datepicker select.ui-datepicker-year {
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            padding: 2px 4px;
+            cursor: pointer;
+            overflow: hidden;         /* ✅ 스크롤 제거 */
+            max-height: 30px;         /* ✅ 높이 제한 */
+        }
+
+        /* ======================= */
+        /* 이전/다음 버튼 - 동그란 스타일 */
+        .ui-datepicker-prev,
+        .ui-datepicker-next {
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 8px;
+        }
+
+        .ui-datepicker-prev { left: 8px; }
+        .ui-datepicker-next { right: 8px; }
+
+        /* 화살표 모양 */
+        .ui-datepicker-prev:before,
+        .ui-datepicker-next:before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border: solid #333;
+            border-width: 0 2px 2px 0;
+        }
+        .ui-datepicker-prev:before { transform: rotate(135deg); }
+        .ui-datepicker-next:before { transform: rotate(-45deg); }
+
+        /* ======================= */
+        /* 요일 헤더 */
+        .ui-datepicker thead th {
+            color: #666;
+            font-weight: bold;
+            text-align: center;
+            padding: 6px 0;
+        }
+
+        /* ======================= */
+        /* 날짜 스타일 */
+        .ui-datepicker td {
+            text-align: center;
+            padding: 2px;
+        }
+
+        .ui-datepicker td a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        /* hover 시 */
+        .ui-datepicker td a:hover {
+            background-color: #e6f2ff;
+            color: #3399ff;
+        }
+
+        /* 오늘 날짜 */
+        .ui-datepicker-today a {
+            border: 1px solid #3399ff !important;
+            background-color: #fff !important;
+            color: #3399ff !important;
+            font-weight: bold;
+            border-radius: 50%;
+        }
+
+        /* 선택된 날짜 */
+        .ui-datepicker-current-day a {
+            background-color: #3399ff !important;
+            color: #fff !important;
+            font-weight: bold;
+            border-radius: 50%;
+        }
+        /* 연도 / 월 드롭다운 공통 스타일 */
+        .flatpickr-calendar select.flatpickr-monthDropdown-months,
+        .flatpickr-calendar select.numInput {
+            appearance: none;           /* 브라우저 기본 화살표 제거 */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            border: 1px solid #ddd;
+            border-radius: 6px;         /* 둥글게 */
+            padding: 2px 6px;
+            background-color: #fff;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+            overflow: hidden;           /* 스크롤 제거 */
+        }
+
+        /* 드롭다운 펼쳤을 때 옵션 스타일 */
+        .flatpickr-calendar select.flatpickr-monthDropdown-months option,
+        .flatpickr-calendar select.numInput option {
+            border-radius: 10px;         /* 옵션에도 살짝 둥근 느낌 */
+            padding: 4px;
+        }
+
     </style>
 </head>
 <body>
