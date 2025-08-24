@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IChatService {
 
-    void saveMessage(ChatDTO dto);
+    void saveMessage(ChatDTO pDTO);
 
     List<ChatDTO> getMessages(String roomId);
 

@@ -31,6 +31,9 @@ public class ChattingController {
 
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatDTO chatMessage) {
+
+        log.info("{}.sendMessage Start!", this.getClass().getName());
+
         // timestamp가 비어 있으면 현재 시간으로 설정
         if (chatMessage.getTimestamp() == null) {
             chatMessage.setTimestamp(LocalDateTime.now().toString());
@@ -38,35 +41,57 @@ public class ChattingController {
 
         chatService.saveMessage(chatMessage);
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatMessage.getRoomId(), chatMessage);
+
+        log.info("{}.sendMessage End!", this.getClass().getName());
     }
 
     @GetMapping("/messages")
     @ResponseBody
     public List<ChatDTO> getMessages(HttpServletRequest request) {
+
+        log.info("{}.getMessages Start!", this.getClass().getName());
+
         String roomIdStr = request.getParameter("roomId");
         if (roomIdStr == null) {
             throw new IllegalArgumentException("roomId 파라미터가 필요합니다.");
         }
         Integer roomId = Integer.valueOf(roomIdStr);
+
+        log.info("{}.getMessages End!", this.getClass().getName());
+
         return chatService.getMessagesByRoomId(roomId);
     }
 
     @PostMapping("createRoom")
     @ResponseBody
     public int createChatRoom(@RequestParam String user1Id, @RequestParam String user2Id) {
-        return chatService.createRoom(user1Id, user2Id);
+
+        log.info("{}.createRoom Start!", this.getClass().getName());
+
+        int res = chatService.createRoom(user1Id, user2Id);
+
+        log.info("{}.createRoom End!", this.getClass().getName());
+
+        return res;
     }
 
     @GetMapping("rooms")
     @ResponseBody
     public List<ChatRoomDTO> getChatRooms(@RequestParam String userId) {
+
         return chatService.getRoomsByUserId(userId);
     }
 
     @GetMapping("chatRoom")
     public String chatRoomPage(@RequestParam(required = false) Integer roomId, Model model) {
+
+        log.info("{}.chatRoomPage Start!", this.getClass().getName());
+
         log.info("Controller roomId: {}", roomId);
         model.addAttribute("roomId", roomId);
+
+        log.info("{}.chatRoomPage End!", this.getClass().getName());
+
         return "chat/chatRoom";
     }
 
@@ -80,6 +105,7 @@ public class ChattingController {
 
     @GetMapping("userListPage")
     public String userListPage() {
+
         return "chat/userList";  // /WEB-INF/views/chat/userList.jsp
     }
 
@@ -87,6 +113,9 @@ public class ChattingController {
     @GetMapping("createOrGetRoom")
     @ResponseBody
     public ResponseEntity<?> createOrGetRoom(@RequestParam String otherUserId, HttpSession session) {
+
+        log.info("{}.createOrGetRoom Start!", this.getClass().getName());
+
         String currentUserId = (String) session.getAttribute("SS_USER_ID");
 
         if (currentUserId == null || currentUserId.equals(otherUserId)) {
