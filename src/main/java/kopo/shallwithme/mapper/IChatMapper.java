@@ -10,11 +10,11 @@ import java.util.List;
 @Mapper
 public interface IChatMapper {
 
-    void insertChatMessage(ChatDTO dto);
+    void insertChatMessage(ChatDTO pDTO);
 
     List<ChatDTO> selectChatMessages(String roomId);
 
-    void createChatRoom(ChatRoomDTO dto);
+    void createChatRoom(ChatRoomDTO pDTO);
 
     List<ChatRoomDTO> getRoomsByUserId(String userId);
 
