@@ -1,4 +1,26 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+    $("#logout").on("click", function () {
+        showCustomAlert("로그아웃 하시겠습니까?", function () {
+            $.ajax({
+                url: "/user/logout",
+                type: "Post",
+                dataType: "json",
+                success: function (res) {
+                    if (res.result === 1) {
+                        location.href = "/user/main";
+
+                    } else {
+                        showCustomAlert("실패: " + res.msg);
+                    }
+                },
+                error: function () {
+                    showCustomAlert("서버 통신 중 오류가 발생했습니다.");
+                }
+            });
+        });
+    });
+
     // ✅ 초기화 (접힘 상태 유지)
     const ids = ['menuBox', 'headerDropdownToggle'];
     ids.forEach(id => {

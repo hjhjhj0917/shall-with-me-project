@@ -266,17 +266,6 @@ public class UserInfoController {
         return "user/roommateMain"; // 세션 체크는 인터셉터에서 이미 처리
     }
 
-
-
-    @GetMapping(value ="loginResult")
-    public String loginSuccess() {
-        log.info("{}.user/loginResult Start!", this.getClass().getName());
-
-        log.info("{}.user/loginResult End!", this.getClass().getName());
-
-        return "user/loginResult";
-    }
-
     @GetMapping(value = "userRegForm")
     public String userRegForm() {
         log.info(this.getClass().getName() + ".user/userRegForm");
