@@ -5,7 +5,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>살며시 | 채팅방</title>
+    <title>살며시|채팅방</title>
 
     <%-- 모달 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
