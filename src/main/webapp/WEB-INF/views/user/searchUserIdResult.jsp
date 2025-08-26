@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="kopo.shallwithme.dto.UserInfoDTO" %>
 <%@ page import="kopo.shallwithme.util.CmmUtil" %>
 <%
