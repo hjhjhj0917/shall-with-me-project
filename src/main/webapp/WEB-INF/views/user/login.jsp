@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>로그인하기</title>
+    <title>살며시|로그인</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>

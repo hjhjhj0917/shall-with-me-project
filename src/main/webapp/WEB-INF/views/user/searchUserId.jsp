@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>아이디 찾기</title>
+    <title>살며시|아이디 찾기</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>

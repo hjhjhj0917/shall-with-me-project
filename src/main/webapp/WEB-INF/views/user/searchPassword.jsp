@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>비밀번호 찾기</title>
+    <title>살며시|비밀번호 찾기</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>회원가입 화면</title>
+    <title>살며시|회원가입</title>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
