@@ -11,6 +11,7 @@ import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -427,16 +428,16 @@ public class UserInfoController {
         return "user/userTagSelect";
     }
 
-    @GetMapping(value = "navBar") // /WEB-INF/views/user/navBar.jsp 로 이동
-    public String navBarPage() {
-
-        return "user/navBar";
-    }
-
-    @GetMapping(value = "main") // /WEB-INF/views/user/navBar.jsp 로 이동
+    @GetMapping(value = "main") //
     public String mainPage() {
 
         return "user/main";
+    }
+
+    @GetMapping(value = "sample") //
+    public String sample() {
+
+        return "includes/sample";
     }
 
     @GetMapping("/") // /WEB-INF/views/index.jsp 로 이동
@@ -484,7 +485,7 @@ public class UserInfoController {
     }
 
     // 로그아웃
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     @ResponseBody
     public MsgDTO logout(HttpSession session) {
         int res = 1; // 기본 성공
@@ -505,5 +506,21 @@ public class UserInfoController {
 
         return dto;
     }
+
+    // 회원 프로필 이미지 불러오기
+    @GetMapping("/profile-image/{userId}")
+    public ResponseEntity<Map<String, String>> getProfileImage(@PathVariable String userId) {
+
+        log.info("getProfileImage start!");
+
+        String imageUrl = userInfoService.getImageUrlByUserId(userId);
+        Map<String, String> result = new HashMap<>();
+        result.put("imageUrl", imageUrl != null ? imageUrl : "/images/noimg.png");
+
+        log.info("getProfileImage end!");
+
+        return ResponseEntity.ok(result);
+    }
+
 }
 

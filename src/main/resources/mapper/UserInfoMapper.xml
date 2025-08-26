@@ -105,6 +105,12 @@
             ORDER BY ut.tag_type
         </select>
 
+<!--    회원 프로필 이미지 불러오기-->
+    <select id="selectProfileImageUrlByUserId" resultType="string" parameterType="string">
+        SELECT profile_image_url
+        FROM USER_PROFILE
+        WHERE user_id = #{userId}
+    </select>
 
 
 </mapper>

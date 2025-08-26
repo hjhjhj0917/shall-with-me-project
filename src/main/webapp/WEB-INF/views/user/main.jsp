@@ -44,7 +44,7 @@
                     showCustomAlert("로그아웃 하시겠습니까?", function () {
                         $.ajax({
                             url: "/user/logout",
-                            type: "GET",
+                            type: "Post",
                             dataType: "json",
                             success: function (res) {
                                 if (res.result === 1) {

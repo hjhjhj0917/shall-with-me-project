@@ -28,6 +28,6 @@ public interface IUserInfoService {
 
     int countUserTags(UserTagDTO dto) throws Exception;
 
-
-
+    // 회원 프로필 이미지 불러오기
+    String getImageUrlByUserId(String userId);
 }
