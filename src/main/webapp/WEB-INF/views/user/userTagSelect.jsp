@@ -353,8 +353,8 @@
     console.log(userId);
 </script>
 
-<script src="${pageContext.request.contextPath}/js/tag.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+<script src="${pageContext.request.contextPath}/js/tag.js"></script>
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 
 </body>
