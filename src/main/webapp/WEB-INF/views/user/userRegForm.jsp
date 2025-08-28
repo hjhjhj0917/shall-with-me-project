@@ -277,11 +277,7 @@
             visibility: visible;       /* 메시지가 있을 때 표시 */
         }
 
-        .register-input {
-            border: 1px solid #ddd;
-        }
-
-        .register-input:focus {
+        .form-row input:focus {
             outline: none;
             border-color: #3399ff;
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
@@ -467,48 +463,48 @@
     <form id="f">
         <div class="input-container">
             <div class="form-row">
-                <input type="text" name="userName" placeholder="이름" class="register-input"/>
+                <input type="text" name="userName" placeholder="이름"/>
             </div>
 
         <div class="form-row flex-row">
-            <input type="text" name="userId" placeholder="아이디" class="register-input"/>
+            <input type="text" name="userId" placeholder="아이디"/>
             <button type="button" id="btnUserId" class="form-button">중복확인</button>
         </div>
             <div class="form-row">
-        <input type="password" name="password" placeholder="비밀번호" class="register-input"/>
+        <input type="password" name="password" placeholder="비밀번호"/>
             </div>
             <div class="form-row">
-        <input type="password" name="password2" placeholder="비밀번호 확인" class="register-input"/>
+        <input type="password" name="password2" placeholder="비밀번호 확인"/>
             </div>
 
         <div class="form-row flex-row">
-            <input type="email" name="email" placeholder="이메일" class="register-input"/>
+            <input type="email" name="email" placeholder="이메일"/>
             <button type="button" id="btnEmail" class="form-button">요청</button>
         </div>
 
             <div class="form-row">
-        <input type="text" name="authNumber" placeholder="인증번호 입력" class="register-input"/>
+        <input type="text" name="authNumber" placeholder="인증번호 입력"/>
                 <button type="button" id="btnAuthCheck" class="form-button">확인</button>
             </div>
 
         <div class="form-row flex-row">
-            <input type="text" name="addr1" placeholder="주소" class="register-input"/>
+            <input type="text" name="addr1" placeholder="주소"/>
             <button type="button" id="btnAddr" class="form-button">우편번호</button>
         </div>
 
             <div class="form-row">
-        <input type="text" name="addr2" placeholder="상세주소" class="register-input"/>
+        <input type="text" name="addr2" placeholder="상세주소"/>
             </div>
 
         <div class="form-row birth-row" id="birth-row">
-            <input type="text" name="birthYear" placeholder="2025" class="birth-input" readonly class="register-input"/>
-            <input type="text" name="birthMonth" placeholder="01" class="birth-input" readonly class="register-input"/>
-            <input type="text" name="birthDay" placeholder="01" class="birth-input" readonly class="register-input"/>
+            <input type="text" name="birthYear" placeholder="2025" class="birth-input" readonly/>
+            <input type="text" name="birthMonth" placeholder="01" class="birth-input" readonly/>
+            <input type="text" name="birthDay" placeholder="01" class="birth-input" readonly/>
         </div>
 
         <div class="gender-select">
-            <label><input type="radio" name="gender" value="M" class="register-input"/> 남성</label>
-            <label><input type="radio" name="gender" value="F" class="register-input"/> 여성</label>
+            <label><input type="radio" name="gender" value="M"/> 남성</label>
+            <label><input type="radio" name="gender" value="F"/> 여성</label>
         </div>
 
         <button type="button" id="btnSend" class="form-button submit-button">회원가입</button>
