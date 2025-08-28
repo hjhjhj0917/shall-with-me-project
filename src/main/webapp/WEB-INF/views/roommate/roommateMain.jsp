@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <html>
 <head>
-    <title>살며시|룸메이트 찾기</title>
+    <title>살며시: 룸메이트 찾기</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
@@ -179,19 +179,8 @@
     </div>
 </div>
 
-<!-- 알림 모달 -->
-<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
-            <h2>살며시</h2>
-        </div>
-        <p id="customAlertMessage">메시지 내용</p>
-        <div class="modal-buttons" style="text-align: right;">
-            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
-        </div>
-    </div>
-</div>
+<!-- 커스텀 알림창 -->
+<%@ include file="../includes/customModal.jsp"%>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");

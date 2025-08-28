@@ -102,5 +102,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         `;
         document.head.appendChild(style);
+
+        const hideBoxes = hideBoxByPage[pageName] || [];
+
+        ['menuBox'].forEach(id => {
+            if (hideBoxes.includes(id)) return;  // 숨겨야 할 박스는 무시
+
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('pinned');
+                el.style.display = '';  // 보이게
+            }
+        });
     }
 });

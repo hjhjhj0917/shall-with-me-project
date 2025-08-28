@@ -23,6 +23,10 @@ $(document).ready(function () {
         emailExists(f);
     });
 
+    $("#btnAuthCheck").on("click", function () {
+        doAuthCheck(f);
+    });
+
     $("#btnAddr").on("click", function () {
         kakaoPost(f);
     });
@@ -99,7 +103,12 @@ function userIdExists(f) {
             if (json.existsYn === "Y") {
                 showError("이미 가입된 아이디가 존재합니다.", f.userId);
             } else {
-                alert("가입 가능한 아이디입니다.");
+                showError("가입 가능한 아이디입니다.");
+                f.userId.readOnly = true;
+
+                const btnUserId = document.getElementById("btnUserId");
+
+                if (btnUserId) btnUserId.disabled = true;       // 이메일 요청 버튼 비활성화
                 userIdCheck = "N";
             }
         }
@@ -122,11 +131,34 @@ function emailExists(f) {
             if (json.existsYn === "Y") {
                 showError("이미 가입된 이메일 주소가 존재합니다.", f.email);
             } else {
-                alert("이메일로 인증번호가 발송되었습니다.\n받은 메일의 인증번호를 입력하기 바랍니다.");
+                showCustomAlert("이메일로 인증번호가 발송되었습니다.");
                 emailAuthNumber = json.authNumber;
             }
         }
     });
+}
+
+// 인증번호 확인 처리
+function doAuthCheck(f) {
+    if (f.authNumber.value === "") {
+        showError("인증번호를 입력하세요", f.authNumber);
+        return;
+    }
+
+    if (parseInt(f.authNumber.value) !== emailAuthNumber) {
+        showError("잘못된 인증번호 입니다.", f.authNumber);
+        return;
+    } else {
+        showError("인증번호 확인.");
+        f.email.readOnly = true;               // 이메일 input readonly
+        f.authNumber.readOnly = true;          // 인증번호 input readonly
+
+        const btnEmail = document.getElementById("btnEmail");
+        const btnAuthCheck = document.getElementById("btnAuthCheck");
+
+        if (btnEmail) btnEmail.disabled = true;       // 이메일 요청 버튼 비활성화
+        if (btnAuthCheck) btnAuthCheck.disabled = true; // 인증 확인 버튼 비활성화
+    }
 }
 
 // 카카오 우편번호 API
@@ -185,7 +217,12 @@ function doSubmit(f) {
         return;
     }
 
-    if (f.authNumber.value != emailAuthNumber) {
+    if (f.authNumber.value === "") {
+        showError("인증번호를 입력하세요.", f.authNumber);
+        return;
+    }
+
+    if (parseInt(f.authNumber.value) !== emailAuthNumber) {
         showError("이메일 인증번호가 일치하지 않습니다.", f.authNumber);
         return;
     }
@@ -218,11 +255,12 @@ function doSubmit(f) {
         data: $("#f").serialize(),
         success: function (json) {
             if (json.result === 1) {
-                alert(json.msg);
-                location.href = "/user/userTagSelect";
+                showCustomAlert(json.msg, function () {
+                    location.href = "/user/userTagSelect";
+                });
             } else {
-                alert(json.msg);
+                showCustomAlert(json.msg);
             }
         }
-    });
+    }); // readonly 처리
 }
