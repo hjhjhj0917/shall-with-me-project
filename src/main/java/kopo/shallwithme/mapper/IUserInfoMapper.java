@@ -31,6 +31,10 @@ public interface IUserInfoMapper {
 
     UserInfoDTO getEmailExists(UserInfoDTO pDTO) throws Exception;
 
+    UserInfoDTO emailAuthNumber(UserInfoDTO pDTO) throws Exception;
+
+    UserInfoDTO getUserForPassword(UserInfoDTO pDTO) throws Exception;
+
     // 태그 삽입
     int insertUserTags(UserTagDTO dto);
 

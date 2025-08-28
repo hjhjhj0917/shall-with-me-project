@@ -152,26 +152,39 @@ public class UserInfoController {
 
         return "user/searchUserId";
     }
+    @ResponseBody
     @PostMapping(value = "searchUserIdProc")
-    public String searchUserIdProc(HttpServletRequest requset, ModelMap model) throws Exception {
-        log.info("{].searchUserIdProc Start!", this.getClass().getName());
-        //이름
-        String userName = CmmUtil.nvl(requset.getParameter("userName"));
-        //이메일
-        String email = CmmUtil.nvl(requset.getParameter("email"));
+    public MsgDTO searchUserIdProc(HttpServletRequest request) throws Exception {
 
-        log.info("userName : {} /email : {}", userName, email);
+        log.info("{}.searchUserIdProc Start!", this.getClass().getName());
+
+        String userName = CmmUtil.nvl(request.getParameter("userName"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
+
+        log.info("userName : {} / email : {}", userName, email);
 
         UserInfoDTO pDTO = new UserInfoDTO();
         pDTO.setUserName(userName);
         pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.searchUserIdOrPasswordProc(pDTO)).orElseGet(UserInfoDTO::new);
 
-        model.addAttribute("rDTO", rDTO);
+        UserInfoDTO rDTO = Optional.ofNullable(
+                userInfoService.searchUserIdOrPasswordProc(pDTO)
+        ).orElseGet(UserInfoDTO::new);
+
+        MsgDTO dto = new MsgDTO();
+
+        if (rDTO.getUserId() != null) {
+            dto.setResult(1);
+            dto.setMsg(rDTO.getUserId());
+            dto.setName(rDTO.getUserName());
+        } else {
+            dto.setResult(0);
+            dto.setMsg("존재하지 않는 사용자입니다.");
+        }
 
         log.info("{}.searchUserIdProc End!", this.getClass().getName());
 
-        return "user/searchUserIdResult";
+        return dto;
     }
 
     @ResponseBody
@@ -409,6 +422,31 @@ public class UserInfoController {
         }
 
         return dto;
+    }
+
+    @ResponseBody
+    @PostMapping(value = "emailAuthNumber")
+    public UserInfoDTO emailAuthNumber(HttpServletRequest request) throws Exception {
+
+        log.info("{}.emailAuthNumber Start!", this.getClass().getName());
+
+        String userName = CmmUtil.nvl(request.getParameter("userName"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
+
+        log.info("userName : {}", userName);
+        log.info("email : {}", email);
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserName(userName);
+        pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
+
+        log.info("암호화 email : {}", pDTO.getEmail());
+
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.emailAuthNumber(pDTO)).orElseGet(UserInfoDTO::new);
+
+        log.info("{}.emailAuthNumber End!", this.getClass().getName());
+
+        return rDTO;
     }
 
     @GetMapping(value = "userTagSelect") // /WEB-INF/views/user/index.jsp 로 이동

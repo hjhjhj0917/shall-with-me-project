@@ -10,12 +10,21 @@
         FROM USER_INFO
         WHERE USER_ID = #{userId}
     </select>
+
     <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserinfoDTO">
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
         FROM USER_INFO
         WHERE EMAIL = #{email}
     </select>
+
+    <select id="emailAuthNumber" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+        SELECT
+            IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
+        FROM USER_INFO
+        WHERE EMAIL = #{email} AND USER_NAME = #{userName}
+    </select>
+
     <insert id="insertUserInfo" parameterType="UserInfoDTO">
         INSERT INTO USER_INFO
         (USER_ID,
