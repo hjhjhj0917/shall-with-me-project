@@ -3,7 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html>
 <head>
-    <title>sample</title>
+    <title>살며시: 프로필 등록</title>
 
     <!-- Vendor -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -271,18 +271,8 @@
     <i class="fa-solid fa-floppy-disk"></i><span>저장</span>
 </button>
 
-<!-- Alert -->
-<div id="customAlertOverlay" class="modal-overlay" style="display:none">
-    <div class="modal">
-        <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color:var(--primary)"></i><h2>살며시</h2>
-        </div>
-        <p id="customAlertMessage">메시지 내용</p>
-        <div class="modal-buttons" style="text-align:right">
-            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
-        </div>
-    </div>
-</div>
+<!-- 커스텀 알림창 -->
+<%@ include file="../includes/customModal.jsp"%>
 
 <script>
     /* Alert */

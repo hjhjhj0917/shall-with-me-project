@@ -3,10 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>살며시|회원가입</title>
+    <title>살며시: 회원가입</title>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="//code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
@@ -487,6 +488,7 @@
 
             <div class="form-row">
         <input type="text" name="authNumber" placeholder="인증번호 입력" class="register-input"/>
+                <button type="button" id="btnAuthCheck" class="form-button">확인</button>
             </div>
 
         <div class="form-row flex-row">
@@ -519,6 +521,9 @@
     <input type="text" id="birth-datepicker" style="position:absolute; left:-9999px; top:-9999px;">
 </div>
 
+<!-- 커스텀 알림창 -->
+<%@ include file="../includes/customModal.jsp"%>
+
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
     if (ssUserName == null) {
@@ -529,6 +534,7 @@
     const userName = "<%= ssUserName %>";
 </script>
 
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
 </body>
