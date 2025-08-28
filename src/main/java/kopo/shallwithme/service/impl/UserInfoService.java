@@ -57,7 +57,16 @@ public class UserInfoService implements IUserInfoService {
     public UserInfoDTO searchUserIdOrPasswordProc(UserInfoDTO pDTO) throws Exception {
         log.info("{}.searchUserIdOrPassword Start!", this.getClass().getName());
 
-        UserInfoDTO rDTO = userInfoMapper.getUserId(pDTO);
+        UserInfoDTO rDTO;
+        if (pDTO.getUserId() != null && !pDTO.getUserId().trim().isEmpty()) {
+            // 비밀번호 찾기
+            rDTO = Optional.ofNullable(userInfoMapper.getUserForPassword(pDTO))
+                    .orElseGet(UserInfoDTO::new);
+        } else {
+            // 아이디 찾기
+            rDTO = Optional.ofNullable(userInfoMapper.getUserId(pDTO))
+                    .orElseGet(UserInfoDTO::new);
+        }
 
         log.info("{}.searchUserIdOrPassword End!", this.getClass().getName());
 
@@ -128,6 +137,38 @@ public class UserInfoService implements IUserInfoService {
 
             mailService.doSendMail(dto);
 
+            dto = null;
+
+            rDTO.setAuthNumber(authNumber);
+        }
+
+        log.info("{}.emailAuth End!", this.getClass().getName());
+
+        return rDTO;
+    }
+
+    @Override
+    public UserInfoDTO emailAuthNumber(UserInfoDTO pDTO) throws Exception {
+
+        log.info("{}.emailAuth Start!", this.getClass().getName());
+
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.emailAuthNumber(pDTO)).orElseGet(UserInfoDTO::new);
+
+        log.info("rDTO : {}", rDTO);
+        log.info("rDTO.getExistsYn() : {}", rDTO.getExistsYn());
+
+        if (CmmUtil.nvl(rDTO.getExistsYn()).equals("Y")) {
+
+            int authNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
+            log.info("authNumber : {}", authNumber);
+
+            MailDTO dto = new MailDTO();
+
+            dto.setTitle("아이디 찾기 인증번호 안내"); // 문구만 약간 일반화
+            dto.setContents("인증번호는 " + authNumber + " 입니다.");
+            dto.setToMail(CmmUtil.nvl(EncryptUtil.decAES128BCBC(pDTO.getEmail())));
+
+            mailService.doSendMail(dto);
             dto = null;
 
             rDTO.setAuthNumber(authNumber);
