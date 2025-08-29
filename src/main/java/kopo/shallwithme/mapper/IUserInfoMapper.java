@@ -31,7 +31,11 @@ public interface IUserInfoMapper {
 
     UserInfoDTO getEmailExists(UserInfoDTO pDTO) throws Exception;
 
+    // 아이디 찾기 메일 전송
     UserInfoDTO emailAuthNumber(UserInfoDTO pDTO) throws Exception;
+
+    // 비밀번호 찾기 메일 전송
+    UserInfoDTO emailAuthNumberPw(UserInfoDTO pDTO) throws Exception;
 
     UserInfoDTO getUserForPassword(UserInfoDTO pDTO) throws Exception;
 
