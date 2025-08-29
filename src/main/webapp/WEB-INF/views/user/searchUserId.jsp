@@ -8,8 +8,8 @@
     <!-- CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/> <!-- 로그인과 같은 스타일 적용 -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -21,52 +21,126 @@
         #step2, #step3 {
             display: none;
         }
+
+        #step3 {
+            height: 454px;
+        }
+
+        /* 아이디 찾기 완료 페이지 전용 CSS */
+        .completion-icon-wrapper {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .completion-icon {
+            font-size: 50px; /* 아이콘 크기 */
+            color: #4da3ff; /* 아이콘 색상 */
+        }
+
+        .completion-message {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 45px;
+        }
+
+        .user-info-display {
+            text-align: left;
+            margin-bottom: 30px;
+            border-top: 1px solid #eee; /* 이미지 상단 라인 */
+            padding-top: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            width: 60px; /* 라벨 너비 고정 */
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #333;
+            text-align: right;
+            flex-grow: 1; /* 남은 공간을 채움 */
+        }
+
+        .userid-value {
+            color: #3399ff; /* 아이디 색상 */
+            font-weight: bold;
+        }
+
+        /* 기존 버튼 및 링크 관련 CSS는 유지 */
     </style>
 
     <script type="text/javascript">
         $(document).ready(function () {
-            // 에러 스타일 제거
+
+            // 생성된 에러창을 다른 곳을 누르면 즉시 사라지는 코드
             $(document).on("click", function (e) {
                 const $target = $(e.target);
 
-                if (
+                if ( // 제외 대상
                     !$target.is("#userName") &&
                     !$target.is("#email") &&
-                    !$target.is("#btnSearchUserId")
+                    !$target.is("#btnSearchUserId") &&
+                    !$target.is("#authNum") &&
+                    !$target.is("#btnAuthNum")
                 ) {
                     $(".login-input").removeClass("input-error");
                     $("#findIdErrorMessage").removeClass("visible");
+                    $("#findIdErrorMessage1").removeClass("visible");
                 }
             });
 
             let f = document.getElementById("f");
             let f2 = document.getElementById("f2");
 
-
+            // 로그인 이동 탭
             $(".login-tab").on("click", function () {
                 location.href = "/user/login";
             });
 
+            // 비밀번호 찾기 탭
             $(".login-tab2").on("click", function () {
                 location.href = "/user/searchPassword";
             });
 
+            // 로그인 이동 버튼
             $("#btnLogin").on("click", function () {
                 location.href = "/user/login";
             });
 
+            // 회원가입 이동
             $("#btnUserReg").on("click", function () {
                 location.href = "/user/userRegForm";
             });
 
+            $("#btnUserReg1").on("click", function () {
+                location.href = "/user/userRegForm";
+            });
+
+            $("#btnUserReg2").on("click", function () {
+                location.href = "/user/userRegForm";
+            });
+
+            // 회원정보 조회 버튼
             $("#btnSearchUserId").on("click", function () {
                 emailExists(f)
             });
 
+            // 인증번호 전송 버튼
             $("#btnAuthNum").on("click", function () {
                 doCheck(f2)
             });
 
+            // 입력한 정보 확인
             function emailExists(f) {
                 let userName = f.userName.value.trim();
                 let email = f.email.value.trim();
@@ -107,13 +181,23 @@
 
                             emailAuthNumber = json.authNumber;
 
+                            document.getElementById("hiddenUserName").value = f.userName.value;
+                            document.getElementById("hiddenEmail").value = f.email.value;
+
                         } else {
-                            showError("존재하지 않는 이름 또는 메일 입니다.")
-                            f.email.focus();
+                            $("#userName").addClass("input-error");
+                            $("#findIdErrorMessage").text("존재하지 않는 이름 또는 메일 입니다.").addClass("visible");
+                            setTimeout(() => {
+                                $("#findIdErrorMessage").removeClass("visible");
+                            }, 2000);
+                            $("#userName").focus();
+                            return;
                         }
                     }
                 })
             }
+
+            // 인증번호 확인
             function doCheck(f2) {
 
                 let authNum = f2.authNum.value.trim();
@@ -147,6 +231,9 @@
 
                         if (json.result === 1) {
 
+                            $("#displayUserName").text(json.name); // <span id="displayUserName">에
+                            $("#displayUserId").text(json.msg);   // <span id="displayUserId">에 아이
+
                             step2.style.display = 'none';
                             step3.style.display = 'block';
 
@@ -156,40 +243,6 @@
                     }
                 })
             }
-
-            // $("#btnSearchUserId").on("click", function () {
-            //     let f = document.getElementById("f");
-            //     let userName = f.userName.value.trim();
-            //     let email = f.email.value.trim();
-            //
-            //     $(".login-input").removeClass("input-error");
-            //     $("#findIdErrorMessage").removeClass("visible").text("");
-            //
-            //     if (userName === "") {
-            //         $("#userName").addClass("input-error");
-            //         $("#findIdErrorMessage").text("이름을 입력하세요.").addClass("visible");
-            //         setTimeout(() => {
-            //             $("#findIdErrorMessage").removeClass("visible");
-            //         }, 2000);
-            //         $("#userName").focus();
-            //         return;
-            //     }
-            //
-            //     if (email === "") {
-            //         $("#email").addClass("input-error");
-            //         $("#findIdErrorMessage").text("이메일을 입력하세요.").addClass("visible");
-            //         setTimeout(() => {
-            //             $("#findIdErrorMessage").removeClass("visible");
-            //         }, 2000);
-            //         $("#email").focus();
-            //         return;
-            //     }
-            //
-            //     // 전송
-            //     f.method = "post";
-            //     f.action = "/user/searchUserIdProc";
-            //     f.submit();
-            // });
         });
     </script>
 </head>
@@ -203,8 +256,8 @@
     <div class="login-tab2">FIND PW</div>
 
     <div class="header">
-        <div class="logo">살며시</div>
-        <div class="logo-2">Shall With Me</div>
+        <div class="logo">FIND ID</div>
+        <div class="logo-2">살며시</div>
     </div>
 
     <div id="findIdErrorMessage" class="error-message"></div>
@@ -232,15 +285,17 @@
     <div class="login-tab2">FIND PW</div>
 
     <div class="header">
-        <div class="logo">살며시</div>
-        <div class="logo-2">Shall With Me</div>
+        <div class="logo">FIND ID</div>
+        <div class="logo-2">살며시</div>
     </div>
 
     <div id="findIdErrorMessage1" class="error-message"></div>
 
     <form id="f2">
-        <input type="text" name="userName" id="authNum" class="login-input" placeholder="인증번호" />
-        <input class="login-input">
+        <input type="hidden" name="userName" id="hiddenUserName" />
+        <input type="hidden" name="email" id="hiddenEmail" />
+        <input type="text" name="authNum" id="authNum" class="login-input" placeholder="인증번호" />
+        <input class="login-input" id="notExists" placeholder="인증번호" tabindex="-1">
 
         <button id="btnAuthNum" type="button" class="login-btn">인증번호 확인</button>
 
@@ -260,21 +315,27 @@
     <div class="login-tab1 active-tab">FIND ID</div>
     <div class="login-tab2">FIND PW</div>
 
-    <div class="header">
-        <div class="logo">살며시</div>
-        <div class="logo-2">Shall With Me</div>
-    </div>
+    <form id="f3">
+        <div class="completion-icon-wrapper">
+            <i class="fas fa-check-circle completion-icon"></i>
+        </div>
+        <h2 class="completion-message">아이디 찾기 완료</h2>
 
-    <div class="error-message"></div>
+        <div class="user-info-display">
+            <div class="info-row">
+                <span class="info-label">이름</span>
+                <span id="displayUserName" class="info-value"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">아이디</span>
+                <span id="displayUserId" class="info-value userid-value"></span>
+            </div>
+        </div>
 
-    <form>
-        <input>
-        <input>
-
-        <button type="button" class="login-btn">인증번호 확인</button>
+        <button id="btnLogin" type="button" class="login-btn">로그인</button>
 
         <div class="signup-link">
-            계정이 없으신가요? <a href="#" id="btnUserReg3">ㅤ회원가입</a>
+            계정이 없으신가요? <a href="#" id="btnUserReg2">ㅤ회원가입</a>
         </div>
 
         <div class="login-options">

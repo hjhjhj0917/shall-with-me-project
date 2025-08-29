@@ -55,7 +55,7 @@
                 $(".login-input").removeClass("input-error");
                 $("#loginErrorMessage").removeClass("visible").text("");
 
-                if (f.userId.value === "") {
+                if (userId === "") {
 
                     $("#userId").addClass("input-error");
                     $("#loginErrorMessage")
@@ -71,7 +71,7 @@
                     return;
 
                 }
-                if (f.password.value === "") {
+                if (password === "") {
 
                     $("#password").addClass("input-error");
                     $("#loginErrorMessage")
@@ -105,8 +105,19 @@
                                 location.href = "/user/userTagSelect";
                             });
                         } else {
-                            showCustomAlert(json.msg);
+                            $("#userId").addClass("input-error");
+                            $("#loginErrorMessage")
+                                .text(json.msg)
+                                .addClass("visible");
+
+                            // 2초 후 메시지 자동 숨김
+                            setTimeout(function () {
+                                $("#loginErrorMessage").removeClass("visible");
+                            }, 2000);
+
                             $("#userId").focus();
+                            return;
+
                         }
                     }
                 });
@@ -123,8 +134,8 @@
     <div class="login-tab1">FIND ID</div>
     <div class="login-tab2">FIND PW</div>
     <div class="header">
-        <div class="logo">살며시</div>
-        <div class="logo-2">Shall With Me</div>
+        <div class="logo">LOGIN</div>
+        <div class="logo-2">살며시</div>
     </div>
     <div id="loginErrorMessage" class="error-message"></div>
     <form id="f">
