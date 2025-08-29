@@ -249,7 +249,7 @@
 <body>
 <%@ include file="../includes/header.jsp"%>
 
-<!-- 아이디 찾기 폼 영역 -->
+<!-- 아이디 찾기 폼 영역1 -->
 <div id="step1" class="login-form-wrapper">
     <div class="login-tab">LOGIN</div>
     <div class="login-tab1 active-tab">FIND ID</div>
@@ -279,6 +279,7 @@
     </form>
 </div>
 
+<!-- 아이디 찾기 폼 영역2 -->
 <div id="step2" class="login-form-wrapper">
     <div class="login-tab">LOGIN</div>
     <div class="login-tab1 active-tab">FIND ID</div>
@@ -310,6 +311,7 @@
     </form>
 </div>
 
+<!-- 아이디 찾기 폼 영역3 -->
 <div id="step3" class="login-form-wrapper">
     <div class="login-tab">LOGIN</div>
     <div class="login-tab1 active-tab">FIND ID</div>
