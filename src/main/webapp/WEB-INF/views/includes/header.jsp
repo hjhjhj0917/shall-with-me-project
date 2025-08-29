@@ -9,8 +9,8 @@
   <div class="header-user-area">
     <div class="header-switch-container pinned" id="switchBox">
       <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
-      <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
-      <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
+      <button class="switch-list" onclick="location.href='/roommate/roommateMain'">룸메이트</button>
+      <button class="switch-list" onclick="location.href='/sharehouse/sharehouseMain'">쉐어하우스</button>
       <button class="header-dropdown-toggle" id="switchToggle">
         <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
       </button>
