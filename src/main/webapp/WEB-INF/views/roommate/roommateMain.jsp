@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>살며시: 룸메이트 찾기</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <!-- 룸메이트 전용 CSS -->
@@ -13,7 +13,9 @@
     <!-- 큰 모달 스타일 + 배경 상호작용 차단 -->
     <style>
         /* 모달 열릴 때 바디 스크롤 잠금 */
-        body.modal-open { overflow: hidden; }
+        body.modal-open {
+            overflow: hidden;
+        }
 
         /* 모달 열릴 때 배경(헤더+메인) 상호작용 완전 차단 */
         body.modal-open header,
@@ -25,38 +27,60 @@
         }
 
         /* 큰 모달 오버레이 */
-        #profileModalOverlay{
-            position: fixed; inset: 0;
-            display: none;                /* open 시 flex */
-            align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.45);
-            z-index: 10000;               /* 알림 모달이 9999라면 이게 위 */
+        #profileModalOverlay {
+            position: fixed;
+            inset: 0;
+            display: none; /* open 시 flex */
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 10000; /* 알림 모달이 9999라면 이게 위 */
             pointer-events: auto;
         }
-        #profileModalOverlay .modal-sheet{
+
+        #profileModalOverlay .modal-sheet {
             width: min(1200px, 95vw);
             height: min(90vh, 100svh - 40px);
             background: #fff;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            display: flex; flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
-        #profileModalOverlay .modal-header{
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            padding: 14px 18px; border-bottom: 1px solid #eee; background: #f7faff;
+
+        #profileModalOverlay .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid #eee;
+            background: #f7faff;
         }
-        #profileModalOverlay .modal-title-text{ font-size: 1.1rem; font-weight: 700; color: #1c407d; }
-        #profileModalOverlay .modal-close{
-            border: none; background: transparent; cursor: pointer; padding: 6px; font-size: 1.1rem;
+
+        #profileModalOverlay .modal-title-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1c407d;
         }
-        #profileModalOverlay .modal-body{
+
+        #profileModalOverlay .modal-close {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 6px;
+            font-size: 1.1rem;
+        }
+
+        #profileModalOverlay .modal-body {
             flex: 1 1 auto;
-            padding: 0;                   /* iframe이 꽉 차도록 */
+            padding: 0; /* iframe이 꽉 차도록 */
             overflow: hidden;
         }
+
         /* 등록 화면을 로드하는 프레임 */
-        #profileModalFrame{
+        #profileModalFrame {
             width: 100%;
             height: 100%;
             display: block;
@@ -76,7 +100,7 @@
         });
 
         // ===== 모달 제어 함수 (배경 상호작용 차단: inert + aria-hidden) =====
-        function openProfileModal(url){
+        function openProfileModal(url) {
             const ov = document.getElementById('profileModalOverlay');
             const frame = document.getElementById('profileModalFrame');
             if (!ov || !frame) return;
@@ -95,7 +119,7 @@
             document.getElementById('profileModalClose')?.focus(); // 포커스 이동
         }
 
-        function closeProfileModal(){
+        function closeProfileModal() {
             const ov = document.getElementById('profileModalOverlay');
             const frame = document.getElementById('profileModalFrame');
             if (!ov || !frame) return;
@@ -115,19 +139,19 @@
         }
 
         // 배경 클릭 닫기
-        document.addEventListener('click', (e)=>{
+        document.addEventListener('click', (e) => {
             const ov = document.getElementById('profileModalOverlay');
             if (!ov || ov.style.display !== 'flex') return;
             if (e.target === ov) closeProfileModal();
         });
         // ESC 닫기
-        document.addEventListener('keydown', (e)=>{
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeProfileModal();
         });
     </script>
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 
 <main id="sh-wrapper">
     <!-- 검색바 -->
@@ -169,7 +193,8 @@
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
         <div class="modal-header">
             <div id="profileModalTitle" class="modal-title-text">프로필 등록</div>
-            <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기" onclick="closeProfileModal()">
+            <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기"
+                    onclick="closeProfileModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -180,11 +205,13 @@
 </div>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
-    if (ssUserName == null) { ssUserName = ""; }
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
 %>
 
 <script>
@@ -223,10 +250,11 @@
 
         async function fetchNext() {
             if (loading || last) return;
-            loading = true; loader.style.display = 'block';
+            loading = true;
+            loader.style.display = 'block';
             try {
                 const url = ctx + '/roommate/list?page=' + (page + 1);
-                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const res = await fetch(url, {headers: {'Accept': 'application/json'}});
                 if (!res.ok) throw new Error('network error');
                 const data = await res.json();
                 renderCards(data.items || []);
@@ -236,20 +264,21 @@
             } catch (err) {
                 console.error(err);
             } finally {
-                loading = false; loader.style.display = 'none';
+                loading = false;
+                loader.style.display = 'none';
             }
         }
 
         const io = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) fetchNext();
-        }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
+        }, {root: null, rootMargin: '300px 0px', threshold: 0.01});
 
         io.observe(sentinel);
         setTimeout(fetchNext, 0);
 
         function renderCards(items) {
             const frag = document.createDocumentFragment();
-            items.forEach(function(it){
+            items.forEach(function (it) {
                 const article = document.createElement('article');
                 article.className = 'sh-card';
                 article.dataset.id = it.id;

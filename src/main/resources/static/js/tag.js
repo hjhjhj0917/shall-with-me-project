@@ -66,8 +66,8 @@ document.getElementById('saveButton').addEventListener('click', () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                showCustomAlert("저장 완료!", function() {
-                    location.href = "/user/main"; // 여기 경로 수정
+                showCustomAlert("저장되었습니다.", function() {
+                    location.href = "/user/userProfile";
                 });
             } else {
                 showCustomAlert(data.message, function() {

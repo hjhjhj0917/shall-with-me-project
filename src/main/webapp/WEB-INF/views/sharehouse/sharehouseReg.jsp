@@ -4,14 +4,16 @@
 <head>
     <title>살며시: 쉐어하우스 정보 등록</title>
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/modal.css"/>
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         /* 바깥 컨테이너: 가운데 정렬 */
         .roommate-container {
@@ -41,6 +43,7 @@
             flex-direction: column;
             min-height: 600px;
         }
+
         .roommate-left {
             background: #fff;
             border: 1px solid #ddd;
@@ -52,12 +55,16 @@
         }
 
         /* 내부 요소 */
-        .form-group { margin-bottom: 32px; }
+        .form-group {
+            margin-bottom: 32px;
+        }
+
         .form-group label {
             display: block;
             font-weight: 600;
             margin-bottom: 12px;
         }
+
         .form-group input[type="text"] {
             width: 100%;
             padding: 16px;
@@ -72,6 +79,7 @@
             gap: 20px;
             margin-bottom: 32px;
         }
+
         .upload-box {
             position: relative;
             display: flex;
@@ -89,12 +97,22 @@
             transition: border-color .2s ease, background-color .2s ease;
             text-align: center;
         }
+
         .upload-box:hover {
             border-color: #3399ff;
             background-color: #f7fbff;
         }
-        .upload-box i { color: #999; margin-bottom: 12px; }
-        .upload-box span { font-size: 14px; color: #666; }
+
+        .upload-box i {
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .upload-box span {
+            font-size: 14px;
+            color: #666;
+        }
+
         .upload-box input[type="file"] {
             position: absolute;
             inset: 0;
@@ -107,10 +125,12 @@
             border-color: #3399ff;
             background: #f7fbff;
         }
+
         .upload-box.has-image i,
         .upload-box.has-image span {
             display: none;
         }
+
         .upload-box img.preview {
             /* ⬇️ 박스 꽉 채우는 고정 표시 */
             width: 100%;
@@ -119,6 +139,7 @@
             border-radius: 6px;
             display: block;
         }
+
         /* 삭제 버튼을 항상 위로 */
         .upload-box .remove-btn {
             position: absolute;
@@ -132,6 +153,7 @@
             background: #fff;
             font-size: 0.85rem;
         }
+
         /* 파일 인풋 클릭 막기 (삭제 버튼 클릭 가능) */
         .upload-box.has-image input[type="file"] {
             pointer-events: none;
@@ -164,20 +186,46 @@
         }
 
         /* ✅ 태그 표시용 스타일 추가 */
-        .tag-chip-wrap { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
-        .tag-chip {
-            display:inline-flex; align-items:center; gap:4px;
-            padding:6px 10px; border-radius:999px; background:#f2f6ff; color:#1c407d;
-            font-size:0.9rem; border:1px solid #d9e6ff;
+        .tag-chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
         }
-        .tag-type { color:#6b7da6; font-size:0.78rem; }
-        .tag-empty { color:#888; margin-left:8px; }
+
+        .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f2f6ff;
+            color: #1c407d;
+            font-size: 0.9rem;
+            border: 1px solid #d9e6ff;
+        }
+
+        .tag-type {
+            color: #6b7da6;
+            font-size: 0.78rem;
+        }
+
+        .tag-empty {
+            color: #888;
+            margin-left: 8px;
+        }
 
         /* 반응형 */
         @media (max-width: 1100px) {
-            #roommateForm { flex-direction: column; }
+            #roommateForm {
+                flex-direction: column;
+            }
+
             .roommate-left,
-            .roommate-right { flex: 1 1 auto; min-height: 520px; }
+            .roommate-right {
+                flex: 1 1 auto;
+                min-height: 520px;
+            }
         }
     </style>
 </head>
@@ -226,29 +274,30 @@
         <!-- 왼쪽 -->
         <section class="roommate-left">
             <div class="form-group name-group">
-                <label>이름 : <span><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span></label>
+                <label>이름 :
+                    <span><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span></label>
             </div>
 
             <div class="image-upload-grid">
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
+                    <input type="file" name="images" accept="image/*"/>
                 </div>
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
+                    <input type="file" name="images" accept="image/*"/>
                 </div>
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
+                    <input type="file" name="images" accept="image/*"/>
                 </div>
                 <div class="upload-box">
                     <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                     <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*" />
+                    <input type="file" name="images" accept="image/*"/>
                 </div>
             </div>
 
@@ -291,7 +340,7 @@
 </main>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
@@ -305,7 +354,7 @@
     document.querySelectorAll('.upload-box input[type="file"]').forEach((input) => {
         input.addEventListener('change', (e) => {
             const file = e.target.files && e.target.files[0];
-            const box  = e.target.closest('.upload-box');
+            const box = e.target.closest('.upload-box');
             if (!file) return;
 
             if (!file.type.startsWith('image/')) {

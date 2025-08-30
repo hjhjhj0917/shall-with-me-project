@@ -12,47 +12,47 @@
     <meta charset="UTF-8">
     <title>살며시: 룸메이트/쉐어하우스 찾기</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script>
-            $(document).ready(function () {
+        $(document).ready(function () {
 
-                function checkLoginAndRedirect(url) {
-                    $.ajax({
-                        url: "/user/loginCheck",
-                        type: "GET",
-                        dataType: "json",
-                        success: function (res) {
-                            if (res === 1) {
-                                location.href = url;
-                            } else {
-                                showCustomAlert("로그인이 필요한 서비스입니다.", function() {
-                                    location.href = "/user/login";
-                                });
-                            }
-                        },
-                        error: function () {
-                            showCustomAlert("서버 통신 오류가 발생했습니다.");
+            function checkLoginAndRedirect(url) {
+                $.ajax({
+                    url: "/user/loginCheck",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (res) {
+                        if (res === 1) {
+                            location.href = url;
+                        } else {
+                            showCustomAlert("로그인이 필요한 서비스입니다.", function () {
+                                location.href = "/user/login";
+                            });
                         }
-                    });
-                }
-
-                $("#roommateBtn").on("click", function () {
-                    checkLoginAndRedirect("/roommate/roommateMain");
+                    },
+                    error: function () {
+                        showCustomAlert("서버 통신 오류가 발생했습니다.");
+                    }
                 });
+            }
 
-                $("#sharehouseBtn").on("click", function () {
-                    checkLoginAndRedirect("/sharehouse/sharehouseMain");
-                });
+            $("#roommateBtn").on("click", function () {
+                checkLoginAndRedirect("/roommate/roommateMain");
+            });
+
+            $("#sharehouseBtn").on("click", function () {
+                checkLoginAndRedirect("/sharehouse/sharehouseMain");
+            });
         });
     </script>
 
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 
 <div class="main-container">
 
@@ -64,7 +64,7 @@
             룸메이트 찾기
         </div>
         <div class="left">
-            <img src="/images/roommate.png" class="left-image" alt="왼쪽 이미지" />
+            <img src="/images/roommate.png" class="left-image" alt="왼쪽 이미지"/>
         </div>
     </div>
 
@@ -76,13 +76,13 @@
             쉐어하우스 찾기
         </div>
         <div class="right">
-            <img src="/images/sharehouse.png" class="right-image" alt="오른쪽 이미지" />
+            <img src="/images/sharehouse.png" class="right-image" alt="오른쪽 이미지"/>
         </div>
     </div>
 </div>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");

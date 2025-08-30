@@ -7,11 +7,13 @@
 
     <!-- Vendor -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <!-- Project CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
 
     <style>
         :root {
@@ -23,36 +25,25 @@
             --tag-collapsed-max: 140px; /* 접힘 높이 */
         }
 
-        html, body {
-            height: 100%
-        }
-
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100svh;
-            overflow-x: hidden;
-            font-size: 17px;
-            line-height: 1.6;
+        .register-form-wrapper {
+            width: 1100px;
+            margin: 0 auto;
+            padding: 24px 32px;
+            background-color: #FFFFFF;
+            height: 820px;
+            border-radius: 12px;
+            border-top-right-radius: 0;
+            box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1), 6px 5px 16px rgba(0, 0, 0, 0.27);
+            position: relative;
+            text-align: center;
+            box-sizing: border-box;
+            overflow: visible;
         }
 
         @media (min-width: 1200px) {
             body {
                 font-size: 18px
             }
-        }
-
-        /* 중앙 배치 컨테이너 */
-        .roommate-container {
-            flex: 1 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            min-height: calc(100svh - var(--header-h));
-            padding: 32px 20px;
-            box-sizing: border-box;
         }
 
         /* grid로 좌/우 높이 동기화 */
@@ -68,34 +59,26 @@
 
         /* 좌/우 카드 */
         .roommate-left, .roommate-right {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 32px;
+
             display: flex;
             flex-direction: column;
-            height: 100%;
-            min-height: 520px;
-            box-shadow: 0 14px 36px rgba(0, 0, 0, .08);
             gap: 20px;
             overflow: visible;
         }
 
         /* 섹션 카드 */
         .form-block {
-            background: linear-gradient(180deg, #fff 0%, #f4f9ff 100%);
             border: 1px solid #e1ecff;
             border-radius: 16px;
             padding: 24px 24px 18px;
-            box-shadow: 0 8px 22px rgba(0, 0, 0, .05);
         }
 
         .block-title {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 800;
-            color: var(--primary-dark);
+            font-weight: 500;
+            color: var(--primary);
             font-size: 1.15rem;
             margin-bottom: 14px;
         }
@@ -109,13 +92,13 @@
             border-radius: 999px;
             background: rgba(51, 153, 255, .12);
             border: 1px solid rgba(51, 153, 255, .25);
-            color: var(--primary-dark);
+            color: var(--primary);
             font-size: 1rem;
         }
 
         .block-help {
             margin-top: 12px;
-            font-size: .95rem;
+            font-size: 14px;
             color: #5f6f84
         }
 
@@ -127,18 +110,17 @@
             padding: 14px 16px;
             border: 1px dashed #d7e7ff;
             border-radius: 10px;
-            background: #f9fbff;
             color: #1f2d3d;
         }
 
         .readonly-field .label {
             color: #6e7b8b;
             width: 72px;
-            font-weight: 700
+            font-weight: 500
         }
 
         .readonly-field .value {
-            font-weight: 800
+            font-weight: 500
         }
 
         .image-upload-grid {
@@ -178,14 +160,12 @@
             text-align: center;
             transition: width .25s ease, height .25s ease,
             border-color .2s ease, background-color .2s ease,
-            border-width .2s ease,
-            box-shadow .2s ease, transform .08s ease;
+            border-width .2s ease
         }
 
         .upload-box:hover {
             border-color: var(--primary);
             background: #f7fbff;
-            box-shadow: 0 0 0 4px rgba(51, 153, 255, .12);
             transform: translateY(-1px)
         }
 
@@ -228,17 +208,7 @@
 
         .upload-box.is-error-photo {
             border-color: var(--primary) !important;
-            box-shadow: 0 0 0 5px rgba(51, 153, 255, .18);
             animation: errorPulse 1s ease-in-out 3
-        }
-
-        @keyframes errorPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(51, 153, 255, .35)
-            }
-            100% {
-                box-shadow: 0 0 0 12px rgba(51, 153, 255, 0)
-            }
         }
 
         /* 소개글 카드 풀채움 */
@@ -266,6 +236,10 @@
             min-height: 0
         }
 
+        textarea::placeholder {
+            font-size: 14px;
+        }
+
         .textarea-wrap {
             display: flex;
             flex-direction: column;
@@ -273,7 +247,7 @@
         }
 
         .field-hint {
-            font-size: .95rem;
+            font-size: 14px;
             color: #5f6f84
         }
 
@@ -284,24 +258,23 @@
             padding: 18px 20px;
             border: 1px solid #c7d3e6;
             border-radius: 12px;
-            resize: vertical;
             font-family: inherit;
             font-size: 1.02rem;
             line-height: 1.65;
-            transition: border-color .2s, box-shadow .2s, background-color .2s;
+            resize: none;
             background: #fff;
         }
 
         textarea#introTextarea:hover, textarea#introTextarea:focus {
             border-color: var(--primary) !important;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(51, 153, 255, .15);
+
             background: #fcfeff
         }
 
         .is-error-intro {
             border: 2px solid var(--primary) !important;
-            box-shadow: 0 0 0 5px rgba(51, 153, 255, .22)
+
         }
 
         /* 태그 칩 + 접기/펼치기 */
@@ -328,7 +301,6 @@
             bottom: 0;
             height: 44px;
             pointer-events: none;
-            background: linear-gradient(to bottom, rgba(244, 249, 255, 0), #f4f9ff 60%);
         }
 
         .tag-chip {
@@ -337,12 +309,11 @@
             gap: 8px;
             padding: 8px 14px;
             border-radius: 999px;
-            background: linear-gradient(180deg, #f0f6ff 0%, #e3efff 100%);
             color: var(--primary-dark);
             font-size: 1rem;
             border: 1px solid #c7dcff;
             white-space: nowrap;
-            transition: transform .08s ease, box-shadow .2s ease;
+            transition: transform .08s ease;
         }
 
         .tag-chip i {
@@ -351,7 +322,7 @@
 
         .tag-chip:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(28, 64, 125, .1)
+
         }
 
         .tag-chip-wrap.dense .tag-chip {
@@ -377,8 +348,8 @@
         /* 저장 버튼 */
         .floating-save {
             position: fixed;
-            right: 28px;
-            bottom: 28px;
+            right: 440px;
+            bottom: 70px;
             z-index: 999;
             display: inline-flex;
             align-items: center;
@@ -390,7 +361,6 @@
             padding: 14px 22px;
             font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, .16);
         }
 
         /* 반응형 */
@@ -421,92 +391,173 @@
                 transition: none
             }
         }
+        /* 탭 디자인 */
+        .register-tab, .prefer-tab, .profile-tab {
+            margin-bottom: 12px;
+        }
+
+        .register-tab {
+            position: absolute;
+            top: 10.34%;
+            right: -30px;
+            transform: translateY(-50%);
+            background-color: #4da3ff;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            cursor: default;
+            height: 150px;
+            border-bottom-right-radius: 30px;
+            border-top-right-radius: 12px;
+
+            z-index: 2;
+        }
+
+        .prefer-tab {
+            position: absolute;
+            top: 30.5%;
+            right: -30px;
+            transform: translateY(-50%);
+            background-color: #91C4FB;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            cursor: default;
+            height: 150px;
+            border-bottom-right-radius: 30px;
+            border-top-right-radius: 12px;
+
+            z-index: 1;
+        }
+
+        .profile-tab {
+            position: absolute;
+            top: 51%;
+            right: -30px;
+            transform: translateY(-50%);
+            background-color: #B1B1B1;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            cursor: default;
+            height: 150px;
+            border-bottom-right-radius: 30px;
+            border-top-right-radius: 12px;
+
+        }
+
+        .active-tab {
+            right: -39px;
+            font-size: 20px !important;
+            z-index: 3 !important;
+        }
     </style>
 </head>
 <body>
+<%@ include file="../includes/header.jsp" %>
 
-<main class="roommate-container">
-    <form id="roommateForm" action="/roommate/register" method="post" enctype="multipart/form-data" novalidate>
-        <!-- Left -->
-        <section class="roommate-left">
-            <div class="form-block">
-                <div class="block-title">
-                    <span class="title-badge"><i class="fa-regular fa-id-card"></i></span><span>기본 정보</span>
-                </div>
-                <div class="readonly-field">
-                    <span class="label">이름</span>
-                    <span class="value"><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span>
-                </div>
-            </div>
+<div class="register-form-wrapper">
+    <div class="register-tab">REGISTER</div>
+    <div class="prefer-tab">PREFER</div>
+    <div class="profile-tab active-tab">PROFILE</div>
 
-            <div class="form-block">
-                <div class="block-title">
-                    <span class="title-badge"><i class="fa-regular fa-image"></i></span><span>프로필 사진</span>
-                </div>
-                <div class="image-upload-grid">
-                    <c:set var="profileUrl" value="${userProfile.profileImageUrl}"/>
-                    <c:set var="isFirst" value="${empty userProfile}"/>
-                    <div class="upload-box ${not empty profileUrl ? 'has-image' : ''}" id="profileUploadBox">
-                        <!-- fa-2x 제거: CSS로 동적 스케일 -->
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>프로필 사진 업로드</span>
-                        <input type="file" name="profileImage" accept="image/*"
-                               <c:if test="${isFirst}">required</c:if>/>
-                        <c:if test="${not empty profileUrl}">
-                            <img class="preview" src="${profileUrl}" alt="profile preview"/>
-                        </c:if>
+    <div class="header">
+        <div class="logo">PROFILE</div>
+        <div class="logo-2">살며시</div>
+    </div>
+
+    <main class="roommate-container">
+        <form id="roommateForm" action="/roommate/register" method="post" enctype="multipart/form-data" novalidate>
+            <!-- Left -->
+            <section class="roommate-left">
+                <div class="form-block">
+                    <div class="block-title">
+                        <span class="title-badge"><i class="fa-regular fa-id-card"></i></span><span>기본 정보</span>
+                    </div>
+                    <div class="readonly-field">
+                        <span class="label">이름</span>
+                        <span class="value"><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span>
                     </div>
                 </div>
-                <div class="block-help">정면, 밝은 사진 권장 (최대 5MB)</div>
-            </div>
-        </section>
 
-        <!-- Right -->
-        <section class="roommate-right">
-            <div class="form-block">
-                <div class="block-title">
-                    <span class="title-badge"><i class="fa-solid fa-hashtag"></i></span><span>보여질 태그</span>
+                <div class="form-block">
+                    <div class="block-title">
+                        <span class="title-badge"><i class="fa-regular fa-image"></i></span><span>프로필 사진</span>
+                    </div>
+                    <div class="image-upload-grid">
+                        <c:set var="profileUrl" value="${userProfile.profileImageUrl}"/>
+                        <c:set var="isFirst" value="${empty userProfile}"/>
+                        <div class="upload-box ${not empty profileUrl ? 'has-image' : ''}" id="profileUploadBox">
+                            <!-- fa-2x 제거: CSS로 동적 스케일 -->
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>프로필 사진 업로드</span>
+                            <input type="file" name="profileImage" accept="image/*"
+                                   <c:if test="${isFirst}">required</c:if>/>
+                            <c:if test="${not empty profileUrl}">
+                                <img class="preview" src="${profileUrl}" alt="profile preview"/>
+                            </c:if>
+                        </div>
+                    </div>
+                    <div class="block-help">정면, 밝은 사진 권장 (최대 5MB)</div>
                 </div>
-                <div>
-                    <c:choose>
-                        <c:when test="${not empty userTags}">
-                            <div class="tag-chip-wrap" id="tagWrap">
-                                <c:forEach var="t" items="${userTags}">
+            </section>
+
+            <!-- Right -->
+            <section class="roommate-right">
+                <div class="form-block">
+                    <div class="block-title">
+                        <span class="title-badge"><i class="fa-solid fa-hashtag"></i></span><span>보여질 태그</span>
+                    </div>
+                    <div>
+                        <c:choose>
+                            <c:when test="${not empty userTags}">
+                                <div class="tag-chip-wrap" id="tagWrap">
+                                    <c:forEach var="t" items="${userTags}">
                                     <span class="tag-chip"><i class="fa-solid fa-tag"></i>
                                         <c:out value="${empty t.tagName ? t.tag_name : t.tagName}"/>
                                     </span>
-                                </c:forEach>
-                            </div>
-                            <button type="button" class="chip-toggle" id="chipToggle" aria-expanded="false">
-                                <i class="fa-solid fa-angles-down"></i> 더보기
-                            </button>
-                        </c:when>
-                        <c:otherwise>
+                                    </c:forEach>
+                                </div>
+                                <button type="button" class="chip-toggle" id="chipToggle" aria-expanded="false">
+                                    <i class="fa-solid fa-angles-down"></i> 더보기
+                                </button>
+                            </c:when>
+                            <c:otherwise>
                             <span style="color:#6e7b8b; background:#f7faff; border:1px dashed #dbe9ff; border-radius:10px; padding:10px 14px; display:inline-block">
                                 <i class="fa-regular fa-circle"></i> 등록된 태그가 없습니다.
                             </span>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="block-help">마이페이지에서 태그를 관리할 수 있어요.</div>
                 </div>
-                <div class="block-help">마이페이지에서 태그를 관리할 수 있어요.</div>
-            </div>
 
-            <div class="form-block intro-block">
-                <div class="block-body textarea-wrap">
+                <div class="form-block intro-block">
+                    <div class="block-body textarea-wrap">
                     <textarea id="introTextarea" name="introduction"
                               placeholder="예) 조용한 야근러 / 주말엔 등산 / 설거지 담당 좋아요"
                               <c:if test="${empty userProfile}">required</c:if>><c:out
                             value="${userProfile.introduction}"/></textarea>
-                    <div class="field-hint">최소 10자 이상, 예시를 참고해 개성을 드러내 보세요.</div>
+                        <div class="field-hint">최소 10자 이상, 예시를 참고해 개성을 드러내 보세요.</div>
+                    </div>
                 </div>
-            </div>
 
-            <input type="hidden" id="originalIntro" value="${fn:escapeXml(userProfile.introduction)}"/>
-            <input type="hidden" id="originalUrl" value="${userProfile.profileImageUrl}"/>
-            <input type="hidden" id="isFirstFlag" value="${empty userProfile}"/>
-        </section>
-    </form>
-</main>
+                <input type="hidden" id="originalIntro" value="${fn:escapeXml(userProfile.introduction)}"/>
+                <input type="hidden" id="originalUrl" value="${userProfile.profileImageUrl}"/>
+                <input type="hidden" id="isFirstFlag" value="${empty userProfile}"/>
+            </section>
+        </form>
+    </main>
+</div>
 
 <!-- 저장 버튼 -->
 <button type="button" id="floatingSaveBtn" class="floating-save" title="저장">
@@ -515,6 +566,26 @@
 
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
+
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
+<%
+    String ssUserId = (String) session.getAttribute("SS_USER_ID");
+    if (ssUserId == null) {
+        ssUserId = "";
+    }
+%>
+<script>
+    const userId = "<%= ssUserId %>";
+    console.log(userId);
+</script>
 
 <script>
     /* Alert */

@@ -108,7 +108,7 @@ function userIdExists(f) {
 
                 const btnUserId = document.getElementById("btnUserId");
 
-                if (btnUserId) btnUserId.disabled = true;       // 이메일 요청 버튼 비활성화
+                if (btnUserId) btnUserId.disabled = true;
                 userIdCheck = "N";
             }
         }
@@ -129,9 +129,9 @@ function emailExists(f) {
         data: $("#f").serialize(),
         success: function (json) {
             if (json.existsYn === "Y") {
-                showError("이미 가입된 이메일 주소가 존재합니다.", f.email);
+                showError("이미 가입된 이메일 주소가 존재합니다", f.email);
             } else {
-                showCustomAlert("이메일로 인증번호가 발송되었습니다.");
+                showCustomAlert("이메일로 인증번호가 발송되었습니다");
                 emailAuthNumber = json.authNumber;
             }
         }
@@ -146,10 +146,10 @@ function doAuthCheck(f) {
     }
 
     if (parseInt(f.authNumber.value) !== emailAuthNumber) {
-        showError("잘못된 인증번호 입니다.", f.authNumber);
+        showError("잘못된 인증번호 입니다", f.authNumber);
         return;
     } else {
-        showError("인증번호 확인.");
+        showError("인증번호 확인");
         f.email.readOnly = true;               // 이메일 input readonly
         f.authNumber.readOnly = true;          // 인증번호 input readonly
 
