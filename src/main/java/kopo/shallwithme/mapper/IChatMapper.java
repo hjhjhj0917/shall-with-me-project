@@ -1,6 +1,7 @@
 package kopo.shallwithme.mapper;
 
 import kopo.shallwithme.dto.ChatDTO;
+import kopo.shallwithme.dto.ChatPartnerDTO;
 import kopo.shallwithme.dto.ChatRoomDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,4 +26,7 @@ public interface IChatMapper {
     void insertChatRoom(ChatRoomDTO chatRoomDTO) throws Exception;
 
     List<ChatDTO> selectMessagesByRoomId(Integer roomId);
+
+    // 메세지 주고받은 유저만 불러오기
+    List<ChatPartnerDTO> selectChatPartnersWithLastMsg(UserInfoDTO pDTO);
 }

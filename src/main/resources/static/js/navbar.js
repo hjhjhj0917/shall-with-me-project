@@ -48,19 +48,132 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+
+    // 메세지 리스트 보기 ================================================== //
+
+    /**
+     * ===================================================================
+     * 메시지 모달 제어 스크립트
+     * ===================================================================
+     */
+
+// 모달을 열었던 버튼(트리거) 요소를 저장하기 위한 변수
+    let messageModalTrigger = null;
+
+// [수정] #messageBox 버튼 클릭 시 모달 열기
+    const messageBox = document.getElementById('messageBox');
+    if (messageBox) {
+        messageBox.addEventListener('click', function(e) {
+            e.stopPropagation();
+
+            const ov = document.getElementById('messageModalOverlay');
+            if (!ov) return; // 모달이 없으면 중단
+
+            // 모달이 현재 열려있는지 상태를 확인
+            const isModalOpen = ov.style.display === 'flex';
+
+            if (isModalOpen) {
+                // 모달이 열려있으면 닫는 함수를 호출
+                closeMessageModal();
+            } else {
+                // 모달이 닫혀있으면 여는 함수를 호출
+                messageModalTrigger = this; // 포커스 관리를 위해 현재 버튼을 트리거로 저장
+                this.classList.add('pinned'); // 버튼을 활성화 상태로 만듦
+                openMessageModal('/chat/userListPage');
+            }
+        });
+    }
+
+// [추가] 닫기 버튼(#messageModalClose)에 클릭 이벤트 연결
+    document.getElementById('messageModalClose')?.addEventListener('click', closeMessageModal);
+
+    /**
+     * 메시지 모달을 여는 함수
+     * @param {string} url - iframe에 로드할 페이지 주소
+     */
+    function openMessageModal(url) {
+        const ov = document.getElementById('messageModalOverlay');
+        const frame = document.getElementById('messageModalFrame');
+        if (!ov || !frame) return;
+
+        frame.src = url;
+        ov.style.display = 'flex';
+        ov.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+
+        const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
+        bgEls.forEach(el => {
+            if (el) {
+                el.setAttribute('inert', '');
+                el.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        document.getElementById('messageModalClose')?.focus();
+    }
+
+    /**
+     * 메시지 모달을 닫는 함수
+     */
+    function closeMessageModal() {
+        const ov = document.getElementById('messageModalOverlay');
+        const frame = document.getElementById('messageModalFrame');
+        if (!ov || !frame) return;
+
+        ov.style.display = 'none';
+        ov.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+
+        const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
+        bgEls.forEach(el => {
+            if (el) {
+                el.removeAttribute('inert');
+                el.removeAttribute('aria-hidden');
+            }
+        });
+
+        frame.src = 'about:blank';
+
+        if (messageModalTrigger) {
+            messageModalTrigger.focus();
+
+            // [추가] 모달을 닫을 때 버튼의 활성화(.pinned) 상태도 함께 제거
+            messageModalTrigger.classList.remove('pinned');
+        }
+    }
+
+// 배경 클릭 시 모달 닫기 (이 기능은 사용자 편의성을 높여주므로 유지하는 것이 좋습니다)
+    document.addEventListener('click', (e) => {
+        const ov = document.getElementById('messageModalOverlay');
+        if (ov && e.target === ov) {
+            closeMessageModal();
+        }
+    });
+
+// ESC 키 입력 시 모달 닫기 (이 기능은 접근성을 위해 필수적이므로 유지하는 것이 좋습니다)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const ov = document.getElementById('messageModalOverlay');
+            if (ov && ov.style.display === 'flex') {
+                closeMessageModal();
+            }
+        }
+    });
+
+    // =================================================================== //
+
     // ✅ 숨겨야 할 페이지들 처리
     const path = window.location.pathname;
     const pageName = path.split('/').pop();
 
     const hideBoxByPage = {
         main: ['switchBox'],
-        userProfile: ['switchBox', 'menuBox', 'userNameBox'],
-        userTagSelect: ['switchBox', 'menuBox', 'userNameBox'],
-        preTagSelect: ['switchBox', 'menuBox'],
-        userRegForm: ['switchBox', 'menuBox', 'userNameBox'],
-        login: ['userNameBox', 'switchBox', 'menuBox'],
-        searchUserId: ['userNameBox', 'switchBox', 'menuBox'],
-        searchPassword: ['userNameBox', 'switchBox', 'menuBox'],
+        userProfile: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
+        userTagSelect: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
+        userRegForm: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
+        login: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
+        searchUserId: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
+        searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
         chatRoom: ['switchBox'],
     };
 
@@ -74,8 +187,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // ✅ 로그인 안 돼 있으면 이름 박스 및 메뉴 수정
     if (!userName || userName.trim() === "") {
         const userNameBox = document.getElementById("userNameBox");
-        if (userNameBox) userNameBox.style.display = "none";
-
+        const messageBox = document.getElementById("messageBox");
+        if (userNameBox) {
+            userNameBox.style.display = "none";
+            messageBox.style.display = "none";
+        }
         const menuButtons = document.querySelectorAll("#menuBox .menu-list");
 
         if (menuButtons.length >= 2) {
