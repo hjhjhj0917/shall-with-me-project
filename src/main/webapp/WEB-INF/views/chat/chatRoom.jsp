@@ -19,10 +19,10 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <%-- 무료 아이콘 --%>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 
 <!-- 상단 버튼 -->
 <div class="top-buttons">
@@ -36,14 +36,14 @@
 
 <!-- 입력 영역 -->
 <div class="input-area">
-    <input type="text" id="messageInput" placeholder="채팅을 입력하세요" />
+    <input type="text" id="messageInput" placeholder="채팅을 입력하세요"/>
     <button class="send-btn" onclick="sendMessage()">
         <i class="fa-regular fa-paper-plane fa-xs" style="color: #ffffff;"></i>
     </button>
 </div>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
@@ -143,7 +143,7 @@
 
         const msgDate = new Date(time);
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
-        const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeStr = msgDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 
         if (lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
@@ -186,8 +186,7 @@
                 msgContent.className = "message-content";
 
                 const senderElem = document.createElement("div");
-                senderElem.className = "sender-id";
-                senderElem.textContent = sender;
+
 
                 const messageBubble = document.createElement("div");
                 messageBubble.className = "message-bubble";

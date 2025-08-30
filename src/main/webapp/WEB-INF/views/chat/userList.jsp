@@ -17,7 +17,8 @@
     }
 %>
 
-<p>로그인한 유저 ID: <strong><%= ssUserId %></strong></p>
+<p>로그인한 유저 ID: <strong><%= ssUserId %>
+</strong></p>
 
 <table border="1" id="userTable">
     <thead>
@@ -62,17 +63,17 @@
             });
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $.ajax({
             url: "/chat/userList",
             method: "GET",
             dataType: "json",
-            success: function(userList) {
+            success: function (userList) {
                 console.log("userList 데이터:", userList);
                 const tbody = $("#userTable tbody");
                 tbody.empty();
 
-                userList.forEach(function(user) {
+                userList.forEach(function (user) {
                     if (user.userId === loggedInUserId) return; // 본인은 제외
 
                     const row = $('<tr></tr>');
@@ -80,7 +81,7 @@
                     row.append('<td>' + user.userName + '</td>');
 
                     const chatBtn = $('<button>채팅하기</button>');
-                    chatBtn.on('click', function() {
+                    chatBtn.on('click', function () {
                         openChat(user.userId);
                     });
 
@@ -88,7 +89,7 @@
                     tbody.append(row);
                 });
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error("유저 목록 불러오기 실패:", error);
                 alert("회원 목록을 불러오는 중 오류가 발생했습니다.");
             }

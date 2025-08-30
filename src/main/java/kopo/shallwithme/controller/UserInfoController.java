@@ -7,6 +7,7 @@ import kopo.shallwithme.dto.MsgDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.IUserInfoService;
+import kopo.shallwithme.service.impl.RoommateService;
 import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Map;
-
 
 
 @Slf4j
@@ -56,6 +56,7 @@ public class UserInfoController {
     }
 
     private final IUserInfoService userInfoService;
+    private final RoommateService roommateService;
 
     @GetMapping(value = "searchPassword")
     public String searchPassword(HttpSession session) {
@@ -306,6 +307,38 @@ public class UserInfoController {
         return "user/userRegForm";
     }
 
+    @GetMapping("/userProfile")
+    public String userProfile() {
+
+        log.info("{}.userProfile Start!", this.getClass().getName());
+
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        var req = attrs.getRequest();
+        HttpSession session = req.getSession(false);
+
+        String userId   = (session != null) ? (String) session.getAttribute("SS_USER_ID")   : "";
+        String userName = (session != null) ? (String) session.getAttribute("SS_USER_NAME") : "";
+
+        // 태그 조회 (DTO에 tagName 포함)
+        List<UserTagDTO> userTags = roommateService.getUserTagsByUserId(userId);
+        if (userTags == null) userTags = List.of(); // NPE 방지
+
+        // ✅ tag_name만 추출 (중복 제거 원하면 .distinct() 추가)
+        List<String> userTagNames = userTags.stream()
+                .map(UserTagDTO::getTagName)   // <-- 여기 수정!
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // JSP에서 사용할 값
+        req.setAttribute("userTags", userTags);
+        req.setAttribute("userTagNames", userTagNames);
+        req.setAttribute("SS_USER_NAME", userName);
+
+        log.info("{}.userProfile End!", this.getClass().getName());
+
+        return "user/userProfile";
+    }
 
     @ResponseBody
     @PostMapping(value = "getUserIdExists")

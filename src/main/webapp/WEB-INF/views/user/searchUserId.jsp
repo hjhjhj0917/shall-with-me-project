@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <!-- jQuery -->
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
@@ -247,7 +247,7 @@
     </script>
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 
 <!-- 아이디 찾기 폼 영역1 -->
 <div id="step1" class="login-form-wrapper">
@@ -263,8 +263,8 @@
     <div id="findIdErrorMessage" class="error-message"></div>
 
     <form id="f">
-        <input type="text" name="userName" id="userName" class="login-input" placeholder="이름" />
-        <input type="email" name="email" id="email" class="login-input" placeholder="이메일" />
+        <input type="text" name="userName" id="userName" class="login-input" placeholder="이름"/>
+        <input type="email" name="email" id="email" class="login-input" placeholder="이메일"/>
 
         <button id="btnSearchUserId" type="button" class="login-btn">아이디 찾기</button>
 
@@ -293,9 +293,9 @@
     <div id="findIdErrorMessage1" class="error-message"></div>
 
     <form id="f2">
-        <input type="hidden" name="userName" id="hiddenUserName" />
-        <input type="hidden" name="email" id="hiddenEmail" />
-        <input type="text" name="authNum" id="authNum" class="login-input" placeholder="인증번호" />
+        <input type="hidden" name="userName" id="hiddenUserName"/>
+        <input type="hidden" name="email" id="hiddenEmail"/>
+        <input type="text" name="authNum" id="authNum" class="login-input" placeholder="인증번호"/>
         <input class="login-input" id="notExists" placeholder="인증번호" tabindex="-1">
 
         <button id="btnAuthNum" type="button" class="login-btn">인증번호 확인</button>
@@ -348,7 +348,7 @@
 </div>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");

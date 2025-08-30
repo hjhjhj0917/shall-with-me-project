@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>살며시: 쉐어하우스 찾기</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
@@ -11,7 +11,7 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 <%--내가 프론트 만들부분--%>
 <main id="sh-wrapper">
     <!-- 검색바 -->
@@ -112,7 +112,7 @@
 </main>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
@@ -162,10 +162,11 @@
 
         async function fetchNext() {
             if (loading || last) return;
-            loading = true; loader.style.display = 'block';
+            loading = true;
+            loader.style.display = 'block';
             try {
                 const url = ctx + '/sharehouse/list?page=' + (page + 1);  // ← 백틱 제거
-                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const res = await fetch(url, {headers: {'Accept': 'application/json'}});
                 if (!res.ok) throw new Error('network error');
                 const data = await res.json();
                 renderCards(data.items || []);
@@ -175,13 +176,14 @@
             } catch (err) {
                 console.error(err);
             } finally {
-                loading = false; loader.style.display = 'none';
+                loading = false;
+                loader.style.display = 'none';
             }
         }
 
         const io = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) fetchNext();
-        }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
+        }, {root: null, rootMargin: '300px 0px', threshold: 0.01});
 
         io.observe(sentinel);
 
@@ -190,7 +192,7 @@
 
         function renderCards(items) {
             const frag = document.createDocumentFragment();
-            items.forEach(function(it){
+            items.forEach(function (it) {
                 const article = document.createElement('article');
                 article.className = 'sh-card';
                 article.dataset.id = it.id;

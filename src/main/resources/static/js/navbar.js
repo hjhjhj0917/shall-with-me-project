@@ -54,7 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const hideBoxByPage = {
         main: ['switchBox'],
-        userTagSelect: ['switchBox', 'menuBox'],
+        userProfile: ['switchBox', 'menuBox', 'userNameBox'],
+        userTagSelect: ['switchBox', 'menuBox', 'userNameBox'],
         preTagSelect: ['switchBox', 'menuBox'],
         userRegForm: ['switchBox', 'menuBox', 'userNameBox'],
         login: ['userNameBox', 'switchBox', 'menuBox'],

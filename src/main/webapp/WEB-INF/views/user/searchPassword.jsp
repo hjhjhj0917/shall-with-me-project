@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <!-- jQuery -->
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
@@ -262,7 +262,7 @@
                     data: $("#f3").serialize(),
                     success: function (json) {
                         if (json.result === "1") {
-                            showCustomAlert(json.msg, function() {
+                            showCustomAlert(json.msg, function () {
                                 location.href = "/user/login"
                             })
 
@@ -278,7 +278,7 @@
     </script>
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 
 <!-- 비밀번호 찾기 폼 영역1 -->
 <div id="step1" class="login-form-wrapper">
@@ -323,9 +323,9 @@
     <div id="findPwErrorMessage1" class="error-message"></div>
 
     <form id="f2">
-        <input type="hidden" name="userId" id="hiddenUserId" />
-        <input type="hidden" name="email" id="hiddenEmail" />
-        <input type="text" name="authNum" id="authNum" class="login-input" placeholder="인증번호" />
+        <input type="hidden" name="userId" id="hiddenUserId"/>
+        <input type="hidden" name="email" id="hiddenEmail"/>
+        <input type="text" name="authNum" id="authNum" class="login-input" placeholder="인증번호"/>
         <input class="login-input" id="notExists" placeholder="인증번호" tabindex="-1">
 
         <button id="btnAuthNum" type="button" class="login-btn">인증번호 확인</button>
@@ -371,7 +371,7 @@
     </form>
 </div>
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");

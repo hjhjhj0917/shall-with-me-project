@@ -9,12 +9,18 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#btnUserReg").on("click", function () { location.href = "/user/userRegForm"; });
-            $("#btnSearchUserId").on("click", function () { location.href = "/user/searchUserId"; });
-            $("#btnSearchPassword").on("click", function () { location.href = "/user/searchPassword"; });
+            $("#btnUserReg").on("click", function () {
+                location.href = "/user/userRegForm";
+            });
+            $("#btnSearchUserId").on("click", function () {
+                location.href = "/user/searchUserId";
+            });
+            $("#btnSearchPassword").on("click", function () {
+                location.href = "/user/searchPassword";
+            });
 
             $("#password").on("keydown", function (e) {
                 if (e.key === "Enter") {
@@ -96,7 +102,7 @@
                     data: $("#f").serialize(),
                     success: function (json) {
                         if (json.result === 1) {
-                            showCustomAlert(json.msg, function() {
+                            showCustomAlert(json.msg, function () {
                                 location.href = "/user/main";
                             });
                         } else if (json.result === 3) {
@@ -126,7 +132,7 @@
     </script>
 </head>
 <body>
-<%@ include file="../includes/header.jsp"%>
+<%@ include file="../includes/header.jsp" %>
 
 <!-- 로그인 폼 영역 -->
 <div class="login-form-wrapper">
@@ -139,8 +145,8 @@
     </div>
     <div id="loginErrorMessage" class="error-message"></div>
     <form id="f">
-        <input type="text" name="userId" id="userId" class="login-input" placeholder="아이디" />
-        <input type="password" name="password" id="password" class="login-input" placeholder="비밀번호" />
+        <input type="text" name="userId" id="userId" class="login-input" placeholder="아이디"/>
+        <input type="password" name="password" id="password" class="login-input" placeholder="비밀번호"/>
 
         <button id="btnLogin" type="button" class="login-btn">로그인</button>
 
@@ -156,7 +162,7 @@
 </div>
 
 <!-- 커스텀 알림창 -->
-<%@ include file="../includes/customModal.jsp"%>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
