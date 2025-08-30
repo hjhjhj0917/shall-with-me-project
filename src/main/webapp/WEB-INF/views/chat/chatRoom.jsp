@@ -10,7 +10,7 @@
     <%-- 모달 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <%-- 네브바 css --%>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <%-- 채팅방 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat/chat.css"/>
     <%-- js --%>
