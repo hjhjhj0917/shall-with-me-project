@@ -384,14 +384,16 @@ header {
 #messageModalOverlay {
     position: fixed;
     inset: 0;
-    left: 79%;
-    top: 10%;
+    background: transparent; /* 배경을 투명하게 만들어 클릭만 막도록 함 */
     display: none; /* open 시 flex */
-    z-index: 10000; /* 알림 모달이 9999라면 이게 위 */
+    z-index: 10000;
     pointer-events: auto;
 }
 
 #messageModalOverlay .modal-sheet {
+    position: absolute; /* 배경(Overlay)을 기준으로 위치를 잡음 */
+    left: 79%;
+    top: 10%;
     width: 300px;
     height: 400px;
     background: #fff;
@@ -448,4 +450,8 @@ header {
 
 #messageModalOverlay .modal-body::-webkit-scrollbar {
     display: none !important; /* !important 추가 */
+}
+
+body.modal-open {
+    overflow: hidden; /* 이 속성이 body의 스크롤을 막습니다. */
 }

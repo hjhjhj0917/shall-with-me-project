@@ -14,7 +14,7 @@
         }
         /* 기본 스타일 초기화 */
         body, html {
-            margin: 0;
+
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: white;
@@ -28,7 +28,6 @@
         /* 채팅 목록을 감싸는 컨테이너 */
         .chat-list-container {
             max-width: 600px;
-            padding: 10px;
             background-color: white;
             border-radius: 16px;
         }
@@ -82,6 +81,21 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* 목록이 비어있을 때 컨테이너 스타일 */
+        .chat-list-container.is-empty {
+            display: flex;
+            justify-content: center; /* 수평 중앙 */
+            align-items: center;   /* 수직 중앙 */
+            min-height: 80vh;
+        }
+
+        /* [추가] 비어있을 때 표시되는 메시지 자체의 스타일 */
+        .chat-list-container.is-empty p {
+            color: #888;
+            font-size: 1rem;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -174,8 +188,14 @@
                 var container = $("#chatList");
                 container.empty();
 
+                // [추가] 이전 상태 초기화를 위해 is-empty 클래스를 먼저 제거합니다.
+                container.removeClass('is-empty');
+
                 if (userList.length === 0) {
-                    container.append('<p style="text-align:center; color:#999;">대화 상대가 없습니다.</p>');
+                    // [수정] is-empty 클래스를 추가하고, 스타일이 없는 p 태그를 넣습니다.
+                    container.addClass('is-empty');
+                    container.append('<p>대화 상대가 없습니다.</p>');
+
                 } else {
                     $.each(userList, function (index, user) {
                         var chatItem = createChatItem(user);

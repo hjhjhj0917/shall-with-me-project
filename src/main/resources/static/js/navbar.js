@@ -1,27 +1,51 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     $("#logout").on("click", function () {
-        showCustomAlert("로그아웃 하시겠습니까?", function () {
-            $.ajax({
-                url: "/user/logout",
-                type: "Post",
-                dataType: "json",
-                success: function (res) {
-                    if (res.result === 1) {
-                        location.href = "/user/main";
+        if (this.id === "logout") {
+            showCustomAlert("로그아웃 하시겠습니까?", function () {
+                $.ajax({
+                    url: "/user/logout",
+                    type: "Post",
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.result === 1) {
+                            location.href = "/user/main";
 
-                    } else {
-                        showCustomAlert("실패: " + res.msg);
+                        } else {
+                            showCustomAlert("실패: " + res.msg);
+                        }
+                    },
+                    error: function () {
+                        showCustomAlert("서버 통신 중 오류가 발생했습니다.");
                     }
-                },
-                error: function () {
-                    showCustomAlert("서버 통신 중 오류가 발생했습니다.");
-                }
+                });
             });
-        });
+        }
     });
 
-    // ✅ 초기화 (접힘 상태 유지)
+    // 숨겨야 할 페이지들 처리
+    const path = window.location.pathname;
+    const pageName = path.split('/').pop();
+
+    const hideBoxByPage = {
+        main: ['switchBox'],
+        userProfile: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
+        userTagSelect: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
+        userRegForm: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
+        login: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
+        searchUserId: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
+        searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
+        chatRoom: ['switchBox'],
+    };
+
+    if (hideBoxByPage[pageName]) {
+        hideBoxByPage[pageName].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    // 초기화 (접힘 상태 유지)
     const ids = ['menuBox', 'headerDropdownToggle'];
     ids.forEach(id => {
         const el = document.getElementById(id);
@@ -38,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-// toggle 대상 요소만 클릭 시 pinned 토글
+    // toggle 대상 요소만 클릭 시 pinned 토글
     ['switchToggle', 'userIconToggle', 'headerDropdownToggle'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -48,6 +72,54 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // 로그인 안 돼 있으면 이름 박스 및 메뉴 수정
+    if (!userName || userName.trim() === "") {
+        const userNameBox = document.getElementById("userNameBox");
+        const messageBox = document.getElementById("messageBox");
+        if (userNameBox) {
+            userNameBox.style.display = "none";
+            messageBox.style.display = "none";
+        }
+        const menuButtons = document.querySelectorAll("#menuBox .menu-list");
+
+        if (menuButtons.length >= 2) {
+            menuButtons[0].textContent = "회원가입";
+            menuButtons[0].setAttribute("onclick", "location.href='/user/userRegForm'");
+
+            menuButtons[1].textContent = "ㅤ로그인ㅤ";
+            menuButtons[1].setAttribute("id", "loginBtn");
+            menuButtons[1].setAttribute("onclick", "location.href='/user/login'");
+        }
+
+        if (menuButtons.length >= 3) {
+            menuButtons[2].style.display = "none";
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .header-menu-container:hover:not(.pinned),
+            .header-menu-container.pinned {
+                width: 250px !important;
+            }
+            #headerDropdownToggle {
+                margin-top: 2px;
+                margin-right: 176px;
+            }
+        `;
+        document.head.appendChild(style);
+
+        const hideBoxes = hideBoxByPage[pageName] || [];
+
+        ['menuBox'].forEach(id => {
+            if (hideBoxes.includes(id)) return;  // 숨겨야 할 박스는 무시
+
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('pinned');
+                el.style.display = '';  // 보이게
+            }
+        });
+    }
 
     // 메세지 리스트 보기 ================================================== //
 
@@ -57,10 +129,10 @@ document.addEventListener('DOMContentLoaded', function () {
      * ===================================================================
      */
 
-// 모달을 열었던 버튼(트리거) 요소를 저장하기 위한 변수
+    // 모달을 열었던 버튼(트리거) 요소를 저장하기 위한 변수
     let messageModalTrigger = null;
 
-// [수정] #messageBox 버튼 클릭 시 모달 열기
+    // [수정] #messageBox 버튼 클릭 시 모달 열기
     const messageBox = document.getElementById('messageBox');
     if (messageBox) {
         messageBox.addEventListener('click', function(e) {
@@ -84,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-// [추가] 닫기 버튼(#messageModalClose)에 클릭 이벤트 연결
+    // [추가] 닫기 버튼(#messageModalClose)에 클릭 이벤트 연결
     document.getElementById('messageModalClose')?.addEventListener('click', closeMessageModal);
 
     /**
@@ -142,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-// 배경 클릭 시 모달 닫기 (이 기능은 사용자 편의성을 높여주므로 유지하는 것이 좋습니다)
+    // 배경 클릭 시 모달 닫기 (이 기능은 사용자 편의성을 높여주므로 유지하는 것이 좋습니다)
     document.addEventListener('click', (e) => {
         const ov = document.getElementById('messageModalOverlay');
         if (ov && e.target === ov) {
@@ -150,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-// ESC 키 입력 시 모달 닫기 (이 기능은 접근성을 위해 필수적이므로 유지하는 것이 좋습니다)
+    // ESC 키 입력 시 모달 닫기 (이 기능은 접근성을 위해 필수적이므로 유지하는 것이 좋습니다)
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const ov = document.getElementById('messageModalOverlay');
@@ -161,75 +233,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // =================================================================== //
-
-    // ✅ 숨겨야 할 페이지들 처리
-    const path = window.location.pathname;
-    const pageName = path.split('/').pop();
-
-    const hideBoxByPage = {
-        main: ['switchBox'],
-        userProfile: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
-        userTagSelect: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
-        userRegForm: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
-        login: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
-        searchUserId: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
-        searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
-        chatRoom: ['switchBox'],
-    };
-
-    if (hideBoxByPage[pageName]) {
-        hideBoxByPage[pageName].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'none';
-        });
-    }
-
-    // ✅ 로그인 안 돼 있으면 이름 박스 및 메뉴 수정
-    if (!userName || userName.trim() === "") {
-        const userNameBox = document.getElementById("userNameBox");
-        const messageBox = document.getElementById("messageBox");
-        if (userNameBox) {
-            userNameBox.style.display = "none";
-            messageBox.style.display = "none";
-        }
-        const menuButtons = document.querySelectorAll("#menuBox .menu-list");
-
-        if (menuButtons.length >= 2) {
-            menuButtons[0].textContent = "회원가입";
-            menuButtons[0].setAttribute("onclick", "location.href='/user/userRegForm'");
-
-            menuButtons[1].textContent = "ㅤ로그인ㅤ";
-            menuButtons[1].setAttribute("id", "loginBtn");
-            menuButtons[1].setAttribute("onclick", "location.href='/user/login'");
-        }
-
-        if (menuButtons.length >= 3) {
-            menuButtons[2].style.display = "none";
-        }
-
-        const style = document.createElement('style');
-        style.innerHTML = `
-            .header-menu-container:hover:not(.pinned),
-            .header-menu-container.pinned {
-                width: 250px !important;
-            }
-            #headerDropdownToggle {
-                margin-top: 2px;
-                margin-right: 176px;
-            }
-        `;
-        document.head.appendChild(style);
-
-        const hideBoxes = hideBoxByPage[pageName] || [];
-
-        ['menuBox'].forEach(id => {
-            if (hideBoxes.includes(id)) return;  // 숨겨야 할 박스는 무시
-
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('pinned');
-                el.style.display = '';  // 보이게
-            }
-        });
-    }
 });
