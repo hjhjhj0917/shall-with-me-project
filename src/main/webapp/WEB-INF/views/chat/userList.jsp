@@ -97,6 +97,11 @@
             font-size: 1rem;
             font-weight: 500;
         }
+
+        p {
+            margin-top: 30px;
+            padding-top: 30px;
+        }
     </style>
 </head>
 <body>

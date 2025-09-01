@@ -6,7 +6,9 @@ import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.impl.RoommateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -60,26 +62,37 @@ public class RoommateController {
 
     // ✅ 저장 처리
     @PostMapping("/register")
-    public String registerProfile(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-                                  @RequestParam(value = "introduction", required = false) String introduction,
-                                  HttpSession session) throws Exception {
+    @ResponseBody // JSON 데이터를 반환하기 위해 이 어노테이션을 추가합니다.
+    public ResponseEntity<?> registerProfile(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+                                             @RequestParam(value = "introduction", required = false) String introduction,
+                                             HttpSession session) {
+
+        log.info("{}.registerProfile Start!", this.getClass().getName());
 
         String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
         if (userId == null || userId.isBlank()) {
-            // 로그인 요구 페이지로 리다이렉트(필요시 변경)
-            return "redirect:/user/login";
+            // 로그인되지 않은 경우 401 Unauthorized 에러와 함께 JSON 응답
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("result", "fail", "msg", "로그인이 필요합니다."));
         }
 
-        // 파일 저장 (옵션)
-        String imageUrl = null;
-        if (profileImage != null && !profileImage.isEmpty()) {
-            imageUrl = saveProfileImage(profileImage);
+        try {
+            String imageUrl = null;
+            if (profileImage != null && !profileImage.isEmpty()) {
+                imageUrl = saveProfileImage(profileImage); // 이미지 저장 로직
+            }
+
+            roommateService.saveUserProfile(userId, introduction, imageUrl); // 프로필 저장 로직
+
+            // 성공 시 "result":"success" 라는 JSON 응답을 보냅니다.
+            return ResponseEntity.ok(Map.of("result", "success"));
+
+        } catch (Exception e) {
+            // log.error("프로필 저장 실패", e);
+            // 서버 처리 중 에러 발생 시 500 Internal Server Error와 함께 JSON 응답
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("result", "fail", "msg", "서버 오류로 저장에 실패했습니다."));
         }
-
-        roommateService.saveUserProfile(userId, introduction, imageUrl);
-
-        // 저장 후 다시 화면으로
-        return "redirect:/roommate/roommateReg";
     }
 
     // 로컬 폴더에 저장하고 /uploads/profile/.. URL 반환

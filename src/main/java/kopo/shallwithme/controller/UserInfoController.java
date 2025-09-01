@@ -12,6 +12,7 @@ import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
@@ -162,6 +164,12 @@ public class UserInfoController {
         log.info("{}.login End!", this.getClass().getName());
 
         return "user/login";
+    }
+
+    @GetMapping(value = "myPage")
+    public String myPage() {
+
+        return "user/myPage";
     }
 
     @GetMapping(value = "searchUserId")

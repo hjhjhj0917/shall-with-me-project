@@ -259,7 +259,7 @@
             border: 1px solid #c7d3e6;
             border-radius: 12px;
             font-family: inherit;
-            font-size: 1.02rem;
+            font-size: 14px;
             line-height: 1.65;
             resize: none;
             background: #fff;
@@ -651,7 +651,12 @@
     });
 
     /* 커스텀 검증: 첫 에러만 강조(사진 → 소개글) */
+    /* 커스텀 검증: 첫 에러만 강조(사진 → 소개글) */
     document.getElementById('roommateForm').addEventListener('submit', function (e) {
+        // [수정] 이 부분을 함수의 가장 위로 옮겨야 합니다.
+        // 이렇게 하면 유효성 검사를 통과하더라도 페이지가 새로고침되지 않습니다.
+        e.preventDefault();
+
         const isFirst = document.getElementById('isFirstFlag').value === 'true';
         const fileInput = document.querySelector('input[name="profileImage"]');
         const uploadBox = document.getElementById('profileUploadBox');
@@ -664,34 +669,55 @@
         uploadBox.classList.remove('is-error-photo');
         introEl.classList.remove('is-error-intro');
 
+        // 유효성 검사 실패 시 return하는 로직은 그대로 유지합니다.
         if (isFirst) {
             if (!hasFile) {
-                e.preventDefault();
+                // e.preventDefault(); // 이미 위에서 처리했으므로 여기서 또 호출할 필요는 없습니다.
                 showCustomAlert('프로필 사진을 업로드해주세요.');
                 uploadBox.classList.add('is-error-photo');
-                try {
-                    fileInput.focus();
-                } catch (_) {
-                }
                 uploadBox.scrollIntoView({behavior: 'smooth', block: 'center'});
                 return;
             }
-            if (intro.length === 0) {
-                e.preventDefault();
-                showCustomAlert('자기소개를 입력해주세요.');
+            if (intro.length < 10) { // 최소 글자 수 검사 추가
+                // e.preventDefault();
+                showCustomAlert('자기소개를 10자 이상 입력해주세요.');
                 introEl.classList.add('is-error-intro');
                 introEl.focus();
                 return;
             }
         } else {
-            if (!hasFile && intro === origIntro) {
-                e.preventDefault();
+            const originalUrl = document.getElementById('originalUrl').value;
+            if (!hasFile && intro === origIntro && originalUrl === (uploadBox.querySelector('img.preview')?.src || '')) {
+                // e.preventDefault();
                 showCustomAlert('변경된 내용이 없습니다.');
                 introEl.classList.add('is-error-intro');
                 introEl.focus();
                 return;
             }
         }
+
+        // 유효성 검사를 통과하면 이 코드가 실행됩니다.
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: "/roommate/register",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.result === "success") {
+                    showCustomAlert('저장이 완료되었습니다.', function () {
+                        location.href = "/user/main";
+                    });
+                } else {
+                    showCustomAlert(response.msg || '저장에 실패했습니다.');
+                }
+            },
+            error: function (xhr) {
+                showCustomAlert('오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        });
     });
 
     /* 태그 영역: 자동 클램프 + 더보기/접기 + 많을 때 dense */
