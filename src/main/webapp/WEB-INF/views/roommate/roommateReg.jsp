@@ -20,7 +20,9 @@
             --border:#ddd;
             --muted:#666;
             --header-h:0px;
-            --tag-collapsed-max:140px; /* 접힘 높이 */
+            --tag-collapsed-max:140px; /* 접힘 높이 (이제 사용하지 않지만 하위호환 위해 남김) */
+            /* [MOD] 스크롤 높이 변수 추가 */
+            --tag-scroll-h: clamp(140px, 24vh, 260px);
         }
 
         html,body{height:100%}
@@ -83,7 +85,6 @@
 
         /* ===============================
            ✅ 업로더 크기 & 내부 요소 동시 스케일
-           - JS가 --upload-size를 바꾸면 원형/테두리/아이콘/텍스트까지 함께 커짐
            =============================== */
         .roommate-left{
             --upload-size: 240px;        /* JS가 동적으로 변경 */
@@ -94,8 +95,8 @@
         .upload-box{
             position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
             width:var(--upload-size); height:var(--upload-size);
-            border:2px dashed #bbb;                 /* 기본값 */
-            border-width: clamp(2px, calc(var(--upload-size) * var(--upload-border-ratio)), 8px); /* ★ 스케일 */
+            border:2px dashed #bbb;
+            border-width: clamp(2px, calc(var(--upload-size) * var(--upload-border-ratio)), 8px);
             border-radius:100%; overflow:hidden; cursor:pointer; text-align:center;
             transition:
                     width .25s ease, height .25s ease,
@@ -105,7 +106,6 @@
         }
         .upload-box:hover{ border-color:var(--primary); background:#f7fbff; box-shadow:0 0 0 4px rgba(51,153,255,.12); transform:translateY(-1px) }
         .upload-box i{
-            /* fa-2x 대신 동적 크기 */
             font-size: clamp(18px, calc(var(--upload-size) * var(--upload-icon-ratio)), 56px);
             color:#8a8a8a; margin-bottom: clamp(8px, calc(var(--upload-size) * 0.04), 18px);
         }
@@ -135,16 +135,15 @@
         }
         .is-error-intro{ border:2px solid var(--primary)!important; box-shadow:0 0 0 5px rgba(51,153,255,.22) }
 
-        /* 태그 칩 + 접기/펼치기 */
+        /* [MOD] 태그 칩 영역: 스크롤 가능하도록 수정 */
         .tag-chip-wrap{
             display:flex; flex-wrap:wrap; row-gap:10px; column-gap:10px;
-            position:relative; max-height:var(--tag-collapsed-max); overflow:hidden;
-            transition:max-height .25s ease;
-        }
-        .tag-chip-wrap.expanded{ max-height:none }
-        .tag-chip-wrap.is-clamped::after{
-            content:""; position:absolute; left:0; right:0; bottom:0; height:44px; pointer-events:none;
-            background:linear-gradient(to bottom, rgba(244,249,255,0), #f4f9ff 60%);
+            max-height: var(--tag-scroll-h);   /* 고정 높이 */
+            overflow: auto;                    /* 스크롤 허용 */
+            padding-right: 6px;
+            scrollbar-gutter: stable both-edges;
+            scroll-behavior: smooth;
+            position: relative;
         }
         .tag-chip{
             display:inline-flex; align-items:center; gap:8px;
@@ -156,11 +155,23 @@
         .tag-chip i{ font-size:.95rem }
         .tag-chip:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(28,64,125,.1) }
         .tag-chip-wrap.dense .tag-chip{ padding:6px 10px; font-size:.95rem } /* 칩 많으면 컴팩트 */
-        .chip-toggle{
-            margin-top:10px; display:none; align-items:center; gap:8px;
-            background:#f0f6ff; color:var(--primary-dark); border:1px solid #c7dcff; border-radius:999px;
-            padding:8px 14px; cursor:pointer; font-size:.95rem;
+
+        /* [MOD] 접근성: 키보드 포커스 표시 */
+        .tag-chip-wrap:focus-visible{
+            outline: 3px solid rgba(51,153,255,.35);
+            border-radius: 12px;
         }
+
+        /* [MOD] 스크롤바 미세 커스텀 */
+        .tag-chip-wrap::-webkit-scrollbar{ width:10px }
+        .tag-chip-wrap::-webkit-scrollbar-track{ background:#eef4ff; border-radius:8px }
+        .tag-chip-wrap::-webkit-scrollbar-thumb{ background:#c7dcff; border-radius:8px; border:2px solid #eef4ff }
+        .tag-chip-wrap{ scrollbar-width: thin; scrollbar-color: #c7dcff #eef4ff }
+
+        /* [MOD] 더보기/접기 관련 스타일 비활성화 */
+        .tag-chip-wrap.expanded{ max-height: var(--tag-scroll-h) !important }
+        .tag-chip-wrap.is-clamped::after{ display:none !important }
+        .chip-toggle{ display:none !important }
 
         /* 저장 버튼 */
         .floating-save{
@@ -207,7 +218,6 @@
                     <c:set var="profileUrl" value="${userProfile.profileImageUrl}"/>
                     <c:set var="isFirst" value="${empty userProfile}"/>
                     <div class="upload-box ${not empty profileUrl ? 'has-image' : ''}" id="profileUploadBox">
-                        <!-- fa-2x 제거: CSS로 동적 스케일 -->
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>프로필 사진 업로드</span>
                         <input type="file" name="profileImage" accept="image/*" <c:if test="${isFirst}">required</c:if>/>
@@ -229,16 +239,15 @@
                 <div>
                     <c:choose>
                         <c:when test="${not empty userTags}">
-                            <div class="tag-chip-wrap" id="tagWrap">
+                            <!-- [MOD] 스크롤 가능하도록 tabindex/aria-label 추가, 더보기 버튼 제거 -->
+                            <div class="tag-chip-wrap" id="tagWrap" tabindex="0" aria-label="사용자 태그 목록 (스크롤 가능)">
                                 <c:forEach var="t" items="${userTags}">
                                     <span class="tag-chip"><i class="fa-solid fa-tag"></i>
                                         <c:out value="${empty t.tagName ? t.tag_name : t.tagName}"/>
                                     </span>
                                 </c:forEach>
                             </div>
-                            <button type="button" class="chip-toggle" id="chipToggle" aria-expanded="false">
-                                <i class="fa-solid fa-angles-down"></i> 더보기
-                            </button>
+                            <!-- [REMOVED] chip-toggle 버튼 (더보기/접기) -->
                         </c:when>
                         <c:otherwise>
                             <span style="color:#6e7b8b; background:#f7faff; border:1px dashed #dbe9ff; border-radius:10px; padding:10px 14px; display:inline-block">
@@ -339,29 +348,16 @@
         }
     });
 
-    /* 태그 영역: 자동 클램프 + 더보기/접기 + 많을 때 dense */
+    /* [MOD] 태그 영역: 스크롤 방식 (dense만 유지, 클램프/토글 제거) */
     (function(){
         const wrap=document.getElementById('tagWrap');
-        const btn=document.getElementById('chipToggle');
-        if(!wrap||!btn) { calcUploadSize(); return; }
+        if(!wrap){ calcUploadSize(); return; }
 
         const chips=wrap.querySelectorAll('.tag-chip');
         if(chips.length>12){ wrap.classList.add('dense'); }
 
-        const collapsedMax=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tag-collapsed-max'))||140;
-        const needsClamp=wrap.scrollHeight>collapsedMax+8;
-        if(needsClamp){ wrap.classList.add('is-clamped'); btn.style.display='inline-flex'; }
-
-        btn.addEventListener('click',function(){
-            const expanded=wrap.classList.toggle('expanded');
-            btn.setAttribute('aria-expanded',expanded?'true':'false');
-            btn.innerHTML=expanded?'<i class="fa-solid fa-angles-up"></i> 접기':'<i class="fa-solid fa-angles-down"></i> 더보기';
-            wrap.classList.toggle('is-clamped',!expanded && needsClamp);
-
-            deferCalcUploadSize(); /* 펼침/접힘 후 업로더 크기 재계산 */
-        });
-
-        calcUploadSize(); /* 초기 계산 */
+        /* 스크롤 방식은 펼침으로 높이가 바뀌지 않으니 업로더 리사이즈는 1회만 */
+        calcUploadSize();
     })();
 
     /* ============================
