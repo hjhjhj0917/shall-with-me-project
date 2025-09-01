@@ -637,5 +637,11 @@ public class UserInfoController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping(value = "userInfo")
+    public String userInfo() {
+
+        return "user/userInfo";
+    }
+
 }
 
