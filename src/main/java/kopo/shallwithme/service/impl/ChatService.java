@@ -1,6 +1,7 @@
 package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.dto.ChatDTO;
+import kopo.shallwithme.dto.ChatPartnerDTO;
 import kopo.shallwithme.dto.ChatRoomDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.mapper.IChatMapper;
@@ -48,6 +49,15 @@ public class ChatService implements IChatService {
     public List<ChatRoomDTO> getRoomsByUserId(String userId) {
 
         return chatMapper.getRoomsByUserId(userId);
+    }
+
+    // 메세지 주고받은 유저만 불러오기
+    @Override
+    public List<ChatPartnerDTO> getChatPartners(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + ".getChatPartners Start!");
+
+        return chatMapper.selectChatPartnersWithLastMsg(pDTO); // 새 매퍼 메소드 호출
     }
 
     @Override

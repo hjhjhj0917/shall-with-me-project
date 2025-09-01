@@ -194,7 +194,7 @@ header {
 
 #headerDropdownToggle {
     margin-top: 2px;
-    margin-right: 242px;
+    margin-right: 176px;
 }
 
 #switchToggle {
@@ -204,6 +204,19 @@ header {
 
 /* 둥글고 기다란 배경 */
 .slide-bg2 {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-120%);
+    width: 80px;
+    height: 30px;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    z-index: 0;
+    opacity: 0;
+}
+
+.slide-bg4 {
     position: absolute;
     left: 10px;
     top: 50%;
@@ -234,13 +247,36 @@ header {
     justify-content: center;
 }
 
+.header-message-container {
+    display: flex;
+    align-items: center;
+    height: 47px;
+    width: 47px; /* 원형 */
+    background-color: white;
+    border-radius: 50%;
+    padding-left: 0;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    justify-content: center;
+}
+
 /* hover 시 펼쳐짐 */
 .header-menu-container:hover:not(.pinned),
 .header-menu-container.pinned {
-    width: 320px;             /* 펼쳐진 크기 */
+    width: 250px;             /* 펼쳐진 크기 */
     border-radius: 40px;      /* 타원형 */
     padding-left: 30px;
     justify-content: flex-start;
+}
+
+/* 아이콘 위치를 오른쪽으로 밀어주는 스타일 */
+.header-message-container .header-dropdown-toggle {
+    z-index: 1;
+    background-color: transparent;
 }
 
 /* 메뉴 리스트 */
@@ -370,4 +406,82 @@ header {
 
 .home-logo {
     cursor: pointer;
+}
+
+/*======================================================*/
+
+/* 큰 모달 오버레이 */
+#messageModalOverlay {
+    position: fixed;
+    inset: 0;
+    background: transparent; /* 배경을 투명하게 만들어 클릭만 막도록 함 */
+    display: none; /* open 시 flex */
+    z-index: 10000;
+    pointer-events: auto;
+}
+
+#messageModalOverlay .modal-sheet {
+    position: absolute; /* 배경(Overlay)을 기준으로 위치를 잡음 */
+    left: 79%;
+    top: 10%;
+    width: 300px;
+    height: 400px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#messageModalOverlay .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #eee;
+    background: #f7faff;
+}
+
+#messageModalOverlay .modal-title-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1c407d;
+}
+
+#messageModalOverlay .modal-close {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1.1rem;
+}
+
+#messageModalOverlay .modal-body {
+    flex: 1 1 auto;
+    padding: 0; /* iframe이 꽉 차도록 */
+    overflow: hidden;
+}
+
+/* 등록 화면을 로드하는 프레임 */
+#messageModalFrame {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+}
+
+#messageModalOverlay .modal-body {
+    overflow-y: auto;
+    scrollbar-width: none !important; /* !important 추가 */
+    -ms-overflow-style: none !important; /* !important 추가 */
+}
+
+#messageModalOverlay .modal-body::-webkit-scrollbar {
+    display: none !important; /* !important 추가 */
+}
+
+body.modal-open {
+    overflow: hidden; /* 이 속성이 body의 스크롤을 막습니다. */
 }

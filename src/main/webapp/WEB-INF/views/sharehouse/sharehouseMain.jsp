@@ -1,57 +1,17 @@
-
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <html>
 <head>
-    <title>Title</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>살며시: 쉐어하우스 찾기</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
     <link rel="icon" href="${pageContext.request.contextPath}/images/noimg.png">
+    <%-- js --%>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<header>
-    <div class="home-logo" onclick="location.href='/user/main'">
-        <div class="header-icon-stack">
-            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
-        </div>
-        <div class="header-logo">살며시</div>
-    </div>
-    <div class="header-user-area">
-        <div class="header-switch-container pinned" id="switchBox">
-            <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
-            <button class="switch-list"
-                    onclick="location.href='${pageContext.request.contextPath}/roommate/roommateMain'">
-                룸메이트</button>
-            <button class="switch-list"
-                    onclick="location.href='${pageContext.request.contextPath}/sharehouse/sharehouseMain'">
-                쉐어하우스
-            </button>
-
-            <button class="header-dropdown-toggle" id="switchToggle">
-                <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-user-name-container pinned" id="userNameBox">
-            <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-            <span class="user-name-text" id="userNameText">
-        <%= session.getAttribute("SS_USER_NAME") %>님
-      </span>
-            <button class="header-dropdown-toggle" id="userIconToggle">
-                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-menu-container pinned" id="menuBox">
-            <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
-            <button class="menu-list" onclick="location.href='/chat/userListPage'">메세지</button>
-            <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
-            <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
-            <button class="header-dropdown-toggle" id="headerDropdownToggle">
-                <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
-            </button>
-        </div>
-    </div>
-</header>
+<%@ include file="../includes/header.jsp" %>
 <%--내가 프론트 만들부분--%>
 <main id="sh-wrapper">
     <!-- 검색바 -->
@@ -151,26 +111,8 @@
     </button>
 </main>
 
-
-
-
-<%--모달창부분--%>
-<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
-            <h2>살며시</h2>
-        </div>
-        <p id="customAlertMessage">메시지 내용</p>
-        <div class="modal-buttons" style="text-align: right;">
-            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
-        </div>
-    </div>
-</div>
-
-
-
-
+<!-- 커스텀 알림창 -->
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
@@ -178,10 +120,6 @@
         ssUserName = "";
     }
 %>
-
-
-
-
 
 <script>
     const userName = "<%= ssUserName %>";
@@ -224,10 +162,11 @@
 
         async function fetchNext() {
             if (loading || last) return;
-            loading = true; loader.style.display = 'block';
+            loading = true;
+            loader.style.display = 'block';
             try {
                 const url = ctx + '/sharehouse/list?page=' + (page + 1);  // ← 백틱 제거
-                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const res = await fetch(url, {headers: {'Accept': 'application/json'}});
                 if (!res.ok) throw new Error('network error');
                 const data = await res.json();
                 renderCards(data.items || []);
@@ -237,13 +176,14 @@
             } catch (err) {
                 console.error(err);
             } finally {
-                loading = false; loader.style.display = 'none';
+                loading = false;
+                loader.style.display = 'none';
             }
         }
 
         const io = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) fetchNext();
-        }, { root: null, rootMargin: '300px 0px', threshold: 0.01 });
+        }, {root: null, rootMargin: '300px 0px', threshold: 0.01});
 
         io.observe(sentinel);
 
@@ -252,7 +192,7 @@
 
         function renderCards(items) {
             const frag = document.createDocumentFragment();
-            items.forEach(function(it){
+            items.forEach(function (it) {
                 const article = document.createElement('article');
                 article.className = 'sh-card';
                 article.dataset.id = it.id;

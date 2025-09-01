@@ -1,16 +1,16 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>살며시 | 채팅방</title>
+    <title>살며시: 채팅방</title>
 
     <%-- 모달 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <%-- 네브바 css --%>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <%-- 채팅방 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat/chat.css"/>
     <%-- js --%>
@@ -19,71 +19,10 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <%-- 무료 아이콘 --%>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <script>
-        $(document).ready(function () {
-
-        $("#logout").on("click", function () {
-            showCustomAlert("로그아웃 하시겠습니까?", function () {
-                $.ajax({
-                    url: "/user/logout",
-                    type: "GET",
-                    dataType: "json",
-                    success: function (res) {
-                        if (res.result === 1) {
-                            location.href = "/user/main";
-
-                        } else {
-                            showCustomAlert("실패: " + res.msg);
-                        }
-                    },
-                    error: function () {
-                        showCustomAlert("서버 통신 중 오류가 발생했습니다.");
-                    }
-                });
-            });
-        });
-        });
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
-<header>
-    <div class="home-logo" onclick="location.href='/user/main'">
-        <div class="header-icon-stack">
-            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
-        </div>
-        <div class="header-logo">살며시</div>
-    </div>
-    <div class="header-user-area">
-        <div class="header-switch-container pinned" id="switchBox">
-            <span class="slide-bg3"></span>
-            <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
-            <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
-            <button class="header-dropdown-toggle" id="switchToggle">
-                <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-user-name-container pinned" id="userNameBox">
-            <span class="slide-bg"></span>
-            <span class="user-name-text" id="userNameText">
-                <%= session.getAttribute("SS_USER_NAME") %>님
-            </span>
-            <button class="header-dropdown-toggle" id="userIconToggle">
-                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-menu-container pinned" id="menuBox">
-            <span class="slide-bg2"></span>
-            <button class="menu-list" onclick="location.href='/chat/userListPage'">메세지</button>
-            <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
-            <button class="menu-list" id="logout">로그아웃</button>
-            <button class="header-dropdown-toggle" id="headerDropdownToggle">
-                <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
-            </button>
-        </div>
-    </div>
-</header>
+<%@ include file="../includes/header.jsp" %>
 
 <!-- 상단 버튼 -->
 <div class="top-buttons">
@@ -97,25 +36,14 @@
 
 <!-- 입력 영역 -->
 <div class="input-area">
-    <input type="text" id="messageInput" placeholder="채팅을 입력하세요" />
+    <input type="text" id="messageInput" placeholder="채팅을 입력하세요"/>
     <button class="send-btn" onclick="sendMessage()">
         <i class="fa-regular fa-paper-plane fa-xs" style="color: #ffffff;"></i>
     </button>
 </div>
 
-<%-- 모달창 --%>
-<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
-            <h2>살며시</h2>
-        </div>
-        <p id="customAlertMessage">메시지 내용</p>
-        <div class="modal-buttons" style="text-align: right;">
-            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
-        </div>
-    </div>
-</div>
+<!-- 커스텀 알림창 -->
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
@@ -215,7 +143,7 @@
 
         const msgDate = new Date(time);
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
-        const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeStr = msgDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 
         if (lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
@@ -258,8 +186,7 @@
                 msgContent.className = "message-content";
 
                 const senderElem = document.createElement("div");
-                senderElem.className = "sender-id";
-                senderElem.textContent = sender;
+
 
                 const messageBubble = document.createElement("div");
                 messageBubble.className = "message-bubble";

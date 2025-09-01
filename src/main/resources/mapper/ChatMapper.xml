@@ -10,11 +10,46 @@
         VALUES (#{roomId}, #{senderId}, #{message})
     </insert>
 
-    <select id="selectChatMessages" resultType="kopo.shallwithme.dto.ChatDTO">
+    <select id="selectChatMessages" resultType="ChatDTO">
         SELECT room_id AS roomId, sender_id AS senderId, message, sent_at AS sentAt
         FROM CHAT_MESSAGE
         WHERE room_id = #{roomId}
         ORDER BY sent_at ASC
+    </select>
+
+    <!--메세지 주고받은 유저만 불러오기-->
+    <select id="selectChatPartnersWithLastMsg"
+            parameterType="UserInfoDTO"
+            resultType="ChatPartnerDTO">
+        SELECT
+            U.USER_ID AS userId,
+            U.USER_NAME AS userName,
+            UP.profile_image_url AS profileImgUrl,
+            LM.MESSAGE AS lastMessage
+        FROM
+            USER_INFO U
+                INNER JOIN (
+                SELECT
+                    CASE
+                        WHEN USER1_ID = #{userId} THEN USER2_ID
+                        ELSE USER1_ID
+                        END AS partner_id,
+                    ROOM_ID
+                FROM CHAT_ROOM
+                WHERE USER1_ID = #{userId} OR USER2_ID = #{userId}
+            ) AS P ON U.USER_ID = P.partner_id
+                LEFT JOIN USER_PROFILE UP ON U.USER_ID = UP.user_id
+                LEFT JOIN (
+                SELECT
+                    ROOM_ID,
+                    MESSAGE,
+                    sent_at,  -- [수정 1] 최종 정렬을 위해 sent_at 컬럼 추가
+                    ROW_NUMBER() OVER(PARTITION BY ROOM_ID ORDER BY sent_at DESC) as rn -- [수정 2] TIMESTAMP -> sent_at
+                FROM CHAT_MESSAGE
+            ) AS LM ON P.ROOM_ID = LM.ROOM_ID AND LM.rn = 1
+        ORDER BY
+            LM.sent_at DESC, -- [수정 3] TIMESTAMP -> sent_at
+            U.USER_NAME ASC
     </select>
 
     <insert id="createChatRoom" useGeneratedKeys="true" keyProperty="roomId">
@@ -22,20 +57,20 @@
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
-    <select id="getRoomsByUserId" resultType="kopo.shallwithme.dto.ChatRoomDTO">
+    <select id="getRoomsByUserId" resultType="ChatRoomDTO">
         SELECT room_id, user1_id, user2_id
         FROM CHAT_ROOM
         WHERE user1_id = #{userId} OR user2_id = #{userId}
     </select>
 
-    <select id="selectUserList" resultType="kopo.shallwithme.dto.UserInfoDTO">
+    <select id="selectUserList" resultType="UserInfoDTO">
         SELECT USER_ID AS user_id, USER_NAME AS user_name
         FROM USER_INFO
         ORDER BY USER_NAME
     </select>
 
     <!-- 방 조회 : user1_id, user2_id 로 방 검색 -->
-    <select id="findRoomIdByUsers" parameterType="kopo.shallwithme.dto.ChatRoomDTO" resultType="int">
+    <select id="findRoomIdByUsers" parameterType="ChatRoomDTO" resultType="int">
         SELECT room_id
         FROM CHAT_ROOM
         WHERE user1_id = #{user1Id} AND user2_id = #{user2Id}
@@ -43,13 +78,13 @@
     </select>
 
     <!-- 방 생성 -->
-    <insert id="insertChatRoom" parameterType="kopo.shallwithme.dto.ChatRoomDTO"
+    <insert id="insertChatRoom" parameterType="ChatRoomDTO"
             useGeneratedKeys="true" keyProperty="roomId">
         INSERT INTO CHAT_ROOM (user1_id, user2_id)
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
-    <select id="selectMessagesByRoomId" parameterType="int" resultType="kopo.shallwithme.dto.ChatDTO">
+    <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatDTO">
         SELECT message_id, room_id AS roomId, sender_id AS senderId, message, sent_at AS timestamp
         FROM CHAT_MESSAGE
         WHERE room_id = #{value}

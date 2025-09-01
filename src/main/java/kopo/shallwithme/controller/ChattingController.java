@@ -3,6 +3,7 @@ package kopo.shallwithme.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.ChatDTO;
+import kopo.shallwithme.dto.ChatPartnerDTO;
 import kopo.shallwithme.dto.ChatRoomDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.service.IChatService;
@@ -95,13 +96,31 @@ public class ChattingController {
         return "chat/chatRoom";
     }
 
-
-    @GetMapping("userList")
+    // 메세지 주고받은 유저만 불러오기
+    @GetMapping("chatPartners")
     @ResponseBody
-    public List<UserInfoDTO> getUserList() throws Exception {
-        return chatService.getUserList(); // JSON 형태로 반환됨
-    }
+    public ResponseEntity<List<ChatPartnerDTO>> getChatPartners(HttpSession session) throws Exception {
 
+        log.info(this.getClass().getName() + ".getChatPartners Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        if (userId == null) { // 로그인한 상태인지 확인 // 보안상 더 안전한 방법이라는데 공부가 필요함!
+            // HttpStatus.UNAUTHORIZED: 서버가 클라이언트에게 보내는 HTTP 응답 상태 코드를 401 Unauthorized 설정
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(java.util.Collections.emptyList());
+        }
+
+        // DTO 객체 생성 및 userId 설정
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserId(userId);
+
+        // DTO를 매개변수로 전달
+        List<ChatPartnerDTO> rList = chatService.getChatPartners(pDTO);
+
+        log.info(this.getClass().getName() + ".getChatPartners End!");
+
+        return ResponseEntity.ok(rList);
+    }
 
     @GetMapping("userListPage")
     public String userListPage() {
@@ -130,6 +149,19 @@ public class ChattingController {
             log.error("❌ 채팅방 생성 실패: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("채팅방 생성 중 오류가 발생했습니다.");
         }
+    }
+
+    @GetMapping("userList")
+    @ResponseBody
+    public List<UserInfoDTO> getUserList() throws Exception {
+        return chatService.getUserList(); // JSON 형태로 반환됨
+    }
+
+
+    @GetMapping("chatTest")
+    public String chatTest() {
+
+        return "chat/chatTest";  // /WEB-INF/views/chat/userList.jsp
     }
 
 }

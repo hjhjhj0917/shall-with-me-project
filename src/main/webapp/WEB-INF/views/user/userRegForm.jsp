@@ -1,66 +1,87 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>회원가입 화면</title>
+    <title>살며시: 회원가입</title>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="//code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/register.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <script>
-        $.datepicker.regional['ko'] = {
-            closeText: '닫기',
-            prevText: '이전달',
-            nextText: '다음달',
-            currentText: '오늘',
-            monthNames: ['1월','2월','3월','4월','5월','6월',
-                '7월','8월','9월','10월','11월','12월'],
-            monthNamesShort: ['1월','2월','3월','4월','5월','6월',
-                '7월','8월','9월','10월','11월','12월'],
-            dayNames: ['일','월','화','수','목','금','토'],
-            dayNamesShort: ['일','월','화','수','목','금','토'],
-            dayNamesMin: ['일','월','화','수','목','금','토'],
-            weekHeader: 'Wk',
-            dateFormat: 'yy-mm-dd',
-            firstDay: 0,
-            isRTL: false,
-            showMonthAfterYear: true,
-            yearSuffix: '년'
-        };
-        $.datepicker.setDefaults($.datepicker.regional['ko']);
+        $(document).ready(function () {
+            // ✅ birth-input 필드의 placeholder를 현재 날짜로 동적 업데이트
+            function updateBirthPlaceholders() {
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.getDate().toString().padStart(2, '0');
 
-        $("#birth-datepicker").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            yearRange: "1900:2025",
-            dateFormat: "yy-mm-dd",
-            beforeShow: function(input, inst) {
-                setTimeout(function() {
-                    const $container = $('.input-container');
-                    const offset = $container.offset();
-                    const width = $container.outerWidth();
-                    const height = $container.outerHeight();
-
-                    const dpWidth = $(inst.dpDiv).outerWidth();
-                    const dpHeight = $(inst.dpDiv).outerHeight();
-
-                    const top = offset.top + (height / 2) - (dpHeight / 2);
-                    const left = offset.left + (width / 2) - (dpWidth / 2);
-
-                    $(inst.dpDiv).css({
-                        position: 'absolute',
-                        top: top + 'px',
-                        left: left + 'px',
-                        transform: 'none',
-                        zIndex: 9999
-                    });
-                }, 0);
+                $('[name="birthYear"]').attr('placeholder', year);
+                $('[name="birthMonth"]').attr('placeholder', month);
+                $('[name="birthDay"]').attr('placeholder', day);
             }
+
+            // 페이지 로드 시 placeholder 업데이트 함수 호출
+            updateBirthPlaceholders();
+
+            // ✅ Datepicker 설정
+            $.datepicker.regional['ko'] = {
+                closeText: '닫기',
+                prevText: '이전달',
+                nextText: '다음달',
+                currentText: '오늘',
+                monthNames: ['1월', '2월', '3월', '4월', '5월', '6월',
+                    '7월', '8월', '9월', '10월', '11월', '12월'],
+                monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월',
+                    '7월', '8월', '9월', '10월', '11월', '12월'],
+                dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+                dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+                dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+                weekHeader: 'Wk',
+                dateFormat: 'yy-mm-dd',
+                firstDay: 0,
+                isRTL: false,
+                showMonthAfterYear: true,
+                yearSuffix: '년'
+            };
+            $.datepicker.setDefaults($.datepicker.regional['ko']);
+
+            $("#birth-datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "1900:2025",
+                dateFormat: "yy-mm-dd",
+                beforeShow: function (input, inst) {
+                    setTimeout(function () {
+                        const $container = $('.input-container');
+                        const offset = $container.offset();
+                        const width = $container.outerWidth();
+                        const height = $container.outerHeight();
+
+                        const dpWidth = $(inst.dpDiv).outerWidth();
+                        const dpHeight = $(inst.dpDiv).outerHeight();
+
+                        const top = offset.top + (height / 2) - (dpHeight / 2);
+                        const left = offset.left + (width / 2) - (dpWidth / 2);
+
+                        $(inst.dpDiv).css({
+                            position: 'absolute',
+                            top: top + 'px',
+                            left: left + 'px',
+                            transform: 'none',
+                            zIndex: 9999
+                        });
+                    }, 0);
+                }
+            });
         });
     </script>
     <style>
@@ -68,12 +89,13 @@
             background-image: url("../images/kpaas-background.png");
         }
 
-            /* ✅ 등록 폼 컨테이너 */
+        /* ✅ 등록 폼 컨테이너 */
         .register-form-wrapper {
             width: 1100px;
             margin: 0 auto;
             padding: 24px 32px;
             background-color: #FFFFFF;
+            height: 820px;
             border-radius: 12px;
             border-top-right-radius: 0;
             box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1), 6px 5px 16px rgba(0, 0, 0, 0.27);
@@ -82,6 +104,7 @@
             box-sizing: border-box;
             overflow: visible; /* 중요 */
         }
+
         /*/////////////////////////////////////////*/
         /* form-row 내부의 input과 버튼들을 유연하게 배치 */
         .form-row {
@@ -98,8 +121,8 @@
         .form-row input[type="email"],
         .form-row input[type="password"],
         .form-row input[type="number"] {
-            flex: 1 1 auto;   /* flex-grow:1, flex-shrink:1, flex-basis:auto */
-            min-width: 0;     /* 오버플로우 방지 */
+            flex: 1 1 auto; /* flex-grow:1, flex-shrink:1, flex-basis:auto */
+            min-width: 0; /* 오버플로우 방지 */
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
@@ -109,7 +132,7 @@
 
         /* 버튼은 내용 크기만큼만 */
         .form-row button.form-button {
-            flex: 0 0 auto;  /* 크기 고정, 늘어나거나 줄어들지 않음 */
+            flex: 0 0 auto; /* 크기 고정, 늘어나거나 줄어들지 않음 */
             height: 40px;
             padding: 0 12px;
             font-size: 14px;
@@ -135,7 +158,8 @@
             margin: 0 auto;
             box-sizing: border-box;
         }
-/*///////////////////////////////////*/
+
+        /*///////////////////////////////////*/
 
 
         /* ✅ 버튼 스타일 고정 */
@@ -175,7 +199,7 @@
 
         /* ✅ 회원가입 버튼 */
         .submit-button {
-            width: 100%;  /* 부모(.input-container) 너비에 맞게 꽉 채우기 */
+            width: 100%; /* 부모(.input-container) 너비에 맞게 꽉 채우기 */
             margin-top: 16px;
         }
 
@@ -265,22 +289,18 @@
         .error-message {
             color: #3399ff;
             font-size: 14px;
-            text-align: left;          /* 왼쪽 정렬 */
-            height: 5px;              /* 고정 높이로 레이아웃 안정 */
+            text-align: left; /* 왼쪽 정렬 */
+            height: 5px; /* 고정 높이로 레이아웃 안정 */
             padding-left: 275px;
             padding-bottom: 15px;
-            visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
         }
 
         .error-message.visible {
-            visibility: visible;       /* 메시지가 있을 때 표시 */
+            visibility: visible; /* 메시지가 있을 때 표시 */
         }
 
-        .register-input {
-            border: 1px solid #ddd;
-        }
-
-        .register-input:focus {
+        .form-row input:focus {
             outline: none;
             border-color: #3399ff;
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
@@ -297,14 +317,13 @@
             border-radius: 12px;
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
 
-
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                z-index: 9999 !important;     /* 위로 띄우기 */
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 9999 !important; /* 위로 띄우기 */
 
         }
 
@@ -340,8 +359,8 @@
             color: #333;
             padding: 2px 4px;
             cursor: pointer;
-            overflow: hidden;         /* ✅ 스크롤 제거 */
-            max-height: 30px;         /* ✅ 높이 제한 */
+            overflow: hidden; /* ✅ 스크롤 제거 */
+            max-height: 30px; /* ✅ 높이 제한 */
         }
 
         /* ======================= */
@@ -360,8 +379,13 @@
             top: 8px;
         }
 
-        .ui-datepicker-prev { left: 8px; }
-        .ui-datepicker-next { right: 8px; }
+        .ui-datepicker-prev {
+            left: 8px;
+        }
+
+        .ui-datepicker-next {
+            right: 8px;
+        }
 
         /* 화살표 모양 */
         .ui-datepicker-prev:before,
@@ -373,8 +397,14 @@
             border: solid #333;
             border-width: 0 2px 2px 0;
         }
-        .ui-datepicker-prev:before { transform: rotate(135deg); }
-        .ui-datepicker-next:before { transform: rotate(-45deg); }
+
+        .ui-datepicker-prev:before {
+            transform: rotate(135deg);
+        }
+
+        .ui-datepicker-next:before {
+            transform: rotate(-45deg);
+        }
 
         /* ======================= */
         /* 요일 헤더 */
@@ -426,123 +456,96 @@
             font-weight: bold;
             border-radius: 50%;
         }
+
         /* 연도 / 월 드롭다운 공통 스타일 */
         .flatpickr-calendar select.flatpickr-monthDropdown-months,
         .flatpickr-calendar select.numInput {
-            appearance: none;           /* 브라우저 기본 화살표 제거 */
+            appearance: none; /* 브라우저 기본 화살표 제거 */
             -webkit-appearance: none;
             -moz-appearance: none;
             border: 1px solid #ddd;
-            border-radius: 6px;         /* 둥글게 */
+            border-radius: 6px; /* 둥글게 */
             padding: 2px 6px;
             background-color: #fff;
             font-size: 14px;
             text-align: center;
             outline: none;
-            overflow: hidden;           /* 스크롤 제거 */
+            overflow: hidden; /* 스크롤 제거 */
         }
 
         /* 드롭다운 펼쳤을 때 옵션 스타일 */
         .flatpickr-calendar select.flatpickr-monthDropdown-months option,
         .flatpickr-calendar select.numInput option {
-            border-radius: 10px;         /* 옵션에도 살짝 둥근 느낌 */
+            border-radius: 10px; /* 옵션에도 살짝 둥근 느낌 */
             padding: 4px;
+        }
+
+        .logo-2 {
+            margin-bottom: 20px;
         }
 
     </style>
 </head>
 <body>
-<header>
-    <div class="home-logo" onclick="location.href='/user/main'">
-        <div class="header-icon-stack">
-            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
-        </div>
-        <div class="header-logo">살며시</div>
-    </div>
-    <div class="header-user-area">
-        <div class="header-switch-container pinned" id="switchBox">
-            <span class="slide-bg3"></span> <!-- 둥근 반스도 역할 -->
-            <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
-            <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
-            <button class="header-dropdown-toggle" id="switchToggle">
-                <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-user-name-container pinned" id="userNameBox">
-            <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-            <span class="user-name-text" id="userNameText">
-        <%= session.getAttribute("SS_USER_NAME") %>님
-      </span>
-            <button class="header-dropdown-toggle" id="userIconToggle">
-                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-menu-container pinned" id="menuBox">
-            <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
-            <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
-            <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
-            <button class="header-dropdown-toggle" id="headerDropdownToggle">
-                <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
-            </button>
-        </div>
-    </div>
-</header>
+<%@ include file="../includes/header.jsp" %>
+
 <div class="register-form-wrapper">
     <div class="register-tab active-tab">REGISTER</div>
     <div class="prefer-tab">PREFER</div>
     <div class="profile-tab">PROFILE</div>
     <div class="header">
-        <div class="logo">살며시</div>
-        <div class="logo-2">Shall With Me</div>
+        <div class="logo">REGISTER</div>
+        <div class="logo-2">살며시</div>
     </div>
     <div id="errorMessage" class="error-message"></div>
     <form id="f">
         <div class="input-container">
             <div class="form-row">
-                <input type="text" name="userName" placeholder="이름" class="register-input"/>
+                <input type="text" name="userName" placeholder="이름"/>
             </div>
 
-        <div class="form-row flex-row">
-            <input type="text" name="userId" placeholder="아이디" class="register-input"/>
-            <button type="button" id="btnUserId" class="form-button">중복확인</button>
-        </div>
-            <div class="form-row">
-        <input type="password" name="password" placeholder="비밀번호" class="register-input"/>
+            <div class="form-row flex-row">
+                <input type="text" name="userId" placeholder="아이디"/>
+                <button type="button" id="btnUserId" class="form-button">중복확인</button>
             </div>
             <div class="form-row">
-        <input type="password" name="password2" placeholder="비밀번호 확인" class="register-input"/>
+                <input type="password" name="password" placeholder="비밀번호"/>
+            </div>
+            <div class="form-row">
+                <input type="password" name="password2" placeholder="비밀번호 확인"/>
             </div>
 
-        <div class="form-row flex-row">
-            <input type="email" name="email" placeholder="이메일" class="register-input"/>
-            <button type="button" id="btnEmail" class="form-button">요청</button>
-        </div>
+            <div class="form-row flex-row">
+                <input type="email" name="email" placeholder="이메일"/>
+                <button type="button" id="btnEmail" class="form-button">요청</button>
+            </div>
 
             <div class="form-row">
-        <input type="text" name="authNumber" placeholder="인증번호 입력" class="register-input"/>
+                <input type="text" name="authNumber" placeholder="인증번호 입력"/>
+                <button type="button" id="btnAuthCheck" class="form-button">확인</button>
             </div>
 
-        <div class="form-row flex-row">
-            <input type="text" name="addr1" placeholder="주소" class="register-input"/>
-            <button type="button" id="btnAddr" class="form-button">우편번호</button>
-        </div>
+            <div class="form-row flex-row">
+                <input type="text" name="addr1" placeholder="주소"/>
+                <button type="button" id="btnAddr" class="form-button">우편번호</button>
+            </div>
 
             <div class="form-row">
-        <input type="text" name="addr2" placeholder="상세주소" class="register-input"/>
+                <input type="text" name="addr2" placeholder="상세주소"/>
             </div>
 
-        <div class="form-row birth-row" id="birth-row">
-            <input type="text" name="birthYear" placeholder="2025" class="birth-input" readonly class="register-input"/>
-            <input type="text" name="birthMonth" placeholder="01" class="birth-input" readonly class="register-input"/>
-            <input type="text" name="birthDay" placeholder="01" class="birth-input" readonly class="register-input"/>
-        </div>
+            <div class="form-row birth-row" id="birth-row">
+                <input type="text" name="birthYear" placeholder="2025" class="birth-input" readonly/>
+                <input type="text" name="birthMonth" placeholder="01" class="birth-input" readonly/>
+                <input type="text" name="birthDay" placeholder="01" class="birth-input" readonly/>
+            </div>
 
-        <div class="gender-select">
-            <label><input type="radio" name="gender" value="M" class="register-input"/> 남성</label>
-            <label><input type="radio" name="gender" value="F" class="register-input"/> 여성</label>
-        </div>
+            <div class="gender-select">
+                <label><input type="radio" name="gender" value="M"/> 남성</label>
+                <label><input type="radio" name="gender" value="F"/> 여성</label>
+            </div>
 
-        <button type="button" id="btnSend" class="form-button submit-button">회원가입</button>
+            <button type="button" id="btnSend" class="form-button submit-button">회원가입</button>
         </div>
     </form>
     <div class="signup-link">
@@ -551,6 +554,9 @@
 
     <input type="text" id="birth-datepicker" style="position:absolute; left:-9999px; top:-9999px;">
 </div>
+
+<!-- 커스텀 알림창 -->
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
@@ -562,6 +568,7 @@
     const userName = "<%= ssUserName %>";
 </script>
 
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
 </body>

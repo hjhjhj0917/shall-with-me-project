@@ -1,20 +1,26 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>로그인하기</title>
+    <title>살며시: 로그인</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#btnUserReg").on("click", function () { location.href = "/user/userRegForm"; });
-            $("#btnSearchUserId").on("click", function () { location.href = "/user/searchUserId"; });
-            $("#btnSearchPassword").on("click", function () { location.href = "/user/searchPassword"; });
+            $("#btnUserReg").on("click", function () {
+                location.href = "/user/userRegForm";
+            });
+            $("#btnSearchUserId").on("click", function () {
+                location.href = "/user/searchUserId";
+            });
+            $("#btnSearchPassword").on("click", function () {
+                location.href = "/user/searchPassword";
+            });
 
             $("#password").on("keydown", function (e) {
                 if (e.key === "Enter") {
@@ -55,7 +61,7 @@
                 $(".login-input").removeClass("input-error");
                 $("#loginErrorMessage").removeClass("visible").text("");
 
-                if (f.userId.value === "") {
+                if (userId === "") {
 
                     $("#userId").addClass("input-error");
                     $("#loginErrorMessage")
@@ -71,7 +77,7 @@
                     return;
 
                 }
-                if (f.password.value === "") {
+                if (password === "") {
 
                     $("#password").addClass("input-error");
                     $("#loginErrorMessage")
@@ -96,7 +102,7 @@
                     data: $("#f").serialize(),
                     success: function (json) {
                         if (json.result === 1) {
-                            showCustomAlert(json.msg, function() {
+                            showCustomAlert(json.msg, function () {
                                 location.href = "/user/main";
                             });
                         } else if (json.result === 3) {
@@ -105,8 +111,19 @@
                                 location.href = "/user/userTagSelect";
                             });
                         } else {
-                            showCustomAlert(json.msg);
+                            $("#userId").addClass("input-error");
+                            $("#loginErrorMessage")
+                                .text(json.msg)
+                                .addClass("visible");
+
+                            // 2초 후 메시지 자동 숨김
+                            setTimeout(function () {
+                                $("#loginErrorMessage").removeClass("visible");
+                            }, 2000);
+
                             $("#userId").focus();
+                            return;
+
                         }
                     }
                 });
@@ -115,41 +132,7 @@
     </script>
 </head>
 <body>
-<header>
-    <div class="home-logo" onclick="location.href='/user/main'">
-        <div class="header-icon-stack">
-            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
-        </div>
-        <div class="header-logo">살며시</div>
-    </div>
-    <div class="header-user-area">
-        <div class="header-switch-container pinned" id="switchBox">
-            <span class="slide-bg3"></span>
-            <button class="switch-list" onclick="location.href='/profile.html'">룸메이트</button>
-            <button class="switch-list" onclick="location.href='/logout.html'">쉐어하우스</button>
-            <button class="header-dropdown-toggle" id="switchToggle">
-                <i class="fa-solid fa-repeat fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-user-name-container pinned" id="userNameBox">
-            <span class="slide-bg"></span>
-            <span class="user-name-text" id="userNameText">
-                <%= session.getAttribute("SS_USER_NAME") %>님
-            </span>
-            <button class="header-dropdown-toggle" id="userIconToggle">
-                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
-            </button>
-        </div>
-        <div class="header-menu-container pinned" id="menuBox">
-            <span class="slide-bg2"></span>
-            <button class="menu-list" onclick="location.href='/profile.html'">마이페이지</button>
-            <button class="menu-list" onclick="location.href='/logout.html'">로그아웃</button>
-            <button class="header-dropdown-toggle" id="headerDropdownToggle">
-                <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>
-            </button>
-        </div>
-    </div>
-</header>
+<%@ include file="../includes/header.jsp" %>
 
 <!-- 로그인 폼 영역 -->
 <div class="login-form-wrapper">
@@ -157,13 +140,13 @@
     <div class="login-tab1">FIND ID</div>
     <div class="login-tab2">FIND PW</div>
     <div class="header">
-        <div class="logo">살며시</div>
-        <div class="logo-2">Shall With Me</div>
+        <div class="logo">LOGIN</div>
+        <div class="logo-2">살며시</div>
     </div>
     <div id="loginErrorMessage" class="error-message"></div>
     <form id="f">
-        <input type="text" name="userId" id="userId" class="login-input" placeholder="아이디" />
-        <input type="password" name="password" id="password" class="login-input" placeholder="비밀번호" />
+        <input type="text" name="userId" id="userId" class="login-input" placeholder="아이디"/>
+        <input type="password" name="password" id="password" class="login-input" placeholder="비밀번호"/>
 
         <button id="btnLogin" type="button" class="login-btn">로그인</button>
 
@@ -179,18 +162,7 @@
 </div>
 
 <!-- 커스텀 알림창 -->
-<div id="customAlertOverlay" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <div class="modal-title">
-            <i class="fa-solid fa-circle-exclamation fa-shake fa-lg" style="color: #3399ff;"></i>
-            <h2>살며시</h2>
-        </div>
-        <p id="customAlertMessage">메시지 내용</p>
-        <div class="modal-buttons" style="text-align: right;">
-            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
-        </div>
-    </div>
-</div>
+<%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
