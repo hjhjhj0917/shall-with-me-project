@@ -32,7 +32,8 @@
 </div>
 
 <!-- 채팅 영역 -->
-<div id="chatBox"></div>
+<div id="chatBox">
+</div>
 
 <!-- 입력 영역 -->
 <div class="input-area">
@@ -130,7 +131,6 @@
             roomId: roomId,
             senderId: userId,
             message: message,
-            timestamp: new Date().toISOString(),
             clientId: clientId  // ✅ clientId 포함
         };
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(msg));
@@ -145,28 +145,21 @@
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
         const timeStr = msgDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 
-        if (lastMessageDate !== dateStr) {
+        // [핵심 수정] 이전에 기록된 날짜가 있으면서 && 현재 메시지의 날짜와 다를 때만 구분선을 추가합니다.
+        if (lastMessageDate && lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
             dateSeparator.className = "date-separator";
             dateSeparator.innerHTML = `<span>${dateStr}</span>`;
             chatBox.appendChild(dateSeparator);
-            lastMessageDate = dateStr;
         }
-        console.log("fetch 시작, userId:", sender);
-        console.log("fetch URL: /user/profile-image/" + sender);
+
+        // [핵심 수정] 다음 메시지와의 비교를 위해 현재 메시지의 날짜를 항상 기록합니다.
+        lastMessageDate = dateStr;
+
         // 💡 프로필 이미지 URL 비동기 조회
         fetch("/user/profile-image/" + sender)
-        fetch("/user/profile-image/" + sender)
-            .then(res => {
-                console.log("fetch 응답 상태:", res.status, res.statusText);
-                if (!res.ok) {
-                    throw new Error("네트워크 응답 상태가 정상적이지 않음: " + res.status);
-                }
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                console.log("fetch 응답 데이터:", data);
-
                 const imageUrl = data.imageUrl || '/images/noimg.png';
 
                 const wrapper = document.createElement("div");
@@ -174,36 +167,39 @@
 
                 const profileImg = document.createElement("div");
                 profileImg.className = "profile-img";
-
                 const img = document.createElement("img");
                 img.src = imageUrl;
                 img.alt = "profile";
                 profileImg.appendChild(img);
 
-                console.log(`이미지 url : ${imageUrl}`);
-
                 const msgContent = document.createElement("div");
                 msgContent.className = "message-content";
 
-                const senderElem = document.createElement("div");
-
-
                 const messageBubble = document.createElement("div");
                 messageBubble.className = "message-bubble";
+                messageBubble.style.marginTop = '15px';
+                if (sender === userId) {
+                    messageBubble.style.borderRadius = '18px 2px 18px 18px';
+                } else {
+                    messageBubble.style.borderRadius = '2px 18px 18px 18px';
+                }
 
                 const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 messageBubble.textContent = safeText;
 
+                msgContent.appendChild(messageBubble);
+
                 const timeElem = document.createElement("div");
+
                 timeElem.className = "message-time";
                 timeElem.textContent = timeStr;
 
-                msgContent.appendChild(senderElem);
-                msgContent.appendChild(messageBubble);
-                msgContent.appendChild(timeElem);
+                timeElem.style.alignSelf = 'flex-start';
+                timeElem.style.marginTop = '40px'
 
                 wrapper.appendChild(profileImg);
                 wrapper.appendChild(msgContent);
+                wrapper.appendChild(timeElem);
 
                 chatBox.appendChild(wrapper);
                 chatBox.scrollTop = chatBox.scrollHeight;
