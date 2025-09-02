@@ -13,7 +13,7 @@ public interface IChatService {
 
     List<ChatDTO> getMessages(String roomId);
 
-    int createRoom(String user1Id, String user2Id);
+    int createRoom(ChatRoomDTO pDTO);
 
     List<ChatRoomDTO> getRoomsByUserId(String userId);
 
