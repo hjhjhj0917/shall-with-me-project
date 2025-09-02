@@ -27,22 +27,20 @@ public class ChatService implements IChatService {
 
     @Override
     public List<ChatDTO> getMessages(String roomId) {
+
         return chatMapper.selectChatMessages(roomId);
     }
 
     @Override
-    public int createRoom(String user1Id, String user2Id) {
+    public int createRoom(ChatRoomDTO pDTO) { // user1Id와 user2Id가 담긴 pDTO를 받음
 
         log.info("{}.createRoom Start!", this.getClass().getName());
 
-        ChatRoomDTO roomDTO = new ChatRoomDTO();
-        roomDTO.setUser1Id(user1Id);
-        roomDTO.setUser2Id(user2Id);
-        chatMapper.createChatRoom(roomDTO);
+        chatMapper.createChatRoom(pDTO);
 
         log.info("{}.createRoom End!", this.getClass().getName());
 
-        return roomDTO.getRoomId(); // 생성된 roomId 리턴
+        return pDTO.getRoomId();
     }
 
     @Override

@@ -2,6 +2,7 @@ package kopo.shallwithme.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import kopo.shallwithme.dto.ChatDTO;
 import kopo.shallwithme.dto.ChatPartnerDTO;
 import kopo.shallwithme.dto.ChatRoomDTO;
@@ -15,9 +16,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +56,9 @@ public class ChattingController {
         log.info("{}.getMessages Start!", this.getClass().getName());
 
         String roomIdStr = request.getParameter("roomId");
+
+        log.info("roomId : {}", roomIdStr);
+
         if (roomIdStr == null) {
             throw new IllegalArgumentException("roomId 파라미터가 필요합니다.");
         }
@@ -65,15 +71,34 @@ public class ChattingController {
 
     @PostMapping("createRoom")
     @ResponseBody
-    public int createChatRoom(@RequestParam String user1Id, @RequestParam String user2Id) {
+    public Map<String, Object> createChatRoom(@Valid @RequestBody ChatRoomDTO pDTO, BindingResult bindingResult) {
 
         log.info("{}.createRoom Start!", this.getClass().getName());
 
-        int res = chatService.createRoom(user1Id, user2Id);
+        Map<String, Object> response = new HashMap<>();
 
-        log.info("{}.createRoom End!", this.getClass().getName());
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            response.put("result", 0); // 0: 실패
+            response.put("msg", errorMessage);
+            return response;
+        }
 
-        return res;
+        try {
+            int newRoomId = chatService.createRoom(pDTO);
+
+            response.put("result", 1); // 1: 성공
+            response.put("roomId", newRoomId); // 성공 시 생성된 roomId 추가
+
+            log.info("{}.createRoom End!", this.getClass().getName());
+
+        } catch (Exception e) {
+            log.error("채팅방 생성 실패", e);
+            response.put("result", 0); // 0: 실패
+            response.put("msg", "채팅방 생성 중 오류가 발생했습니다.");
+        }
+
+        return response;
     }
 
     @GetMapping("rooms")
@@ -154,6 +179,9 @@ public class ChattingController {
     @GetMapping("userList")
     @ResponseBody
     public List<UserInfoDTO> getUserList() throws Exception {
+
+        log.info("{}.getUserList Start!", this.getClass().getName());
+
         return chatService.getUserList(); // JSON 형태로 반환됨
     }
 

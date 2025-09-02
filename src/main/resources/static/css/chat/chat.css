@@ -84,7 +84,7 @@ body {
     border-radius: 50%;
     background-color: #ccc;
     overflow: hidden; /* 내부 이미지 둥글게 자르기 */
-    border: 1px solid #3399ff;
+    border: 1px solid #1c407d;
     flex-shrink: 0;
 }
 
