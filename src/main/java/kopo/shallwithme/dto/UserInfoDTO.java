@@ -32,4 +32,8 @@ public class UserInfoDTO {
     // 룸메이트 태그 불러오가
     private String tagId;
     private String tagType; // 'ME'
+
+    // UserProfile 조인
+    private String profileImageUrl;
+    private String introduction;
 }

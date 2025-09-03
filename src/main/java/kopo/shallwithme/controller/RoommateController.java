@@ -2,8 +2,10 @@ package kopo.shallwithme.controller;
 
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.TagDTO;
+import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.impl.RoommateService;
+import kopo.shallwithme.service.impl.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class RoommateController {
 
     private final RoommateService roommateService;
+    private final UserInfoService userInfoService;
 
     @GetMapping("/roommateReg")
     public String roommateReg() {
@@ -111,7 +114,7 @@ public class RoommateController {
         Path target = uploadDir.resolve(filename);
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
-        // 브라우저에서 접근 가능한 URL
+        // 브라우저에서 접근 가능한 URLCHAT_ROOM
         return "/uploads/profile/" + filename;
     }
 
@@ -122,27 +125,42 @@ public class RoommateController {
         return "roommate/roommateMain";
     }
 
+    // 룸메이트 메인 페이지 회원 리스트 불러오기
+    @GetMapping(value = "/userList")
+    @ResponseBody
+    public List<UserInfoDTO> getUserList() {
+
+        log.info("{}.getUserList Start!", this.getClass().getName());
+
+        List<UserInfoDTO> rList = userInfoService.getAllUsers();
+
+        log.info("{}.getUserList End!", this.getClass().getName());
+
+        return rList; // Service에서 user_info 전체 조회
+    }
+
     // ★ 무한 스크롤 목록 API (JSON)
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
 
-        int safePage = Math.max(page, 1); // 음수/0 방지
+        int safePage = Math.max(page, 1);
 
-        List<Map<String, Object>> items = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            int id = safePage * 100 + (i + 1);
-            Map<String, Object> it = new HashMap<>();
-            it.put("id", id);
-            it.put("imageUrl", "/images/noimg.png"); // 공용 이미지 경로
-            it.put("location", "송파구");
-            it.put("moveInText", "즉시");
-            it.put("priceText", "월세 55");
-            items.add(it);
-        }
+        // ✅ 기존 임시 데이터 만드는 코드 전부 삭제
+        // List<Map<String, Object>> items = new ArrayList<>();
+        // for (int i = 0; i < 8; i++) {
+        //     ...
+        //     it.put("imageUrl", "/images/noimg.png");
+        //     ...
+        //     items.add(it);
+        // }
 
-        boolean lastPage = (safePage >= 3); // 동일 로직
+        // ✅ DB에서 데이터 가져오기
+        List<Map<String, Object>> items = roommateService.getRoommateList(safePage);
+
+        boolean lastPage = (safePage >= 3); // ← 일단 임시 로직 그대로 두고
         return Map.of("items", items, "lastPage", lastPage);
     }
+
 
 }
