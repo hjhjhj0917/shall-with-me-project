@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <!-- 룸메이트 전용 CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/roommate/roommateMain.css"/>
+    <link rel="stylesheet" href="/css/roommate/roommateMain.css"/>
     <link rel="icon" href="${pageContext.request.contextPath}/images/noimg.png">
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
@@ -263,9 +263,18 @@
                 var $info = $("<div>").addClass("sh-info")
                     .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
 
+// ✅ 태그 박스 추가
+                if (user.tags && user.tags.length > 0) {
+                    var $tagBox = $("<div>").addClass("tag-box");
+                    user.tags.forEach(function(tag) {
+                        $tagBox.append($("<span>").addClass("tag").text(tag));
+                    });
+                    $info.append($tagBox);
+                }
 
                 $card.append($thumb).append($info);
                 $grid.append($card);
+
             });
         }
     });

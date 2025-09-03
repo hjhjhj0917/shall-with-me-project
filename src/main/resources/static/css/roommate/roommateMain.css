@@ -123,3 +123,16 @@ html, body{
 
 /* 혹시 다른 CSS가 스크롤을 잠그면 강제로 해제 */
 html, body { overflow-y: auto !important; min-height: 100%; }
+
+.tag-box {
+    margin-top: 6px;
+}
+.tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    margin-right: 4px;
+    border-radius: 12px;
+}
