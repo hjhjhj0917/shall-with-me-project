@@ -44,9 +44,15 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public List<ChatRoomDTO> getRoomsByUserId(String userId) {
+    public List<ChatRoomDTO> getRoomsByUserId(UserInfoDTO pDTO) {
 
-        return chatMapper.getRoomsByUserId(userId);
+        log.info("{}.createRoom Start!", this.getClass().getName());
+
+        List<ChatRoomDTO> rList = chatMapper.getRoomsByUserId(pDTO);
+
+        log.info("{}.createRoom End!", this.getClass().getName());
+
+        return rList;
     }
 
     // 메세지 주고받은 유저만 불러오기

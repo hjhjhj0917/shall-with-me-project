@@ -57,6 +57,7 @@ public class ChattingController {
 
         String roomIdStr = request.getParameter("roomId");
 
+        // 룸아이디 확인 로그
         log.info("roomId : {}", roomIdStr);
 
         if (roomIdStr == null) {
@@ -87,10 +88,10 @@ public class ChattingController {
         try {
             int newRoomId = chatService.createRoom(pDTO);
 
+            log.info("새 룸 아이디 : {}", newRoomId);
+
             response.put("result", 1); // 1: 성공
             response.put("roomId", newRoomId); // 성공 시 생성된 roomId 추가
-
-            log.info("{}.createRoom End!", this.getClass().getName());
 
         } catch (Exception e) {
             log.error("채팅방 생성 실패", e);
@@ -98,23 +99,31 @@ public class ChattingController {
             response.put("msg", "채팅방 생성 중 오류가 발생했습니다.");
         }
 
+        log.info("{}.createRoom End!", this.getClass().getName());
+
         return response;
     }
 
+    // 사용안하는 컨트롤러
     @GetMapping("rooms")
     @ResponseBody
-    public List<ChatRoomDTO> getChatRooms(@RequestParam String userId) {
+    public List<ChatRoomDTO> getChatRooms(UserInfoDTO pDTO) {
 
-        return chatService.getRoomsByUserId(userId);
+        // 컨트롤러에서 직접 null 또는 빈 값인지 검사
+        if (pDTO.getUserId() == null || pDTO.getUserId().isBlank()) {
+            return java.util.Collections.emptyList();
+        }
+
+        return chatService.getRoomsByUserId(pDTO);
     }
 
     @GetMapping("chatRoom")
-    public String chatRoomPage(@RequestParam(required = false) Integer roomId, Model model) {
+    public String chatRoomPage(ChatRoomDTO pDTO, Model model) { // DTO로 파라미터 받기
 
         log.info("{}.chatRoomPage Start!", this.getClass().getName());
 
-        log.info("Controller roomId: {}", roomId);
-        model.addAttribute("roomId", roomId);
+        log.info("roomId: {}", pDTO.getRoomId());
+        model.addAttribute("roomId", pDTO.getRoomId());
 
         log.info("{}.chatRoomPage End!", this.getClass().getName());
 
