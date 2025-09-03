@@ -138,5 +138,36 @@
         WHERE user_id = #{userId}
     </select>
 
+    <select id="getRoommateList" parameterType="int" resultType="map">
+        SELECT
+            ui.user_id,
+            ui.user_name,
+            ui.age,
+            up.profile_image_url AS imageUrl
+        FROM USER_INFO ui
+                 JOIN USER_PROFILE up ON ui.user_id = up.user_id
+        ORDER BY ui.user_id
+            LIMIT #{page}, 8
+    </select>
+
+    <!-- USER_INFO + USER_PROFILE 조인 -->
+    <select id="getAllUsersWithProfile" resultType="UserInfoDTO">
+        SELECT
+            u.USER_ID        AS userId,
+            u.USER_NAME      AS userName,
+            u.PASSWORD       AS password,
+            u.EMAIL          AS email,
+            u.ADDR1          AS addr1,
+            u.ADDR2          AS addr2,
+            u.AGE            AS age,
+            u.GENDER         AS gender,
+            u.BIRTH_DATE     AS birthDate,
+            p.PROFILE_IMAGE_URL AS profileImageUrl,
+            p.INTRODUCTION      AS introduction
+        FROM USER_INFO u
+                 LEFT JOIN USER_PROFILE p
+                           ON u.USER_ID = p.USER_ID
+        ORDER BY u.USER_ID
+    </select>
 
 </mapper>

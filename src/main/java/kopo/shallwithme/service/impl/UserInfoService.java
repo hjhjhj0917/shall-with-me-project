@@ -42,6 +42,11 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
+    public List<UserInfoDTO> getAllUsers() {
+        return userInfoMapper.getAllUsersWithProfile();
+    }
+
+    @Override
     public int newPasswordProc(UserInfoDTO pDTO) throws Exception {
         log.info("{}.newPasswordProc Start!", this.getClass().getName());
 

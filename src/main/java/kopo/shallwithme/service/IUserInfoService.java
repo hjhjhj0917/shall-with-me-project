@@ -36,4 +36,6 @@ public interface IUserInfoService {
 
     // 회원 프로필 이미지 불러오기
     String getImageUrlByUserId(String userId);
+
+    List<UserInfoDTO> getAllUsers();
 }

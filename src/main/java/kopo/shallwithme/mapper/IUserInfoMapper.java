@@ -52,6 +52,9 @@ public interface IUserInfoMapper {
     UserProfileDTO getUserProfile(String userId);
 
     String selectProfileImageUrlByUserId(String userId);
+
+    List<Map<String, Object>> getRoommateList(int page);
+
+    List<UserInfoDTO> getAllUsersWithProfile();
+
 }
-
-
