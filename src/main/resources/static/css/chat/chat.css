@@ -84,17 +84,20 @@ body {
     border-radius: 50%;
     background-color: #ccc;
     overflow: hidden; /* 내부 이미지 둥글게 자르기 */
-    border: 1px solid #1c407d;
     flex-shrink: 0;
 }
 
-/* 아이디 + 말풍선 컨테이너 */
 .message-content {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;    /* [수정] 자식 요소(버블, 시간)를 세로(column)가 아닌 가로(row)로 정렬 */
+    align-items: flex-end;  /* [수정] 자식 요소들을 아래쪽 기준으로 정렬 */
+    gap: 8px;               /* [추가] 버블과 시간 사이의 간격 */
 }
-.message-wrapper.me .message-content { align-items: flex-end; }
+
+.message-wrapper.me .message-content {
+    /* 기존 align-items 속성은 위에서 공통으로 처리하므로 제거해도 됩니다. */
+    flex-direction: row-reverse; /* [추가] 내용물의 순서를 반대로 뒤집음 (시간이 왼쪽, 버블이 오른쪽) */
+}
 
 /* 아이디 */
 .sender-id {
@@ -108,6 +111,7 @@ body {
     padding: 10px 14px;
     border-radius: 18px;
     max-width: 100%;
+    margin-top: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     position: relative;
     white-space: pre-wrap;
@@ -121,8 +125,9 @@ body {
 /* 시간 표시 */
 .message-time {
     font-size: 10px;
-    color: gray;
-    margin-top: 2px;
+    color: #999;
+    /* margin-top은 더 이상 필요 없으므로 제거합니다. */
+    white-space: nowrap; /* 시간이 줄바꿈되지 않도록 설정 */
 }
 
 /* 입력 영역 */

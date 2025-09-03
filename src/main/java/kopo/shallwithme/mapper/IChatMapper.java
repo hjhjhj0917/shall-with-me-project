@@ -17,7 +17,7 @@ public interface IChatMapper {
 
     void createChatRoom(ChatRoomDTO pDTO);
 
-    List<ChatRoomDTO> getRoomsByUserId(String userId);
+    List<ChatRoomDTO> getRoomsByUserId(UserInfoDTO pDTO);
 
     List<UserInfoDTO> selectUserList() throws Exception;
 

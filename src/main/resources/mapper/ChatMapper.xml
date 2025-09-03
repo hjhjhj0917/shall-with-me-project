@@ -57,7 +57,7 @@
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
-    <select id="getRoomsByUserId" resultType="ChatRoomDTO">
+    <select id="getRoomsByUserId" parameterType="UserInfoDTO" resultType="ChatRoomDTO">
         SELECT room_id, user1_id, user2_id
         FROM CHAT_ROOM
         WHERE user1_id = #{userId} OR user2_id = #{userId}
