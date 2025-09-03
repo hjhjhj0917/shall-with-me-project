@@ -164,22 +164,6 @@
 
     <!-- 카드 그리드: 초기 8개 (샘플) -->
     <section class="sh-grid">
-        <article class="sh-card" data-id="101">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-        <article class="sh-card" data-id="108">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
     </section>
 
     <!-- 좌하단 등록 플로팅 버튼 -->
@@ -235,85 +219,140 @@
 </script>
 
 <script>
-    // 무한스크롤 API → /roommate/list
-    (function () {
-        const grid = document.querySelector('.sh-grid');
-        if (!grid) return;
-
-        let page = 1, loading = false, last = false;
-
-        const sentinel = document.createElement('div');
-        sentinel.id = 'sh-sentinel';
-        grid.after(sentinel);
-
-        const loader = document.createElement('div');
-        loader.id = 'sh-loader';
-        loader.textContent = '불러오는 중...';
-        loader.style.display = 'none';
-        sentinel.after(loader);
-
-        async function fetchNext() {
-            if (loading || last) return;
-            loading = true;
-            loader.style.display = 'block';
-            try {
-                const url = ctx + '/roommate/list?page=' + (page + 1);
-                const res = await fetch(url, {headers: {'Accept': 'application/json'}});
-                if (!res.ok) throw new Error('network error');
-                const data = await res.json();
-                renderCards(data.items || []);
-                page++;
-                last = !!data.lastPage || (data.items && data.items.length === 0);
-                if (last) io.disconnect();
-            } catch (err) {
-                console.error(err);
-            } finally {
-                loading = false;
-                loader.style.display = 'none';
+    $(document).ready(function () {
+        // roommateMain 페이지 진입 시 회원 정보 불러오기
+        $.ajax({
+            url: ctx + "/roommate/userList",   // 회원 리스트를 반환하는 컨트롤러 엔드포인트
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // data가 배열 형태라고 가정
+                renderUserCards(data);
+            },
+            error: function (xhr, status, err) {
+                console.error("회원 정보 불러오기 실패:", err);
             }
-        }
+        });
 
-        const io = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) fetchNext();
-        }, {root: null, rootMargin: '300px 0px', threshold: 0.01});
+        // 카드 HTML을 생성하는 함수
+        function renderUserCards(users) {
+            var $grid = $(".sh-grid");
+            $grid.empty(); // 기존 샘플 초기화
 
-        io.observe(sentinel);
-        setTimeout(fetchNext, 0);
+            $.each(users, function (i, user) {
+                // 프로필 이미지 경로 결정
+                var imgUrl = user.profileImageUrl;
+                if (!imgUrl || imgUrl.trim() === "") {
+                    imgUrl = ctx + "/images/noimg.png";
+                }
 
-        function renderCards(items) {
-            const frag = document.createDocumentFragment();
-            items.forEach(function (it) {
-                const article = document.createElement('article');
-                article.className = 'sh-card';
-                article.dataset.id = it.id;
+                var address = user.addr1 ? user.addr1 : "미입력";
+                var nickname = user.userName ? user.userName : "알 수 없음";
+                var email = user.email ? user.email : "비공개";
 
-                const thumb = document.createElement('div');
-                thumb.className = 'sh-thumb';
-                thumb.style.backgroundImage = "url('" + (it.imageUrl || '/images/noimg.png') + "')";
+                // jQuery로 DOM 생성
+                var $card = $("<article>")
+                    .addClass("sh-card")
+                    .attr("data-id", user.userId);
 
-                const info = document.createElement('div');
-                info.className = 'sh-info';
+                var $thumb = $("<div>")
+                    .addClass("sh-thumb")
+                    .css("background-image", "url('" + imgUrl + "')");
 
-                const t = document.createElement('p');
-                t.className = 'sh-title';
-                t.textContent = '위치 : ' + (it.location || '');
+                var age = user.age ? user.age + "세" : "";  // age가 있으면 "25세" 같은 문자열
+                var $info = $("<div>").addClass("sh-info")
+                    .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
 
-                const s = document.createElement('p');
-                s.className = 'sh-sub';
-                s.textContent = it.moveInText ? ('입주일 : ' + it.moveInText) : '';
 
-                const p = document.createElement('p');
-                p.className = 'sh-price';
-                p.textContent = it.priceText ? ('비용 : ' + it.priceText) : '';
-
-                info.append(t, s, p);
-                article.append(thumb, info);
-                frag.append(article);
+                $card.append($thumb).append($info);
+                $grid.append($card);
             });
-            grid.append(frag);
         }
-    })();
+    });
 </script>
+
+
+
+<%--<script>--%>
+<%--    // 무한스크롤 API → /roommate/list--%>
+<%--    (function () {--%>
+<%--        const grid = document.querySelector('.sh-grid');--%>
+<%--        if (!grid) return;--%>
+
+<%--        let page = 1, loading = false, last = false;--%>
+
+<%--        const sentinel = document.createElement('div');--%>
+<%--        sentinel.id = 'sh-sentinel';--%>
+<%--        grid.after(sentinel);--%>
+
+<%--        const loader = document.createElement('div');--%>
+<%--        loader.id = 'sh-loader';--%>
+<%--        loader.textContent = '불러오는 중...';--%>
+<%--        loader.style.display = 'none';--%>
+<%--        sentinel.after(loader);--%>
+
+<%--        async function fetchNext() {--%>
+<%--            if (loading || last) return;--%>
+<%--            loading = true;--%>
+<%--            loader.style.display = 'block';--%>
+<%--            try {--%>
+<%--                const url = ctx + '/roommate/list?page=' + (page + 1);--%>
+<%--                const res = await fetch(url, {headers: {'Accept': 'application/json'}});--%>
+<%--                if (!res.ok) throw new Error('network error');--%>
+<%--                const data = await res.json();--%>
+<%--                renderCards(data.items || []);--%>
+<%--                page++;--%>
+<%--                last = !!data.lastPage || (data.items && data.items.length === 0);--%>
+<%--                if (last) io.disconnect();--%>
+<%--            } catch (err) {--%>
+<%--                console.error(err);--%>
+<%--            } finally {--%>
+<%--                loading = false;--%>
+<%--                loader.style.display = 'none';--%>
+<%--            }--%>
+<%--        }--%>
+
+<%--        const io = new IntersectionObserver((entries) => {--%>
+<%--            if (entries[0].isIntersecting) fetchNext();--%>
+<%--        }, {root: null, rootMargin: '300px 0px', threshold: 0.01});--%>
+
+<%--        io.observe(sentinel);--%>
+<%--        setTimeout(fetchNext, 0);--%>
+
+<%--        function renderCards(items) {--%>
+<%--            const frag = document.createDocumentFragment();--%>
+<%--            items.forEach(function (it) {--%>
+<%--                const article = document.createElement('article');--%>
+<%--                article.className = 'sh-card';--%>
+<%--                article.dataset.id = it.id;--%>
+
+<%--                const thumb = document.createElement('div');--%>
+<%--                thumb.className = 'sh-thumb';--%>
+<%--                thumb.style.backgroundImage = "url('" + (it.imageUrl || '/images/noimg.png') + "')";--%>
+
+<%--                const info = document.createElement('div');--%>
+<%--                info.className = 'sh-info';--%>
+
+<%--                const t = document.createElement('p');--%>
+<%--                t.className = 'sh-title';--%>
+<%--                t.textContent = '위치 : ' + (it.location || '');--%>
+
+<%--                const s = document.createElement('p');--%>
+<%--                s.className = 'sh-sub';--%>
+<%--                s.textContent = it.moveInText ? ('입주일 : ' + it.moveInText) : '';--%>
+
+<%--                const p = document.createElement('p');--%>
+<%--                p.className = 'sh-price';--%>
+<%--                p.textContent = it.priceText ? ('비용 : ' + it.priceText) : '';--%>
+
+<%--                info.append(t, s, p);--%>
+<%--                article.append(thumb, info);--%>
+<%--                frag.append(article);--%>
+<%--            });--%>
+<%--            grid.append(frag);--%>
+<%--        }--%>
+<%--    })();--%>
+<%--</script>--%>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
