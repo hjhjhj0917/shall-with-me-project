@@ -1,9 +1,6 @@
 package kopo.shallwithme.service.impl;
 
-import kopo.shallwithme.dto.ChatDTO;
-import kopo.shallwithme.dto.ChatPartnerDTO;
-import kopo.shallwithme.dto.ChatRoomDTO;
-import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.*;
 import kopo.shallwithme.mapper.IChatMapper;
 import kopo.shallwithme.service.IChatService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +19,33 @@ public class ChatService implements IChatService {
     @Override
     public void saveMessage(ChatDTO pDTO) {
 
+        log.info("{}.saveMessage Start!", this.getClass().getName());
+
         chatMapper.insertChatMessage(pDTO);
     }
 
     @Override
-    public List<ChatDTO> getMessages(String roomId) {
+    public ChatRoomDTO getOtherUserId(ChatRoomDTO pDTO) {
 
-        return chatMapper.selectChatMessages(roomId);
+        log.info("{}.getOtherUserId Start!", this.getClass().getName());
+
+        ChatRoomDTO rDTO = chatMapper.getOtherUserId(pDTO);
+
+        log.info("{}.getOtherUserId End!", this.getClass().getName());
+
+        return rDTO;
+    }
+
+    @Override
+    public UserProfileDTO getImageUrlByUserId(ChatRoomDTO pDTO) {
+
+        log.info("{}.getImageUrlByUserId Start!", this.getClass().getName());
+
+        UserProfileDTO rDTO = chatMapper.selectProfileImageUrlByUserId(pDTO);
+
+        log.info("{}.getImageUrlByUserId end!", this.getClass().getName());
+
+        return rDTO;
     }
 
     @Override
@@ -57,46 +74,64 @@ public class ChatService implements IChatService {
 
     // 메세지 주고받은 유저만 불러오기
     @Override
-    public List<ChatPartnerDTO> getChatPartners(UserInfoDTO pDTO) throws Exception {
+    public List<ChatPartnerDTO> getChatPartners(UserInfoDTO pDTO) {
 
-        log.info(this.getClass().getName() + ".getChatPartners Start!");
+        log.info("{}.getChatPartners Start!", this.getClass().getName());
 
-        return chatMapper.selectChatPartnersWithLastMsg(pDTO); // 새 매퍼 메소드 호출
+        List<ChatPartnerDTO> rList = chatMapper.selectChatPartnersWithLastMsg(pDTO);
+
+        log.info("{}.getChatPartners End!", this.getClass().getName());
+
+        return rList; // 새 매퍼 메소드 호출
     }
 
     @Override
     public List<UserInfoDTO> getUserList() throws Exception {
 
-        return chatMapper.selectUserList();
+        log.info("{}.getUserList Start!", this.getClass().getName());
+
+        List<UserInfoDTO> rList = chatMapper.selectUserList();
+
+        log.info("{}.getUserList End!", this.getClass().getName());
+
+        return rList;
     }
 
+    // 채팅방을 새로 생성할지 기존 채팅방을 불러오는지 판단
     @Override
-    public int createOrGetChatRoom(String user1Id, String user2Id) throws Exception {
+    public int createOrGetChatRoom(ChatRoomDTO pDTO) throws Exception {
 
         log.info("{}.createOrGetChatRoom Start!", this.getClass().getName());
 
+        // DTO에서 사용자 ID들을 가져옴
+        String user1Id = pDTO.getUser1Id();
+        String user2Id = pDTO.getUser2Id();
         log.info("user1Id={}, user2Id={}", user1Id, user2Id);
 
         // 오름차순 정렬
         String firstUser = user1Id.compareTo(user2Id) < 0 ? user1Id : user2Id;
         String secondUser = user1Id.compareTo(user2Id) < 0 ? user2Id : user1Id;
-
         log.info("정렬된 유저 순서: {}, {}", firstUser, secondUser);
 
-        ChatRoomDTO dto = new ChatRoomDTO();
-        dto.setUser1Id(firstUser);
-        dto.setUser2Id(secondUser);
+        // 정렬된 ID를 Mapper에 전달할 DTO에 다시 설정
+        ChatRoomDTO dtoForFind = new ChatRoomDTO();
+        dtoForFind.setUser1Id(firstUser);
+        dtoForFind.setUser2Id(secondUser);
 
-        Integer roomId = chatMapper.findRoomIdByUsers(dto);
-        if (roomId != null) {
-            log.info("기존 채팅방 존재: roomId={}", roomId);
-            return roomId;
+        ChatRoomDTO rDTO = chatMapper.findRoomIdByUsers(dtoForFind);
+
+        if (rDTO != null) {
+            log.info("기존 채팅방 존재: roomId={}", rDTO.getRoomId());
+
+            log.info("{}.createOrGetChatRoom End!", this.getClass().getName());
+
+            return rDTO.getRoomId();
         }
 
-        log.info("📦 채팅방 존재하지 않음 → 새로 생성 시도");
-        chatMapper.insertChatRoom(dto);
+        log.info("채팅방 존재하지 않음 → 새로 생성 시도");
+        chatMapper.insertChatRoom(dtoForFind);
 
-        Integer newRoomId = chatMapper.findRoomIdByUsers(dto);
+        Integer newRoomId = dtoForFind.getRoomId();
         log.info("채팅방 생성 후 roomId={}", newRoomId);
 
         log.info("{}.createOrGetChatRoom End!", this.getClass().getName());
@@ -107,7 +142,13 @@ public class ChatService implements IChatService {
     @Override
     public List<ChatDTO> getMessagesByRoomId(Integer roomId) {
 
-        return chatMapper.selectMessagesByRoomId(roomId);
+        log.info("{}.getMessagesByRoomId Start!", this.getClass().getName());
+
+        List<ChatDTO> rList = chatMapper.selectMessagesByRoomId(roomId);
+
+        log.info("{}.getMessagesByRoomId End!", this.getClass().getName());
+
+        return rList;
     }
 
 }

@@ -139,7 +139,7 @@
     // 채팅방으로 이동하는 함수
     function openChat(otherUserId) {
         console.log("openChat 호출됨:", otherUserId);
-        fetch("/chat/createOrGetRoom?otherUserId=" + encodeURIComponent(otherUserId))
+        fetch("/chat/createOrGetRoom?user2Id=" + encodeURIComponent(otherUserId))
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
