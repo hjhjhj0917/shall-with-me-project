@@ -215,6 +215,10 @@
 %>
 
 <script>
+    const userName = "<%= ssUserName %>";
+</script>
+
+<script>
     // 카드 클릭 → 상세로 이동
     (function () {
         const grid = document.querySelector('.sh-grid');

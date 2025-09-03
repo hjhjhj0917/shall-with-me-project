@@ -6,36 +6,26 @@
 <head>
     <meta charset="UTF-8">
     <title>살며시: 채팅방</title>
-
-    <%-- 모달 css --%>
+    <%-- ... CSS 및 라이브러리 링크는 기존과 동일 ... --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <%-- 네브바 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
-    <%-- 채팅방 css --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/chat/chat.css"/>
-    <%-- js --%>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <%-- 웹소캣 관련 js --%>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <%-- 무료 아이콘 --%>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
 
-<!-- 상단 버튼 -->
 <div class="top-buttons">
     <div class="circle-btn" onclick="location.href='/schedule'">
         <i class="fa-regular fa-calendar fa-xl" style="color: #ffffff;"></i>
     </div>
 </div>
 
-<!-- 채팅 영역 -->
-<div id="chatBox">
-</div>
+<div id="chatBox"></div>
 
-<!-- 입력 영역 -->
 <div class="input-area">
     <input type="text" id="messageInput" placeholder="채팅을 입력하세요"/>
     <button class="send-btn" onclick="sendMessage()">
@@ -43,7 +33,6 @@
     </button>
 </div>
 
-<!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
@@ -56,15 +45,33 @@
     const userName = "<%= ssUserName %>";
 </script>
 
+<%-- [수정] JSP에서 사용할 사용자 정보를 JavaScript 객체로 미리 선언 --%>
+<script>
+    // 내 정보
+    const myUser = {
+        id: "<%= session.getAttribute("SS_USER_ID") %>",
+        // 세션에 내 프로필 이미지 URL이 있다면 추가 (없으면 기본 이미지)
+        imageUrl: "<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
+    };
+
+    // 상대방 정보 (Controller에서 전달받음)
+    const otherUser = {
+        id: "${otherUser.userId}",
+        name: "${otherUser.userName}",
+        imageUrl: "${not empty otherUser.profileImgUrl ? otherUser.profileImgUrl : '/images/noimg.png'}"
+    };
+
+    const roomId = "${roomId}";
+    const clientId = 'client-' + Math.random().toString(36).substring(2, 15);
+    let lastMessageDate = "";
+</script>
+
+<%-- navbar.js, modal.js 등 다른 공통 스크립트 --%>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 
 <script>
-    const roomId = "${roomId}";
-    const userId = "<%= session.getAttribute("SS_USER_ID") %>";
-    const clientId = 'client-' + Math.random().toString(36).substring(2, 15);  // 고유 식별자
-    let lastMessageDate = "";
-
+    // Enter 키로 메시지 전송
     document.getElementById("messageInput").addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -74,54 +81,41 @@
 
     if (!roomId) {
         alert("채팅방 ID가 없습니다. 올바른 경로로 접속해 주세요.");
-        throw new Error("roomId is null or undefined");
     }
 
     let stompClient = null;
 
+    // WebSocket 연결
     function connect() {
         const socket = new SockJS("/ws-chat");
         stompClient = Stomp.over(socket);
-
-        stompClient.debug = function (str) {
-            console.log('[STOMP DEBUG]', str);
-        };
+        stompClient.debug = null; // 디버그 로그 끄기
 
         stompClient.connect({}, function () {
-
             // 1. 이전 메시지 불러오기
             fetch(`/chat/messages?roomId=${roomId}`)
                 .then(res => res.json())
                 .then(messages => {
                     messages.forEach(msg => {
-                        appendMessage(msg.senderId, msg.message, msg.timestamp || new Date());
+                        appendMessage(msg); // DTO 전체를 전달
                     });
                 })
                 .catch(err => console.error("메시지 로딩 실패:", err))
                 .finally(() => {
                     // 2. WebSocket 구독
                     stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
-                        console.log("📥 수신:", message.body);
-                        try {
-                            const msg = JSON.parse(message.body);
+                        const msg = JSON.parse(message.body);
 
-                            console.log("appendMessage 호출 sender:", msg.senderId);  // 여기에 추가
+                        // 내가 보낸 메시지(myUser.id)이면 화면에 다시 그리지 않음
+                        if (msg.senderId === myUser.id) return;
 
-                            // 🔒 같은 브라우저(탭)에서 보낸 메시지면 무시
-                            if (msg.clientId === clientId) {
-                                console.log("⚠️ 같은 클라이언트에서 보낸 메시지 무시됨");
-                                return;
-                            }
-
-                            appendMessage(msg.senderId, msg.message, msg.timestamp || msg.sentAt || new Date());
-                        } catch (e) {
-                            console.error("❌ JSON 파싱 에러:", e);
-                        }
+                        appendMessage(msg);
                     });
                 });
         });
     }
 
+    // 메시지 전송
     function sendMessage() {
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
@@ -129,84 +123,78 @@
 
         const msg = {
             roomId: roomId,
-            senderId: userId,
+            senderId: myUser.id,
             message: message,
-            clientId: clientId  // ✅ clientId 포함
+            clientId: clientId
         };
+
+        // 내가 보낸 메시지를 화면에 즉시 표시
+        appendMessage(msg);
+
+        // 서버로 메시지 전송
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(msg));
         messageInput.value = '';
     }
 
-    function appendMessage(sender, text, time) {
+    // 메시지를 화면에 추가하는 함수
+    function appendMessage(msg) {
         const chatBox = document.getElementById("chatBox");
         if (!chatBox) return;
+
+        // msg 객체에서 필요한 정보 추출
+        const senderId = msg.senderId;
+        const text = msg.message;
+        const time = msg.timestamp || new Date(); // timestamp가 없으면 현재 시간 사용
 
         const msgDate = new Date(time);
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
         const timeStr = msgDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 
-        // [핵심 수정] 이전에 기록된 날짜가 있으면서 && 현재 메시지의 날짜와 다를 때만 구분선을 추가합니다.
         if (lastMessageDate && lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
             dateSeparator.className = "date-separator";
             dateSeparator.innerHTML = `<span>${dateStr}</span>`;
             chatBox.appendChild(dateSeparator);
         }
-
-        // [핵심 수정] 다음 메시지와의 비교를 위해 현재 메시지의 날짜를 항상 기록합니다.
         lastMessageDate = dateStr;
 
-        // 💡 프로필 이미지 URL 비동기 조회
-        fetch("/user/profile-image/" + sender)
-            .then(res => res.json())
-            .then(data => {
-                const imageUrl = data.imageUrl || '/images/noimg.png';
+        // myUser, otherUser 객체 사용
+        const isMe = (senderId === myUser.id);
+        const profileImageUrl = isMe ? myUser.imageUrl : otherUser.imageUrl;
 
-                const wrapper = document.createElement("div");
-                wrapper.className = "message-wrapper " + (sender === userId ? "me" : "other");
+        const wrapper = document.createElement("div");
+        wrapper.className = "message-wrapper " + (isMe ? "me" : "other");
 
-                const profileImg = document.createElement("div");
-                profileImg.className = "profile-img";
-                const img = document.createElement("img");
-                img.src = imageUrl;
-                img.alt = "profile";
-                profileImg.appendChild(img);
+        const profileImg = document.createElement("div");
+        profileImg.className = "profile-img";
+        const img = document.createElement("img");
+        img.src = profileImageUrl;
+        profileImg.appendChild(img);
 
-                const msgContent = document.createElement("div");
-                msgContent.className = "message-content";
+        const msgContent = document.createElement("div");
+        msgContent.className = "message-content";
 
-                const messageBubble = document.createElement("div");
-                messageBubble.className = "message-bubble";
-                messageBubble.style.marginTop = '15px';
-                if (sender === userId) {
-                    messageBubble.style.borderRadius = '18px 2px 18px 18px';
-                } else {
-                    messageBubble.style.borderRadius = '2px 18px 18px 18px';
-                }
+        const messageBubble = document.createElement("div");
+        messageBubble.className = "message-bubble";
+        if (isMe) {
+            messageBubble.style.borderRadius = '18px 2px 18px 18px';
+        } else {
+            messageBubble.style.borderRadius = '2px 18px 18px 18px';
+        }
+        messageBubble.textContent = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-                const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                messageBubble.textContent = safeText;
+        const timeElem = document.createElement("div");
+        timeElem.className = "message-time";
+        timeElem.textContent = timeStr;
 
-                msgContent.appendChild(messageBubble);
+        msgContent.appendChild(messageBubble);
+        msgContent.appendChild(timeElem);
 
-                const timeElem = document.createElement("div");
+        wrapper.appendChild(profileImg);
+        wrapper.appendChild(msgContent);
 
-                timeElem.className = "message-time";
-                timeElem.textContent = timeStr;
-
-                timeElem.style.alignSelf = 'flex-start';
-                timeElem.style.marginTop = '40px'
-
-                wrapper.appendChild(profileImg);
-                wrapper.appendChild(msgContent);
-                wrapper.appendChild(timeElem);
-
-                chatBox.appendChild(wrapper);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            })
-            .catch(err => {
-                console.error("프로필 이미지 불러오기 실패:", err);
-            });
+        chatBox.appendChild(wrapper);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     window.onload = connect;

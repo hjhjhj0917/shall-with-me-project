@@ -4,6 +4,9 @@
 <head>
     <title>채팅 목록</title>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <%-- 웹소캣 관련 js --%>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <style>
         * {
             user-select: none;       /* 텍스트 드래그 금지 */
