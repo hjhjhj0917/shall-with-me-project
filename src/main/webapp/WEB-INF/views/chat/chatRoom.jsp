@@ -57,8 +57,7 @@
     // 상대방 정보 (Controller에서 전달받음)
     const otherUser = {
         id: "${otherUser.userId}",
-        name: "${otherUser.userName}",
-        imageUrl: "${not empty otherUser.profileImgUrl ? otherUser.profileImgUrl : '/images/noimg.png'}"
+        imageUrl: "${not empty otherUser.profileImageUrl ? otherUser.profileImageUrl : '/images/noimg.png'}"
     };
 
     const roomId = "${roomId}";

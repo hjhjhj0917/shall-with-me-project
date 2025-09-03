@@ -5,16 +5,15 @@
 
 <mapper namespace="kopo.shallwithme.mapper.IChatMapper">
 
-    <insert id="insertChatMessage">
+    <insert id="insertChatMessage" parameterType="ChatDTO">
         INSERT INTO CHAT_MESSAGE (room_id, sender_id, message)
         VALUES (#{roomId}, #{senderId}, #{message})
     </insert>
 
-    <select id="selectChatMessages" resultType="ChatDTO">
-        SELECT room_id AS roomId, sender_id AS senderId, message, sent_at AS sentAt
-        FROM CHAT_MESSAGE
-        WHERE room_id = #{roomId}
-        ORDER BY sent_at ASC
+    <select id="getOtherUserId" parameterType="ChatRoomDTO" resultType="ChatRoomDTO">
+        SELECT USER2_ID, USER1_ID, ROOM_ID
+        FROM CHAT_ROOM
+        WHERE ROOM_ID = #{roomId}
     </select>
 
     <!--메세지 주고받은 유저만 불러오기-->
@@ -70,7 +69,7 @@
     </select>
 
     <!-- 방 조회 : user1_id, user2_id 로 방 검색 -->
-    <select id="findRoomIdByUsers" parameterType="ChatRoomDTO" resultType="int">
+    <select id="findRoomIdByUsers" parameterType="ChatRoomDTO" resultType="ChatRoomDTO">
         SELECT room_id
         FROM CHAT_ROOM
         WHERE user1_id = #{user1Id} AND user2_id = #{user2Id}
@@ -89,6 +88,13 @@
         FROM CHAT_MESSAGE
         WHERE room_id = #{value}
         ORDER BY sent_at ASC
+    </select>
+
+    <!--    회원 프로필 이미지 불러오기-->
+    <select id="selectProfileImageUrlByUserId" resultType="UserProfileDTO" parameterType="ChatRoomDTO">
+        SELECT profile_image_url as profileImageUrl, user_id, introduction
+        FROM USER_PROFILE
+        WHERE user_id = #{user2Id}
     </select>
 
 </mapper>

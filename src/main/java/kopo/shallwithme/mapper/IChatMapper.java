@@ -1,9 +1,6 @@
 package kopo.shallwithme.mapper;
 
-import kopo.shallwithme.dto.ChatDTO;
-import kopo.shallwithme.dto.ChatPartnerDTO;
-import kopo.shallwithme.dto.ChatRoomDTO;
-import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -13,7 +10,7 @@ public interface IChatMapper {
 
     void insertChatMessage(ChatDTO pDTO);
 
-    List<ChatDTO> selectChatMessages(String roomId);
+    ChatRoomDTO getOtherUserId(ChatRoomDTO pDTO);
 
     void createChatRoom(ChatRoomDTO pDTO);
 
@@ -21,12 +18,15 @@ public interface IChatMapper {
 
     List<UserInfoDTO> selectUserList() throws Exception;
 
-    Integer findRoomIdByUsers(ChatRoomDTO chatRoomDTO) throws Exception;
+    ChatRoomDTO findRoomIdByUsers(ChatRoomDTO pDTO) throws Exception;
 
-    void insertChatRoom(ChatRoomDTO chatRoomDTO) throws Exception;
+    void insertChatRoom(ChatRoomDTO pDTO) throws Exception;
 
     List<ChatDTO> selectMessagesByRoomId(Integer roomId);
 
     // 메세지 주고받은 유저만 불러오기
     List<ChatPartnerDTO> selectChatPartnersWithLastMsg(UserInfoDTO pDTO);
+
+    // 채팅방 상대 프로필 이미지 불러오기
+    UserProfileDTO selectProfileImageUrlByUserId(ChatRoomDTO pDTO);
 }
