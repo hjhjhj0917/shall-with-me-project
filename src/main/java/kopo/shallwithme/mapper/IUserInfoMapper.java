@@ -57,4 +57,6 @@ public interface IUserInfoMapper {
 
     List<UserInfoDTO> getAllUsersWithProfile();
 
+    // userId로 태그 이름 목록 조회
+    List<String> getUserTags(String userId);
 }

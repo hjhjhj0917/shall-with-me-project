@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,4 +37,7 @@ public class UserInfoDTO {
     // UserProfile 조인
     private String profileImageUrl;
     private String introduction;
+
+    // 룸메이트 태그 (여러 개 가능)
+    private List<String> tags;
 }
