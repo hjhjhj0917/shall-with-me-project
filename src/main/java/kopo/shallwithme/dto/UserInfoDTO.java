@@ -9,8 +9,9 @@ import java.util.Date;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT) // 데이터를 Json 형태로 변환함
 public class UserInfoDTO {
+
     private String userId;
     private String userName;
     private String password;
