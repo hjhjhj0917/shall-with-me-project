@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import kopo.shallwithme.dto.*;
 import kopo.shallwithme.service.IChatService;
-import kopo.shallwithme.service.impl.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,10 +29,28 @@ public class ChattingController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final IChatService chatService;
-    private final UserInfoService userInfoService;
+
+    // 채팅 연결 테스트 페이지
+    @GetMapping("chatTest")
+    public String chatTest() {
+
+        log.info("{}.chatTest Start!", this.getClass().getName());
+
+        return "chat/chatTest";
+    }
+
+    // 회원 메시지 보관 페이지
+    @GetMapping("userListPage")
+    public String userListPage() {
+
+        log.info("{}.userListPage Start!", this.getClass().getName());
+
+        return "chat/userList";
+    }
+
 
     @MessageMapping("/chat.sendMessage")
-    public void sendMessage(ChatDTO chatMessage) {
+    public void sendMessage(ChatMessageDTO chatMessage) {
 
         log.info("{}.sendMessage Start!", this.getClass().getName());
 
@@ -42,15 +59,25 @@ public class ChattingController {
             chatMessage.setTimestamp(LocalDateTime.now().toString());
         }
 
-        chatService.saveMessage(chatMessage);
-        messagingTemplate.convertAndSend("/topic/chatroom/" + chatMessage.getRoomId(), chatMessage);
+        try {
+            // 메시지 시간을 항상 신뢰할 수 있는 서버 시간으로 설정
+            chatMessage.setTimestamp(LocalDateTime.now().toString());
+
+            chatService.saveMessage(chatMessage);
+
+            messagingTemplate.convertAndSend("/topic/chatroom/" + chatMessage.getRoomId(), chatMessage);
+
+        } catch (Exception e) {
+
+            log.error("메시지 전송 및 저장 중 오류 발생: {}", chatMessage.toString(), e);
+        }
 
         log.info("{}.sendMessage End!", this.getClass().getName());
     }
 
     @GetMapping("/messages")
     @ResponseBody
-    public List<ChatDTO> getMessages(HttpServletRequest request) {
+    public List<ChatMessageDTO> getMessages(HttpServletRequest request) {
 
         log.info("{}.getMessages Start!", this.getClass().getName());
 
@@ -103,18 +130,18 @@ public class ChattingController {
         return response;
     }
 
-    // 사용안하는 컨트롤러
-    @GetMapping("rooms")
-    @ResponseBody
-    public List<ChatRoomDTO> getChatRooms(UserInfoDTO pDTO) {
-
-        // 컨트롤러에서 직접 null 또는 빈 값인지 검사
-        if (pDTO.getUserId() == null || pDTO.getUserId().isBlank()) {
-            return java.util.Collections.emptyList();
-        }
-
-        return chatService.getRoomsByUserId(pDTO);
-    }
+//    사용안하는 컨트롤러
+//    @GetMapping("rooms")
+//    @ResponseBody
+//    public List<ChatRoomDTO> getChatRooms(UserInfoDTO pDTO) {
+//
+//        // 컨트롤러에서 직접 null 또는 빈 값인지 검사
+//        if (pDTO.getUserId() == null || pDTO.getUserId().isBlank()) {
+//            return java.util.Collections.emptyList();
+//        }
+//
+//        return chatService.getRoomsByUserId(pDTO);
+//    }
 
     @GetMapping("chatRoom")
     public String chatRoomPage(ChatRoomDTO pDTO, Model model) throws Exception { // DTO로 파라미터 받기
@@ -126,6 +153,7 @@ public class ChattingController {
 
         ChatRoomDTO cDTO = new ChatRoomDTO();
         cDTO.setRoomId(pDTO.getRoomId());
+
         ChatRoomDTO rDTO = chatService.getOtherUserId(cDTO);
         UserProfileDTO otherUser = chatService.getImageUrlByUserId(rDTO);
 
@@ -163,12 +191,6 @@ public class ChattingController {
         log.info(this.getClass().getName() + ".getChatPartners End!");
 
         return ResponseEntity.ok(rList);
-    }
-
-    @GetMapping("userListPage")
-    public String userListPage() {
-
-        return "chat/userList";
     }
 
     // 상대방과의 채팅방 생성 또는 기존 방 조회
@@ -215,6 +237,8 @@ public class ChattingController {
             response.put("msg", "채팅방 생성 중 오류가 발생했습니다.");
         }
 
+        log.info("{}.createOrGetRoom End!", this.getClass().getName());
+
         return response;
     }
 
@@ -224,14 +248,10 @@ public class ChattingController {
 
         log.info("{}.getUserList Start!", this.getClass().getName());
 
-        return chatService.getUserList(); // JSON 형태로 반환됨
+        List<UserInfoDTO> rList = chatService.getUserList();
+
+        log.info("{}.getUserList End!", this.getClass().getName());
+
+        return rList; // JSON 형태로 반환됨
     }
-
-
-    @GetMapping("chatTest")
-    public String chatTest() {
-
-        return "chat/chatTest";  // /WEB-INF/views/chat/userList.jsp
-    }
-
 }

@@ -7,7 +7,7 @@ import java.util.List;
 public interface IChatService {
 
     // 채팅 내용을 저장
-    void saveMessage(ChatDTO pDTO);
+    void saveMessage(ChatMessageDTO pDTO);
 
     ChatRoomDTO getOtherUserId(ChatRoomDTO pDTO);
 
@@ -24,7 +24,7 @@ public interface IChatService {
     int createOrGetChatRoom(ChatRoomDTO pDTO) throws Exception;
 
     // 채팅방에 기존 메시지를 불러옴
-    List<ChatDTO> getMessagesByRoomId(Integer roomId);
+    List<ChatMessageDTO> getMessagesByRoomId(Integer roomId);
 
     // 메세지 주고받은 유저만 불러옴
     List<ChatPartnerDTO> getChatPartners(UserInfoDTO pDTO) throws Exception;
