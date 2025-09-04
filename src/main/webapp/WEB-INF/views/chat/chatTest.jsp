@@ -63,6 +63,7 @@
             });
     }
 
+    // 본인을 제외한 유저 목록 불러오기
     $(document).ready(function () {
         $.ajax({
             url: "/chat/userList",

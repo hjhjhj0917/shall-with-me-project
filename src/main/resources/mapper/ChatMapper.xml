@@ -5,7 +5,7 @@
 
 <mapper namespace="kopo.shallwithme.mapper.IChatMapper">
 
-    <insert id="insertChatMessage" parameterType="ChatDTO">
+    <insert id="insertChatMessage" parameterType="ChatMessageDTO">
         INSERT INTO CHAT_MESSAGE (room_id, sender_id, message)
         VALUES (#{roomId}, #{senderId}, #{message})
     </insert>
@@ -83,7 +83,7 @@
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
-    <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatDTO">
+    <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatMessageDTO">
         SELECT message_id, room_id AS roomId, sender_id AS senderId, message, sent_at AS timestamp
         FROM CHAT_MESSAGE
         WHERE room_id = #{value}

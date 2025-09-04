@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface IChatMapper {
 
-    void insertChatMessage(ChatDTO pDTO);
+    void insertChatMessage(ChatMessageDTO pDTO);
 
     ChatRoomDTO getOtherUserId(ChatRoomDTO pDTO);
 
@@ -22,7 +22,7 @@ public interface IChatMapper {
 
     void insertChatRoom(ChatRoomDTO pDTO) throws Exception;
 
-    List<ChatDTO> selectMessagesByRoomId(Integer roomId);
+    List<ChatMessageDTO> selectMessagesByRoomId(Integer roomId);
 
     // 메세지 주고받은 유저만 불러오기
     List<ChatPartnerDTO> selectChatPartnersWithLastMsg(UserInfoDTO pDTO);

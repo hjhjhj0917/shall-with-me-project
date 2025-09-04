@@ -17,11 +17,11 @@ public class ChatService implements IChatService {
     private final IChatMapper chatMapper;
 
     @Override
-    public void saveMessage(ChatDTO pDTO) {
+    public void saveMessage(ChatMessageDTO pDTO) {
 
         log.info("{}.saveMessage Start!", this.getClass().getName());
 
-        chatMapper.insertChatMessage(pDTO);
+        chatMapper.insertChatMessage(pDTO); // 여기 void 타입의 매퍼를 호출하는 로직을 try-catch로 처리하기
     }
 
     @Override
@@ -140,11 +140,11 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public List<ChatDTO> getMessagesByRoomId(Integer roomId) {
+    public List<ChatMessageDTO> getMessagesByRoomId(Integer roomId) {
 
         log.info("{}.getMessagesByRoomId Start!", this.getClass().getName());
 
-        List<ChatDTO> rList = chatMapper.selectMessagesByRoomId(roomId);
+        List<ChatMessageDTO> rList = chatMapper.selectMessagesByRoomId(roomId);
 
         log.info("{}.getMessagesByRoomId End!", this.getClass().getName());
 
