@@ -2,14 +2,18 @@ package kopo.shallwithme.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageDTO {
+    private String messageId;
     private String roomId;
     private String senderId;
     private String message;
-    private String sentAt; // 시간 타입 LocalDateTime으로 변경하기
+    private LocalDateTime sentAt;
+
     private String timestamp;
 }

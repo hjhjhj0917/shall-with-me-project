@@ -21,7 +21,13 @@ public class ChatService implements IChatService {
 
         log.info("{}.saveMessage Start!", this.getClass().getName());
 
-        chatMapper.insertChatMessage(pDTO); // 여기 void 타입의 매퍼를 호출하는 로직을 try-catch로 처리하기
+        try {
+            chatMapper.insertChatMessage(pDTO);
+        } catch (Exception e) {
+            log.error("메시지 전송 및 저장 중 오류 발생 : {}", pDTO.toString(), e);
+        }
+
+        log.info("{}.saveMessage End!", this.getClass().getName());
     }
 
     @Override
@@ -53,7 +59,11 @@ public class ChatService implements IChatService {
 
         log.info("{}.createRoom Start!", this.getClass().getName());
 
-        chatMapper.createChatRoom(pDTO);
+        try {
+            chatMapper.createChatRoom(pDTO);
+        } catch (Exception e) {
+            log.error("채팅방 생성 중 오류 발생 : {}", pDTO.toString(), e);
+        }
 
         log.info("{}.createRoom End!", this.getClass().getName());
 
@@ -129,7 +139,12 @@ public class ChatService implements IChatService {
         }
 
         log.info("채팅방 존재하지 않음 → 새로 생성 시도");
-        chatMapper.insertChatRoom(dtoForFind);
+
+        try {
+            chatMapper.insertChatRoom(dtoForFind);
+        } catch (Exception e) {
+            log.error("새 채팅방 생성 중 오류 발생 : {}", pDTO.toString(), e);
+        }
 
         Integer newRoomId = dtoForFind.getRoomId();
         log.info("채팅방 생성 후 roomId={}", newRoomId);

@@ -47,24 +47,25 @@ body {
 }
 #chatBox::-webkit-scrollbar { display: none; }
 
-/* 날짜 구분선 */
+/* 날짜 구분선 스타일 (이 코드로 교체) */
 .date-separator {
-    display: flex;
-    align-items: center;
-    color: #888;
-    font-size: 12px;
-    margin: 10px 0;
+    display: block; /* 블록 요소로 확실히 지정 */
+    width: 100%;    /* 너비를 100%로 설정 */
+    text-align: center;
+    margin: 20px 0; /* 위아래 여백 */
+    padding: 0;
+    background: none; /* 부모 요소의 배경을 투명하게 */
 }
-.date-separator::before,
-.date-separator::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background-color: #ccc;
-}
+
+/* 날짜 텍스트를 감싸는 span 태그 스타일 */
 .date-separator span {
-    margin: 0 10px;
-    white-space: nowrap;
+    display: inline-block; /* span이 패딩과 배경색을 가질 수 있도록 설정 */
+    background-color: #c2c2c2;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 4px 12px;
+    border-radius: 20px;
 }
 
 /* 메시지 래퍼 */
