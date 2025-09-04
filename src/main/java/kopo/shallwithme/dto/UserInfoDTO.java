@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,4 +33,11 @@ public class UserInfoDTO {
     // 룸메이트 태그 불러오가
     private String tagId;
     private String tagType; // 'ME'
+
+    // UserProfile 조인
+    private String profileImageUrl;
+    private String introduction;
+
+    // 룸메이트 태그 (여러 개 가능)
+    private List<String> tags;
 }

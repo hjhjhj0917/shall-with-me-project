@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
@@ -40,6 +37,31 @@ public class UserInfoService implements IUserInfoService {
 
         return url;
     }
+
+    @Override
+    public List<UserInfoDTO> getAllUsers() {
+
+        log.info("{}.getAllUsers Start!", this.getClass().getName());
+
+        List<UserInfoDTO> userList = userInfoMapper.getAllUsersWithProfile();
+
+        for (UserInfoDTO user : userList) {
+            List<String> tags = userInfoMapper.getUserTags(user.getUserId());
+
+            if (tags != null && !tags.isEmpty()) {
+                Collections.shuffle(tags);
+                if (tags.size() > 3) {
+                    tags = tags.subList(0, 3);
+                }
+            }
+
+            user.setTags(tags);
+        }
+
+        log.info("{}.getAllUsers End!", this.getClass().getName());
+        return userList;
+    }
+
 
     @Override
     public int newPasswordProc(UserInfoDTO pDTO) throws Exception {
