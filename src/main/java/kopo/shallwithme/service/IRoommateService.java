@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface IRoommateService {
+
     List<UserTagDTO> getUserTagsByUserId(String userId);
+
     void saveUserProfile(String userId, String introduction, String profileImageUrl) throws Exception;
 
     List<Map<String, Object>> getRoommateList(int page);

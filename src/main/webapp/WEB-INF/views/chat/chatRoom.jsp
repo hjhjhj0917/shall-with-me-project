@@ -57,8 +57,7 @@
     // 상대방 정보 (Controller에서 전달받음)
     const otherUser = {
         id: "${otherUser.userId}",
-        name: "${otherUser.userName}",
-        imageUrl: "${not empty otherUser.profileImgUrl ? otherUser.profileImgUrl : '/images/noimg.png'}"
+        imageUrl: "${not empty otherUser.profileImageUrl ? otherUser.profileImageUrl : '/images/noimg.png'}"
     };
 
     const roomId = "${roomId}";
@@ -153,9 +152,13 @@
         if (lastMessageDate && lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
             dateSeparator.className = "date-separator";
-            dateSeparator.innerHTML = `<span>${dateStr}</span>`;
+
+            // ✅ 기존 방식인 + 연산자를 사용합니다.
+            dateSeparator.innerHTML = '<span>' + dateStr + '</span>';
+
             chatBox.appendChild(dateSeparator);
         }
+
         lastMessageDate = dateStr;
 
         // myUser, otherUser 객체 사용

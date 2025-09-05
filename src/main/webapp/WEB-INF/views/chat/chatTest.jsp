@@ -38,7 +38,7 @@
 
     function openChat(otherUserId) {
         console.log("openChat 호출됨:", otherUserId);
-        fetch("/chat/createOrGetRoom?otherUserId=" + encodeURIComponent(otherUserId))
+        fetch("/chat/createOrGetRoom?user2Id=" + encodeURIComponent(otherUserId))
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -63,6 +63,7 @@
             });
     }
 
+    // 본인을 제외한 유저 목록 불러오기
     $(document).ready(function () {
         $.ajax({
             url: "/chat/userList",
