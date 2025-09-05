@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <html>
 <head>
-    <title>살며시: "이름"</title>
+    <title>살며시: 스케쥴</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
@@ -11,6 +11,7 @@
 <%@ include file="../includes/header.jsp" %>
 
 <%--여기에 코드 작성--%>
+일정 잡는 페이지 입니다.
 
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>

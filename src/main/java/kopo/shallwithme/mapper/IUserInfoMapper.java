@@ -47,8 +47,10 @@ public interface IUserInfoMapper {
 
     // userId가 담긴 UserInfoDTO를 파라미터로 받음
     List<UserTagDTO> findByUserId(UserInfoDTO pDTO);
+
     //룸메이트 프로필 저장
     int upsertUserProfile(UserProfileDTO pDTO);
+
     UserProfileDTO getUserProfile(String userId);
 
     String selectProfileImageUrlByUserId(String userId);

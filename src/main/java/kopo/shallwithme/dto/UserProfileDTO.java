@@ -11,4 +11,6 @@ public class UserProfileDTO {
     private String introduction;
     private String regDt;
     private String chgDt;
+
+    private String userName;
 }

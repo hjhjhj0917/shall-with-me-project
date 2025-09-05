@@ -39,6 +39,19 @@
     cursor: pointer;
 }
 
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end; /* 버튼들을 오른쪽으로 정렬 */
+    gap: 8px; /* 버튼 사이 간격 */
+}
+
+/* 취소 버튼 스타일 */
+.cancel-btn {
+    background: #f1f1f1;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
 .deactivate-btn {
     background: #3399ff;
     color: white;

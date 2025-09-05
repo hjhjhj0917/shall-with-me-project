@@ -92,9 +92,17 @@
 
     <!--    회원 프로필 이미지 불러오기-->
     <select id="selectProfileImageUrlByUserId" resultType="UserProfileDTO" parameterType="ChatRoomDTO">
-        SELECT profile_image_url as profileImageUrl, user_id, introduction
-        FROM USER_PROFILE
-        WHERE user_id = #{user2Id}
+        SELECT
+            p.PROFILE_IMAGE_URL,
+            p.USER_ID,
+            p.INTRODUCTION,
+            i.USER_NAME
+        FROM
+            USER_PROFILE p
+                INNER JOIN
+            USER_INFO i ON p.USER_ID = i.USER_ID
+        WHERE
+            p.USER_ID = #{user2Id}
     </select>
 
 </mapper>
