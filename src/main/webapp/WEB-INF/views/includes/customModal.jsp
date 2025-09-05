@@ -7,7 +7,8 @@
         </div>
         <p id="customAlertMessage">메시지 내용</p>
         <div class="modal-buttons" style="text-align: right;">
-            <button class="deactivate-btn" onclick="closeCustomAlert()">확인</button>
+            <button class="cancel-btn" id="customAlertCancel" style="display: none;">취소</button>
+            <button class="deactivate-btn" id="customAlertOk">확인</button>
         </div>
     </div>
 </div>
