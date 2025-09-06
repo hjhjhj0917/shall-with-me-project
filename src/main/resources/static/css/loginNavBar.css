@@ -404,6 +404,12 @@ header {
     overflow: hidden;
 }
 
+.user-profile-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
 #messageModalOverlay .modal-header {
     display: flex;
     align-items: center;

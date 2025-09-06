@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <header>
-<%--    메인으로 가는 사이트 로고--%>
+    <%--    메인으로 가는 사이트 로고--%>
     <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
             <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
@@ -26,7 +26,8 @@
                 <%= session.getAttribute("SS_USER_NAME") %>님
             </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
-                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>
+                <%--                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>--%>
+                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진" class="user-profile-image">
             </button>
         </div>
 

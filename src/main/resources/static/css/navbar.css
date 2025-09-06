@@ -192,6 +192,12 @@ header {
     margin-right: 69px;
 }
 
+.user-profile-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
 #headerDropdownToggle {
     margin-top: 2px;
     margin-right: 176px;
