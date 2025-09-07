@@ -1,0 +1,149 @@
+/* 사이드바 기본 스타일 */
+.sidebar {
+    position: fixed;
+    height: 85%;
+    width: 260px;
+    padding: 20px 14px;
+    border-right: 1px solid #eee;
+    transition: width 0.3s ease;
+    display: flex; /* [추가] Flexbox 레이아웃 적용 */
+    flex-direction: column; /* 세로로 쌓기 */
+}
+
+/* 헤더 (로고, 토글 버튼) */
+.sidebar-header {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 50px;
+    flex-shrink: 0; /* 헤더 높이가 줄어들지 않도록 고정 */
+}
+.sidebar-logo {
+    display: flex;
+    flex-direction: column; /* ✅ 이미지와 이름을 세로로 정렬 */
+    align-items: center;   /* ✅ 가로 중앙 정렬 */
+    gap: 10px;             /* ✅ 이미지와 이름 사이 간격 */
+    text-decoration: none;
+    color: #3399ff;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.sidebar-profile-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.sidebar-logo-text {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    font-size: 1rem;
+}
+.sidebar-toggle-btn {
+    position: absolute; /* 사이드바를 기준으로 위치 고정 */
+    top: 22px;
+    left: 24px;
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    z-index: 10;
+}
+.sidebar-toggle-btn:hover {
+    background-color: #eee;
+}
+
+/* [추가] 메뉴 전체를 감싸는 래퍼 */
+.sidebar-menu-wrapper {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    overflow-y: auto; /* 내용이 길어지면 스크롤 생성 */
+    scrollbar-width: none; /* 스크롤바 숨기기 (Firefox) */
+}
+.sidebar-menu-wrapper::-webkit-scrollbar {
+    display: none; /* 스크롤바 숨기기 (Chrome, Safari) */
+}
+
+/* 메뉴 컨테이너 */
+.sidebar-menu-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 메뉴 아이템 */
+.sidebar-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 50px;
+    text-decoration: none;
+    color: #555;
+    border-radius: 8px;
+    padding: 0 12px;
+    white-space: nowrap;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+/* 메뉴 아이템 내부의 아이콘 */
+.sidebar-menu-item i {
+    font-size: 1.2rem;
+
+    /* [핵심 수정 1] 아이콘의 공간 너비를 고정합니다. */
+    width: 30px;
+
+    /* [핵심 수정 2] 아이콘 크기가 변해도 공간을 유지하도록 합니다. */
+    flex-shrink: 0;
+
+    text-align: center;
+}
+
+.sidebar-menu-item:hover, .sidebar-menu-item.active {
+    background-color: #e6e6e6;
+    color: #111;
+}
+.sidebar-menu-item i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+.sidebar-menu-text {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    font-weight: 500;
+}
+
+/* ============================
+   사이드바가 접혔을 때 (collapsed)
+   ============================ */
+
+/* 1. 사이드바 너비 축소 */
+.sidebar.collapsed {
+    width: 88px;
+    /* ✅ 펼쳤을 때와 동일한 좌우 패딩을 유지하여 아이콘 위치를 고정합니다. */
+    padding: 20px 14px;
+}
+
+.sidebar.collapsed .sidebar-header {
+    visibility: hidden; /* 요소를 보이지 않게 함 */
+    opacity: 0;         /* 투명도를 0으로 만들어 애니메이션 효과를 줌 */
+    pointer-events: none; /* 클릭되지 않도록 함 */
+}
+
+/* 3. 메뉴 아이템 내부의 간격(gap)을 제거하여 아이콘이 밀려나지 않도록 함 */
+.sidebar.collapsed .sidebar-menu-item {
+    gap: 0;
+}
+
+/* 4. 메뉴 텍스트 숨기기 (기존과 동일) */
+.sidebar.collapsed .sidebar-menu-text {
+    opacity: 0;
+    pointer-events: none;
+}

@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <title>살며시: 룸메이트/쉐어하우스 찾기</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
