@@ -320,11 +320,6 @@
             font-size: .95rem
         }
 
-        .tag-chip:hover {
-            transform: translateY(-1px);
-
-        }
-
         .tag-chip-wrap.dense .tag-chip {
             padding: 6px 10px;
             font-size: .95rem
@@ -515,7 +510,7 @@
             <section class="roommate-right">
                 <div class="form-block">
                     <div class="block-title">
-                        <span class="title-badge"><i class="fa-solid fa-hashtag"></i></span><span>보여질 태그</span>
+                        <span class="title-badge"><i class="fa-solid fa-hashtag"></i></span><span>성향 태그</span>
                     </div>
                     <div>
                         <c:choose>

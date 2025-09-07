@@ -26,8 +26,7 @@
                 <%= session.getAttribute("SS_USER_NAME") %>님
             </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
-                <%--                <i class="fa-solid fa-circle-user fa-sm" style="color: #1c407d;"></i>--%>
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진" class="user-profile-image">
+                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진" class="user-profile-img">
             </button>
         </div>
 

@@ -26,6 +26,10 @@ body{
     font-size: 20px;
 }
 
+#userIconToggle {
+    margin-top: 6px;
+}
+
 .right-panel:hover {
     width: 60%;
 }
@@ -95,15 +99,6 @@ body{
     margin-top: 230px;
     z-index: 1;
 }
-
-/*.roommate-start {*/
-/*    height: 60px;*/
-/*    width: 300px; !* 원형 *!*/
-/*    background-color: white;*/
-/*    border-radius: 50px;*/
-/*    border: 2px solid #E5F2FF;*/
-/*    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);*/
-/*}*/
 
 
 

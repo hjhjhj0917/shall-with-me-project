@@ -231,3 +231,8 @@ body {
     height: 100%;
     object-fit: cover; /* 이미지를 정사각형 원에 꽉 채우게 */
 }
+
+#userIconToggle {
+    margin-top: 6px;
+}
+
