@@ -14,7 +14,6 @@
         .sidebar-main-content {
             margin-top: 50px;
             padding: 40px;
-            background-color: #f8f9fa; /* 밝은 회색 배경 */
         }
 
         /* 비밀번호 확인 폼 전체를 감싸는 컨테이너 */
@@ -24,7 +23,6 @@
             padding: 40px;
             background-color: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         /* 상단 헤더 (제목, 설명) */
@@ -34,18 +32,18 @@
             align-items: center; /* ✅ 왼쪽 정렬 */
             text-align: left;
             border-bottom: 1px solid #e9ecef;
-            padding-bottom: 20px;
             margin-bottom: 30px;
         }
+
         .confirm-header h1 {
-            font-size: 1.8rem;
+            font-size: 30px;
             color: #333;
-            text-align: center;
         }
+
         .confirm-header p {
+            padding-top: 30px;
             font-size: 15px;
             color: #666;
-            text-align: left; /* p 태그의 텍스트도 왼쪽 정렬 */
         }
 
         /* 폼 행 (라벨 + 값/입력) */
@@ -75,8 +73,12 @@
             flex-grow: 1; /* 남은 공간을 모두 차지 */
             padding: 10px 12px;
             border: 1px solid #ccc;
-            border-radius: 6px;
+            border-radius: 3px;
             font-size: 1rem;
+        }
+
+        .form-row input::placeholder {
+            font-size: 13px;
         }
 
         /* 에러 메시지 */
@@ -130,7 +132,7 @@
             </div>
             <div class="form-row">
                 <label for="password">현재 비밀번호</label>
-                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" >
             </div>
 
             <p class="error-msg" id="errorMsg"></p>
