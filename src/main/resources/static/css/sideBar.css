@@ -33,6 +33,8 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
+    border: 2px solid #DAEDFF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     object-fit: cover;
     flex-shrink: 0;
 }
@@ -146,4 +148,19 @@
 .sidebar.collapsed .sidebar-menu-text {
     opacity: 0;
     pointer-events: none;
+}
+
+.sidebar-main-content {
+    /* position: relative; */ /* relative는 필요 없습니다. */
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    margin-left: 260px; /* 펼쳐진 사이드바 너비만큼 왼쪽 여백 */
+    width: calc(100% - 260px); /* 전체 너비에서 사이드바 너비를 뺀 값 */
+    padding: 20px;
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+
+/* 사이드바가 접혔을 때 메인 콘텐츠의 위치와 너비 조정 */
+.sidebar.collapsed ~ .sidebar-main-content {
+    margin-left: 88px; /* 접힌 사이드바 너비만큼 왼쪽 여백 */
+    width: calc(100% - 88px);
 }

@@ -93,16 +93,18 @@
     <!--    회원 프로필 이미지 불러오기-->
     <select id="selectProfileImageUrlByUserId" resultType="UserProfileDTO" parameterType="ChatRoomDTO">
         SELECT
-            p.PROFILE_IMAGE_URL,
-            p.USER_ID,
-            p.INTRODUCTION,
-            i.USER_NAME
+            U.USER_ID AS userId,
+            U.USER_NAME AS userName,
+            P.profile_image_url AS profileImageUrl
         FROM
-            USER_PROFILE p
+            CHAT_ROOM R
                 INNER JOIN
-            USER_INFO i ON p.USER_ID = i.USER_ID
+            -- CASE 문을 이용해 채팅방의 두 사용자 중 내가 아닌 사람을 찾아 JOIN 합니다.
+                USER_INFO U ON (CASE WHEN R.USER1_ID = #{myUserId} THEN R.USER2_ID ELSE R.USER1_ID END) = U.USER_ID
+                LEFT JOIN
+            USER_PROFILE P ON U.USER_ID = P.user_id
         WHERE
-            p.USER_ID = #{user2Id}
+            R.room_id = #{roomId}
     </select>
 
 </mapper>

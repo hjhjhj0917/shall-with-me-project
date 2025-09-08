@@ -18,18 +18,18 @@
   <div class="sidebar-menu-wrapper">
     <div class="sidebar-menu-container">
       <div class="sidebar-menu-list">
-        <a href="#" class="sidebar-menu-item">
+        <div onclick="location.href='/mypage/userModify'" class="sidebar-menu-item">
           <i class="fa-solid fa-user" style="color: #1c407d;"></i>
           <span class="sidebar-menu-text">개인정보/프로필 수정</span>
-        </a>
-        <a href="#" class="sidebar-menu-item">
+        </div>
+        <div onclick="location.href='/mypage/sharehouseModify'" class="sidebar-menu-item">
           <i class="fa-solid fa-house" style="color: #1c407d;"></i>
           <span class="sidebar-menu-text">쉐어하우스 정보 수정</span>
-        </a>
-        <a href="#" class="sidebar-menu-item">
+        </div>
+        <div onclick="location.href='/mypage/scheduleCheck'" class="sidebar-menu-item">
           <i class="fa-solid fa-calendar-days" style="color: #1c407d;"></i>
           <span class="sidebar-menu-text">일정 확인</span>
-        </a>
+        </div>
       </div>
 
       <div class="sidebar-menu-list">

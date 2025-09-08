@@ -160,12 +160,6 @@ public class UserInfoController {
         return "user/login";
     }
 
-    @GetMapping(value = "myPage")
-    public String myPage() {
-
-        return "user/myPage";
-    }
-
     @GetMapping(value = "searchUserId")
     public String searchUserId() {
         log.info("{}.user/searchUserId Start!", this.getClass().getName());
