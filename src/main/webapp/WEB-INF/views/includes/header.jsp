@@ -41,7 +41,7 @@
         <%--메뉴--%>
         <div class="header-menu-container pinned" id="menuBox">
             <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
-            <button class="menu-list" onclick="location.href='/user/myPage'">마이페이지</button>
+            <button class="menu-list" onclick="location.href='/mypage/userModify'">마이페이지</button>
             <button class="menu-list" id="logout">로그아웃</button>
             <button class="header-dropdown-toggle" id="headerDropdownToggle">
                 <i class="fa-solid fa-bars fa-xs" style="color: #1c407d;"></i>

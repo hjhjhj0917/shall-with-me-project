@@ -48,7 +48,6 @@ public class ChattingController {
         return "chat/userList";
     }
 
-
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatMessageDTO chatMessage) {
 
@@ -144,7 +143,7 @@ public class ChattingController {
 //    }
 
     @GetMapping("chatRoom")
-    public String chatRoomPage(ChatRoomDTO pDTO, Model model) throws Exception { // DTO로 파라미터 받기
+    public String chatRoomPage(ChatRoomDTO pDTO, Model model, HttpSession session) throws Exception { // DTO로 파라미터 받기
 
         log.info("{}.chatRoomPage Start!", this.getClass().getName());
 
@@ -155,8 +154,10 @@ public class ChattingController {
         cDTO.setRoomId(pDTO.getRoomId());
 
         ChatRoomDTO rDTO = chatService.getOtherUserId(cDTO);
+        rDTO.setMyUserId(session.getAttribute("SS_USER_ID").toString());
         UserProfileDTO otherUser = chatService.getImageUrlByUserId(rDTO);
 
+        log.info("myUserId : {}", rDTO.getMyUserId());
         log.info("user2Id : {}", rDTO.getUser2Id());
         log.info("otherUser : {}", otherUser);
 
@@ -242,6 +243,7 @@ public class ChattingController {
         return response;
     }
 
+    // 유저 목록 불러오기 나중에 수정하기!
     @GetMapping("userList")
     @ResponseBody
     public List<UserInfoDTO> getUserList() throws Exception {

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <html>
 <head>
-    <title>살며시: 마이페이지</title>
+    <title>살며시: 쉐어하우스 정보 수정</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sideBar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
@@ -16,7 +16,7 @@
 <%@ include file="../includes/sideBar.jsp" %>
 
 <main class="sidebar-main-content">
-
+    <h1>쉐어하우스 정보 수정</h1>
 </main>
 
 <!-- 커스텀 알림창 -->
