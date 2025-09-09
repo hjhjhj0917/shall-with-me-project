@@ -56,10 +56,18 @@ public interface IUserInfoMapper {
 
     String selectProfileImageUrlByUserId(String userId);
 
-    List<Map<String, Object>> getRoommateList(int page);
+    List<Map<String, Object>> getRoommateList(@Param("offset") int offset,
+                                              @Param("limit") int limit);
 
     List<UserInfoDTO> getAllUsersWithProfile();
 
     // userId로 태그 이름 목록 조회
     List<String> getUserTags(String userId);
+
+    // userId로 회원 성별 가져오기
+    UserInfoDTO getUserById(String userId);
+
+    // userId로 태그 목록 조회
+    List<UserTagDTO> selectUserTags(String userId);
+
 }
