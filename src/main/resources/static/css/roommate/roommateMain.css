@@ -20,11 +20,15 @@ html, body{
 }
 
 /* 헤더가 fixed라면 겹치지 않도록 여백 */
-#sh-wrapper{
-    max-width:1200px;
-    margin:0 auto;
-    padding:110px 24px 60px; /* 상단 여백은 navbar 높이에 맞게 조절 */
+#sh-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 110px 24px 0;    /* 하단 padding 제거 */
+    display: flex;            /* flex 컨테이너 선언 */
+    flex-direction: column;   /* 세로 배치 */
+    height: calc(100vh - 110px); /* 헤더 높이만큼 뺀 전체 높이 */
 }
+
 
 /* 검색바 */
 .sh-searchbar{
@@ -161,9 +165,8 @@ html, body{
 /*}*/
 
 .sh-scroll-area {
-    height: calc(100vh - 200px); /* 화면 전체 높이에서 헤더/검색창 공간 빼기 */
+    flex: 1;                   /* wrapper에서 남은 공간 채움 */
     overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 8px;
+    padding: 0 8px 80px 0;     /* 하단 여백 80px 줘서 마지막 카드 안 잘림 */
 }
-/* 수정한거 이제 안됨 밑에 4개 추가안됬음 이거하고 */
