@@ -447,7 +447,13 @@
         }
 
         function renderUserCards(users) {
+            const loginUserId = "${sessionScope.SS_USER_ID}";
+
             $.each(users, function (i, user) {
+                if (user.userId === loginUserId) {
+                    return true;
+                }
+
                 var imgUrl = user.profileImageUrl || (ctx + "/images/noimg.png");
                 var nickname = user.userName || "알 수 없음";
                 var age = user.age ? user.age + "세" : "";
