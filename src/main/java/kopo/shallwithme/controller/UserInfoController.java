@@ -205,7 +205,6 @@ public class UserInfoController {
     }
 
     @ResponseBody
-
     @PostMapping(value = "loginProc")
     public MsgDTO loginProc(HttpServletRequest request, HttpSession session) {
         log.info("{}.loginProc Start!", this.getClass().getName());
@@ -276,8 +275,8 @@ public class UserInfoController {
 
                 log.info("{}.loginProc Eng!", this.getClass().getName());
             }
-            return dto;
 
+            return dto;
     }
 
     @GetMapping(value = "loginCheck")
