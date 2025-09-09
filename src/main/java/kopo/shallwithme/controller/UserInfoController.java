@@ -161,12 +161,6 @@ public class UserInfoController {
         return "user/login";
     }
 
-    @GetMapping(value = "myPage")
-    public String myPage() {
-
-        return "user/myPage";
-    }
-
     @GetMapping(value = "searchUserId")
     public String searchUserId() {
         log.info("{}.user/searchUserId Start!", this.getClass().getName());
@@ -212,7 +206,6 @@ public class UserInfoController {
     }
 
     @ResponseBody
-
     @PostMapping(value = "loginProc")
     public MsgDTO loginProc(HttpServletRequest request, HttpSession session) {
         log.info("{}.loginProc Start!", this.getClass().getName());
@@ -283,8 +276,8 @@ public class UserInfoController {
 
                 log.info("{}.loginProc Eng!", this.getClass().getName());
             }
-            return dto;
 
+            return dto;
     }
 
     @GetMapping(value = "loginCheck")

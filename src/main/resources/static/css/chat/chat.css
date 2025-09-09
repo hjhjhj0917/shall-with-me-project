@@ -2,14 +2,16 @@ body {
     background-image: url("../../images/kpaas-background.png");
 }
 
-/* 상단 버튼 */
+/* 상단 버튼 전체를 감싸는 컨테이너 */
 .top-buttons {
-    position: absolute;
-    top: 180px;
+    position: relative;
+    width: 65px;
+    height: 85px;
     left: 100px;
-    display: flex;
-    gap: 15px;
+    top: 70px;
 }
+
+/* 동그란 버튼 */
 .circle-btn {
     width: 55px;
     height: 55px;
@@ -19,22 +21,33 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    color: #000;
-    text-align: center;
     transition: all 0.2s ease;
+    position: absolute;
+    left: 50%; /* 컨테이너의 중앙으로 이동 */
+    transform: translateX(-50%); /* 정확한 중앙 정렬 */
 }
+
 .circle-btn:hover {
     background-color: #2b88e6;
-    transform: scale(1.05);
+}
+
+.btn-diary {
+    /* [추가] 텍스트 위치를 직접 지정 */
+    position: absolute;
+    bottom: 0; /* 컨테이너의 맨 아래에 위치 */
+    left: 50%; /* 컨테이너의 중앙으로 이동 */
+    transform: translateX(-50%); /* 정확한 중앙 정렬 */
+
+    color: #333; /* 눈에 잘 띄는 색으로 변경 */
+    font-size: 15px;
+    font-weight: 500;
 }
 
 /* 채팅 박스 */
 #chatBox {
     max-width: 650px;
     margin: 20px auto;
-    margin-top: 100px;
+    margin-top: 40px;
     height: 500px;
     overflow-y: auto;
     padding: 15px;
@@ -90,9 +103,57 @@ body {
 
 .message-content {
     display: flex;
-    flex-direction: row;    /* [수정] 자식 요소(버블, 시간)를 세로(column)가 아닌 가로(row)로 정렬 */
+    flex-direction: column;    /* [수정] 자식 요소(버블, 시간)를 세로(column)가 아닌 가로(row)로 정렬 */
     align-items: flex-end;  /* [수정] 자식 요소들을 아래쪽 기준으로 정렬 */
     gap: 8px;               /* [추가] 버블과 시간 사이의 간격 */
+}
+
+.message-wrapper.me .message-content {
+    align-items: flex-end;   /* 내 메시지는 오른쪽 정렬 */
+}
+.message-wrapper.other .message-content {
+    align-items: flex-start; /* 상대 메시지는 왼쪽 정렬 */
+}
+
+.bubble-wrapper {
+    display: flex;
+    align-items: flex-end; /* 버블과 시간을 아래쪽 기준으로 정렬 */
+    gap: 8px;
+}
+
+.message-wrapper.me .bubble-wrapper {
+    flex-direction: row-reverse; /* 내 메시지는 시간 순서 뒤집기 */
+}
+
+/* 상대방 이름 스타일 */
+.sender-name {
+    color: #1c407d;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* 말풍선 */
+.message-wrapper.me .message-bubble {
+    padding: 10px 14px;
+    border-radius: 18px;
+    max-width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.message-wrapper.other .message-bubble {
+    padding: 10px 14px;
+    border-radius: 18px;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .message-wrapper.me .message-content {
@@ -107,18 +168,6 @@ body {
     margin-bottom: 2px;
 }
 
-/* 말풍선 */
-.message-bubble {
-    padding: 10px 14px;
-    border-radius: 18px;
-    max-width: 100%;
-    margin-top: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    position: relative;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
 .message-bubble.long-text { white-space: normal; }
 .message-wrapper.me .message-bubble { background-color: #e0f7fa; }
 .message-wrapper.other .message-bubble { background-color: #f1f1f1; }
@@ -182,3 +231,8 @@ body {
     height: 100%;
     object-fit: cover; /* 이미지를 정사각형 원에 꽉 채우게 */
 }
+
+#userIconToggle {
+    margin-top: 6px;
+}
+

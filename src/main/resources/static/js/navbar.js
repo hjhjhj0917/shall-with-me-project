@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $("#logout").on("click", function () {
         if (this.id === "logout") {
-            showCustomAlert("로그아웃 하시겠습니까?", function () {
+            showCustomConfirm("로그아웃 하시겠습니까?", function () {
                 $.ajax({
                     url: "/user/logout",
                     type: "Post",
@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         searchUserId: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
         searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
         chatRoom: ['switchBox'],
+        scheduleReg: ['switchBox']
     };
 
     if (hideBoxByPage[pageName]) {

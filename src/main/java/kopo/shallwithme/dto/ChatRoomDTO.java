@@ -9,4 +9,6 @@ public class ChatRoomDTO {
     private Integer roomId;
     private String user1Id;
     private String user2Id;
+
+    private String myUserId;
 }

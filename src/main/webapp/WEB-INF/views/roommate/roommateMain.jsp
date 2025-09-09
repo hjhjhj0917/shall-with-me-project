@@ -162,9 +162,13 @@
         </button>
     </div>
 
-    <!-- 카드 그리드: 초기 8개 (샘플) -->
-    <section class="sh-grid">
-    </section>
+    <!-- ✅ 스크롤 전용 박스 추가 -->
+    <div class="sh-scroll-area">
+        <section class="sh-grid">
+            <!-- 카드들이 Ajax로 들어옴 -->
+        </section>
+    </div>
+
 
     <!-- 좌하단 등록 플로팅 버튼 -->
     <button class="sh-fab" title="등록" id="roommateAdd">
@@ -218,67 +222,86 @@
     })();
 </script>
 
-<script>
-    $(document).ready(function () {
-        // roommateMain 페이지 진입 시 회원 정보 불러오기
-        $.ajax({
-            url: ctx + "/roommate/userList",   // 회원 리스트를 반환하는 컨트롤러 엔드포인트
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                // data가 배열 형태라고 가정
-                renderUserCards(data);
-            },
-            error: function (xhr, status, err) {
-                console.error("회원 정보 불러오기 실패:", err);
-            }
-        });
+<%--<script>--%>
+<%--    $(document).ready(function () {--%>
+<%--        // roommateMain 페이지 진입 시 회원 정보 불러오기--%>
+<%--        $.ajax({--%>
+<%--            url: ctx + "/roommate/userList",   // 회원 리스트를 반환하는 컨트롤러 엔드포인트--%>
+<%--            type: "GET",--%>
+<%--            dataType: "json",--%>
+<%--            success: function (data) {--%>
+<%--                // data가 배열 형태라고 가정--%>
+<%--                renderUserCards(data);--%>
+<%--            },--%>
+<%--            error: function (xhr, status, err) {--%>
+<%--                console.error("회원 정보 불러오기 실패:", err);--%>
+<%--            }--%>
+<%--        });--%>
 
-        // 카드 HTML을 생성하는 함수
-        function renderUserCards(users) {
-            var $grid = $(".sh-grid");
-            $grid.empty(); // 기존 샘플 초기화
+<%--        // 카드 HTML을 생성하는 함수--%>
+<%--        function renderUserCards(users) {--%>
+<%--            var $grid = $(".sh-grid");--%>
+<%--            $grid.empty(); // 기존 샘플 초기화--%>
 
-            $.each(users, function (i, user) {
-                // 프로필 이미지 경로 결정
-                var imgUrl = user.profileImageUrl;
-                if (!imgUrl || imgUrl.trim() === "") {
-                    imgUrl = ctx + "/images/noimg.png";
-                }
+<%--            $.each(users, function (i, user) {--%>
+<%--                // 프로필 이미지 경로 결정--%>
+<%--                var imgUrl = user.profileImageUrl;--%>
+<%--                if (!imgUrl || imgUrl.trim() === "") {--%>
+<%--                    imgUrl = ctx + "/images/noimg.png";--%>
+<%--                }--%>
 
-                var address = user.addr1 ? user.addr1 : "미입력";
-                var nickname = user.userName ? user.userName : "알 수 없음";
-                var email = user.email ? user.email : "비공개";
+<%--                var address = user.addr1 ? user.addr1 : "미입력";--%>
+<%--                var nickname = user.userName ? user.userName : "알 수 없음";--%>
+<%--                var email = user.email ? user.email : "비공개";--%>
 
-                // jQuery로 DOM 생성
-                var $card = $("<article>")
-                    .addClass("sh-card")
-                    .attr("data-id", user.userId);
+<%--                // jQuery로 DOM 생성--%>
+<%--                var $card = $("<article>")--%>
+<%--                    .addClass("sh-card")--%>
+<%--                    .attr("data-id", user.userId);--%>
 
-                var $thumb = $("<div>")
-                    .addClass("sh-thumb")
-                    .css("background-image", "url('" + imgUrl + "')");
+<%--                var $thumb = $("<div>")--%>
+<%--                    .addClass("sh-thumb")--%>
+<%--                    .css("background-image", "url('" + imgUrl + "')");--%>
 
-                var age = user.age ? user.age + "세" : "";  // age가 있으면 "25세" 같은 문자열
-                var $info = $("<div>").addClass("sh-info")
-                    .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
+<%--                var age = user.age ? user.age + "세" : "";  // age가 있으면 "25세" 같은 문자열--%>
+<%--                var $info = $("<div>").addClass("sh-info")--%>
+<%--                    .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));--%>
 
-// ✅ 태그 박스 추가
-                if (user.tags && user.tags.length > 0) {
-                    var $tagBox = $("<div>").addClass("tag-box");
-                    user.tags.forEach(function(tag) {
-                        $tagBox.append($("<span>").addClass("tag").text(tag));
-                    });
-                    $info.append($tagBox);
-                }
+<%--// ✅ 태그 박스 추가--%>
+<%--                // ✅ 태그 + 성별 박스 추가--%>
+<%--                var $tagBox = $("<div>").addClass("tag-box");--%>
 
-                $card.append($thumb).append($info);
-                $grid.append($card);
+<%--// 태그1--%>
+<%--                if (user.tag1) {--%>
+<%--                    $tagBox.append($("<span>").addClass("tag").text(user.tag1));--%>
+<%--                }--%>
 
-            });
-        }
-    });
-</script>
+<%--                if (user.tag2) {--%>
+<%--                    $tagBox.append($("<span>").addClass("tag").text(user.tag2));--%>
+<%--                }--%>
+
+
+<%--// 성별--%>
+<%--                if (user.gender) {--%>
+<%--                    var genderClass = (user.gender === "남" || user.gender === "M") ? "male" : "female";--%>
+<%--                    $tagBox.append(--%>
+<%--                        $("<span>")--%>
+<%--                            .addClass("tag gender " + genderClass)--%>
+<%--                            .text(user.gender === "M" ? "남" : "여")--%>
+<%--                    );--%>
+<%--                }--%>
+
+<%--                $info.append($tagBox);--%>
+
+
+
+<%--                $card.append($thumb).append($info);--%>
+<%--                $grid.append($card);--%>
+
+<%--            });--%>
+<%--        }--%>
+<%--    });--%>
+<%--</script>--%>
 
 
 
@@ -365,5 +388,103 @@
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+
+<!-- ✅ 무한 스크롤 스크립트 -->
+<script>
+    $(document).ready(function () {
+        let page = 1;
+        let loading = false;
+        let lastPage = false;
+
+        const $grid = $(".sh-grid");
+
+        // 첫 로드
+        loadPage(page);
+
+        // ✅ 카드 리스트 전용 스크롤 이벤트
+        const $scrollArea = $(".sh-scroll-area");
+
+        $scrollArea.on("scroll", function () {
+            if (loading || lastPage) return;
+
+            let scrollTop = $scrollArea.scrollTop();
+            let innerHeight = $scrollArea.innerHeight();
+            let scrollHeight = $scrollArea[0].scrollHeight;
+
+            // 바닥 근처 도달 시 다음 페이지 로드
+            if (scrollTop + innerHeight + 100 >= scrollHeight) {
+                page++;
+                loadPage(page);
+            }
+        });
+
+
+        function loadPage(p) {
+            loading = true;
+            $.ajax({
+                url: ctx + "/roommate/list",
+                type: "GET",
+                data: { page: p },
+                dataType: "json",
+                success: function (data) {
+                    if (!data || !data.items || data.items.length === 0) {
+                        lastPage = true;
+                        return;
+                    }
+                    renderUserCards(data.items);
+
+                    if (data.lastPage) {
+                        lastPage = true;
+                    }
+                },
+                error: function (xhr, status, err) {
+                    console.error("회원 정보 불러오기 실패:", err);
+                },
+                complete: function () {
+                    loading = false;
+                }
+            });
+        }
+
+        function renderUserCards(users) {
+            const loginUserId = "${sessionScope.SS_USER_ID}";
+
+            $.each(users, function (i, user) {
+                if (user.userId === loginUserId) {
+                    return true;
+                }
+
+                var imgUrl = user.profileImageUrl || (ctx + "/images/noimg.png");
+                var nickname = user.userName || "알 수 없음";
+                var age = user.age ? user.age + "세" : "";
+
+                var $card = $("<article>")
+                    .addClass("sh-card")
+                    .attr("data-id", user.userId);
+
+                var $thumb = $("<div>")
+                    .addClass("sh-thumb")
+                    .css("background-image", "url('" + imgUrl + "')");
+
+                var $info = $("<div>").addClass("sh-info")
+                    .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
+
+                var $tagBox = $("<div>").addClass("tag-box");
+
+                if (user.tag1) $tagBox.append($("<span>").addClass("tag").text(user.tag1));
+                if (user.tag2) $tagBox.append($("<span>").addClass("tag").text(user.tag2));
+
+                if (user.gender) {
+                    var genderClass = (user.gender === "남" || user.gender === "M") ? "male" : "female";
+                    $tagBox.append($("<span>").addClass("tag gender " + genderClass).text(user.gender));
+                }
+
+                $info.append($tagBox);
+                $card.append($thumb).append($info);
+                $grid.append($card);
+            });
+        }
+    });
+</script>
 </body>
 </html>
