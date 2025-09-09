@@ -64,8 +64,8 @@
                 ) {
                     $(".login-input").removeClass("input-error");
                     $("#findPwErrorMessage").removeClass("visible");
-                    $("#findIdErrorMessage1").removeClass("visible");
-                    $("#findIdErrorMessage2").removeClass("visible");
+                    $("#findPwErrorMessage1").removeClass("visible");
+                    $("#findPwErrorMessage2").removeClass("visible");
                 }
             });
 

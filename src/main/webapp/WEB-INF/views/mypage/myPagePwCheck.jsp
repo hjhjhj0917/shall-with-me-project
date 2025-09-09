@@ -199,9 +199,9 @@
                     data: {"password" : password},
                     success: function (json) {
                         if (json.result === 1) {
-                            showCustomAlert(json.msg, function () {
-                                location.href = "<%= session.getAttribute("MYPAGE_TARGET_URL") %>";
-                            });
+
+                            location.href = "<%= session.getAttribute("MYPAGE_TARGET_URL") %>";
+
                         } else {
                             $("#password").addClass("input-error");
                             $("#mypageErrorMessage")
