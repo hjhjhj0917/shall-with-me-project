@@ -126,18 +126,18 @@ public class RoommateController {
     }
 
     // 룸메이트 메인 페이지 회원 리스트 불러오기
-    @GetMapping(value = "/userList")
+    @GetMapping(value = "/userList", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<UserInfoDTO> getUserList() {
-
+    public List<Map<String, Object>> getUserList(@RequestParam(defaultValue = "1") int page) {
         log.info("{}.getUserList Start!", this.getClass().getName());
 
-        List<UserInfoDTO> rList = userInfoService.getAllUsers();
+        List<Map<String, Object>> rList = roommateService.getRoommateList(page);
 
         log.info("{}.getUserList End!", this.getClass().getName());
 
-        return rList; // Service에서 user_info 전체 조회
+        return rList; // tag1, tag2, gender 포함됨
     }
+
 
     // ★ 무한 스크롤 목록 API (JSON)
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -146,21 +146,27 @@ public class RoommateController {
 
         int safePage = Math.max(page, 1);
 
-        // ✅ 기존 임시 데이터 만드는 코드 전부 삭제
-        // List<Map<String, Object>> items = new ArrayList<>();
-        // for (int i = 0; i < 8; i++) {
-        //     ...
-        //     it.put("imageUrl", "/images/noimg.png");
-        //     ...
-        //     items.add(it);
-        // }
-
-        // ✅ DB에서 데이터 가져오기
+        // ✅ Service에서 알아서 pageSize/offset 처리
         List<Map<String, Object>> items = roommateService.getRoommateList(safePage);
 
-        boolean lastPage = (safePage >= 3); // ← 일단 임시 로직 그대로 두고
+        // 다음 페이지가 없으면 lastPage = true
+        boolean lastPage = items.isEmpty();
+
         return Map.of("items", items, "lastPage", lastPage);
     }
+
+
+
+    // ✅ 특정 유저의 태그 2개 + 성별 조회 API
+    @GetMapping("/{userId}/info")
+    @ResponseBody
+    public Map<String, Object> getRoommateInfo(@PathVariable String userId) {
+        log.info("getRoommateInfo called for userId={}", userId);
+
+        // Service 호출 → {tag1, tag2, gender} 반환
+        return roommateService.getDisplayInfo(userId);
+    }
+
 
 
 }

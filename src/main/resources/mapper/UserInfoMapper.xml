@@ -122,33 +122,43 @@
 
 <!--DB에 저장된 태그 불러오기 룸메이트 -->
 
-        <!-- ✅ 유저의 태그 목록 조회 -->
-        <select id="selectUserTags" parameterType="string" resultType="UserInfoDTO">
-            SELECT t.tag_id, ut.tag_type
-            FROM USER_TAG ut
-                     JOIN TAG t ON t.tag_id = ut.tag_id
-            WHERE ut.user_id = #{userId}
-            ORDER BY ut.tag_type
-        </select>
+    <select id="selectUserTags" parameterType="string" resultType="UserTagDTO">
+        SELECT t.tag_id    AS tagId,
+               t.tag_name  AS tagName,
+               ut.tag_type AS tagType
+        FROM USER_TAG ut
+                 JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+        ORDER BY ut.tag_type
+    </select>
 
-<!--    회원 프로필 이미지 불러오기-->
+
+    <!--    회원 프로필 이미지 불러오기-->
     <select id="selectProfileImageUrlByUserId" resultType="string" parameterType="string">
         SELECT profile_image_url
         FROM USER_PROFILE
         WHERE user_id = #{userId}
     </select>
 
-    <select id="getRoommateList" parameterType="int" resultType="map">
+    <select id="getRoommateList" resultType="map">
         SELECT
-            ui.user_id,
-            ui.user_name,
-            ui.age,
-            up.profile_image_url AS imageUrl
-        FROM USER_INFO ui
-                 JOIN USER_PROFILE up ON ui.user_id = up.user_id
-        ORDER BY ui.user_id
-            LIMIT #{page}, 8
+            u.user_id          AS userId,
+            u.user_name        AS userName,
+            u.age              AS age,
+            u.gender           AS gender,
+            p.profile_image_url AS profileImageUrl
+        FROM USER_INFO u
+                 LEFT JOIN USER_PROFILE p
+                           ON u.user_id = p.user_id
+        ORDER BY u.user_id DESC
+            LIMIT #{limit} OFFSET #{offset}
     </select>
+
+
+
+
+
+
 
     <!-- USER_INFO + USER_PROFILE 조인 -->
     <select id="getAllUsersWithProfile" resultType="UserInfoDTO">
@@ -177,5 +187,13 @@
                  JOIN TAG t ON ut.tag_id = t.tag_id
         WHERE ut.user_id = #{userId}
     </select>
+
+    <select id="getUserById" parameterType="string" resultType="UserInfoDTO">
+        SELECT USER_ID AS userId,
+               GENDER  AS gender
+        FROM USER_INFO
+        WHERE USER_ID = #{userId}
+    </select>
+
 
 </mapper>
