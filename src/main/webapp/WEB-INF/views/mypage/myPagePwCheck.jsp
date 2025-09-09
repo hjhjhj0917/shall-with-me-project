@@ -109,7 +109,119 @@
         .confirm-btn:hover {
             background-color: #1c84ff;
         }
+
+        /*에러 메시지*/
+        .error-message {
+            color: #3399ff;
+            font-size: 14px;
+            text-align: left;          /* 왼쪽 정렬 */
+            height: 5px;              /* 고정 높이로 레이아웃 안정 */
+            padding-left: 150px;
+            padding-top: 10px;
+            visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+        }
+
+        .error-message.visible {
+            visibility: visible;       /* 메시지가 있을 때 표시 */
+        }
+
+        /*input 디자인*/
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .login-input:focus {
+            border-color: #3399ff;
+            box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
+        }
     </style>
+
+    <script>
+        $(document).ready(function () {
+
+            $("#password").on("keydown", function (e) {
+                if (e.key === "Enter") {
+                    $("#mypagePwCkBtn").click();
+                }
+            });
+
+            $(document).on("click", function (e) {
+                const $target = $(e.target);
+
+                // 클릭한 요소가 input이나 로그인 버튼이 아니면 에러 스타일 제거
+                if (
+                    !$target.is("#password") &&
+                    !$target.is("#mypagePwCkBtn")
+                ) {
+                    $(".login-input").removeClass("input-error");
+                    $("#mypageErrorMessage").removeClass("visible");
+                }
+            });
+
+            $("#mypagePwCkBtn").on("click", function () {
+                let f = document.getElementById("passwordConfirmForm");
+                let password = f.password.value.trim();
+                let hasError = false;
+
+                // 초기화
+                $(".login-input").removeClass("input-error");
+                $("#mypageErrorMessage").removeClass("visible").text("");
+
+                if (password === "") {
+
+                    $("#password").addClass("input-error");
+                    $("#mypageErrorMessage")
+                        .text("비밀번호를 입력하세요.")
+                        .addClass("visible");
+
+                    // 2초 후 메시지 자동 숨김
+                    setTimeout(function () {
+                        $("#mypageErrorMessage").removeClass("visible");
+                    }, 2000);
+
+                    $("#password").focus();
+                    return;
+                }
+
+                if (hasError) return;
+
+                $.ajax({
+                    url: "/mypage/pwCheckProc",
+                    type: "post",
+                    dataType: "JSON",
+                    data: {"password" : password},
+                    success: function (json) {
+                        if (json.result === 1) {
+                            showCustomAlert(json.msg, function () {
+                                location.href = "<%= session.getAttribute("MYPAGE_TARGET_URL") %>";
+                            });
+                        } else {
+                            $("#password").addClass("input-error");
+                            $("#mypageErrorMessage")
+                                .text(json.msg)
+                                .addClass("visible");
+
+                            // 2초 후 메시지 자동 숨김
+                            setTimeout(function () {
+                                $("#mypageErrorMessage").removeClass("visible");
+                            }, 2000);
+
+                            $("#password").focus();
+                            return;
+
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 <%--헤더--%>
@@ -126,19 +238,19 @@
         </div>
 
         <form id="passwordConfirmForm" class="confirm-form">
+
             <div class="form-row">
                 <label>아이디</label>
                 <span class="user-id-display"><%= session.getAttribute("SS_USER_ID") %></span>
             </div>
+            <div class="error-message" id="mypageErrorMessage"></div>
             <div class="form-row">
                 <label for="password">현재 비밀번호</label>
-                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" >
+                <input type="password" id="password" name="password" class="login-input" placeholder="비밀번호를 입력하세요" >
             </div>
 
-            <p class="error-msg" id="errorMsg"></p>
-
             <div class="form-actions">
-                <button type="submit" class="confirm-btn">확인</button>
+                <button type="button" id="mypagePwCkBtn" class="confirm-btn">확인</button>
             </div>
         </form>
     </div>

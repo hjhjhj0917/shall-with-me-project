@@ -35,6 +35,7 @@ public class ChattingController {
     public String chatTest() {
 
         log.info("{}.chatTest Start!", this.getClass().getName());
+        log.info("{}.chatTest End!", this.getClass().getName());
 
         return "chat/chatTest";
     }
@@ -44,6 +45,7 @@ public class ChattingController {
     public String userListPage() {
 
         log.info("{}.userListPage Start!", this.getClass().getName());
+        log.info("{}.userListPage End!", this.getClass().getName());
 
         return "chat/userList";
     }
