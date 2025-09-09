@@ -12,6 +12,7 @@ import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Controller
 public class UserInfoController {
+
+    private final SqlSession sqlSession;
 
     private int calculateAge(String birthYear, String birthMonth, String birthDay) {
         int year = Integer.parseInt(birthYear);
@@ -157,12 +160,6 @@ public class UserInfoController {
         return "user/login";
     }
 
-    @GetMapping(value = "myPage")
-    public String myPage() {
-
-        return "user/myPage";
-    }
-
     @GetMapping(value = "searchUserId")
     public String searchUserId() {
         log.info("{}.user/searchUserId Start!", this.getClass().getName());
@@ -243,7 +240,10 @@ public class UserInfoController {
 
                 msg = "로그인을 성공했습니다.";
 
+                String imageUrl = userInfoService.getImageUrlByUserId(userId);
+
                 session.setAttribute("SS_USER_ID", userId);
+                session.setAttribute("SS_USER_PROFILE_IMG_URL", imageUrl);
 
                 if (CmmUtil.nvl(rDTO.getUserName()).length() == 2) {
                     session.setAttribute("SS_USER_NAME", "ㅤ" + CmmUtil.nvl(rDTO.getUserName()));
