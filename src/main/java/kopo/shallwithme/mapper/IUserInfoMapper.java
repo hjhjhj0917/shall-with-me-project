@@ -59,4 +59,7 @@ public interface IUserInfoMapper {
 
     // userId로 태그 이름 목록 조회
     List<String> getUserTags(String userId);
+
+    // ✅ 프로필 조회: DTO로 받고 DTO로 반환 (void 금지, @Param 금지)
+    UserProfileDTO findUserProfileByUserId(UserProfileDTO pDTO);
 }

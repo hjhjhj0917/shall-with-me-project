@@ -178,4 +178,20 @@
         WHERE ut.user_id = #{userId}
     </select>
 
+    <!-- ✅ 프로필 단건 조회 (userId 기준) -->
+    <select id="findUserProfileByUserId"
+            parameterType="kopo.shallwithme.dto.UserProfileDTO"
+            resultType="kopo.shallwithme.dto.UserProfileDTO">
+        SELECT
+            user_id                                   AS userId,
+            profile_image_url                         AS profileImageUrl,
+            introduction                              AS introduction,
+            DATE_FORMAT(reg_dt, '%Y-%m-%d %H:%i:%s')  AS regDt,
+            DATE_FORMAT(chg_dt, '%Y-%m-%d %H:%i:%s')  AS chgDt
+        FROM USER_PROFILE
+        WHERE user_id = #{userId}
+            LIMIT 1
+    </select>
+
+
 </mapper>

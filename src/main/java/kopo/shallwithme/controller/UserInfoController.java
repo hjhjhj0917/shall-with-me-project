@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.MsgDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.IUserInfoService;
 import kopo.shallwithme.service.impl.RoommateService;
@@ -636,6 +637,34 @@ public class UserInfoController {
 
     @GetMapping(value = "userInfo")
     public String userInfo() {
+        // 현재 요청/세션 얻기 (메서드 시그니처 안 바꿈)
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attrs.getRequest();
+        HttpSession session = request.getSession(false);
+
+        String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
+        log.info("session userId={}", userId);
+
+        if (userId == null || userId.isBlank()) {
+            log.info("not logged in → redirect:/user/login");
+            return "redirect:/user/login"; // @RequestMapping("/user") 기준
+        }
+
+        // ✅ DB에서 프로필(소개글/이미지) 조회 → JSP로 전달
+        UserProfileDTO pDTO = new UserProfileDTO();
+        pDTO.setUserId(userId);
+
+        UserProfileDTO userProfile = userInfoService.findUserProfileByUserId(pDTO);
+        request.setAttribute("userProfile", userProfile);
+        log.info("userProfile set: {}", userProfile);
+
+        log.info("{}.userInfo End!", this.getClass().getName());
+
+        List<UserTagDTO> userTags = roommateService.getUserTagsByUserId(userId);
+        if (userTags == null) userTags = List.of();
+        request.setAttribute("userTags", userTags);
+        log.info("userTags size={}", userTags.size());
 
         return "user/userInfo";
     }

@@ -3,6 +3,7 @@ package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.dto.MailDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.mapper.IUserInfoMapper;
 import kopo.shallwithme.service.IMailService;
@@ -274,6 +275,22 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public int countUserTags(UserTagDTO dto) throws Exception {
         return userInfoMapper.countUserTags(dto);
+    }
+
+    @Override
+    public UserProfileDTO findUserProfileByUserId(UserProfileDTO pDTO) {
+        log.info("[UserInfoService] findUserProfileByUserId start, pDTO={}", pDTO);
+
+        UserProfileDTO rDTO = userInfoMapper.findUserProfileByUserId(pDTO);
+
+        if (rDTO == null) {
+            log.info("[UserInfoService] no profile found for userId={}", pDTO.getUserId());
+            rDTO = new UserProfileDTO(); // NPE 방지
+            rDTO.setUserId(pDTO.getUserId());
+        }
+
+        log.info("[UserInfoService] findUserProfileByUserId end, rDTO={}", rDTO);
+        return rDTO;
     }
 
 }
