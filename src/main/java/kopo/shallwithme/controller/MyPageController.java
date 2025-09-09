@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Optional;
+
 @Slf4j
 @RequestMapping(value = "/mypage")
 @RequiredArgsConstructor
@@ -49,6 +51,15 @@ public class MyPageController {
         log.info("{}.scheduleCheck End!", this.getClass().getName());
 
         return "mypage/scheduleCheck";
+    }
+
+    @GetMapping("withdraw")
+    public String withdraw() {
+
+        log.info("{}.withdraw Start!", this.getClass().getName());
+        log.info("{}.withdraw End!", this.getClass().getName());
+
+        return "mypage/withdraw";
     }
 
     @GetMapping("myPagePwCheck")
@@ -112,4 +123,36 @@ public class MyPageController {
         return dto;
 
     }
+
+    // 회원 탈퇴 이메일 확인
+    @ResponseBody
+    @PostMapping(value = "withdrawEmailChk")
+    public UserInfoDTO withdrawEmailChk(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info("{}.withdrawEmailChk Start!", this.getClass().getName());
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
+
+        log.info("userId : {}", userId);
+        log.info("email : {}", email);
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserId(userId);
+        pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
+
+        log.info("암호화 email : {}", pDTO.getEmail());
+
+        UserInfoDTO rDTO = Optional.ofNullable(myPageService.emailCheck(pDTO)).orElseGet(UserInfoDTO::new);
+
+        if(CmmUtil.nvl(rDTO.getExistsYn()).equals("Y")) {
+
+            session.setAttribute("SS_USER_EMAIL", pDTO.getEmail());
+        }
+
+        log.info("{}.withdrawEmailChk End!", this.getClass().getName());
+
+        return rDTO;
+    }
+
 }

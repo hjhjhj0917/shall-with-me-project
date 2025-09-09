@@ -28,4 +28,19 @@ public class MyPageService implements IMyPageService {
         return rDTO;
     }
 
+    @Override
+    public UserInfoDTO emailCheck(UserInfoDTO pDTO) throws Exception {
+
+        log.info("{}.emailCheck Start!", this.getClass().getName());
+
+        UserInfoDTO rDTO = Optional.ofNullable(myPageMapper.emailCheck(pDTO)).orElseGet(UserInfoDTO::new);
+
+        log.info("rDTO : {}", rDTO);
+        log.info("rDTO.getExistsYn() : {}", rDTO.getExistsYn());
+
+        log.info("{}.emailCheck End!", this.getClass().getName());
+
+        return rDTO;
+    }
+
 }

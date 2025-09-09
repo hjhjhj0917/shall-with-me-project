@@ -3,10 +3,19 @@
 
 
 <mapper namespace="kopo.shallwithme.mapper.IMyPageMapper">
+
     <select id="pwCheck" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT USER_ID, USER_NAME, EMAIL
         FROM USER_INFO
         WHERE USER_ID = #{userId}
           AND PASSWORD = #{password}
     </select>
+
+    <select id="emailCheck" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+        SELECT
+            IF(COUNT(PASSWORD) > 0, 'Y', 'N') AS EXISTS_YN
+        FROM USER_INFO
+        WHERE EMAIL = #{email} AND USER_ID = #{userId}
+    </select>
+
 </mapper>
