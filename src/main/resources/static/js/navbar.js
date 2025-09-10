@@ -235,3 +235,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // =================================================================== //
 });
+
+// + 버튼 클릭 → 모달 열기
+$(document).ready(function () {
+    $("#userNameBox").on("click", function () {
+        openProfileModal('/user/userInfo');
+    });
+});
+
+// ===== 모달 제어 함수 (배경 상호작용 차단: inert + aria-hidden) =====
+function openProfileModal(url) {
+    const ov = document.getElementById('profileModalOverlay');
+    const frame = document.getElementById('profileModalFrame');
+    if (!ov || !frame) return;
+
+    frame.src = url;                 // 등록 페이지 로드
+    ov.style.display = 'flex';       // 모달 표시
+    document.body.classList.add('modal-open');
+
+    const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
+    bgEls.forEach(el => {
+        if (!el) return;
+        el.setAttribute('inert', '');        // 포커스/탭 이동 차단(지원 브라우저)
+        el.setAttribute('aria-hidden', 'true'); // 스크린리더 숨김
+    });
+
+    document.getElementById('profileModalClose')?.focus(); // 포커스 이동
+}
+
+function closeProfileModal() {
+    const ov = document.getElementById('profileModalOverlay');
+    const frame = document.getElementById('profileModalFrame');
+    if (!ov || !frame) return;
+
+    ov.style.display = 'none';
+    document.body.classList.remove('modal-open');
+
+    const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
+    bgEls.forEach(el => {
+        if (!el) return;
+        el.removeAttribute('inert');
+        el.removeAttribute('aria-hidden');
+    });
+
+    frame.src = 'about:blank'; // 프레임 리셋
+    document.getElementById('roommateAdd')?.focus(); // 트리거로 포커스 복귀
+}
+
+// 배경 클릭 닫기
+document.addEventListener('click', (e) => {
+    const ov = document.getElementById('profileModalOverlay');
+    if (!ov || ov.style.display !== 'flex') return;
+    if (e.target === ov) closeProfileModal();
+});
+// ESC 닫기
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeProfileModal();
+});
+

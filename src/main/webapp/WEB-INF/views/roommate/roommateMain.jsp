@@ -89,66 +89,70 @@
     </style>
 
     <script>
-        // 전역 컨텍스트 경로
         const ctx = '${pageContext.request.contextPath}';
-
-        // + 버튼 클릭 → 모달 열기
-        $(document).ready(function () {
-            $("#roommateAdd").on("click", function () {
-                openProfileModal(ctx + '/roommate/roommateReg');
-            });
-        });
-
-        // ===== 모달 제어 함수 (배경 상호작용 차단: inert + aria-hidden) =====
-        function openProfileModal(url) {
-            const ov = document.getElementById('profileModalOverlay');
-            const frame = document.getElementById('profileModalFrame');
-            if (!ov || !frame) return;
-
-            frame.src = url;                 // 등록 페이지 로드
-            ov.style.display = 'flex';       // 모달 표시
-            document.body.classList.add('modal-open');
-
-            const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
-            bgEls.forEach(el => {
-                if (!el) return;
-                el.setAttribute('inert', '');        // 포커스/탭 이동 차단(지원 브라우저)
-                el.setAttribute('aria-hidden', 'true'); // 스크린리더 숨김
-            });
-
-            document.getElementById('profileModalClose')?.focus(); // 포커스 이동
-        }
-
-        function closeProfileModal() {
-            const ov = document.getElementById('profileModalOverlay');
-            const frame = document.getElementById('profileModalFrame');
-            if (!ov || !frame) return;
-
-            ov.style.display = 'none';
-            document.body.classList.remove('modal-open');
-
-            const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
-            bgEls.forEach(el => {
-                if (!el) return;
-                el.removeAttribute('inert');
-                el.removeAttribute('aria-hidden');
-            });
-
-            frame.src = 'about:blank'; // 프레임 리셋
-            document.getElementById('roommateAdd')?.focus(); // 트리거로 포커스 복귀
-        }
-
-        // 배경 클릭 닫기
-        document.addEventListener('click', (e) => {
-            const ov = document.getElementById('profileModalOverlay');
-            if (!ov || ov.style.display !== 'flex') return;
-            if (e.target === ov) closeProfileModal();
-        });
-        // ESC 닫기
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeProfileModal();
-        });
     </script>
+
+<%--    <script>--%>
+<%--        // 전역 컨텍스트 경로--%>
+<%--        const ctx = '${pageContext.request.contextPath}';--%>
+
+<%--        // + 버튼 클릭 → 모달 열기--%>
+<%--        $(document).ready(function () {--%>
+<%--            $("#roommateAdd").on("click", function () {--%>
+<%--                openProfileModal(ctx + '/roommate/roommateReg');--%>
+<%--            });--%>
+<%--        });--%>
+
+<%--        // ===== 모달 제어 함수 (배경 상호작용 차단: inert + aria-hidden) =====--%>
+<%--        function openProfileModal(url) {--%>
+<%--            const ov = document.getElementById('profileModalOverlay');--%>
+<%--            const frame = document.getElementById('profileModalFrame');--%>
+<%--            if (!ov || !frame) return;--%>
+
+<%--            frame.src = url;                 // 등록 페이지 로드--%>
+<%--            ov.style.display = 'flex';       // 모달 표시--%>
+<%--            document.body.classList.add('modal-open');--%>
+
+<%--            const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];--%>
+<%--            bgEls.forEach(el => {--%>
+<%--                if (!el) return;--%>
+<%--                el.setAttribute('inert', '');        // 포커스/탭 이동 차단(지원 브라우저)--%>
+<%--                el.setAttribute('aria-hidden', 'true'); // 스크린리더 숨김--%>
+<%--            });--%>
+
+<%--            document.getElementById('profileModalClose')?.focus(); // 포커스 이동--%>
+<%--        }--%>
+
+<%--        function closeProfileModal() {--%>
+<%--            const ov = document.getElementById('profileModalOverlay');--%>
+<%--            const frame = document.getElementById('profileModalFrame');--%>
+<%--            if (!ov || !frame) return;--%>
+
+<%--            ov.style.display = 'none';--%>
+<%--            document.body.classList.remove('modal-open');--%>
+
+<%--            const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];--%>
+<%--            bgEls.forEach(el => {--%>
+<%--                if (!el) return;--%>
+<%--                el.removeAttribute('inert');--%>
+<%--                el.removeAttribute('aria-hidden');--%>
+<%--            });--%>
+
+<%--            frame.src = 'about:blank'; // 프레임 리셋--%>
+<%--            document.getElementById('roommateAdd')?.focus(); // 트리거로 포커스 복귀--%>
+<%--        }--%>
+
+<%--        // 배경 클릭 닫기--%>
+<%--        document.addEventListener('click', (e) => {--%>
+<%--            const ov = document.getElementById('profileModalOverlay');--%>
+<%--            if (!ov || ov.style.display !== 'flex') return;--%>
+<%--            if (e.target === ov) closeProfileModal();--%>
+<%--        });--%>
+<%--        // ESC 닫기--%>
+<%--        document.addEventListener('keydown', (e) => {--%>
+<%--            if (e.key === 'Escape') closeProfileModal();--%>
+<%--        });--%>
+<%--    </script>--%>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
@@ -169,28 +173,7 @@
         </section>
     </div>
 
-
-    <!-- 좌하단 등록 플로팅 버튼 -->
-    <button class="sh-fab" title="등록" id="roommateAdd">
-        <i class="fa-solid fa-plus"></i>
-    </button>
 </main>
-
-<!-- 큰 모달 (등록 페이지를 iframe으로 로드) -->
-<div id="profileModalOverlay" aria-hidden="true">
-    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
-        <div class="modal-header">
-            <div id="profileModalTitle" class="modal-title-text">프로필 등록</div>
-            <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기"
-                    onclick="closeProfileModal()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            <iframe id="profileModalFrame" title="룸메이트 등록 화면"></iframe>
-        </div>
-    </div>
-</div>
 
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>

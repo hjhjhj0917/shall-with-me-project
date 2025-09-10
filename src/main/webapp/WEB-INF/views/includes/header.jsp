@@ -58,3 +58,19 @@
         </div>
     </div>
 </div>
+
+<!-- 큰 모달 (등록 페이지를 iframe으로 로드) -->
+<div id="profileModalOverlay" aria-hidden="true">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+        <div class="modal-header">
+            <div id="profileModalTitle" class="modal-title-text">개인 프로필</div>
+            <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기"
+                    onclick="closeProfileModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <iframe id="profileModalFrame" title="룸메이트 등록 화면"></iframe>
+        </div>
+    </div>
+</div>

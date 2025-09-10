@@ -259,16 +259,6 @@
     <section id="profileView">
         <!-- Left -->
         <div class="roommate-left">
-            <div class="form-block" id="basicInfoBlock"><!-- [ADD] id -->
-                <div class="block-title">
-                    <span class="title-badge"><i class="fa-regular fa-id-card"></i></span>
-                    <span>기본 정보</span>
-                </div>
-                <div class="readonly-field">
-                    <span class="label">이름</span>
-                    <span class="value"><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span>
-                </div>
-            </div>
 
             <div class="form-block">
                 <div class="block-title">
@@ -282,6 +272,18 @@
                 </div>
                 <div class="block-help">ㅤ</div>
             </div>
+
+            <div class="form-block" id="basicInfoBlock"><!-- [ADD] id -->
+                <div class="block-title">
+                    <span class="title-badge"><i class="fa-regular fa-id-card"></i></span>
+                    <span>기본 정보</span>
+                </div>
+                <div class="readonly-field">
+                    <span class="label">이름</span>
+                    <span class="value"><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span>
+                </div>
+            </div>
+
         </div>
 
         <!-- Right -->
