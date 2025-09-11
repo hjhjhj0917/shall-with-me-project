@@ -8,7 +8,7 @@
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
         FROM USER_INFO
-        WHERE USER_ID = #{userId}
+        WHERE USER_ID = #{userId} AND STATUS = 'ACTIVE'
     </select>
 
     <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserinfoDTO">
@@ -153,12 +153,6 @@
         ORDER BY u.user_id DESC
             LIMIT #{limit} OFFSET #{offset}
     </select>
-
-
-
-
-
-
 
     <!-- USER_INFO + USER_PROFILE 조인 -->
     <select id="getAllUsersWithProfile" resultType="UserInfoDTO">

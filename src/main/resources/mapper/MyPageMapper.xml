@@ -18,4 +18,28 @@
         WHERE EMAIL = #{email} AND USER_ID = #{userId}
     </select>
 
+    <update id="softDeleteUser" parameterType="UserInfoDTO">
+        UPDATE
+        USER_INFO
+        SET
+        USER_NAME = '알수없음',
+        PASSWORD = UUID(), <!-- 임의의 값으로 변경하여 로그인 불가 처리 -->
+        EMAIL = CONCAT('deleted_', NOW(), '_', EMAIL), <!-- 이메일 중복 방지를 위해 기존 이메일 변경 -->
+        status = 'DEACTIVATED',
+        deleted_at = NOW() <!-- 현재 시간을 탈퇴 요청 시간으로 기록 -->
+        WHERE
+        USER_ID = #{userId}
+    </update>
+
+    <!-- 탈퇴한 지 30일 지난 회원 영구 삭제 (Hard Delete) 쿼리 -->
+    <delete id="deleteOldDeactivatedUsers">
+        DELETE FROM USER_INFO
+        WHERE
+            status = 'DEACTIVATED'
+          AND
+        <![CDATA[
+            deleted_at <= DATE_SUB(NOW(), INTERVAL 15 DAY)
+        ]]>
+    </delete>
+
 </mapper>
