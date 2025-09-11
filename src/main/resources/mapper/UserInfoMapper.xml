@@ -8,7 +8,7 @@
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
         FROM USER_INFO
-        WHERE USER_ID = #{userId} AND STATUS = 'ACTIVE'
+        WHERE USER_ID = #{userId}
     </select>
 
     <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserinfoDTO">
