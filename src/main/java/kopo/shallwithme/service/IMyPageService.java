@@ -11,7 +11,7 @@ public interface IMyPageService {
     UserInfoDTO emailCheck(UserInfoDTO pDTO) throws Exception;
 
     // 회원 비활성화
-    int deactivateUser(UserInfoDTO pDTO);
+    int deactivateUser(UserInfoDTO pDTO) throws Exception;
 
     // 비활성 계정을 영구 삭제
     int hardDeleteDeactivatedUsers();

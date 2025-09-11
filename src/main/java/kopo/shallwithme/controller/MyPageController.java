@@ -184,6 +184,11 @@ public class MyPageController {
                     // 비밀번호 일치 → 삭제
                     UserInfoDTO dDTO = new UserInfoDTO();
                     dDTO.setUserId(userId);
+                    dDTO.setUserName(session.getAttribute("SS_USER_NAME").toString());
+                    dDTO.setEmail(session.getAttribute("SS_USER_EMAIL").toString());
+
+                    log.info(dDTO.getEmail());
+
                     int i = myPageService.deactivateUser(dDTO);
 
                     if (i > 0) {
