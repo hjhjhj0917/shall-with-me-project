@@ -86,6 +86,7 @@ public class RoommateController {
             }
 
             roommateService.saveUserProfile(userId, introduction, imageUrl); // 프로필 저장 로직
+            session.setAttribute("SS_USER_PROFILE_IMG_URL", imageUrl);
 
             // 성공 시 "result":"success" 라는 JSON 응답을 보냅니다.
             return ResponseEntity.ok(Map.of("result", "success"));

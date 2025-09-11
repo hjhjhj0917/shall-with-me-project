@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class UserInfoDTO {
     private int age;
     private String gender;
     private Date birthDate;
+    private String status;
+    private LocalDateTime deletedAt;
 
     private String existsYn; // 중복 가입을 방지하기 위해 사용할 변수
     private int authNumber; // 메일 중복체크를 위한 인증번호
