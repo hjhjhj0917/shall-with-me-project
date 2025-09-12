@@ -613,20 +613,20 @@ public class UserInfoController {
         return dto;
     }
 
-    // 회원 프로필 이미지 불러오기
-    @GetMapping("/profile-image/{userId}")
-    public ResponseEntity<Map<String, String>> getProfileImage(@PathVariable String userId) {
-
-        log.info("getProfileImage start!");
-
-        String imageUrl = userInfoService.getImageUrlByUserId(userId);
-        Map<String, String> result = new HashMap<>();
-        result.put("imageUrl", imageUrl != null ? imageUrl : "/images/noimg.png");
-
-        log.info("getProfileImage end!");
-
-        return ResponseEntity.ok(result);
-    }
+//    회원 프로필 이미지 불러오기
+//    @GetMapping("/profile-image/{userId}")
+//    public ResponseEntity<Map<String, String>> getProfileImage(@PathVariable String userId) {
+//
+//        log.info("getProfileImage start!");
+//
+//        String imageUrl = userInfoService.getImageUrlByUserId(userId);
+//        Map<String, String> result = new HashMap<>();
+//        result.put("imageUrl", imageUrl != null ? imageUrl : "/images/noimg.png");
+//
+//        log.info("getProfileImage end!");
+//
+//        return ResponseEntity.ok(result);
+//    }
 
     @GetMapping(value = "userInfo")
     public String userInfo() {

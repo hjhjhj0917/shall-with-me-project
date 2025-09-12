@@ -102,9 +102,7 @@
                     data: $("#f").serialize(),
                     success: function (json) {
                         if (json.result === 1) {
-                            showCustomAlert(json.msg, function () {
-                                location.href = "/user/main";
-                            });
+                            location.href = "/user/main";
                         } else if (json.result === 3) {
                             showCustomAlert(json.msg);
                             showCustomAlert("회원님의 성향태그를 선택하여주세요", function () {

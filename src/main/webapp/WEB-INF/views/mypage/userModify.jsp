@@ -9,182 +9,141 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
+        /* --- mypage.css --- */
 
-        /* === 고정 높이 설정 === */
-        :root {
-            --mypage-card-h: 290px; /* ← 원하는 픽셀로 조절 (예: 240/260/280px) */
+        /* 전체 메인 콘텐츠 영역 */
+        .sidebar-main-content {
+            padding: 40px;
+            background-color: #f8f9fa;
         }
 
-        /* 레이아웃 */
-        .mypage-container {
-            padding: 24px;
-        }
-
-        .mypage-frame {
-            width: 1200px;
+        .mypage-wrapper {
+            max-width: 1200px;
             margin: 80px auto;
-            padding: 18px;
-            border-radius: 14px; /* 스샷 외곽 연한 박스 느낌 */
         }
 
+        .mypage-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* 카드 그리드 레이아웃 */
         .mypage-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            grid-auto-rows: var(--mypage-card-h); /* ★ 행 높이 고정 */
+            grid-template-columns: repeat(2, 1fr); /* 2개의 열을 동일한 너비로 */
+            gap: 30px; /* 카드 사이의 간격 */
         }
 
-        @media (max-width: 900px) {
-            .mypage-grid {
-                grid-template-columns: 1fr;
-                grid-auto-rows: auto;
-            }
-
-            .mypage-card {
-                height: auto;
-            }
-        }
-
-        /* 카드 공통 */
+        /* 카드 공통 스타일 */
         .mypage-card {
-            height: 100%; /* ★ 고정 행 높이를 100%로 채우기 */
-            min-height: unset; /* 기존 min-height 제거 */
-            background: #fff;
-            border: 1px solid #e6e8ec;
-            border-radius: 10px;
-            overflow: hidden;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
         }
 
-        .mypage-card-head {
+        .card-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 10px 14px;
-            background: #f7f8fa;
-            border-bottom: 1px solid #e6e8ec;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
         }
 
-        .mypage-card-title {
-            font-size: 14px;
-            color: #2b3340;
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
             font-weight: 600;
         }
 
-        .link-more {
-            font-size: 12px;
-            color: #8a94a6;
+        .card-body {
+            padding: 24px;
+            flex-grow: 1; /* 카드가 남은 공간을 모두 채우도록 */
+        }
+
+        /* 카드별 특화 스타일 */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .profile-pic-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        .profile-info .profile-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .profile-contact {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .profile-contact i {
+            margin-right: 8px;
+            color: #888;
+        }
+
+        .empty-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 150px;
+            color: #888;
+        }
+
+        /* 버튼 및 링크 스타일 */
+        .card-action-btn.active {
+            background: none;
+            border: 1px solid #3399ff;
+            color: #3399ff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .card-primary-btn {
+            margin-top: 16px;
+            background-color: #3399ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .card-link {
+            font-size: 0.9rem;
+            color: #666;
             text-decoration: none;
         }
 
-        .link-more:hover {
-            text-decoration: underline;
+        /* 반응형: 화면이 좁아지면 1열로 변경 */
+        @media (max-width: 992px) {
+            .mypage-grid {
+                grid-template-columns: 1fr;
+            }
         }
-
-        .mypage-card-body {
-            overflow: auto;
-        }
-
-        .mypage-card-foot {
-            padding: 12px 16px;
-            border-top: 1px solid #eef1f4;
-            background: #fafbfc;
-        }
-
-        .mypage-card-empty {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #a1a8b3;
-            font-size: 14px;
-            padding: 24px;
-            text-align: center;
-        }
-
-        /* 프로필 카드 디테일 */
-        .profile-body {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-        }
-
-        .avatar-circle {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: #f0f2f5;
-            color: #a7b0bb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            flex: 0 0 auto;
-        }
-
-        .profile-cols {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .profile-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2b3340;
-            margin: 2px 0 8px;
-        }
-
-        .profile-meta {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            color: #6c7583;
-        }
-
-        .profile-meta li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-        }
-
-        .profile-meta i {
-            width: 16px;
-            text-align: center;
-        }
-
-        /* 버튼 */
-        .btn {
-            border-radius: 8px;
-            padding: 7px 12px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            font-size: 13px;
-        }
-
-        .btn-ghost {
-            background: #fff;
-            border-color: #e1e5ea;
-            color: #475063;
-        }
-
-        .btn-ghost:hover {
-            background: #f2f4f7;
-        }
-
-        .btn-outline {
-            background: #fff;
-            border-color: #d6deea;
-            color: #2b3340;
-        }
-
-        .btn-outline:hover {
-            background: #f5f7fa;
-        }
-
     </style>
-
 </head>
 <body>
 <%--헤더--%>
@@ -193,57 +152,65 @@
 <%--사이드바--%>
 <%@ include file="../includes/sideBar.jsp" %>
 
-<main class="sidebar-main-content mypage-container">
+<main class="sidebar-main-content">
+    <div class="mypage-wrapper">
+        <h1 class="mypage-title"></h1>
 
-    <div class="mypage-frame">
-        <section class="mypage-grid">
-            <!-- 정보수정 -->
-            <article class="mypage-card mypage-profile">
-                <div class="mypage-card-head">
-                    <span class="mypage-card-title">정보수정</span>
-                    <button type="button" class="btn btn-ghost" id="editProfileBtn">수정하기</button>
+        <div class="mypage-grid">
+
+            <!-- 정보 수정 카드 -->
+            <div class="mypage-card">
+                <div class="card-header">
+                    <h3>정보 수정</h3>
+                    <a href="/mypage/profileEdit" class="card-action-btn active">수정하기</a>
                 </div>
-                <div class="mypage-card-body profile-body">
-                    <div class="avatar-circle"><i class="fa-regular fa-user"></i></div>
-                    <div class="profile-cols">
-                        <div class="profile-name" id="profileName">이름</div>
-                        <ul class="profile-meta">
-                            <li><i class="fa-solid fa-globe"></i> 홈페이지 미입력</li>
-                            <li><i class="fa-regular fa-envelope"></i></li>
-                            <li><i class="fa-solid fa-phone"></i></li>
-                        </ul>
+                <div class="card-body profile-section">
+                    <div class="profile-pic-placeholder">
+                        <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진" class="profile-pic-placeholder">
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name"><%= session.getAttribute("SS_USER_NAME") %>님</span>
+                        <div class="profile-contact">
+                            <span><i class="fa-regular fa-envelope"></i> ${userInfo.email}</span>
+                            <span><i class="fa-solid fa-phone"></i> 연락처 미등록</span>
+                        </div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <!-- 결제내역 -->
-            <article class="mypage-card">
-                <div class="mypage-card-head">
-                    <span class="mypage-card-title">결제내역</span>
+            <!-- 결제 내역 카드 -->
+            <div class="mypage-card">
+                <div class="card-header">
+                    <h3>자기소개</h3>
                 </div>
-                <div class="mypage-card-empty">결제 내역이 없습니다.</div>
-            </article>
+                <div class="card-body empty-content">
+                    <p>결제 내역이 없습니다.</p>
+                </div>
+            </div>
 
-            <!-- 문의내역 -->
-            <article class="mypage-card">
-                <div class="mypage-card-head">
-                    <span class="mypage-card-title">문의내역</span>
+            <!-- 문의 내역 카드 -->
+            <div class="mypage-card">
+                <div class="card-header">
+                    <h3>문의 내역</h3>
                 </div>
-                <div class="mypage-card-empty">문의 내역이 없습니다.</div>
-                <div class="mypage-card-foot">
-                    <button type="button" class="btn btn-outline" id="contactBtn">문의하기</button>
+                <div class="card-body empty-content">
+                    <p>문의 내역이 없습니다.</p>
+                    <button class="card-primary-btn">문의하기</button>
                 </div>
-            </article>
+            </div>
 
-            <!-- 결제 수단 -->
-            <article class="mypage-card">
-                <div class="mypage-card-head">
-                    <span class="mypage-card-title">결제 수단</span>
-                    <a class="link-more" href="#">더보기</a>
+            <!-- 결제 수단 카드 -->
+            <div class="mypage-card">
+                <div class="card-header">
+                    <h3>결제 수단</h3>
+                    <a href="#" class="card-link">더보기</a>
                 </div>
-                <div class="mypage-card-empty">등록된 결제 수단이 없습니다.</div>
-            </article>
-        </section>
+                <div class="card-body empty-content">
+                    <p>등록된 결제 수단이 없습니다.</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 </main>
 
