@@ -9,6 +9,8 @@
     <!-- FullCalendar 라이브러리 -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
     <style>
         /* 페이지 전체 배경 */
         body {
@@ -262,11 +264,17 @@
         const eventLocationDisplay = document.getElementById('eventLocationDisplay');
         const eventDescriptionDisplay = document.getElementById('eventDescriptionDisplay');
 
+        let f = document.getElementById("eventForm");
+
+        $("#eventLocationInput").on("click", function () {
+            kakaoPost(f);
+        });
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             headerToolbar: {left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek'},
 
-            // [핵심 수정] events를 URL이 아닌 함수로 변경하여, 서버 데이터를 FullCalendar 형식으로 변환합니다.
+            // events를 URL이 아닌 함수로 변경하여, 서버 데이터를 FullCalendar 형식으로 변환합니다.
             events: function (fetchInfo, successCallback, failureCallback) {
                 $.ajax({
                     url: '/schedule/api/events',
@@ -335,6 +343,17 @@
                 }
             }
         });
+
+        // 카카오 우편번호 API
+        function kakaoPost(f) {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    let address = data.address;
+                    let zonecode = data.zonecode;
+                    f.eventLocationInput.value = "(" + zonecode + ")" + address;
+                }
+            }).open();
+        }
 
         calendar.render();
 
