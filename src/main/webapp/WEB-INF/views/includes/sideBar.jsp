@@ -37,10 +37,10 @@
           <i class="fa-solid fa-right-from-bracket" style="color: #1c407d;"></i>
           <span class="sidebar-menu-text">로그아웃</span>
         </div>
-        <a href="#" class="sidebar-menu-item">
+        <div onclick="location.href='/mypage/withdraw'" class="sidebar-menu-item">
           <i class="fa-solid fa-gear" style="color: #1c407d;"></i>
           <span class="sidebar-menu-text">회원 탈퇴</span>
-        </a>
+        </div>
       </div>
     </div>
   </div>

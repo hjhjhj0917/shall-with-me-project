@@ -12,11 +12,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthInterceptor())
                 .addPathPatterns("/user/roommateMain", "/user/sharehouseMain", "/chat/**", "/user/userTagSelect",
-                        "/user/mypage/**", "/roommate/**", "/sharehouse/**", "/mypage/**") // 로그인 필요 경로
+                        "/roommate/**", "/sharehouse/**", "/mypage/**") // 로그인 필요 경로
                 .excludePathPatterns("/user/login", "/user/loginProc", "/user/userRegForm", "/user/insertUserInfo"); // 로그인 제외
 
         registry.addInterceptor(new MyPageAuthInterceptor())
-                .addPathPatterns("/mypage/userModify", "/mypage/sharehouseModify", "/mypage/scheduleCheck") // 이 주소들에만 적용
+                .addPathPatterns("/mypage/userModify", "/mypage/sharehouseModify", "/mypage/scheduleCheck", "/mypage/withdraw") // 이 주소들에만 적용
                 .excludePathPatterns("/mypage/myPagePwCheck"); // 비밀번호 확인 페이지 자체는 제외 (무한 루프 방지)
     }
 

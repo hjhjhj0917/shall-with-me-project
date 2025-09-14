@@ -155,12 +155,6 @@
             LIMIT #{limit} OFFSET #{offset}
     </select>
 
-
-
-
-
-
-
     <!-- USER_INFO + USER_PROFILE 조인 -->
     <select id="getAllUsersWithProfile" resultType="UserInfoDTO">
         SELECT

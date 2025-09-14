@@ -11,6 +11,7 @@
         /* --- mypage.css --- */
 
         /* 전체 메인 콘텐츠 영역 패딩 */
+
         .sidebar-main-content {
             margin-top: 50px;
             padding: 40px;
@@ -199,9 +200,9 @@
                     data: {"password" : password},
                     success: function (json) {
                         if (json.result === 1) {
-                            showCustomAlert(json.msg, function () {
-                                location.href = "<%= session.getAttribute("MYPAGE_TARGET_URL") %>";
-                            });
+
+                            location.href = "<%= session.getAttribute("MYPAGE_TARGET_URL") %>";
+
                         } else {
                             $("#password").addClass("input-error");
                             $("#mypageErrorMessage")
