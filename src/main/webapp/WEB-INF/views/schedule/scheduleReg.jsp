@@ -112,10 +112,12 @@
         .schedule-picker {
             flex: 1;
             padding: 32px;
+            display: flex;
         }
 
         /* FullCalendar 스타일 */
         #calendar {
+            flex-grow: 1;
             --fc-border-color: #eef2f6;
             --fc-today-bg-color: rgba(51, 153, 255, 0.1);
             --fc-button-bg-color: #3399ff;
@@ -126,17 +128,64 @@
             cursor: pointer;
         }
 
-        /* [핵심 수정] 모달 스타일 */
+        /* FullCalendar 툴바 수평 정렬을 위한 스타일 */
+        .fc .fc-toolbar.fc-header-toolbar {
+            display: flex;
+            align-items: center; /* 세로 중앙 정렬 */
+            gap: 1em; /* 각 영역(left, center, right) 사이의 최소 간격 */
+        }
+
+        .fc .fc-toolbar-chunk {
+            display: flex;
+            align-items: center;
+            gap: 0.5em; /* 버튼들 사이의 간격 */
+        }
+
+        /* 중앙 영역(제목, 화살표)이 남은 공간을 모두 차지하도록 설정 */
+        .fc .fc-toolbar-chunk:nth-child(2) {
+            flex-grow: 1; /* 남은 공간을 모두 차지 */
+            justify-content: center; /* 내부 요소들을 중앙에 배치 */
+
+        }
+
+        /* 캘린더의 날짜 숫자 크기를 줄입니다. */
+        .fc .fc-daygrid-day-number {
+            font-size: 0.8em; /* 기본 크기(1em)보다 작게 설정 */
+            padding: 4px;
+        }
+
+        /* 토요일(sat) 헤더 및 날짜 색상을 파란색으로 변경 */
+        .fc .fc-col-header-cell.fc-day-sat a,
+        .fc .fc-day-sat .fc-daygrid-day-number {
+            color: #3399ff !important;
+        }
+
+        /* 일요일(sun) 헤더 및 날짜 색상을 빨간색으로 변경 */
+        .fc .fc-col-header-cell.fc-day-sun a,
+        .fc .fc-day-sun .fc-daygrid-day-number {
+            color: #dc3545 !important;
+        }
+
+        /* 이전/다음 화살표 버튼 스타일 초기화 */
+        .fc .fc-prev-button,
+        .fc .fc-next-button {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #333 !important; /* 화살표 아이콘 색상 */
+        }
+
+        /* 모달 스타일 */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
-            display: flex; /* 자식 요소를 중앙 정렬하기 위해 flex 사용 */
-            justify-content: center; /* 수평 중앙 */
-            align-items: center;   /* 수직 중앙 */
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 1000;
         }
 
@@ -271,8 +320,22 @@
         });
 
         const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'ko',
             initialView: 'dayGridMonth',
-            headerToolbar: {left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek'},
+            headerToolbar: {
+                left: 'today',
+                center: 'prev title next',
+                right: 'dayGridMonth,listWeek'
+            },
+            displayEventTime: false,
+            height: '100%',
+            fixedWeekCount: false,  // 해당 월에 필요한 주(week)만 표시
+            dayMaxEvents: true,
+            buttonText: {
+                today: '오늘',
+                dayGridMonth: '달력',
+                listWeek: '일정'
+            },
 
             // events를 URL이 아닌 함수로 변경하여, 서버 데이터를 FullCalendar 형식으로 변환합니다.
             events: function (fetchInfo, successCallback, failureCallback) {
@@ -357,7 +420,7 @@
 
         calendar.render();
 
-        $('#eventForm').on('submit', function(e) {
+        $('#eventForm').on('submit', function (e) {
             e.preventDefault();
 
             const title = $('#eventTitleInput').val().trim();
@@ -393,11 +456,11 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(eventData),
-                success: function() {
+                success: function () {
                     $('#eventModal').hide();
                     calendar.refetchEvents();
                 },
-                error: function() {
+                error: function () {
                     alert('일정 저장에 실패했습니다.');
                 }
             });
