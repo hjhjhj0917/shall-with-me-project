@@ -11,6 +11,7 @@
         /* --- mypage.css --- */
 
         /* 전체 메인 콘텐츠 영역 패딩 */
+
         .sidebar-main-content {
             margin-top: 50px;
             padding: 40px;

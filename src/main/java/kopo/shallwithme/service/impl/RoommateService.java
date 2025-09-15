@@ -3,6 +3,7 @@ package kopo.shallwithme.service.impl;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
+import kopo.shallwithme.mapper.IRoommateMapper;
 import kopo.shallwithme.mapper.IUserInfoMapper;
 import kopo.shallwithme.service.IRoommateService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RoommateService implements IRoommateService {
 
-    private final IUserInfoMapper mapper;
+    private final IRoommateMapper mapper;
+    private final IUserInfoMapper userInfoMapper;
 
     @Override
     public List<UserTagDTO> getUserTagsByUserId(String userId) {
@@ -89,7 +91,7 @@ public class RoommateService implements IRoommateService {
         pDTO.setUserId(userId);
         pDTO.setIntroduction(introduction);
         pDTO.setProfileImageUrl(profileImageUrl);
-        mapper.upsertUserProfile(pDTO);
+        userInfoMapper.upsertUserProfile(pDTO);
         log.info("User profile saved. userId={}, imageUrl={}", userId, profileImageUrl);
     }
 

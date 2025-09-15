@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="kopo.shallwithme.mapper.IScheduleMapper">
+
+    <select id="getScheduleList" parameterType="UserInfoDTO" resultType="ScheduleDTO">
+        SELECT
+            schedule_id, title, DATE_FORMAT(schedule_dt, '%Y-%m-%dT%H:%i:%s') AS schedule_dt,
+            location, memo, creator_id, participant_id
+        FROM
+            SCHEDULE
+        WHERE
+            creator_id = #{userId} OR participant_id = #{userId}
+    </select>
+
+    <insert id="insertSchedule" parameterType="ScheduleDTO">
+        INSERT INTO SCHEDULE (
+            title, schedule_dt, location, memo, creator_id, participant_id
+        ) VALUES (
+                     #{title}, #{scheduleDt}, #{location}, #{memo}, #{creatorId}, #{participantId}
+                 )
+    </insert>
+
+</mapper>
