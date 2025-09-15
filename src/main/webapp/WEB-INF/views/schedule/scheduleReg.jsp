@@ -226,24 +226,6 @@
             font-weight: 500 !important; /* 일반 굵기 */
         }
 
-        /* 모달 스타일 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            width: 450px;
-        }
-
         .form-group {
             margin-bottom: 15px;
             text-align: left;
@@ -278,10 +260,12 @@
         .top-buttons {
             position: absolute;
             width: 65px;
-            height: 85px;
+            height: 65px;
+            border-radius: 50%;
             left: 100px;
             top: 150px;
             z-index: 10;
+            cursor: pointer;
         }
 
         #step2 {
@@ -345,45 +329,21 @@
             outline: none;
         }
 
-        #titleErrorMessage {
-            color: #3399ff;
-            font-size: 14px;
-            text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
-            padding-left: 10px;
-            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
-            margin-bottom: 20px;
-        }
-
-        #titleErrorMessage.visible {
-            visibility: visible; /* 메시지가 있을 때 표시 */
-        }
-
-        #timeErrorMessage {
-            color: #3399ff;
-            font-size: 14px;
-            text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
-            padding-left: 10px;
-            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
-            margin-bottom: 20px;
-        }
-
-        #timeErrorMessage.visible {
-            visibility: visible; /* 메시지가 있을 때 표시 */
-        }
-
+        #titleErrorMessage,
+        #timeErrorMessage,
         #locationErrorMessage {
             color: #3399ff;
             font-size: 14px;
             text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
-            padding-left: 10px;
+            height: 3px; /* 고정 높이로 레이아웃 안정 */
+            padding-left: 5px;
             visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
             margin-bottom: 20px;
         }
 
-        #locationErrorMessage.visible {
+        #locationErrorMessage.visible,
+        #timeErrorMessage.visible,
+        #titleErrorMessage.visible {
             visibility: visible; /* 메시지가 있을 때 표시 */
         }
 
@@ -438,7 +398,6 @@
             gap: 6px; /* 시/분/AMPM 간격 */
         }
 
-
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -459,7 +418,7 @@
 <body>
 <%@ include file="../includes/header.jsp" %>
 
-<div class="top-buttons">
+<div class="top-buttons" onclick="history.back()">
     <i class="fa-solid fa-arrow-left fa-xl"></i>
 </div>
 
