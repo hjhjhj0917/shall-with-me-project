@@ -217,7 +217,7 @@
             if (!card || !grid.contains(card)) return;
             const id = card.dataset.id;
             if (!id) return;
-            location.href = ctx + '/roommate/detail?id=' + encodeURIComponent(id);
+            location.href = ctx + '/roommate/roommateDetail?id=' + encodeURIComponent(id);
         });
     })();
 </script>
