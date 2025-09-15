@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 반드시 IRoommateMapper.java 와 일치 -->
+<mapper namespace="kopo.shallwithme.mapper.IRoommateMapper">
+
+    <!-- 유저 태그 조회 -->
+    <select id="findByUserId" parameterType="string" resultType="kopo.shallwithme.dto.UserTagDTO">
+        SELECT
+            ut.user_id  AS userId,
+            ut.tag_id   AS tagId,
+            ut.tag_type AS tagType,
+            t.tag_name  AS tagName
+        FROM USER_TAG ut
+                 JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+        ORDER BY ut.tag_id DESC
+    </select>
+
+    <!-- 룸메이트 카드 리스트 (페이징) -->
+    <select id="getRoommateList" resultType="map">
+        SELECT
+            ui.user_id    AS userId,
+            ui.user_name  AS userName,
+            ui.gender     AS gender,
+            up.profile_image_url AS profileImageUrl,
+            up.introduction
+        FROM USER_INFO ui
+                 LEFT JOIN USER_PROFILE up ON ui.user_id = up.user_id
+        WHERE ui.status = 'ACTIVE'   <!-- ✅ 활성 계정만 -->
+        ORDER BY ui.reg_dt DESC
+            LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 성별, 기본정보 조회 -->
+    <select id="getUserById" parameterType="string"
+            resultType="kopo.shallwithme.dto.UserInfoDTO">
+        SELECT USER_ID AS userId,
+               GENDER  AS gender
+        FROM USER_INFO
+        WHERE USER_ID = #{userId}
+    </select>
+
+
+    <!-- 태그만 따로 조회 -->
+    <select id="selectUserTags" parameterType="string" resultType="kopo.shallwithme.dto.UserTagDTO">
+        SELECT
+            ut.user_id  AS userId,
+            ut.tag_id   AS tagId,
+            ut.tag_type AS tagType,
+            t.tag_name  AS tagName
+        FROM USER_TAG ut
+                 JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+        ORDER BY ut.tag_id DESC
+    </select>
+
+</mapper>

@@ -1,9 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kopo.shallwithme.mapper.IUserInfoMapper">
 
+    <!-- 아이디 중복 체크 -->
     <select id="getUserIdExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
@@ -11,14 +13,15 @@
         WHERE USER_ID = #{userId}
     </select>
 
-    <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserinfoDTO">
+    <!-- 이메일 중복 체크 -->
+    <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
         FROM USER_INFO
         WHERE EMAIL = #{email}
     </select>
 
-<!--    아이디 찾기 메일 전송-->
+    <!-- 아이디 찾기 (이메일 + 이름) -->
     <select id="emailAuthNumber" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT
             IF(COUNT(USER_ID) > 0, 'Y', 'N') AS EXISTS_YN
@@ -26,7 +29,7 @@
         WHERE EMAIL = #{email} AND USER_NAME = #{userName}
     </select>
 
-<!--    비밀번호 찾기 메일 전송-->
+    <!-- 비밀번호 찾기 (아이디 + 이메일) -->
     <select id="emailAuthNumberPw" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT
             IF(COUNT(PASSWORD) > 0, 'Y', 'N') AS EXISTS_YN
@@ -34,6 +37,7 @@
         WHERE EMAIL = #{email} AND USER_ID = #{userId}
     </select>
 
+    <!-- 비밀번호 찾기용 유저 조회 -->
     <select id="getUserForPassword" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT USER_ID, USER_NAME, EMAIL
         FROM USER_INFO
@@ -42,38 +46,16 @@
             LIMIT 1
     </select>
 
+    <!-- 회원가입 -->
     <insert id="insertUserInfo" parameterType="UserInfoDTO">
         INSERT INTO USER_INFO
-        (USER_ID,
-         USER_NAME,
-         PASSWORD,
-         EMAIL,
-         ADDR1,
-         ADDR2,
-         REG_ID,
-         REG_DT,
-         CHG_ID,
-         CHG_DT,
-         AGE,
-         GENDER,
-         BIRTH_DATE)
-
-        VALUES (#{userId},
-                #{userName},
-                #{password},
-                #{email},
-                #{addr1},
-                #{addr2},
-                #{userId},
-                NOW(),
-                #{userId},
-                NOW(),
-                #{age},
-                #{gender},
-                #{birthDate})
+        (USER_ID, USER_NAME, PASSWORD, EMAIL, ADDR1, ADDR2, REG_ID, REG_DT, CHG_ID, CHG_DT, AGE, GENDER, BIRTH_DATE)
+        VALUES (#{userId}, #{userName}, #{password}, #{email}, #{addr1}, #{addr2},
+                #{userId}, NOW(), #{userId}, NOW(),
+                #{age}, #{gender}, #{birthDate})
     </insert>
 
-    <!-- tag 삽입-->
+    <!-- 태그 삽입 -->
     <insert id="insertUserTags" parameterType="UserTagDTO" >
         INSERT INTO USER_TAG (user_id, tag_id, tag_type)
         VALUES
@@ -83,75 +65,43 @@
         ON DUPLICATE KEY UPDATE user_id=user_id
     </insert>
 
+    <!-- 유저별 태그 개수 -->
     <select id="countUserTags" parameterType="UserTagDTO" resultType="int">
         SELECT COUNT(*) FROM USER_TAG WHERE user_id = #{userId}
     </select>
 
-<!-- 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 -->
+    <!-- 로그인 -->
     <select id="getLogin" parameterType="UserInfoDTO" resultType="UserInfoDTO">
-            SELECT USER_ID, USER_NAME, EMAIL
-            FROM USER_INFO
-            WHERE USER_ID = #{userId}
-              AND PASSWORD = #{password}
+        SELECT USER_ID, USER_NAME, EMAIL
+        FROM USER_INFO
+        WHERE USER_ID = #{userId}
+          AND PASSWORD = #{password}
     </select>
 
-    <!--  아이디, 비밀번호 찾기에 활용
-    1.이름과 이메일이 맞다면, 아이디 알려주기
-    2.아이디, 이름과 이메일이 맞다면, 비밀번호 재설정하기
-    -->
+    <!-- 아이디/비밀번호 찾기 -->
     <select id="getUserId" parameterType="UserInfoDTO" resultType="UserInfoDTO">
-        SELECT
-        USER_ID,
-        USER_NAME,
-        EMAIL
+        SELECT USER_ID, USER_NAME, EMAIL
         FROM USER_INFO
         WHERE 1=1
-        <if test="userId neq null and userId neq '' "> <!-- 비밀번호 찾기라면, user_id 조회 추가 -->
+        <if test="userId neq null and userId neq '' ">
             AND USER_ID = #{userId}
         </if>
         AND USER_NAME = #{userName}
         AND EMAIL = #{email}
     </select>
 
-    <!-- 비밀번호 재설설 -->
+    <!-- 비밀번호 재설정 -->
     <update id="updatePassword" parameterType="UserInfoDTO">
         UPDATE USER_INFO
         SET PASSWORD = #{password}
         WHERE USER_ID  = #{userId}
     </update>
 
-<!--DB에 저장된 태그 불러오기 룸메이트 -->
-
-    <select id="selectUserTags" parameterType="string" resultType="UserTagDTO">
-        SELECT t.tag_id    AS tagId,
-               t.tag_name  AS tagName,
-               ut.tag_type AS tagType
-        FROM USER_TAG ut
-                 JOIN TAG t ON t.tag_id = ut.tag_id
-        WHERE ut.user_id = #{userId}
-        ORDER BY ut.tag_type
-    </select>
-
-
-    <!--    회원 프로필 이미지 불러오기-->
+    <!-- 프로필 이미지 불러오기 -->
     <select id="selectProfileImageUrlByUserId" resultType="string" parameterType="string">
         SELECT profile_image_url
         FROM USER_PROFILE
         WHERE user_id = #{userId}
-    </select>
-
-    <select id="getRoommateList" resultType="map">
-        SELECT
-            u.user_id          AS userId,
-            u.user_name        AS userName,
-            u.age              AS age,
-            u.gender           AS gender,
-            p.profile_image_url AS profileImageUrl
-        FROM USER_INFO u
-                 LEFT JOIN USER_PROFILE p
-                           ON u.user_id = p.user_id
-        ORDER BY u.user_id DESC
-            LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <!-- USER_INFO + USER_PROFILE 조인 -->
@@ -169,8 +119,7 @@
             p.PROFILE_IMAGE_URL AS profileImageUrl,
             p.INTRODUCTION      AS introduction
         FROM USER_INFO u
-                 LEFT JOIN USER_PROFILE p
-                           ON u.USER_ID = p.USER_ID
+                 LEFT JOIN USER_PROFILE p ON u.USER_ID = p.USER_ID
         ORDER BY u.USER_ID
     </select>
 
@@ -182,6 +131,7 @@
         WHERE ut.user_id = #{userId}
     </select>
 
+    <!-- 유저 기본 정보 -->
     <select id="getUserById" parameterType="string" resultType="UserInfoDTO">
         SELECT USER_ID AS userId,
                GENDER  AS gender
@@ -189,5 +139,26 @@
         WHERE USER_ID = #{userId}
     </select>
 
+    <!-- ✅ 추가된 부분: 프로필 조회 -->
+    <select id="getUserProfile" parameterType="string" resultType="kopo.shallwithme.dto.UserProfileDTO">
+        SELECT
+            user_id,
+            profile_image_url AS profileImageUrl,
+            introduction,
+            reg_dt AS regDt,
+            chg_dt AS chgDt
+        FROM USER_PROFILE
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- ✅ 추가된 부분: 프로필 저장/수정 -->
+    <insert id="upsertUserProfile" parameterType="kopo.shallwithme.dto.UserProfileDTO">
+        INSERT INTO USER_PROFILE (user_id, profile_image_url, introduction, reg_dt)
+        VALUES (#{userId}, #{profileImageUrl}, #{introduction}, NOW())
+            ON DUPLICATE KEY UPDATE
+                                 profile_image_url = VALUES(profile_image_url),
+                                 introduction      = VALUES(introduction),
+                                 chg_dt            = NOW();
+    </insert>
 
 </mapper>

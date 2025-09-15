@@ -168,6 +168,14 @@ public class RoommateController {
         return roommateService.getDisplayInfo(userId);
     }
 
+    // ✅ 25-09-15 추가 //
+    @GetMapping("roommateDetail")
+    public String roommateDetail() {
 
+        log.info("{}.roommateDetail Start!", this.getClass().getName());
+        log.info("{}.roommateDetail End!", this.getClass().getName());
+
+        return "roommate/roommateDetail";
+    }
 
 }
