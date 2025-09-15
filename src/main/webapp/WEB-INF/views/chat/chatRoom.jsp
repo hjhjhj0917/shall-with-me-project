@@ -107,8 +107,11 @@
                     stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
                         const msg = JSON.parse(message.body);
 
-                        // 내가 보낸 메시지(myUser.id)이면 화면에 다시 그리지 않음
-                        if (msg.senderId === myUser.id) return;
+                        // [수정] 내가 보낸 메시지(myUser.id)이면 화면에 다시 그리지 않음
+                        if (msg.senderId === myUser.id) {
+                            console.log("내가 보낸 메시지이므로 화면에 다시 그리지 않습니다.");
+                            return;
+                        }
 
                         appendMessage(msg);
                     });
@@ -213,7 +216,7 @@
     window.onload = connect;
 
     $("#scheduleBtn").on("click", function () {
-        location.href = "/schedule/scheduleReg";
+        location.href = '/schedule/scheduleReg?targetUserId='+ otherUser.id;
     });
 </script>
 
