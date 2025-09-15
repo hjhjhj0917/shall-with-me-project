@@ -150,6 +150,7 @@
         FROM USER_INFO u
                  LEFT JOIN USER_PROFILE p
                            ON u.user_id = p.user_id
+        WHERE status = 'ACTIVE'
         ORDER BY u.user_id DESC
             LIMIT #{limit} OFFSET #{offset}
     </select>
