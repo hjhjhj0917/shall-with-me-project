@@ -14,7 +14,6 @@
         /* 전체 메인 콘텐츠 영역 */
         .sidebar-main-content {
             padding: 40px;
-            background-color: #f8f9fa;
         }
 
         .mypage-wrapper {
