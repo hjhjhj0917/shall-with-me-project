@@ -1,0 +1,71 @@
+.detail-wrapper {
+    display: flex;
+    justify-content: space-evenly;  /* 👉 좌우 균등 간격 */
+    align-items: flex-start;        /* 위쪽 기준 정렬 */
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+
+.profile-photo {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: #ddd url('/images/noimg.png') center/cover no-repeat;
+}
+
+.self-intro {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+/* 왼쪽 */
+.detail-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 오른쪽 */
+.detail-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-left, .detail-right {
+    flex: 1;              /* 두 영역을 같은 비율로 */
+    min-width: 300px;     /* 최소 크기 보장 */
+}
+
+.user-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.user-info {
+    margin: 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* 태그 */
+.tag-box {
+    margin-top: 16px;
+}
+.tag {
+    display: inline-block;
+    background: #f0f0f0;
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    margin-right: 8px;
+}
