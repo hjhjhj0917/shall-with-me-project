@@ -98,7 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const style = document.createElement('style');
         style.innerHTML = `
-            .header-menu-container:hover:not(.pinned),
             .header-menu-container.pinned {
                 width: 250px !important;
             }

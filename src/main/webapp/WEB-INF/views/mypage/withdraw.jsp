@@ -152,7 +152,7 @@
             font-size: 14px;
             text-align: left; /* 왼쪽 정렬 */
             height: 5px; /* 고정 높이로 레이아웃 안정 */
-            padding-left: 10px;
+            padding-left: 5px;
             visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
             margin-bottom: 20px;
         }
@@ -171,7 +171,7 @@
             font-size: 14px;
             text-align: left; /* 왼쪽 정렬 */
             height: 5px; /* 고정 높이로 레이아웃 안정 */
-            padding-left: 10px;
+            padding-left: 5px;
             visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
         }
 

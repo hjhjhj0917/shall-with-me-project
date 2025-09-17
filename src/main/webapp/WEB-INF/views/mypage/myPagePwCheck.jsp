@@ -147,12 +147,6 @@
     <script>
         $(document).ready(function () {
 
-            $("#password").on("keydown", function (e) {
-                if (e.key === "Enter") {
-                    $("#mypagePwCkBtn").click();
-                }
-            });
-
             $(document).on("click", function (e) {
                 const $target = $(e.target);
 
