@@ -41,6 +41,7 @@
         <%--메뉴--%>
         <div class="header-menu-container pinned" id="menuBox">
             <span class="slide-bg2"></span> <!-- 둥근 반스도 역할 -->
+            <button class="menu-list" onclick="location.href='/notice/noticeList'">ㅤㅤ청년정책</button>
             <button class="menu-list" onclick="location.href='/mypage/userModify'">마이페이지</button>
             <button class="menu-list" id="logout">로그아웃</button>
             <button class="header-dropdown-toggle" id="headerDropdownToggle">
@@ -50,7 +51,7 @@
     </div>
 </header>
 
-<%--메세지 리스트 띄우는 모달--%>
+<%--메시지 리스트 띄우는 모달--%>
 <div id="messageModalOverlay" aria-hidden="true">
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="messageModalTitle">
         <div class="modal-body">
