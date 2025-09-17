@@ -1,6 +1,7 @@
 package kopo.shallwithme.mapper;
 
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,4 +22,6 @@ public interface IRoommateMapper {
 
     // 태그만 따로 조회
     List<UserTagDTO> selectUserTags(String userId);
+
+    UserProfileDTO findUserProfileById(String userId);
 }

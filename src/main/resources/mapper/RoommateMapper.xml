@@ -57,4 +57,18 @@
         ORDER BY ut.tag_id DESC
     </select>
 
+    <select id="findUserProfileById" parameterType="string" resultType="kopo.shallwithme.dto.UserProfileDTO">
+        SELECT
+        u.user_id          AS userId,
+        u.user_name        AS userName,
+        u.age              AS age,
+        u.gender           AS gender,
+        p.profile_image_url AS profileImageUrl,  <!-- ✅ 여기를 profile_image_url로 맞춤 -->
+        p.introduction     AS introduction
+        FROM USER_INFO u
+        LEFT JOIN USER_PROFILE p ON u.user_id = p.user_id
+        WHERE u.user_id = #{userId}
+    </select>
+
+
 </mapper>

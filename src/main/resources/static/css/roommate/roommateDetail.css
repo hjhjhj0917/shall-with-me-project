@@ -4,26 +4,29 @@
     align-items: flex-start;        /* 위쪽 기준 정렬 */
     gap: 60px;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 60px auto 0;   /* 👉 위쪽 여백 60px */
     padding: 40px;
 }
 
-
 .profile-photo {
-    width: 220px;
-    height: 220px;
+    width: 260px;   /* 기존 220px */
+    height: 260px;  /* 기존 220px */
     border-radius: 50%;
     background: #ddd url('/images/noimg.png') center/cover no-repeat;
 }
 
+
 .self-intro {
-    width: 100%;
-    min-height: 120px;
+    width: 90%;          /* 👉 원래 100% → 줄여서 사진 밑에만 적당히 */
+    max-width: 350px;    /* 👉 너무 넓어지지 않도록 제한 */
+    min-height: 100px;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 16px;
     background: #fafafa;
+    text-align: left;
 }
+
 
 /* 왼쪽 */
 .detail-left {

@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>  <%-- 이거 추가 --%>
+
 <html>
 <head>
   <title>살며시: "이름"</title>
@@ -15,30 +17,30 @@
 <main class="detail-wrapper">
   <!-- 왼쪽 영역 -->
   <div class="detail-left">
-    <!-- 프로필 사진 (동그라미) -->
-    <div class="profile-photo"></div>
+    <div class="profile-photo"
+         style="background-image:url('${user.profileImageUrl}')">
+    </div>
 
-    <!-- 자기소개 -->
+    <!-- ⬇⬇ 자기소개도 DB 값으로 교체 -->
     <div class="self-intro">
       <h3>자기소개</h3>
-      <p>
-        안녕하세요! 저는 홍길동입니다. <br>
-        조용한 분위기를 좋아하고 성실하게 지내고 싶습니다.
-      </p>
+      <p>${user.introduction}</p>
     </div>
   </div>
 
   <!-- 오른쪽 영역 -->
   <div class="detail-right">
-    <h2 class="user-name">홍길동 (25세)</h2>
-    <p class="user-info">성별: 남</p>
-    <p class="user-info">주소: 부산광역시 동래구</p>
+    <!-- ⬇⬇ 이름 + 나이 -->
+    <h2 class="user-name">${user.userName} (${user.age}세)</h2>
 
-    <!-- 태그 목록 -->
+    <!-- ⬇⬇ 성별 / 주소 -->
+    <p class="user-info">성별: ${user.gender}</p>
+
+    <!-- ⬇⬇ 태그 목록 -->
     <div class="tag-box">
-      <span class="tag">#청결</span>
-      <span class="tag">#조용한</span>
-      <span class="tag">#비흡연</span>
+      <c:forEach var="tag" items="${user.tags}">
+        <span class="tag">#${tag}</span>
+      </c:forEach>
     </div>
   </div>
 </main>
