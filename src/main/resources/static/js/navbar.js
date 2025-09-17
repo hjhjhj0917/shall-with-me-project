@@ -100,10 +100,11 @@ document.addEventListener('DOMContentLoaded', function () {
         style.innerHTML = `
             .header-menu-container.pinned {
                 width: 250px !important;
+                padding-left: 30px;
             }
             #headerDropdownToggle {
                 margin-top: 2px;
-                margin-right: 176px;
+                margin-right: 66px;
             }
         `;
         document.head.appendChild(style);

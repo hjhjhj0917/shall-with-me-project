@@ -275,10 +275,31 @@ header {
 /* hover 시 펼쳐짐 */
 /*.header-menu-container:hover:not(.pinned),*/
 .header-menu-container.pinned {
-    width: 250px;             /* 펼쳐진 크기 */
+    width: 330px;             /* 펼쳐진 크기 */
     border-radius: 40px;      /* 타원형 */
-    padding-left: 30px;
     justify-content: flex-start;
+}
+
+.header-menu-container:not(.pinned) .menu-list {
+    opacity: 0;
+    pointer-events: none; /* 접힌 상태에서는 텍스트 부분 클릭 방지 */
+}
+
+.header-menu-container:not(.pinned) .header-dropdown-toggle {
+    margin: 0 auto;
+    display: block;
+    pointer-events: auto; /* 아이콘만 클릭 가능 */
+}
+
+.header-switch-container:not(.pinned) .switch-list {
+    opacity: 0;
+    pointer-events: none; /* 접힌 상태에서는 텍스트 부분 클릭 방지 */
+}
+
+.header-switch-container:not(.pinned) .header-dropdown-toggle {
+    margin: 0 auto;
+    display: block;
+    pointer-events: auto; /* 아이콘만 클릭 가능 */
 }
 
 /* 아이콘 위치를 오른쪽으로 밀어주는 스타일 */
@@ -318,8 +339,7 @@ header {
 /* 아이콘은 항상 가운데 */
 .header-menu-container .header-dropdown-toggle {
     z-index: 1;
-    margin-left: auto;
-    margin-right: 10px;
+    padding-right: 133px;
     background-color: transparent;
 }
 

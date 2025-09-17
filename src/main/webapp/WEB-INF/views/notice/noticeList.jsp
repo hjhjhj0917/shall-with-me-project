@@ -83,7 +83,7 @@
 <%@ include file="../includes/header.jsp" %>
 
 <div class="notice-container">
-    <h2>청년 공지사항</h2>
+    <h2>청년정책 알림</h2>
 
     <table>
         <thead>
