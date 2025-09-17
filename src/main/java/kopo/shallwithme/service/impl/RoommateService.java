@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -124,8 +125,26 @@ public class RoommateService implements IRoommateService {
         if (userId == null || userId.isBlank()) {
             return null;
         }
-        return mapper.findUserProfileById(userId); // Mapper 호출
+
+        // 1) 기본 프로필 정보 가져오기
+        UserProfileDTO user = mapper.findUserProfileById(userId);
+
+        if (user != null) {
+            // 2) 해당 유저의 태그 리스트 가져오기
+            List<UserTagDTO> tagList = mapper.selectUserTags(userId);
+
+            // 3) 태그 이름만 추출해서 String 리스트로 변환
+            List<String> tagNames = tagList.stream()
+                    .map(UserTagDTO::getTagName)
+                    .collect(Collectors.toList());
+
+            // 4) DTO에 태그 추가
+            user.setTags(tagNames);
+        }
+
+        return user;
     }
+
 
 }
 
