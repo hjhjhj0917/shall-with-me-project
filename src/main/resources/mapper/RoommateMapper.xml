@@ -24,6 +24,7 @@
         SELECT
             ui.user_id    AS userId,
             ui.user_name  AS userName,
+            ui.age        AS age,
             ui.gender     AS gender,
             up.profile_image_url AS profileImageUrl,
             up.introduction
