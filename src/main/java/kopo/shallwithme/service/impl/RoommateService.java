@@ -119,11 +119,13 @@ public class RoommateService implements IRoommateService {
         return baseList;
     }
 
-
-
-
-
-
+    @Override
+    public UserProfileDTO getUserProfile(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return null;
+        }
+        return mapper.findUserProfileById(userId); // Mapper 호출
+    }
 
 }
 

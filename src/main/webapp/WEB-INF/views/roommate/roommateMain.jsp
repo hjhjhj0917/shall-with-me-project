@@ -219,7 +219,7 @@
 
             // 새 탭으로 열기
             window.open(
-                ctx + '/roommate/roommateDetail?id=' + encodeURIComponent(id),
+                ctx + '/roommate/roommateDetail?userId=' + encodeURIComponent(id),
                 '_blank'
             );
         });

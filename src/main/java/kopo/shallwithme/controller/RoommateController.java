@@ -3,6 +3,7 @@ package kopo.shallwithme.controller;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.impl.RoommateService;
 import kopo.shallwithme.service.impl.UserInfoService;
@@ -168,14 +169,29 @@ public class RoommateController {
         return roommateService.getDisplayInfo(userId);
     }
 
-    // ✅ 25-09-15 추가 //
-    @GetMapping("roommateDetail")
-    public String roommateDetail() {
+//    // ✅ 25-09-15 추가 //
+//    @GetMapping("roommateDetail")
+//    public String roommateDetail() {
+//
+//        log.info("{}.roommateDetail Start!", this.getClass().getName());
+//        log.info("{}.roommateDetail End!", this.getClass().getName());
+//
+//        return "roommate/roommateDetail";
+//    }
 
-        log.info("{}.roommateDetail Start!", this.getClass().getName());
-        log.info("{}.roommateDetail End!", this.getClass().getName());
+    //    // ✅ 25-09-17 추가 //
+// UserProfileDTO 안에 userId 필드가 있다고 가정
+    @GetMapping("/roommateDetail")
+    public String roommateDetail(UserProfileDTO pDTO, org.springframework.ui.Model model) {
+        String userId = pDTO.getUserId();  // ?userId=xxx 로 전달됨
+
+        log.info("roommateDetail called with userId={}", userId);
+
+        UserProfileDTO user = roommateService.getUserProfile(userId);
+        model.addAttribute("user", user);
 
         return "roommate/roommateDetail";
     }
+
 
 }
