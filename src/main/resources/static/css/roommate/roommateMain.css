@@ -75,9 +75,11 @@ html, body{
 }
 
 /* 썸네일: 4:3 비율 */
-.sh-thumb{
-    height:180px;
-    background:#e9eef7 center/cover no-repeat;
+.sh-thumb {
+    height: 180px;
+    background: #e9eef7 no-repeat;
+    background-size: cover;
+    background-position: center 15%;  /* ← 세로 위치를 x% 정도 내려줌 */
     background-image: url("../../images/roommatenoimg.png");
 }
 
