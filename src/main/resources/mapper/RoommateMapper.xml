@@ -11,7 +11,6 @@
         SELECT
             ut.user_id  AS userId,
             ut.tag_id   AS tagId,
-            ut.tag_type AS tagType,
             t.tag_name  AS tagName
         FROM USER_TAG ut
                  JOIN TAG t ON t.tag_id = ut.tag_id
