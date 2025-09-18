@@ -1,5 +1,12 @@
 package kopo.shallwithme.controller;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
@@ -9,6 +16,7 @@ import kopo.shallwithme.service.impl.RoommateService;
 import kopo.shallwithme.service.impl.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +43,24 @@ public class RoommateController {
 
     private final RoommateService roommateService;
     private final UserInfoService userInfoService;
+
+    @Value("${ncp.object-storage.endpoint}")
+    private String endpoint;
+
+    @Value("${ncp.object-storage.region}")
+    private String region;
+
+    @Value("${ncp.object-storage.access-key}")
+    private String accessKey;
+
+    @Value("${ncp.object-storage.secret-key}")
+    private String secretKey;
+
+    @Value("${ncp.object-storage.bucket-name}")
+    private String bucketName;
+
+    @Value("${ncp.object-storage.folder}")
+    private String folder;
 
     @GetMapping("/roommateReg")
     public String roommateReg() {
@@ -102,22 +128,31 @@ public class RoommateController {
 
     // 로컬 폴더에 저장하고 /uploads/profile/.. URL 반환
     private String saveProfileImage(MultipartFile file) throws IOException {
-        String original = file.getOriginalFilename();
-        String ext = "";
-        if (original != null) {
-            String cleaned = StringUtils.getFilenameExtension(original);
-            ext = (cleaned != null && !cleaned.isBlank()) ? "." + cleaned : "";
-        }
-        String filename = UUID.randomUUID().toString().replace("-", "") + ext;
+        String originalFilename = file.getOriginalFilename();
+        String ext = StringUtils.getFilenameExtension(originalFilename);
+        String uuidFileName = UUID.randomUUID().toString().replace("-", "") + (ext != null ? "." + ext : "");
 
-        Path uploadDir = Paths.get("uploads", "profile");
-        Files.createDirectories(uploadDir);
+        // NCP Object Storage 클라이언트 생성
+        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withPathStyleAccessEnabled(true) // NCP는 이게 꼭 필요함
+                .build();
 
-        Path target = uploadDir.resolve(filename);
-        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        // 파일 메타데이터 설정
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
 
-        // 브라우저에서 접근 가능한 URLCHAT_ROOM
-        return "/uploads/profile/" + filename;
+        String key = folder + "/" + uuidFileName;
+
+        // S3 업로드
+        s3Client.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), metadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead)); // 공개 읽기 권한
+
+        // URL 반환
+        return endpoint + "/" + bucketName + "/" + key;
     }
 
     @GetMapping("/roommateMain")

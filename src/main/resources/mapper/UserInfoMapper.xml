@@ -56,13 +56,13 @@
     </insert>
 
     <!-- 태그 삽입 -->
-    <insert id="insertUserTags" parameterType="UserTagDTO" >
-        INSERT INTO USER_TAG (user_id, tag_id, tag_type)
+    <insert id="insertUserTags" parameterType="UserTagDTO">
+        INSERT INTO USER_TAG (user_id, tag_id)
         VALUES
         <foreach collection="tagList" item="tag" separator=",">
-            (#{userId}, #{tag}, #{tagType})
+            (#{userId}, #{tag})
         </foreach>
-        ON DUPLICATE KEY UPDATE user_id=user_id
+        ON DUPLICATE KEY UPDATE tag_id = VALUES(tag_id)
     </insert>
 
     <!-- 유저별 태그 개수 -->
