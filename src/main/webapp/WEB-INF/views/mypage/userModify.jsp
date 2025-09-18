@@ -81,6 +81,7 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             font-size: 2rem;
             flex-shrink: 0;
+            object-fit: cover;
         }
         .profile-info .profile-name {
             font-size: 1.2rem;
