@@ -8,9 +8,8 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
-
         .notice-container {
-            padding: 60px 250px; /* 위아래 20px, 좌우 80px로 확장 */
+            padding: 60px 250px;
         }
 
         h2 {
@@ -51,8 +50,6 @@
             color: #444;
         }
 
-
-
         tbody td:nth-child(2) {
             width: 60%;
             font-weight: 600;
@@ -76,7 +73,6 @@
             text-decoration: underline;
         }
     </style>
-
 </head>
 <body>
 
@@ -84,6 +80,9 @@
 
 <div class="notice-container">
     <h2>청년정책 알림</h2>
+
+    <!-- JSON 데이터 전달용 div -->
+    <div id="policyJsonData" data-json='${policiesJson}' style="display: none;"></div>
 
     <table>
         <thead>
@@ -98,7 +97,6 @@
     </table>
 </div>
 
-<!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
@@ -106,18 +104,14 @@
     if (ssUserName == null) {
         ssUserName = "";
     }
-
-    // JSON 문자열을 JS 변수로 안전하게 전달하기 위해 큰따옴표 이스케이프
-    String rawJson = (String) request.getAttribute("policiesJson");
-    String safeJson = rawJson == null ? "[]" : rawJson.replace("\"", "\\\"");  // " → \"
 %>
 
 <script>
     const userName = "<%= ssUserName %>";
 
-    // JSON 문자열 복원
-    const rawJsonString = "<%= safeJson %>".replace(/\\"/g, '"');  // 다시 "로 복원
-    console.log("rawJsonString:", rawJsonString);
+    // JSON 데이터 가져오기
+    const jsonDataDiv = document.getElementById("policyJsonData");
+    const rawJsonString = jsonDataDiv?.dataset?.json || "[]";
 
     let policies = [];
     try {
@@ -152,14 +146,13 @@
             a.textContent = '바로가기';
             tdLink.appendChild(a);
 
-            tr.appendChild(tdNo)
+            tr.appendChild(tdNo);
             tr.appendChild(tdTitle);
             tr.appendChild(tdPeriod);
             tr.appendChild(tdLink);
 
             tableBody.appendChild(tr);
         });
-
     }
 </script>
 
