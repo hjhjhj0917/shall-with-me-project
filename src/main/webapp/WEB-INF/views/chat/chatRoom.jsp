@@ -129,7 +129,8 @@
             roomId: roomId,
             senderId: myUser.id,
             message: message,
-            clientId: clientId
+            clientId: clientId,
+            sentAt: new Date().toISOString()
         };
 
         // 내가 보낸 메시지를 화면에 즉시 표시
@@ -143,12 +144,20 @@
     // 메시지를 화면에 추가하는 함수
     function appendMessage(msg) {
         const chatBox = document.getElementById("chatBox");
+        console.log("appendMessage 호출 - sentAt:", msg.sentAt);
         if (!chatBox) return;
+
+        let sentAtStr = msg.sentAt;
+
+        if (sentAtStr && sentAtStr.length === 19 && sentAtStr.indexOf('Z') === -1) {
+            // "YYYY-MM-DDTHH:mm:ss" 형태이면 끝에 'Z' 붙여서 UTC로 변환 시도
+            sentAtStr += 'Z';
+        }
 
         // ... 날짜 및 시간 변수 선언은 기존과 동일 ...
         const senderId = msg.senderId;
         const text = msg.message;
-        const time = msg.timestamp || new Date();
+        const time = sentAtStr ? new Date(sentAtStr) : new Date();
         const msgDate = new Date(time);
         const dateStr = `${msgDate.getFullYear()}년 ${msgDate.getMonth() + 1}월 ${msgDate.getDate()}일`;
         const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

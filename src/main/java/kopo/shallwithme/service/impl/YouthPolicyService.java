@@ -72,9 +72,9 @@ public class YouthPolicyService implements IYouthPolicyService {
         log.info("TotalCount 응답 JSON: {}", response);
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(response).path("result");
+        JsonNode root = mapper.readTree(response).path("result").path("pagging");
 
-        int totalCount = root.path("totalCount").asInt(0);
+        int totalCount = root.path("totCount").asInt(0);
         log.info("총 정책 수: {}", totalCount);
 
         return totalCount;

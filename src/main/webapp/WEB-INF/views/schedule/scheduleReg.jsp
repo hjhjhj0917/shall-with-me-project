@@ -528,11 +528,17 @@
                     dataType: 'json',
                     success: function (data) {
                         const transformedEvents = data.map(function (event) {
+                            // 자기 자신의 ID와 participantId가 같으면 개인 일정
+                            const isPersonal = event.participantId === myUserId;
+
                             return {
                                 id: event.scheduleId,
                                 title: event.title,
                                 start: event.scheduleDt,
                                 end: event.end,
+                                backgroundColor: isPersonal ? '#ff9933' : '#3399ff',  // 개인: 주황, 상대방: 파랑
+                                borderColor: isPersonal ? '#ff9933' : '#3399ff',
+                                textColor: '#fff',
                                 extendedProps: {
                                     location: event.location,
                                     memo: event.memo,
@@ -717,7 +723,7 @@
     flatpickr("#timePicker", {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "h:i K", // 12시간제 (오전/오후)
+        dateFormat: "h:i", // 12시간제 (오전/오후)
         time_24hr: false,    // true면 24시간제
         minuteIncrement: 5   // 분 단위 간격
     });
@@ -725,14 +731,20 @@
 </script>
 
 <%
+    String ssUserId = (String) session.getAttribute("SS_USER_ID");
+    if (ssUserId == null) ssUserId = "";
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
     if (ssUserName == null) ssUserName = "";
+
     String targetUserId = request.getParameter("targetUserId");
-    if (targetUserId == null) targetUserId = "";
+    if (targetUserId == null || targetUserId.isEmpty()) {
+        targetUserId = ssUserId; // 상대방 ID가 없으면 자신의 ID 사용
+    }
 %>
 
 <script>
     const userName = "<%= ssUserName %>";
+    const myUserId = "<%= ssUserId %>";
     const targetUserId = "<%= targetUserId %>";
 </script>
 
