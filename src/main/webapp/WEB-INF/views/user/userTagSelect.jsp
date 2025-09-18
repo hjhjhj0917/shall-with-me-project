@@ -215,29 +215,28 @@
                         <legend>성격</legend>
                         <div class="button-group" data-group="personality">
                             <button onclick="selectButton(this)" data-tag="15">내향적</button>
-                            <button onclick="selectButton(this)" data-tag="16">중간</button>
-                            <button onclick="selectButton(this)" data-tag="17">외향적</button>
+                            <button onclick="selectButton(this)" data-tag="16">외향적</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>선호하는 성격</legend>
                         <div class="button-group" data-group="preferred-personality">
-                            <button onclick="selectButton(this)" data-tag="18">조용한 사람</button>
-                            <button onclick="selectButton(this)" data-tag="19">활발한 사람</button>
+                            <button onclick="selectButton(this)" data-tag="17">조용한 사람</button>
+                            <button onclick="selectButton(this)" data-tag="18">활발한 사람</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>대화</legend>
                         <div class="button-group" data-group="talk">
-                            <button onclick="selectButton(this)" data-tag="20">자주</button>
-                            <button onclick="selectButton(this)" data-tag="21">필요할 때</button>
+                            <button onclick="selectButton(this)" data-tag="19">자주</button>
+                            <button onclick="selectButton(this)" data-tag="20">필요할 때</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>갈등</legend>
                         <div class="button-group" data-group="conflict">
-                            <button onclick="selectButton(this)" data-tag="22">회피형</button>
-                            <button onclick="selectButton(this)" data-tag="23">해결형</button>
+                            <button onclick="selectButton(this)" data-tag="21">회피형</button>
+                            <button onclick="selectButton(this)" data-tag="22">해결형</button>
                         </div>
                     </fieldset>
                 </div>
@@ -248,32 +247,32 @@
                     <fieldset class="box">
                         <legend>요리</legend>
                         <div class="button-group" data-group="cook">
-                            <button onclick="selectButton(this)" data-tag="24">요리</button>
-                            <button onclick="selectButton(this)" data-tag="25">배달</button>
-                            <button onclick="selectButton(this)" data-tag="26">외식</button>
+                            <button onclick="selectButton(this)" data-tag="23">요리</button>
+                            <button onclick="selectButton(this)" data-tag="24">배달</button>
+                            <button onclick="selectButton(this)" data-tag="25">외식</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>주식</legend>
                         <div class="button-group" data-group="diet">
-                            <button onclick="selectButton(this)" data-tag="27">채식</button>
-                            <button onclick="selectButton(this)" data-tag="28">육식</button>
-                            <button onclick="selectButton(this)" data-tag="29">둘 다</button>
+                            <button onclick="selectButton(this)" data-tag="26">채식</button>
+                            <button onclick="selectButton(this)" data-tag="27">육식</button>
+                            <button onclick="selectButton(this)" data-tag="28">둘 다</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>끼니</legend>
                         <div class="button-group" data-group="meal">
-                            <button onclick="selectButton(this)" data-tag="30">한 끼</button>
-                            <button onclick="selectButton(this)" data-tag="31">두 끼</button>
-                            <button onclick="selectButton(this)" data-tag="32">세 끼</button>
+                            <button onclick="selectButton(this)" data-tag="29">한 끼</button>
+                            <button onclick="selectButton(this)" data-tag="30">두 끼</button>
+                            <button onclick="selectButton(this)" data-tag="31">세 끼</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>음식 냄새</legend>
                         <div class="button-group" data-group="cook-semll">
-                            <button onclick="selectButton(this)" data-tag="33">예민</button>
-                            <button onclick="selectButton(this)" data-tag="34">상관없음</button>
+                            <button onclick="selectButton(this)" data-tag="32">예민</button>
+                            <button onclick="selectButton(this)" data-tag="33">상관없음</button>
                         </div>
                     </fieldset>
                 </div>
@@ -284,31 +283,31 @@
                     <fieldset class="box">
                         <legend>청결</legend>
                         <div class="button-group" data-group="clean">
-                            <button onclick="selectButton(this)" data-tag="35">깔끔이</button>
-                            <button onclick="selectButton(this)" data-tag="36">중간이</button>
-                            <button onclick="selectButton(this)" data-tag="37">대충이</button>
+                            <button onclick="selectButton(this)" data-tag="34">깔끔이</button>
+                            <button onclick="selectButton(this)" data-tag="35">중간이</button>
+                            <button onclick="selectButton(this)" data-tag="36">대충이</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>청소 주기</legend>
                         <div class="button-group" data-group="clean-circle">
-                            <button onclick="selectButton(this)" data-tag="38">주 1회</button>
-                            <button onclick="selectButton(this)" data-tag="39">주 2회</button>
-                            <button onclick="selectButton(this)" data-tag="40">주 3회 이상</button>
+                            <button onclick="selectButton(this)" data-tag="37">주 1회</button>
+                            <button onclick="selectButton(this)" data-tag="38">주 2회</button>
+                            <button onclick="selectButton(this)" data-tag="39">주 3회 이상</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>쓰레기 배출</legend>
                         <div class="button-group" data-group="trash">
-                            <button onclick="selectButton(this)" data-tag="41">바로바로</button>
-                            <button onclick="selectButton(this)" data-tag="42">쌓아두기</button>
+                            <button onclick="selectButton(this)" data-tag="40">바로바로</button>
+                            <button onclick="selectButton(this)" data-tag="41">쌓아두기</button>
                         </div>
                     </fieldset>
                     <fieldset class="box">
                         <legend>설거지</legend>
                         <div class="button-group" data-group="wash-dish">
-                            <button onclick="selectButton(this)" data-tag="43">바로바로</button>
-                            <button onclick="selectButton(this)" data-tag="44">쌓아두기</button>
+                            <button onclick="selectButton(this)" data-tag="42">바로바로</button>
+                            <button onclick="selectButton(this)" data-tag="43">쌓아두기</button>
                         </div>
                     </fieldset>
                 </div>

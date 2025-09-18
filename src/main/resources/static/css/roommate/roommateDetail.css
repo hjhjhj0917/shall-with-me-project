@@ -62,13 +62,20 @@
 
 /* 태그 */
 .tag-box {
-    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;   /* ✅ 태그가 한 줄 넘치면 자동 줄바꿈 */
+    gap: 8px 12px;     /* ✅ 위아래 8px, 좌우 12px 간격 */
+    margin-top: 12px;  /* ✅ 태그 영역과 위 요소 사이 간격 */
+    max-width: 400px;  /* ✅ 한 줄 최대 길이 제한 */
+
 }
+
 .tag {
     display: inline-block;
-    background: #f0f0f0;
-    border-radius: 12px;
     padding: 6px 12px;
-    font-size: 0.9rem;
-    margin-right: 8px;
+    border-radius: 12px;
+    background: #f1f3f5;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap; /* ✅ 태그 안에서는 줄바꿈 안되게 */
 }
