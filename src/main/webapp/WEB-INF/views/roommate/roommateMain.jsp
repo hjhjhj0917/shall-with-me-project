@@ -171,9 +171,9 @@
 
 
     <!-- 좌하단 등록 플로팅 버튼 -->
-    <button class="sh-fab" title="등록" id="roommateAdd">
-        <i class="fa-solid fa-plus"></i>
-    </button>
+<%--    <button class="sh-fab" title="등록" id="roommateAdd">--%>
+<%--        <i class="fa-solid fa-plus"></i>--%>
+<%--    </button>--%>
 </main>
 
 <!-- 큰 모달 (등록 페이지를 iframe으로 로드) -->

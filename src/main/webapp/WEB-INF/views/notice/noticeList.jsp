@@ -72,6 +72,28 @@
         tbody td a:hover {
             text-decoration: underline;
         }
+
+        #pagination button {
+            background-color: transparent; /* 배경 투명 */
+            border: none;                  /* 테두리 제거 */
+            color: #1c407d;                /* 버튼 글자색 (원하는 색으로 변경 가능) */
+            font-weight: 600;              /* 글자 굵기 */
+            margin: 0 4px;                 /* 버튼 사이 간격 */
+            padding: 6px 12px;             /* 클릭 영역 여유 */
+            cursor: pointer;               /* 마우스 커서 포인터 */
+            border-radius: 4px;            /* 약간 둥근 모서리, 필요 없으면 제거 가능 */
+            font-size: 14px;               /* 글자 크기 */
+            transition: background-color 0.3s ease;
+        }
+
+        #pagination button:disabled {
+            color: #999;                  /* 비활성화 시 회색 */
+            cursor: default;              /* 비활성화 시 커서 변경 */
+        }
+
+        #pagination button:hover:not(:disabled) {
+            background-color: #e0e0e0;   /* 마우스 올렸을 때 배경 */
+        }
     </style>
 </head>
 <body>
@@ -95,6 +117,9 @@
         </thead>
         <tbody id="policyTableBody"></tbody>
     </table>
+
+    <div id="pagination" style="text-align:center; margin-top: 20px;"></div>
+
 </div>
 
 <%@ include file="../includes/customModal.jsp" %>
@@ -110,23 +135,42 @@
     const userName = "<%= ssUserName %>";
 
     // JSON 데이터 가져오기
-    const jsonDataDiv = document.getElementById("policyJsonData");
-    const rawJsonString = jsonDataDiv?.dataset?.json || "[]";
-
-    let policies = [];
-    try {
-        policies = JSON.parse(rawJsonString);
-    } catch (e) {
-        console.error("JSON 파싱 오류:", e);
-    }
+    const pageSize = 10; // 한 페이지에 보여줄 아이템 수
+    let currentPage = 1;  // 현재 페이지 번호
+    let totalCount = 0;   // 전체 아이템 수
 
     const tableBody = document.getElementById('policyTableBody');
+    const paginationDiv = document.getElementById('pagination');
+    console.log("paginationDiv.innerHTML : ", paginationDiv.innerHTML);
+    console.log("totalCount:", totalCount, "pageSize:", pageSize);
 
-    if (!policies || policies.length === 0) {
-        const emptyRow = document.createElement('tr');
-        emptyRow.innerHTML = '<td colspan="4">등록된 공지사항이 없습니다.</td>';
-        tableBody.appendChild(emptyRow);
-    } else {
+    // 페이지 데이터 가져오기 함수 (AJAX 요청)
+    function loadPolicies(page) {
+        fetch(window.location.origin + '/notice/api?page=' + page + '&size=' + pageSize)
+            .then(res => res.json())
+            .then(data => {
+                const policies = data.policies || [];
+                totalCount = data.totalCount || 0;
+                currentPage = page;
+
+                renderTable(policies);
+                renderPagination();
+            })
+            .catch(err => {
+                console.error('데이터 로드 실패:', err);
+                tableBody.innerHTML = '<tr><td colspan="4">데이터를 불러오는데 실패했습니다.</td></tr>';
+                paginationDiv.innerHTML = '';
+            });
+    }
+
+    // 테이블 내용 렌더링 함수
+    function renderTable(policies) {
+        tableBody.innerHTML = '';
+        if (policies.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4">등록된 공지사항이 없습니다.</td></tr>';
+            return;
+        }
+
         policies.forEach(policy => {
             const tr = document.createElement('tr');
 
@@ -154,6 +198,53 @@
             tableBody.appendChild(tr);
         });
     }
+
+    // 페이징 버튼 렌더링 함수
+    function renderPagination() {
+        paginationDiv.innerHTML = '';
+
+        const totalPages = Math.ceil(totalCount / pageSize);
+        if (totalPages <= 1) return; // 페이지가 1개 이하이면 페이징 표시 안함
+
+        // 이전 버튼
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '<';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+            if (currentPage > 1) loadPolicies(currentPage - 1);
+        };
+        paginationDiv.appendChild(prevBtn);
+
+        // 페이지 번호 버튼들 (최대 6개 표시)
+        const maxPageButtons = 6;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+        let endPage = startPage + maxPageButtons - 1;
+
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = Math.max(1, endPage - maxPageButtons + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            pageBtn.disabled = (i === currentPage);
+            pageBtn.onclick = () => loadPolicies(i);
+            paginationDiv.appendChild(pageBtn);
+        }
+
+        // 다음 버튼
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '>';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+            if (currentPage < totalPages) loadPolicies(currentPage + 1);
+        };
+        paginationDiv.appendChild(nextBtn);
+    }
+
+    // 초기 로드
+    loadPolicies(1);
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
