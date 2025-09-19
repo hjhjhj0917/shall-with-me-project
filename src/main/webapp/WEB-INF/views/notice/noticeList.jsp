@@ -104,7 +104,8 @@
     <h2>청년정책 알림</h2>
 
     <!-- JSON 데이터 전달용 div -->
-    <div id="policyJsonData" data-json='${policiesJson}' style="display: none;"></div>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <div id="policyJsonData" data-json="<c:out value='${policiesJson}'/>" style="display: none;"></div>
 
     <table>
         <thead>
@@ -122,6 +123,7 @@
 
 </div>
 
+<%@ include file="../includes/chatbot.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
@@ -134,40 +136,42 @@
 <script>
     const userName = "<%= ssUserName %>";
 
-    // JSON 데이터 가져오기
     const pageSize = 10; // 한 페이지에 보여줄 아이템 수
     let currentPage = 1;  // 현재 페이지 번호
     let totalCount = 0;   // 전체 아이템 수
+    let allPolicies = []; // 전체 정책 데이터
 
     const tableBody = document.getElementById('policyTableBody');
     const paginationDiv = document.getElementById('pagination');
-    console.log("paginationDiv.innerHTML : ", paginationDiv.innerHTML);
-    console.log("totalCount:", totalCount, "pageSize:", pageSize);
 
-    // 페이지 데이터 가져오기 함수 (AJAX 요청)
-    function loadPolicies(page) {
-        fetch(window.location.origin + '/notice/api?page=' + page + '&size=' + pageSize)
-            .then(res => res.json())
-            .then(data => {
-                const policies = data.policies || [];
-                totalCount = data.totalCount || 0;
-                currentPage = page;
-
-                renderTable(policies);
-                renderPagination();
-            })
-            .catch(err => {
-                console.error('데이터 로드 실패:', err);
-                tableBody.innerHTML = '<tr><td colspan="4">데이터를 불러오는데 실패했습니다.</td></tr>';
-                paginationDiv.innerHTML = '';
-            });
+    // 1. JSON 데이터 파싱
+    const policyJson = document.getElementById('policyJsonData').dataset.json;
+    if (policyJson) {
+        try {
+            allPolicies = JSON.parse(policyJson);
+            totalCount = allPolicies.length;
+        } catch (e) {
+            console.error('정책 데이터 파싱 오류:', e);
+        }
     }
 
-    // 테이블 내용 렌더링 함수
+    // 2. 특정 페이지의 데이터 로드
+    function loadPolicies(page) {
+        currentPage = page;
+        const startIdx = (page - 1) * pageSize;
+        const endIdx = startIdx + pageSize;
+
+        const paginatedPolicies = allPolicies.slice(startIdx, endIdx);
+
+        renderTable(paginatedPolicies);
+        renderPagination();
+    }
+
+    // 3. 테이블 렌더링
     function renderTable(policies) {
         tableBody.innerHTML = '';
         if (policies.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4">등록된 공지사항이 없습니다.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="4">등록된 정책이 없습니다.</td></tr>';
             return;
         }
 
@@ -199,23 +203,19 @@
         });
     }
 
-    // 페이징 버튼 렌더링 함수
+    // 4. 페이징 버튼 렌더링
     function renderPagination() {
         paginationDiv.innerHTML = '';
 
         const totalPages = Math.ceil(totalCount / pageSize);
-        if (totalPages <= 1) return; // 페이지가 1개 이하이면 페이징 표시 안함
+        if (totalPages <= 1) return;
 
-        // 이전 버튼
         const prevBtn = document.createElement('button');
         prevBtn.textContent = '<';
         prevBtn.disabled = currentPage === 1;
-        prevBtn.onclick = () => {
-            if (currentPage > 1) loadPolicies(currentPage - 1);
-        };
+        prevBtn.onclick = () => loadPolicies(currentPage - 1);
         paginationDiv.appendChild(prevBtn);
 
-        // 페이지 번호 버튼들 (최대 6개 표시)
         const maxPageButtons = 6;
         let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
         let endPage = startPage + maxPageButtons - 1;
@@ -228,22 +228,19 @@
         for (let i = startPage; i <= endPage; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.textContent = i;
-            pageBtn.disabled = (i === currentPage);
+            pageBtn.disabled = i === currentPage;
             pageBtn.onclick = () => loadPolicies(i);
             paginationDiv.appendChild(pageBtn);
         }
 
-        // 다음 버튼
         const nextBtn = document.createElement('button');
         nextBtn.textContent = '>';
         nextBtn.disabled = currentPage === totalPages;
-        nextBtn.onclick = () => {
-            if (currentPage < totalPages) loadPolicies(currentPage + 1);
-        };
+        nextBtn.onclick = () => loadPolicies(currentPage + 1);
         paginationDiv.appendChild(nextBtn);
     }
 
-    // 초기 로드
+    // 5. 초기 로드
     loadPolicies(1);
 </script>
 
