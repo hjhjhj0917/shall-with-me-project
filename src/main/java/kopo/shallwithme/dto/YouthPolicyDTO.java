@@ -18,7 +18,7 @@ public class YouthPolicyDTO {
     private String bizPrdBgngYmd;       // 사업기간 시작일
     private String bizPrdEndYmd;        // 사업기간 종료일
     private String aplyUrlAddr;         // 신청 URL 주소
-    private String inqCnt;              // 조회수
+    private int inqCnt;              // 조회수
 
     private int page = 1;   // 기본값 1
     private int size = 10;  // 기본값 10
