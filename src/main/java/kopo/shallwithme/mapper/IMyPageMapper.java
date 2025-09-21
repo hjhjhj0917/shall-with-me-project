@@ -1,6 +1,7 @@
 package kopo.shallwithme.mapper;
 
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -14,6 +15,9 @@ public interface IMyPageMapper {
 
     // 회원 비활성화
     int softDeleteUser(UserInfoDTO pDTO);
+
+    // 회원 프로필 이미지 비활성화
+    int deactivateProfile(UserProfileDTO pDTO);
 
     // 비활성 계정을 영구 삭제
     int deleteOldDeactivatedUsers();

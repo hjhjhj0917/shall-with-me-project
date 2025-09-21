@@ -192,6 +192,7 @@
     </div>
 </div>
 
+<%@ include file="../includes/chatbot.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 

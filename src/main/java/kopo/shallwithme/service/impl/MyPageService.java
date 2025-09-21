@@ -2,6 +2,7 @@ package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.dto.MailDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.mapper.IMyPageMapper;
 import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.service.IMyPageService;
@@ -22,6 +23,16 @@ public class MyPageService implements IMyPageService {
     private final IMyPageMapper myPageMapper;
     private final IMailService mailService;
 
+    @Override
+    public int deactivateProfile(UserProfileDTO pDTO) throws Exception {
+        log.info("{}.deactivateProfile Start!", this.getClass().getName());
+
+        int res = myPageMapper.deactivateProfile(pDTO);
+
+        log.info("{}.deactivateProfile End!", this.getClass().getName());
+
+        return res;
+    }
 
     @Override
     public UserInfoDTO pwCheck(UserInfoDTO pDTO) throws Exception {
