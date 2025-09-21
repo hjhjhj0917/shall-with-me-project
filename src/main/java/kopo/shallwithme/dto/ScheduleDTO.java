@@ -20,5 +20,6 @@ public class ScheduleDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String roomId;
 
 }

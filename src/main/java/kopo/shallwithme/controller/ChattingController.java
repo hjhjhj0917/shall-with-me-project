@@ -252,4 +252,5 @@ public class ChattingController {
 
         return rList; // JSON 형태로 반환됨
     }
+
 }
