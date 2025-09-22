@@ -16,7 +16,9 @@ body {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background-color: #3399ff;
+    background-color: white;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,18 +29,13 @@ body {
     transform: translateX(-50%); /* 정확한 중앙 정렬 */
 }
 
-.circle-btn:hover {
-    background-color: #2b88e6;
-}
-
 .btn-diary {
-    /* [추가] 텍스트 위치를 직접 지정 */
     position: absolute;
     bottom: 0; /* 컨테이너의 맨 아래에 위치 */
     left: 50%; /* 컨테이너의 중앙으로 이동 */
     transform: translateX(-50%); /* 정확한 중앙 정렬 */
 
-    color: #333; /* 눈에 잘 띄는 색으로 변경 */
+    color: #3399ff; /* 눈에 잘 띄는 색으로 변경 */
     font-size: 15px;
     font-weight: 500;
 }

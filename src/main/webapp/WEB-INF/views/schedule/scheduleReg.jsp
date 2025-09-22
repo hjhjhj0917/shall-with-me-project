@@ -34,7 +34,7 @@
         .schedule-container {
             display: flex;
             max-width: 1200px;
-            margin: 40px auto;
+            margin: -30px auto;
             background-color: #ffffff;
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
@@ -261,15 +261,31 @@
             }
         }
 
+        /* 상단 버튼 전체를 감싸는 컨테이너 */
         .top-buttons {
-            position: absolute;
+            position: relative;
             width: 65px;
-            height: 65px;
-            border-radius: 50%;
+            height: 85px;
             left: 100px;
-            top: 150px;
-            z-index: 10;
+            top: 70px;
+        }
+
+        /* 동그란 버튼 */
+        .circle-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #E5F2FF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: all 0.2s ease;
+            position: absolute;
+            left: 50%; /* 컨테이너의 중앙으로 이동 */
+            transform: translateX(-50%); /* 정확한 중앙 정렬 */
         }
 
         #step2 {
@@ -423,7 +439,9 @@
 <%@ include file="../includes/header.jsp" %>
 
 <div class="top-buttons" onclick="history.back()">
-    <i class="fa-solid fa-arrow-left fa-xl"></i>
+    <div class="circle-btn">
+        <i class="fa-solid fa-arrow-left fa-xl" style="color: #3399ff;"></i>
+    </div>
 </div>
 
 <main class="schedule-container">

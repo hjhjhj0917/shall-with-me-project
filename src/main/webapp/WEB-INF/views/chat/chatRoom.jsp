@@ -20,7 +20,7 @@
 
 <div class="top-buttons">
     <div class="circle-btn" id="scheduleBtn">
-        <i class="fa-regular fa-calendar fa-xl" style="color: #ffffff;"></i>
+        <i class="fa-solid fa-calendar-days fa-xl" style="color: #3399ff;"></i>
     </div>
     <span class="btn-diary">일정</span>
 </div>
