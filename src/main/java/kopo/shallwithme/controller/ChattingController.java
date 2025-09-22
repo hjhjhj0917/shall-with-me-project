@@ -52,29 +52,23 @@ public class ChattingController {
 
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatMessageDTO chatMessage) {
-
         log.info("{}.sendMessage Start!", this.getClass().getName());
 
-        // timestamp가 비어 있으면 현재 시간으로 설정
-        if (chatMessage.getTimestamp() == null) {
-            chatMessage.setTimestamp(LocalDateTime.now().toString());
-        }
-
         try {
-            // 메시지 시간을 항상 신뢰할 수 있는 서버 시간으로 설정
-            chatMessage.setTimestamp(LocalDateTime.now().toString());
+            // 클라이언트에서 보내는 sentAt 무시하고 서버 시간으로 덮어쓰기
+            chatMessage.setSentAt(LocalDateTime.now());
 
             chatService.saveMessage(chatMessage);
 
             messagingTemplate.convertAndSend("/topic/chatroom/" + chatMessage.getRoomId(), chatMessage);
 
         } catch (Exception e) {
-
             log.error("메시지 전송 및 저장 중 오류 발생: {}", chatMessage.toString(), e);
         }
 
         log.info("{}.sendMessage End!", this.getClass().getName());
     }
+
 
     @GetMapping("/messages")
     @ResponseBody
@@ -258,4 +252,5 @@ public class ChattingController {
 
         return rList; // JSON 형태로 반환됨
     }
+
 }

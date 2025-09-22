@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+
     <!-- FullCalendar 라이브러리 -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
@@ -494,7 +498,29 @@
 <%@ include file="../includes/customModal.jsp" %>
 
 <script>
+    let stompClient = null; // ✅ stompClient 전역 선언
+
+    // ✅ WebSocket 연결 함수
+    function connectWebSocket() {
+        const socket = new SockJS('/ws-chat'); // 💡 서버의 WebSocket 엔드포인트 확인 필요
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('WebSocket 연결 성공: ' + frame);
+
+            // 원하는 구독이 있다면 여기 추가
+            // stompClient.subscribe('/topic/chat', function (message) {
+            //     console.log("수신 메시지: ", message.body);
+            // });
+        }, function (error) {
+            console.error("WebSocket 연결 실패:", error);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        // ✅ WebSocket 연결
+        connectWebSocket();
+
         const calendarEl = document.getElementById('calendar');
         let f = document.getElementById("eventForm");
 
@@ -514,13 +540,12 @@
             height: '100%',
             fixedWeekCount: false,
             dayMaxEvents: true,
-            // buttonText: {
-            //     today: '오늘'
-            // },
+
             datesSet: function () {
                 $('.fc-dayGridMonth-button').html('<i class="fa-solid fa-calendar-days"></i>');
                 $('.fc-listWeek-button').html('<i class="fa-solid fa-list-ul"></i>');
             },
+
             events: function (fetchInfo, successCallback, failureCallback) {
                 $.ajax({
                     url: '/schedule/api/events',
@@ -528,11 +553,15 @@
                     dataType: 'json',
                     success: function (data) {
                         const transformedEvents = data.map(function (event) {
+                            const isPersonal = event.participantId === myUserId;
                             return {
                                 id: event.scheduleId,
                                 title: event.title,
                                 start: event.scheduleDt,
                                 end: event.end,
+                                backgroundColor: isPersonal ? '#ff9933' : '#3399ff',
+                                borderColor: isPersonal ? '#ff9933' : '#3399ff',
+                                textColor: '#fff',
                                 extendedProps: {
                                     location: event.location,
                                     memo: event.memo,
@@ -550,6 +579,7 @@
                     }
                 });
             },
+
             editable: true,
             selectable: true,
 
@@ -597,10 +627,8 @@
             $('#deleteEventBtn').hide();
         });
 
-        $(document).on("click", function (e) { // 나중에 추가
+        $(document).on("click", function (e) {
             const $target = $(e.target);
-
-            // 클릭한 요소가 input이나 로그인 버튼이 아니면 에러 스타일 제거
             if (
                 !$target.is("#eventTitleInput") &&
                 !$target.is("#eventTimeInput") &&
@@ -620,80 +648,70 @@
             const location = $('#eventLocationInput').val().trim();
 
             $(".login-input").removeClass("input-error");
-            $("#titleErrorMessage").removeClass("visible").text("");
-            $("#timeErrorMessage").removeClass("visible").text("");
-            $("#locationErrorMessage").removeClass("visible").text("");
+            $("#titleErrorMessage, #timeErrorMessage, #locationErrorMessage").removeClass("visible").text("");
 
             if (!title) {
                 $("#eventTitleInput").addClass("input-error");
-                $("#titleErrorMessage")
-                    .text("일정 제목을 입력하세요.")
-                    .addClass("visible");
-
-                // 2초 후 메시지 자동 숨김
-                setTimeout(function () {
-                    $("#titleErrorMessage").removeClass("visible");
-                }, 2000);
-
+                $("#titleErrorMessage").text("일정 제목을 입력하세요.").addClass("visible");
+                setTimeout(() => $("#titleErrorMessage").removeClass("visible"), 2000);
                 $("#eventTitleInput").focus();
                 return;
             }
 
             if (!time) {
                 $("#timePicker").addClass("input-error");
-                $("#timeErrorMessage")
-                    .text("시간을 입력하세요.")
-                    .addClass("visible");
-
-                // 2초 후 메시지 자동 숨김
-                setTimeout(function () {
-                    $("#timeErrorMessage").removeClass("visible");
-                }, 2000);
-
+                $("#timeErrorMessage").text("시간을 입력하세요.").addClass("visible");
+                setTimeout(() => $("#timeErrorMessage").removeClass("visible"), 2000);
                 $("#timePicker").focus();
                 return;
             }
 
             if (!location) {
                 $("#eventLocationInput").addClass("input-error");
-                $("#locationErrorMessage")
-                    .text("위치 정보를 입력하세요.")
-                    .addClass("visible");
-
-                // 2초 후 메시지 자동 숨김
-                setTimeout(function () {
-                    $("#locationErrorMessage").removeClass("visible");
-                }, 2000);
-
+                $("#locationErrorMessage").text("위치 정보를 입력하세요.").addClass("visible");
+                setTimeout(() => $("#locationErrorMessage").removeClass("visible"), 2000);
                 $("#eventLocationInput").focus();
                 return;
             }
 
-            let startDate = $('#eventStartDate').val(); // 예: '2025-09-15'
+            let startDate = $('#eventStartDate').val();
             if (startDate && time) {
-                startDate += 'T' + time + ':00'; // => '2025-09-15T14:30:00'
+                startDate += 'T' + time + ':00';
             }
 
             const eventData = {
                 title: title,
                 scheduleDt: startDate,
                 participantId: participantId,
-                location: $('#eventLocationInput').val(),
-                memo: $('#eventMemoInput').val()
+                location: location,
+                memo: $('#eventMemoInput').val(),
+                roomId: roomId
             };
 
             $.ajax({
-                url: '/schedule/api/events',
-                type: 'POST',
+                url: '/schedule/api/events/request',
+                method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(eventData),
-                success: function () {
+                success: function(savedEvent) {
+                    console.log("요청 응답:", savedEvent);   // 여기에 schedule 객체 확인
                     $('#step2').hide();
                     $('#step1').show();
                     calendar.refetchEvents();
+
+                    if (stompClient && stompClient.connected) {
+                        const scheduleMessage = {
+                            roomId: roomId,
+                            senderId: myUserId,
+                            messageType: 'SCHEDULE',
+                            schedule: savedEvent,
+                            sentAt: new Date().toISOString()
+                        };
+                        stompClient.send("/app/chat/send", {}, JSON.stringify(scheduleMessage));
+                    }
                 },
-                error: function () {
-                    alert('일정 저장에 실패했습니다.');
+                error: function(err) {
+                    alert("일정 저장에 실패했습니다.");
                 }
             });
         });
@@ -717,7 +735,7 @@
     flatpickr("#timePicker", {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "h:i K", // 12시간제 (오전/오후)
+        dateFormat: "h:i", // 12시간제 (오전/오후)
         time_24hr: false,    // true면 24시간제
         minuteIncrement: 5   // 분 단위 간격
     });
@@ -725,15 +743,24 @@
 </script>
 
 <%
+    String ssUserId = (String) session.getAttribute("SS_USER_ID");
+    if (ssUserId == null) ssUserId = "";
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
     if (ssUserName == null) ssUserName = "";
+
     String targetUserId = request.getParameter("targetUserId");
-    if (targetUserId == null) targetUserId = "";
+    if (targetUserId == null || targetUserId.isEmpty()) {
+        targetUserId = ssUserId; // 상대방 ID가 없으면 자신의 ID 사용
+    }
+
+    String roomId = request.getParameter("roomId");
 %>
 
 <script>
     const userName = "<%= ssUserName %>";
+    const myUserId = "<%= ssUserId %>";
     const targetUserId = "<%= targetUserId %>";
+    const roomId = "<%= roomId %>"
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>

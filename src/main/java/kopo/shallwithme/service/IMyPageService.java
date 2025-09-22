@@ -1,6 +1,7 @@
 package kopo.shallwithme.service;
 
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 
 public interface IMyPageService {
 
@@ -12,6 +13,9 @@ public interface IMyPageService {
 
     // 회원 비활성화
     int deactivateUser(UserInfoDTO pDTO) throws Exception;
+
+    // 회원 프로필 이미지 비활성화
+    int deactivateProfile(UserProfileDTO pDTO) throws Exception;
 
     // 비활성 계정을 영구 삭제
     int hardDeleteDeactivatedUsers();

@@ -31,6 +31,16 @@
         USER_ID = #{userId}
     </update>
 
+    <update id="deactivateProfile" parameterType="UserProfileDTO">
+        UPDATE
+            USER_PROFILE
+        SET
+            profile_image_url = '/images/withdraw-profile-img.png',
+            chg_dt = NOW()
+        WHERE
+            user_id = #{userId}
+    </update>
+
     <!-- 탈퇴한 지 30일 지난 회원 영구 삭제 (Hard Delete) 쿼리 -->
     <delete id="deleteOldDeactivatedUsers">
         DELETE FROM USER_INFO

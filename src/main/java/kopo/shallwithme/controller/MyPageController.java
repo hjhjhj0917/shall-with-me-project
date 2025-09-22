@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.MsgDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.IMyPageService;
 import kopo.shallwithme.util.CmmUtil;
@@ -183,15 +184,20 @@ public class MyPageController {
                 if (rDTO != null && !CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {
                     // 비밀번호 일치 → 삭제
                     UserInfoDTO dDTO = new UserInfoDTO();
+                    UserProfileDTO fDTO = new UserProfileDTO();
+
                     dDTO.setUserId(userId);
                     dDTO.setUserName(session.getAttribute("SS_USER_NAME").toString());
                     dDTO.setEmail(session.getAttribute("SS_USER_EMAIL").toString());
 
+                    fDTO.setUserId(userId);
+
                     log.info(dDTO.getEmail());
 
+                    int j = myPageService.deactivateProfile(fDTO);
                     int i = myPageService.deactivateUser(dDTO);
 
-                    if (i > 0) {
+                    if (i > 0 && j > 0) {
                         res = 1;
                         msg = "회원 탈퇴가 완료되었습니다.";
                         // 세션 종료

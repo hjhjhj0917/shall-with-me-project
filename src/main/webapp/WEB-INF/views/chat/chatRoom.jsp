@@ -107,13 +107,16 @@
                     stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
                         const msg = JSON.parse(message.body);
 
-                        // [수정] 내가 보낸 메시지(myUser.id)이면 화면에 다시 그리지 않음
                         if (msg.senderId === myUser.id) {
                             console.log("내가 보낸 메시지이므로 화면에 다시 그리지 않습니다.");
                             return;
                         }
 
-                        appendMessage(msg);
+                        if (msg.messageType === 'SCHEDULE') {
+                            renderChatMessage(msg);
+                        } else {
+                            appendMessage(msg);
+                        }
                     });
                 });
         });
@@ -129,7 +132,8 @@
             roomId: roomId,
             senderId: myUser.id,
             message: message,
-            clientId: clientId
+            clientId: clientId,
+            sentAt: new Date().toISOString()
         };
 
         // 내가 보낸 메시지를 화면에 즉시 표시
@@ -143,12 +147,20 @@
     // 메시지를 화면에 추가하는 함수
     function appendMessage(msg) {
         const chatBox = document.getElementById("chatBox");
+        console.log("appendMessage 호출 - sentAt:", msg.sentAt);
         if (!chatBox) return;
+
+        let sentAtStr = msg.sentAt;
+
+        if (sentAtStr && sentAtStr.length === 19 && sentAtStr.indexOf('Z') === -1) {
+            // "YYYY-MM-DDTHH:mm:ss" 형태이면 끝에 'Z' 붙여서 UTC로 변환 시도
+            sentAtStr += 'Z';
+        }
 
         // ... 날짜 및 시간 변수 선언은 기존과 동일 ...
         const senderId = msg.senderId;
         const text = msg.message;
-        const time = msg.timestamp || new Date();
+        const time = sentAtStr ? new Date(sentAtStr) : new Date();
         const msgDate = new Date(time);
         const dateStr = `${msgDate.getFullYear()}년 ${msgDate.getMonth() + 1}월 ${msgDate.getDate()}일`;
         const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -215,9 +227,82 @@
 
     window.onload = connect;
 
+    function renderChatMessage(message) {
+        const chatMessages = document.getElementById('chatMessages');
+
+        if (message.messageType === 'SCHEDULE') {
+            const schedule = message.schedule;
+
+            const scheduleDiv = document.createElement('div');
+            scheduleDiv.classList.add('chat-message', 'schedule-message');
+
+            scheduleDiv.innerHTML = `
+      <div class="schedule-title">${schedule.title}</div>
+      <div class="schedule-info">
+        <div>시간: <span class="schedule-date">${schedule.scheduleDt}</span></div>
+        <div>장소: ${schedule.location}</div>
+        <div>메모: ${schedule.memo || '없음'}</div>
+      </div>
+      <div class="schedule-actions">
+        <button class="accept-btn">수락</button>
+        <button class="reject-btn">거절</button>
+      </div>
+    `;
+
+            // 수락 버튼 이벤트
+            scheduleDiv.querySelector('.accept-btn').addEventListener('click', () => {
+                acceptSchedule(message);
+            });
+
+            // 거절 버튼 이벤트
+            scheduleDiv.querySelector('.reject-btn').addEventListener('click', () => {
+                rejectSchedule(message);
+            });
+
+            chatMessages.appendChild(scheduleDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        } else {
+            // 기존 텍스트 메시지 렌더링 코드 (예시)
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('chat-message');
+            textDiv.textContent = message.text || '(메시지 없음)';
+            chatMessages.appendChild(textDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    function acceptSchedule(message) {
+        // 예: REST API 호출 or WebSocket 메시지 전송 등
+        fetch(`/schedule/api/events/accept`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ scheduleId: message.schedule.id, userId: myUser.id })
+        }).then(res => {
+            if(res.ok) {
+                alert('일정을 수락했습니다.');
+                // UI 업데이트 로직 추가 가능
+            }
+        });
+    }
+
+    function rejectSchedule(message) {
+        fetch(`/schedule/api/events/reject`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ scheduleId: message.schedule.id, userId: myUser.id })
+        }).then(res => {
+            if(res.ok) {
+                alert('일정을 거절했습니다.');
+                // UI 업데이트 로직 추가 가능
+            }
+        });
+    }
+
     $("#scheduleBtn").on("click", function () {
-        location.href = '/schedule/scheduleReg?targetUserId='+ otherUser.id;
+        location.href = '/schedule/scheduleReg?targetUserId=' + otherUser.id + '&roomId=' + roomId;
     });
+
 </script>
 
 </body>

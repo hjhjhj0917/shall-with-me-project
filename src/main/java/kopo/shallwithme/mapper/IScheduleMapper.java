@@ -1,5 +1,6 @@
 package kopo.shallwithme.mapper;
 
+import kopo.shallwithme.dto.ChatMessageDTO;
 import kopo.shallwithme.dto.ScheduleDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,4 +15,10 @@ public interface IScheduleMapper {
 
     // 새로운 일정 등록
     int insertSchedule(ScheduleDTO pDTO);
+
+    // 일정 상태 업데이트 쿼리
+    void updateScheduleStatus(String scheduleId, String status, String userId);
+
+    // 일정 ID로 메시지 조회 쿼리
+    ChatMessageDTO selectMessageByScheduleId(String scheduleId);
 }

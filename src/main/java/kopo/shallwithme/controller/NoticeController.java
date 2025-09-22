@@ -2,12 +2,12 @@ package kopo.shallwithme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.shallwithme.dto.YouthPolicyDTO;
-import kopo.shallwithme.service.IYouthPolicyService;
+import kopo.shallwithme.service.impl.YouthPolicyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -15,25 +15,26 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/notice")
+@Slf4j
 public class NoticeController {
 
-    private final IYouthPolicyService youthPolicyService;
+    private final YouthPolicyService youthPolicyService;
 
     @GetMapping("/noticeList")
-    public String noticeList(@ModelAttribute YouthPolicyDTO dto, ModelMap model) throws Exception {
-        int page = Math.max(dto.getPage(), 1);
-        int size = Math.max(dto.getSize(), 1);
+    public String noticeList(ModelMap model) throws Exception {
+        log.info("{}.noticeList Start!", this.getClass().getName());
 
-        List<YouthPolicyDTO> policies = youthPolicyService.getPolicies(page, size);
-        int totalCount = youthPolicyService.getTotalPolicyCount();
-        int totalPages = (int) Math.ceil((double) totalCount / size);
+        // 전체 정책 데이터 DB에서 불러오기
+        List<YouthPolicyDTO> policies = youthPolicyService.getPolicies();
 
+        // JSON 형태로 변환하여 JSP에 넘김
         ObjectMapper objectMapper = new ObjectMapper();
         String policiesJson = objectMapper.writeValueAsString(policies);
 
         model.addAttribute("policiesJson", policiesJson);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalCount", policies.size()); // 전체 개수만 전달
+
+        log.info("{}.noticeList End!", this.getClass().getName());
 
         return "notice/noticeList";
     }

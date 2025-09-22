@@ -1,16 +1,23 @@
 package kopo.shallwithme.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kopo.shallwithme.dto.ChatMessageDTO;
 import kopo.shallwithme.dto.ScheduleDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.service.impl.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequestMapping(value = "/schedule")
@@ -19,6 +26,7 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("scheduleReg")
     public String scheduleReg() {
@@ -71,4 +79,69 @@ public class ScheduleController {
 
         return res;
     }
+
+    @PostMapping("/api/events/request")
+    @ResponseBody
+    public ResponseEntity<?> requestSchedule(@RequestBody ScheduleDTO pDTO, HttpSession session) {
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        String roomId = pDTO.getRoomId();
+
+        pDTO.setCreatorId(userId);
+
+        // DB 저장 없이 수락 요청 메시지 생성
+        ChatMessageDTO chatMessage = new ChatMessageDTO();
+        chatMessage.setRoomId(roomId);
+        chatMessage.setSenderId(userId);
+        chatMessage.setMessageType("SCHEDULE");
+        chatMessage.setSchedule(pDTO);
+        chatMessage.setSentAt(LocalDateTime.now());
+
+        // WebSocket으로 수락 요청 메시지 전송
+        messagingTemplate.convertAndSend("/topic/chatroom/" + roomId, chatMessage);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/api/events/accept")
+    @ResponseBody
+    public ResponseEntity<?> acceptSchedule(@RequestBody Map<String, String> payload) {
+        String scheduleId = payload.get("scheduleId");
+        String userId = payload.get("userId");
+
+        try {
+            // 실제 일정 저장/업데이트 로직 수행
+            scheduleService.updateScheduleStatus(scheduleId, "ACCEPTED", userId);
+
+            // 업데이트된 메시지 가져오기 (필요시)
+            ChatMessageDTO updatedMsg = scheduleService.getChatMessageByScheduleId(scheduleId);
+
+            // WebSocket으로 변경된 일정 메시지 전송 (알림용)
+            messagingTemplate.convertAndSend("/topic/chatroom/" + updatedMsg.getRoomId(), updatedMsg);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일정 수락 처리 실패");
+        }
+    }
+
+    @PostMapping("/api/events/reject")
+    @ResponseBody
+    public ResponseEntity<?> rejectSchedule(@RequestBody Map<String, String> payload) {
+        String scheduleId = payload.get("scheduleId");
+        String userId = payload.get("userId");
+
+        try {
+            scheduleService.updateScheduleStatus(scheduleId, "REJECTED", userId);
+
+            ChatMessageDTO updatedMsg = scheduleService.getChatMessageByScheduleId(scheduleId);
+
+            messagingTemplate.convertAndSend("/topic/chatroom/" + updatedMsg.getRoomId(), updatedMsg);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일정 거절 처리 실패");
+        }
+    }
+
+
 }

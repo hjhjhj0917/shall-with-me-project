@@ -22,4 +22,26 @@
                  )
     </insert>
 
+    <!-- 일정 상태 업데이트 -->
+    <update id="updateScheduleStatus" parameterType="map">
+        UPDATE CHAT_MESSAGE
+        SET status = #{status}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <!-- 일정 ID로 메시지 조회 -->
+    <select id="selectMessageByScheduleId" parameterType="string" resultType="ChatMessageDTO">
+        SELECT
+            message_id,
+            room_id AS roomId,
+            sender_id AS senderId,
+            message,
+            sent_at AS sentAt,
+            message_type AS messageType,
+            schedule -- 복합 타입인 경우 매핑 주의 필요
+        FROM CHAT_MESSAGE
+        WHERE schedule_id = #{scheduleId}
+            LIMIT 1
+    </select>
+
 </mapper>
