@@ -182,7 +182,11 @@
             tdNo.textContent = policy.plcyNo || '정책번호 없음';
 
             const tdTitle = document.createElement('td');
-            tdTitle.textContent = policy.plcyNm || '제목 없음';
+            // 상세보기 새탭 링크 추가
+            const detailLink = document.createElement('a');
+            detailLink.href = `/notice/noticeDetail?plcyNo=` + policy.plcyNo;
+            detailLink.textContent = policy.plcyNm || '제목 없음';
+            tdTitle.appendChild(detailLink);
 
             const tdPeriod = document.createElement('td');
             tdPeriod.textContent = `${policy.bizPrdBgngYmd || '-'} ~ ${policy.bizPrdEndYmd || '-'}`;
@@ -202,6 +206,7 @@
             tableBody.appendChild(tr);
         });
     }
+
 
     // 4. 페이징 버튼 렌더링
     function renderPagination() {
