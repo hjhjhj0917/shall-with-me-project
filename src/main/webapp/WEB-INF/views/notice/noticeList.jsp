@@ -51,7 +51,7 @@
         }
 
         tbody td:nth-child(2) {
-            width: 60%;
+            width: 70%;
             font-weight: 600;
             white-space: normal;
             word-break: break-word;
@@ -94,6 +94,38 @@
         #pagination button:hover:not(:disabled) {
             background-color: #e0e0e0;   /* 마우스 올렸을 때 배경 */
         }
+
+        .notice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: -5px;
+        }
+
+        .notice-search input[type="text"] {
+            padding: 6px 10px;
+            width: 250px;
+            font-size: 15px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            outline: none;
+        }
+
+        .notice-search button {
+            padding: 6px 12px;
+            margin-left: 6px;
+            background-color: #1c407d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .notice-search button:hover {
+            background-color: #16345f; /* 버튼 hover 색상 (선택 사항) */
+        }
+
     </style>
 </head>
 <body>
@@ -101,8 +133,15 @@
 <%@ include file="../includes/header.jsp" %>
 
 <div class="notice-container">
-    <h2>청년정책 알림</h2>
-
+    <div class="notice-header">
+        <h2>청년정책 알림</h2>
+        <div class="notice-search">
+            <input type="text" id="searchInput" placeholder="제목 검색...">
+            <button onclick="handleSearch()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+    </div>
     <!-- JSON 데이터 전달용 div -->
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <div id="policyJsonData" data-json="<c:out value='${policiesJson}'/>" style="display: none;"></div>
@@ -113,7 +152,6 @@
             <th>정책 No</th>
             <th>제목</th>
             <th>접수기간</th>
-            <th>바로가기</th>
         </tr>
         </thead>
         <tbody id="policyTableBody"></tbody>
@@ -140,6 +178,7 @@
     let currentPage = 1;  // 현재 페이지 번호
     let totalCount = 0;   // 전체 아이템 수
     let allPolicies = []; // 전체 정책 데이터
+    let filteredPolicies = []; // 🔍 검색된 데이터 저장용
 
     const tableBody = document.getElementById('policyTableBody');
     const paginationDiv = document.getElementById('pagination');
@@ -158,12 +197,11 @@
     // 2. 특정 페이지의 데이터 로드
     function loadPolicies(page) {
         currentPage = page;
+        const data = filteredPolicies.length ? filteredPolicies : allPolicies;
         const startIdx = (page - 1) * pageSize;
         const endIdx = startIdx + pageSize;
 
-        const paginatedPolicies = allPolicies.slice(startIdx, endIdx);
-
-        renderTable(paginatedPolicies);
+        renderTable(data.slice(startIdx, endIdx));
         renderPagination();
     }
 
@@ -171,8 +209,18 @@
     function renderTable(policies) {
         tableBody.innerHTML = '';
         if (policies.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="4">등록된 정책이 없습니다.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="3">등록된 정책이 없습니다.</td></tr>';
             return;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr.length !== 8) return dateStr || '-';
+
+            const year = dateStr.substring(0, 4);
+            const month = parseInt(dateStr.substring(4, 6), 10);
+            const day = parseInt(dateStr.substring(6, 8), 10);
+
+            return year + '년 ' + month + '월 ' + day + '일';
         }
 
         policies.forEach(policy => {
@@ -189,64 +237,85 @@
             tdTitle.appendChild(detailLink);
 
             const tdPeriod = document.createElement('td');
-            tdPeriod.textContent = `${policy.bizPrdBgngYmd || '-'} ~ ${policy.bizPrdEndYmd || '-'}`;
-
-            const tdLink = document.createElement('td');
-            const a = document.createElement('a');
-            a.href = policy.aplyUrlAddr || '#';
-            a.target = '_blank';
-            a.textContent = '바로가기';
-            tdLink.appendChild(a);
+            const start = formatDate(policy.bizPrdBgngYmd);
+            const end = formatDate(policy.bizPrdEndYmd);
+            tdPeriod.textContent = start + ' ~ ' + end;
 
             tr.appendChild(tdNo);
             tr.appendChild(tdTitle);
             tr.appendChild(tdPeriod);
-            tr.appendChild(tdLink);
 
             tableBody.appendChild(tr);
         });
     }
 
+    function handleSearch() {
+        const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+        // 제목 필터링
+        filteredPolicies = allPolicies.filter(policy =>
+            policy.plcyNm && policy.plcyNm.toLowerCase().includes(keyword)
+        );
+
+        totalCount = filteredPolicies.length;
+        currentPage = 1;
+        renderTable(filteredPolicies.slice(0, pageSize));
+        renderPagination();
+    }
 
     // 4. 페이징 버튼 렌더링
     function renderPagination() {
         paginationDiv.innerHTML = '';
 
-        const totalPages = Math.ceil(totalCount / pageSize);
+        const data = filteredPolicies.length ? filteredPolicies : allPolicies;
+        const totalPages = Math.ceil(data.length / pageSize);
         if (totalPages <= 1) return;
 
-        const prevBtn = document.createElement('button');
-        prevBtn.textContent = '<';
-        prevBtn.disabled = currentPage === 1;
-        prevBtn.onclick = () => loadPolicies(currentPage - 1);
-        paginationDiv.appendChild(prevBtn);
+        const makeBtn = (text, page, disabled = false) => {
+            const btn = document.createElement('button');
+            btn.textContent = text;
+            btn.disabled = disabled;
+            btn.onclick = () => {
+                currentPage = page;
+                const startIdx = (page - 1) * pageSize;
+                const endIdx = startIdx + pageSize;
+                renderTable(data.slice(startIdx, endIdx));
+                renderPagination();
+            };
+            paginationDiv.appendChild(btn);
+        };
+
+        makeBtn('<<', 1, currentPage === 1);
+        makeBtn('<', currentPage - 1, currentPage === 1);
 
         const maxPageButtons = 6;
         let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
         let endPage = startPage + maxPageButtons - 1;
-
         if (endPage > totalPages) {
             endPage = totalPages;
             startPage = Math.max(1, endPage - maxPageButtons + 1);
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            const pageBtn = document.createElement('button');
-            pageBtn.textContent = i;
-            pageBtn.disabled = i === currentPage;
-            pageBtn.onclick = () => loadPolicies(i);
-            paginationDiv.appendChild(pageBtn);
+            makeBtn(i, i, i === currentPage);
         }
 
-        const nextBtn = document.createElement('button');
-        nextBtn.textContent = '>';
-        nextBtn.disabled = currentPage === totalPages;
-        nextBtn.onclick = () => loadPolicies(currentPage + 1);
-        paginationDiv.appendChild(nextBtn);
+        makeBtn('>', currentPage + 1, currentPage === totalPages);
+        makeBtn('>>', totalPages, currentPage === totalPages);
     }
 
     // 5. 초기 로드
     loadPolicies(1);
+    renderPagination(allPolicies);
+
+    // Enter 키 입력 시 검색 실행
+    document.getElementById('searchInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    });
+
+
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
