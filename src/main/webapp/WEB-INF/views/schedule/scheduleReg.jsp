@@ -34,7 +34,8 @@
         .schedule-container {
             display: flex;
             max-width: 1200px;
-            margin: -30px auto;
+            /*margin: -30px auto;*/
+            margin: 40px auto;
             background-color: #ffffff;
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
@@ -198,10 +199,24 @@
         }
 
         .fc .fc-day-today {
-            background-color: white !important;
+            box-sizing: border-box !important;
             border: 2px solid #3399ff !important;
-            box-sizing: border-box;
             border-radius: 4px;
+            background-color: white !important;
+            z-index: 1;
+            position: relative;
+        }
+
+        .fc .fc-scrollgrid {
+            padding-right: 2px;
+        }
+
+        .fc .fc-daygrid-day.fc-day-today:last-child {
+            padding-right: 2px;
+        }
+
+        .fc-day-sat.fc-day-today {
+            margin-right: 2px;
         }
 
         /* 날짜 셀 내 "오늘" 텍스트 표시용 */
@@ -418,16 +433,21 @@
             gap: 6px; /* 시/분/AMPM 간격 */
         }
 
+        .schedule-save-btn {
+            background-color: #3399ff;
+            color: white;
+        }
+
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const timeWrapper = document.getElementById('timeInputWrapper');
-            const timeInput = document.getElementById('eventTimeInput');
+            const timeInput = document.getElementById('timePicker');
 
             timeWrapper.addEventListener('click', function () {
-                // 브라우저에서 지원할 경우 강제로 picker 띄우기
-                if (typeof timeInput.showPicker === "function") {
-                    timeInput.showPicker();
+                // flatpickr 인스턴스가 연결되어 있으면 open() 호출
+                if (timeInput._flatpickr) {
+                    timeInput._flatpickr.open();
                 } else {
                     timeInput.focus();
                 }
@@ -438,11 +458,11 @@
 <body>
 <%@ include file="../includes/header.jsp" %>
 
-<div class="top-buttons" onclick="history.back()">
-    <div class="circle-btn">
-        <i class="fa-solid fa-arrow-left fa-xl" style="color: #3399ff;"></i>
-    </div>
-</div>
+<%--<div class="top-buttons" onclick="history.back()">--%>
+<%--    <div class="circle-btn">--%>
+<%--        <i class="fa-solid fa-arrow-left fa-xl" style="color: #3399ff;"></i>--%>
+<%--    </div>--%>
+<%--</div>--%>
 
 <main class="schedule-container">
     <%-- 왼쪽: 일정 정보 패널 --%>
@@ -502,7 +522,7 @@
             <div class="modal-buttons">
                 <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>
                 <button type="button" onclick="cancelRegister()">취소</button>
-                <button type="submit">저장</button>
+                <button type="submit" class="schedule-save-btn">저장</button>
             </div>
         </form>
     </aside>

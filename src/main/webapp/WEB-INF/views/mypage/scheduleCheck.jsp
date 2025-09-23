@@ -191,10 +191,24 @@
         }
 
         .fc .fc-day-today {
-            background-color: white !important;
+            box-sizing: border-box !important;
             border: 2px solid #3399ff !important;
-            box-sizing: border-box;
             border-radius: 4px;
+            background-color: white !important;
+            z-index: 1;
+            position: relative;
+        }
+
+        .fc .fc-scrollgrid {
+            padding-right: 2px;
+        }
+
+        .fc .fc-daygrid-day.fc-day-today:last-child {
+            padding-right: 2px;
+        }
+
+        .fc-day-sat.fc-day-today {
+            margin-right: 2px;
         }
 
         /* 날짜 셀 내 "오늘" 텍스트 표시용 */
@@ -274,7 +288,7 @@
         #step2 form {
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: 500px;
         }
 
         #eventMemoInput {
@@ -285,9 +299,6 @@
 
         #eventTimeInput {
             font-family: inherit;
-        }
-
-        .modal-buttons {
         }
 
         .form-group input {
@@ -395,16 +406,36 @@
             gap: 6px; /* 시/분/AMPM 간격 */
         }
 
+        .schedule-modal-buttons {
+            margin-top: 14px;
+        }
+
+        .schedule-btn {
+            display: flex;
+            width: 100%;
+            padding: 14px;
+            background-color: #3399ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const timeWrapper = document.getElementById('timeInputWrapper');
-            const timeInput = document.getElementById('eventTimeInput');
+            const timeInput = document.getElementById('timePicker');
 
             timeWrapper.addEventListener('click', function () {
-                // 브라우저에서 지원할 경우 강제로 picker 띄우기
-                if (typeof timeInput.showPicker === "function") {
-                    timeInput.showPicker();
+                // flatpickr 인스턴스가 연결되어 있으면 open() 호출
+                if (timeInput._flatpickr) {
+                    timeInput._flatpickr.open();
                 } else {
                     timeInput.focus();
                 }
@@ -446,12 +477,15 @@
             </div>
         </aside>
 
+
         <aside id="step2" class="schedule-info">
-            <div class="host-info">
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
-                     alt="프로필 사진" class="host-profile-pic">
-                <div class="host-name"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
-            </div>
+
+                <div class="host-info">
+                    <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
+                         alt="프로필 사진" class="host-profile-pic">
+                    <div class="host-name"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
+                </div>
+
             <div class="event-title">
                 <h2 id="regTitleDisplay">일정을 등록하세요</h2>
             </div>
@@ -476,10 +510,10 @@
                 <div class="form-group">
                     <textarea placeholder="메모" id="eventMemoInput"></textarea>
                 </div>
-                <div class="modal-buttons">
+                <div class="schedule-modal-buttons">
                     <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>
-                    <button type="button" onclick="cancelRegister()">취소</button>
-                    <button type="submit">저장</button>
+                    <%-- <button type="button" onclick="cancelRegister()">취소</button> --%>
+                    <button type="submit" class="schedule-btn">일정 등록하기</button>
                 </div>
             </form>
         </aside>

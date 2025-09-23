@@ -171,7 +171,7 @@
         if (isInvalid(value)) {
             section.remove();
         } else {
-            element.textContent = value;
+            element.innerHTML = value;
         }
     };
 
