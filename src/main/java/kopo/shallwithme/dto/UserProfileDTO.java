@@ -19,4 +19,5 @@ public class UserProfileDTO {
     private String chgDt;           // 수정일 (추가 데이터)
 
     private List<String> tags;
+    private String status;
 }

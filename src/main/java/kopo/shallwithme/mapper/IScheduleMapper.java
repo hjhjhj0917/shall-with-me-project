@@ -16,6 +16,12 @@ public interface IScheduleMapper {
     // 새로운 일정 등록
     int insertSchedule(ScheduleDTO pDTO);
 
+    // 일정 수정
+    int updateSchedule(ScheduleDTO pDTO) throws Exception;
+
+    // 일정 삭제
+    int deleteSchedule(ScheduleDTO pDTO) throws Exception;
+
     // 일정 상태 업데이트 쿼리
     void updateScheduleStatus(String scheduleId, String status, String userId);
 

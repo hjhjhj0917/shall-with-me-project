@@ -227,6 +227,16 @@
             font-weight: 500;
         }
 
+        .fc-listWeek-view .fc-day-today::before,
+        .fc-listDay-view .fc-day-today::before {
+            content: none !important;
+        }
+
+        .fc-listWeek-view .fc-day-today,
+        .fc-listDay-view .fc-day-today {
+            border: none !important;
+        }
+
         /* 요일(header) 배경색 변경 */
         .fc .fc-col-header {
             background-color: #f0f4ff;
@@ -410,7 +420,9 @@
             margin-top: 14px;
         }
 
-        .schedule-btn {
+        .schedule-btn,
+        .btn-register,
+        .btn-edit {
             display: flex;
             width: 100%;
             padding: 14px;
@@ -425,6 +437,48 @@
             justify-content: center;
             margin-top: 25px;
         }
+
+        /* 이벤트가 없을 때 메시지 배경 흰색으로 변경 */
+        .fc-list-empty {
+            background-color: white !important;
+            color: #555;
+            padding: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .btn-update {
+            display: flex;
+            width: 100%;
+            padding: 14px;
+            background-color: #3399ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            justify-content: center;
+            margin-top: 0; !important;
+            margin-bottom: 5px;
+        }
+
+        #deleteEventBtn {
+            display: none;
+            width: 100%;
+            padding: 14px;
+            background-color: #c2c2c2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 15px;
+        }
+
 
     </style>
     <script>
@@ -456,7 +510,7 @@
         <%-- 왼쪽: 일정 정보 패널 --%>
         <aside id="step1" class="schedule-info">
             <div class="host-info">
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
+                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/withdraw-profile-img.png" %>"
                      alt="프로필 사진" class="host-profile-pic">
                 <div class="host-name" id="hostName"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
             </div>
@@ -473,18 +527,18 @@
                 달력에서 등록된 일정을 클릭하여 상세 내용을 확인하거나, 비어있는 날짜를 클릭하여 새 일정을 추가할 수 있습니다.
             </p>
             <div class="schedule-footer">
-                <button class="confirm-btn" id="addNewEventBtn">새 일정 등록하기</button>
+                <button type="button" class="btn-event-action btn-add" style="display:none;">새 일정 등록하기</button>
             </div>
         </aside>
 
 
         <aside id="step2" class="schedule-info">
 
-                <div class="host-info">
-                    <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
-                         alt="프로필 사진" class="host-profile-pic">
-                    <div class="host-name"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
-                </div>
+            <div class="host-info">
+                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
+                     alt="프로필 사진" class="host-profile-pic">
+                <div class="host-name"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
+            </div>
 
             <div class="event-title">
                 <h2 id="regTitleDisplay">일정을 등록하세요</h2>
@@ -511,9 +565,8 @@
                     <textarea placeholder="메모" id="eventMemoInput"></textarea>
                 </div>
                 <div class="schedule-modal-buttons">
+                    <button type="submit" class="schedule-btn btn-register">일정 등록하기</button>
                     <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>
-                    <%-- <button type="button" onclick="cancelRegister()">취소</button> --%>
-                    <button type="submit" class="schedule-btn">일정 등록하기</button>
                 </div>
             </form>
         </aside>
@@ -527,242 +580,6 @@
 
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('calendar');
-        let f = document.getElementById("eventForm");
-
-        $("#eventLocationInput").on("click", function () {
-            kakaoPost(f);
-        });
-
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'ko',
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: ' ',
-                center: 'prev title next',
-                right: 'dayGridMonth,listWeek'
-            },
-            displayEventTime: false,
-            height: '100%',
-            fixedWeekCount: false,
-            dayMaxEvents: true,
-            // buttonText: {
-            //     today: '오늘'
-            // },
-            datesSet: function () {
-                $('.fc-dayGridMonth-button').html('<i class="fa-solid fa-calendar-days"></i>');
-                $('.fc-listWeek-button').html('<i class="fa-solid fa-list-ul"></i>');
-            },
-            events: function (fetchInfo, successCallback, failureCallback) {
-                $.ajax({
-                    url: '/schedule/api/events',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        const transformedEvents = data.map(function (event) {
-                            // 자기 자신의 ID와 participantId가 같으면 개인 일정
-                            const isPersonal = event.participantId === myUserId;
-
-                            return {
-                                id: event.scheduleId,
-                                title: event.title,
-                                start: event.scheduleDt,
-                                end: event.end,
-                                backgroundColor: isPersonal ? '#ff9933' : '#3399ff',  // 개인: 주황, 상대방: 파랑
-                                borderColor: isPersonal ? '#ff9933' : '#3399ff',
-                                textColor: '#fff',
-                                extendedProps: {
-                                    location: event.location,
-                                    memo: event.memo,
-                                    creatorId: event.creatorId,
-                                    participantId: event.participantId,
-                                    originalEvent: event
-                                }
-                            };
-                        });
-                        successCallback(transformedEvents);
-                    },
-                    error: function (error) {
-                        console.error("일정 로딩 중 에러 발생", error);
-                        failureCallback(error);
-                    }
-                });
-            },
-            editable: true,
-            selectable: true,
-
-            select: function (info) {
-                $('#step1').hide();
-                $('#step2').show();
-                $('#eventForm')[0].reset();
-                $('#eventStartDate').val(info.startStr);
-                $('#deleteEventBtn').hide();
-            },
-
-            eventClick: function (info) {
-                const props = info.event.extendedProps;
-                const original = props.originalEvent;
-
-                $('#eventTitleDisplay').text(original.title);
-
-                const eventDate = new Date(original.scheduleDt);
-                const options = {year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'};
-                $('#eventTimeDisplay').text(new Intl.DateTimeFormat('ko-KR', options).format(eventDate));
-                $('#eventTimeMeta').show();
-
-                if (original.location) {
-                    $('#eventLocationDisplay').text(original.location);
-                    $('#eventLocationMeta').show();
-                } else {
-                    $('#eventLocationMeta').hide();
-                }
-
-                $('#eventDescriptionDisplay').text(original.memo || '등록된 메모가 없습니다.');
-
-                $('#step2').hide();
-                $('#step1').show();
-            }
-        });
-
-        calendar.render();
-
-        $('#addNewEventBtn').on('click', function () {
-            $('#step1').hide();
-            $('#step2').show();
-            $('#eventForm')[0].reset();
-            const today = new Date().toISOString().split('T')[0];
-            $('#eventStartDate').val(today);
-            $('#deleteEventBtn').hide();
-        });
-
-        $(document).on("click", function (e) { // 나중에 추가
-            const $target = $(e.target);
-
-            // 클릭한 요소가 input이나 로그인 버튼이 아니면 에러 스타일 제거
-            if (
-                !$target.is("#eventTitleInput") &&
-                !$target.is("#eventTimeInput") &&
-                !$target.is("#eventLocationInput")
-            ) {
-                $(".login-input").removeClass("input-error");
-                $("#loginErrorMessage").removeClass("visible");
-            }
-        });
-
-        $('#eventForm').on('submit', function (e) {
-            e.preventDefault();
-
-            const title = $('#eventTitleInput').val().trim();
-            const time = $('#timePicker').val().trim();
-            const participantId = targetUserId;
-            const location = $('#eventLocationInput').val().trim();
-
-            $(".login-input").removeClass("input-error");
-            $("#titleErrorMessage").removeClass("visible").text("");
-            $("#timeErrorMessage").removeClass("visible").text("");
-            $("#locationErrorMessage").removeClass("visible").text("");
-
-            if (!title) {
-                $("#eventTitleInput").addClass("input-error");
-                $("#titleErrorMessage")
-                    .text("일정 제목을 입력하세요.")
-                    .addClass("visible");
-
-                // 2초 후 메시지 자동 숨김
-                setTimeout(function () {
-                    $("#titleErrorMessage").removeClass("visible");
-                }, 2000);
-
-                $("#eventTitleInput").focus();
-                return;
-            }
-
-            if (!time) {
-                $("#timePicker").addClass("input-error");
-                $("#timeErrorMessage")
-                    .text("시간을 입력하세요.")
-                    .addClass("visible");
-
-                // 2초 후 메시지 자동 숨김
-                setTimeout(function () {
-                    $("#timeErrorMessage").removeClass("visible");
-                }, 2000);
-
-                $("#timePicker").focus();
-                return;
-            }
-
-            if (!location) {
-                $("#eventLocationInput").addClass("input-error");
-                $("#locationErrorMessage")
-                    .text("위치 정보를 입력하세요.")
-                    .addClass("visible");
-
-                // 2초 후 메시지 자동 숨김
-                setTimeout(function () {
-                    $("#locationErrorMessage").removeClass("visible");
-                }, 2000);
-
-                $("#eventLocationInput").focus();
-                return;
-            }
-
-            let startDate = $('#eventStartDate').val(); // 예: '2025-09-15'
-            if (startDate && time) {
-                startDate += 'T' + time + ':00'; // => '2025-09-15T14:30:00'
-            }
-
-            const eventData = {
-                title: title,
-                scheduleDt: startDate,
-                participantId: participantId,
-                location: $('#eventLocationInput').val(),
-                memo: $('#eventMemoInput').val()
-            };
-
-            $.ajax({
-                url: '/schedule/api/events',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(eventData),
-                success: function () {
-                    $('#step2').hide();
-                    $('#step1').show();
-                    calendar.refetchEvents();
-                },
-                error: function () {
-                    alert('일정 저장에 실패했습니다.');
-                }
-            });
-        });
-
-        window.cancelRegister = function () {
-            $('#step2').hide();
-            $('#step1').show();
-        }
-
-        function kakaoPost(f) {
-            new daum.Postcode({
-                oncomplete: function (data) {
-                    let address = data.address;
-                    let zonecode = data.zonecode;
-                    f.eventLocationInput.value = "(" + zonecode + ")" + address;
-                }
-            }).open();
-        }
-    });
-
-    flatpickr("#timePicker", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "h:i", // 12시간제 (오전/오후)
-        time_24hr: false,    // true면 24시간제
-        minuteIncrement: 5   // 분 단위 간격
-    });
-
-</script>
 
 <%
     String ssUserId = (String) session.getAttribute("SS_USER_ID");
@@ -782,6 +599,7 @@
     const targetUserId = "<%= targetUserId %>";
 </script>
 
+<script src="${pageContext.request.contextPath}/js/scheduleCheck.js"></script>
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 <script src="${pageContext.request.contextPath}/js/sideBar.js"></script>

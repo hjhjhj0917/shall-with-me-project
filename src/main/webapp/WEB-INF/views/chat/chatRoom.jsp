@@ -59,7 +59,8 @@
     const otherUser = {
         id: "${otherUser.userId}",
         imageUrl: "${not empty otherUser.profileImageUrl ? otherUser.profileImageUrl : '/images/noimg.png'}",
-        otherName: "${otherUser.userName}"
+        otherName: "${otherUser.userName}",
+        status: "${otherUser.status}"
     };
 
     const roomId = "${roomId}";
@@ -124,8 +125,21 @@
 
     // 메시지 전송
     function sendMessage() {
+
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
+
+        if (otherUser.status === 'DEACTIVATED') {
+            showCustomAlert("탈퇴한 회원입니다. 채팅할 수 없습니다.");
+            // 입력창 비활성화 및 내용 제거
+            messageInput.disabled = true;
+            messageInput.value = '';
+
+            // 전송 버튼도 비활성화 (선택)
+            document.querySelector(".send-btn").disabled = true;
+            return;
+        }
+
         if (!message) return;
 
         const msg = {
@@ -300,6 +314,10 @@
     }
 
     $("#scheduleBtn").on("click", function () {
+        if (otherUser.status === 'DEACTIVATED') {
+            showCustomAlert("탈퇴한 회원입니다. 일정을 등록할 수 없습니다.");
+            return;
+        }
         location.href = '/schedule/scheduleReg?targetUserId=' + otherUser.id + '&roomId=' + roomId;
     });
 
