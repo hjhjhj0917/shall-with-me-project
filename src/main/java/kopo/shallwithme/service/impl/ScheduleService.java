@@ -18,6 +18,7 @@ public class ScheduleService implements IScheduleService {
 
     private final IScheduleMapper scheduleMapper;
 
+    // 일정 목록 불러오기
     @Override
     public List<ScheduleDTO> getScheduleList(UserInfoDTO pDTO) {
         log.info("{}.getScheduleList Start!", this.getClass().getName());
@@ -29,6 +30,31 @@ public class ScheduleService implements IScheduleService {
         return rList;
     }
 
+    // 일정 수정
+    @Override
+    public int updateSchedule(ScheduleDTO pDTO) throws Exception {
+        log.info("{}.updateSchedule Start!", this.getClass().getName());
+
+        int res = scheduleMapper.updateSchedule(pDTO);
+
+        log.info("{}.updateSchedule End!", this.getClass().getName());
+
+        return res;
+    }
+
+    // 일정 삭제
+    @Override
+    public int deleteSchedule(ScheduleDTO pDTO) throws Exception {
+        log.info("{}.deleteSchedule Start!", this.getClass().getName());
+
+        int res = scheduleMapper.deleteSchedule(pDTO);
+
+        log.info("{}.deleteSchedule End!", this.getClass().getName());
+
+        return res;
+    }
+
+    // 일정 등록
     @Override
     public int insertSchedule(ScheduleDTO pDTO) {
         log.info("{}.insertSchedule Start!", this.getClass().getName());
@@ -40,7 +66,7 @@ public class ScheduleService implements IScheduleService {
         return res;
     }
 
-
+    // 일정 상태 업데이트
     @Override
     public void updateScheduleStatus(String scheduleId, String status, String userId) {
         log.info("{}.updateScheduleStatus Start! scheduleId={}, status={}, userId={}",

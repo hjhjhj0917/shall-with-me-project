@@ -95,6 +95,7 @@
         SELECT
             U.USER_ID AS userId,
             U.USER_NAME AS userName,
+            U.STATUS AS status,
             P.profile_image_url AS profileImageUrl
         FROM
             CHAT_ROOM R

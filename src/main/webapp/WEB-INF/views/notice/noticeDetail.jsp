@@ -5,64 +5,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/notice/noticeDetail.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-
-    <style>
-        .detail-container {
-            padding: 60px 250px;
-            font-family: 'Noto Sans KR', sans-serif;
-            color: #222;
-        }
-
-        .detail-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 55px;
-        }
-
-        .detail-section {
-            margin-bottom: 30px;
-        }
-
-        .detail-section h3 {
-            font-size: 16px;
-            color: #1c407d;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 6px;
-        }
-
-        .detail-section p {
-            font-size: 14px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-        }
-
-        .go-link {
-            display: inline-block;
-            margin-top: 10px;
-            background-color: #1c407d;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 14px;
-            margin-right: 10px;
-        }
-
-        .go-link:hover {
-            background-color: #163666;
-        }
-
-        .detail-container, .detail-container * {
-            user-select: text !important;
-            -webkit-user-select: text !important;
-            -moz-user-select: text !important;
-            -ms-user-select: text !important;
-        }
-
-    </style>
 </head>
+
 <body>
 <%@ include file="../includes/header.jsp" %>
 

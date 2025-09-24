@@ -151,6 +151,8 @@ public class ChattingController {
 
         ChatRoomDTO rDTO = chatService.getOtherUserId(cDTO);
         rDTO.setMyUserId(session.getAttribute("SS_USER_ID").toString());
+
+        // 채팅 상대 정보 불러오기
         UserProfileDTO otherUser = chatService.getImageUrlByUserId(rDTO);
 
         log.info("myUserId : {}", rDTO.getMyUserId());
