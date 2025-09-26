@@ -1,17 +1,31 @@
+/*body {*/
+/*    background-image: url("../../images/test2.png");*/
+/*    background-repeat: no-repeat;*/
+/*    background-size: cover;*/
+/*    background-position: center;*/
+/*}*/
+
 .detail-wrapper {
     display: flex;
     justify-content: space-evenly;  /* 👉 좌우 균등 간격 */
     align-items: flex-start;        /* 위쪽 기준 정렬 */
     gap: 60px;
-    max-width: 1200px;
+    max-width: 1000px;
+    max-height: 900px;
     margin: 60px auto 0;   /* 👉 위쪽 여백 60px */
-    padding: 40px;
+    border-radius: 40px;
+    padding: 60px 40px 40px;
+    border: 2px solid #E5F2FF;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .profile-photo {
     width: 260px;   /* 기존 220px */
     height: 260px;  /* 기존 220px */
     border-radius: 50%;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     background: #ddd url('/images/noimg.png') center/cover no-repeat;
 }
 
@@ -21,7 +35,7 @@
     max-width: 350px;    /* 👉 너무 넓어지지 않도록 제한 */
     min-height: 100px;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 40px;
     padding: 16px;
     background: #fafafa;
     text-align: left;
@@ -33,7 +47,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 40px;
 }
 
 /* 오른쪽 */
@@ -41,6 +55,10 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+#birthArea {
+    margin-bottom: 55px;
 }
 
 .detail-left, .detail-right {
@@ -51,7 +69,12 @@
 .user-name {
     font-size: 1.4rem;
     font-weight: bold;
-    margin: 0;
+    margin-top: 40px;
+    color: #1c407d;
+}
+
+.self-intro h3 {
+    color: #1c407d;
 }
 
 .user-info {
@@ -73,9 +96,37 @@
 .tag {
     display: inline-block;
     padding: 6px 12px;
-    border-radius: 12px;
+    border-radius: 40px;
     background: #f1f3f5;
     font-size: 14px;
-    color: #333;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: #1c407d;
     white-space: nowrap; /* ✅ 태그 안에서는 줄바꿈 안되게 */
+}
+
+#chatButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.detail-msg-btn {
+    display: flex;
+    width: 150px;             /* 펼쳐진 크기 */
+    height: 40px;
+    border-radius: 40px;      /* 타원형 */
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    color: #3399ff;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease; /* 부드러운 확대 효과 */
+    margin-right: 10px;
+    margin-top: 30px;
+    background-color: white;
+}
+
+.detail-msg-btn:hover {
+    transform: scale(1.05); /* 5% 확대 */
 }

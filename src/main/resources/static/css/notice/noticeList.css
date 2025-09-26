@@ -115,3 +115,9 @@ tbody td a:hover {
 .notice-search button:hover {
     background-color: #16345f; /* 버튼 hover 색상 (선택 사항) */
 }
+
+#pagination button.active {
+    color: #B1B1B1;
+    font-weight: bold;
+
+}
