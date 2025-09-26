@@ -44,6 +44,7 @@
         </div>
 
         <div id="chatButtonContainer">
+            <div class="detail-msg-btn" onclick="openChat('${user.userId}')">메시지</div>
         </div>
 
     </div>
@@ -62,7 +63,7 @@
 
     function openChat(otherUserId) {
         console.log("openChat 호출됨:", otherUserId);
-        fetch("/chat/createOrGetRoom?user2Id=" + encodeURIComponent(otherUserId))
+        fetch("/chat/createOrGetRoom?user2Id=" + otherUserId)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -86,36 +87,6 @@
                 alert("오류가 발생했습니다.");
             });
     }
-
-    // 본인을 제외한 유저 목록 불러오기
-    $(document).ready(function () {
-        $.ajax({
-            url: "/chat/userList",
-            method: "GET",
-            dataType: "json",
-            success: function (userList) {
-                console.log("userList 데이터:", userList);
-
-                const container = $("#chatButtonContainer"); // 버튼을 넣을 div
-                container.empty();
-
-                userList.forEach(function (user) {
-                    if (user.userId === loggedInUserId) return; // 본인은 제외
-
-                    const chatBtn = $('<button>채팅하기</button>');
-                    chatBtn.on('click', function () {
-                        openChat(user.userId);
-                    });
-
-                    container.append(chatBtn);
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error("유저 목록 불러오기 실패:", error);
-                alert("회원 목록을 불러오는 중 오류가 발생했습니다.");
-            }
-        });
-    });
 
 </script>
 
