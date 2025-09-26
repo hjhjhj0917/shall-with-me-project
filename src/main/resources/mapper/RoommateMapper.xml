@@ -62,6 +62,8 @@
         u.user_name        AS userName,
         u.age              AS age,
         u.gender           AS gender,
+        u.addr1            AS addr1,
+        u.birth_date       AS birthDate,
         p.profile_image_url AS profileImageUrl,  <!-- ✅ 여기를 profile_image_url로 맞춤 -->
         p.introduction     AS introduction
         FROM USER_INFO u

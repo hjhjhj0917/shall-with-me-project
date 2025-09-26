@@ -83,6 +83,7 @@
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
+    <!-- int 타입 수정-->
     <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatMessageDTO">
         SELECT message_id, room_id AS roomId, sender_id AS senderId, message, sent_at AS sentAt
         FROM CHAT_MESSAGE

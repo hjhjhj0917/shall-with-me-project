@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <!-- 룸메이트 전용 CSS -->
     <link rel="stylesheet" href="/css/roommate/roommateMain.css"/>
-    <link rel="icon" href="${pageContext.request.contextPath}/images/noimg.png">
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <!-- 큰 모달 스타일 + 배경 상호작용 차단 -->
@@ -192,6 +191,7 @@
     </div>
 </div>
 
+<%-- 챗봇 --%>
 <%@ include file="../includes/chatbot.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>

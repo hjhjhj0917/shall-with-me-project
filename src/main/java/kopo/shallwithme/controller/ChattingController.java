@@ -30,16 +30,6 @@ public class ChattingController {
     private final SimpMessagingTemplate messagingTemplate;
     private final IChatService chatService;
 
-    // 채팅 연결 테스트 페이지
-    @GetMapping("chatTest")
-    public String chatTest() {
-
-        log.info("{}.chatTest Start!", this.getClass().getName());
-        log.info("{}.chatTest End!", this.getClass().getName());
-
-        return "chat/chatTest";
-    }
-
     // 회원 메시지 보관 페이지
     @GetMapping("userListPage")
     public String userListPage() {
@@ -239,20 +229,6 @@ public class ChattingController {
         log.info("{}.createOrGetRoom End!", this.getClass().getName());
 
         return response;
-    }
-
-    // 유저 목록 불러오기 나중에 수정하기!
-    @GetMapping("userList")
-    @ResponseBody
-    public List<UserInfoDTO> getUserList() throws Exception {
-
-        log.info("{}.getUserList Start!", this.getClass().getName());
-
-        List<UserInfoDTO> rList = chatService.getUserList();
-
-        log.info("{}.getUserList End!", this.getClass().getName());
-
-        return rList; // JSON 형태로 반환됨
     }
 
 }
