@@ -3,58 +3,120 @@
 
 <html>
 <head>
-  <title>살며시: "이름"</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-  <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/roommate/roommateDetail.css"/>
+    <title>살며시: "이름"</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/roommate/roommateDetail.css"/>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
 
 <%--여기에 코드 작성--%>
 <main class="detail-wrapper">
-  <!-- 왼쪽 영역 -->
-  <div class="detail-left">
-    <div class="profile-photo"
-         style="background-image:url('${user.profileImageUrl}')">
+    <!-- 왼쪽 영역 -->
+    <div class="detail-left">
+        <div class="profile-photo"
+             style="background-image:url('${user.profileImageUrl}')">
+        </div>
+
+        <!-- ⬇⬇ 자기소개도 DB 값으로 교체 -->
+        <div class="self-intro">
+            <h3>자기소개</h3>
+            <p>${user.introduction}</p>
+        </div>
     </div>
 
-    <!-- ⬇⬇ 자기소개도 DB 값으로 교체 -->
-    <div class="self-intro">
-      <h3>자기소개</h3>
-      <p>${user.introduction}</p>
+    <!-- 오른쪽 영역 -->
+    <div class="detail-right">
+        <!-- ⬇⬇ 이름 + 나이 -->
+        <h2 class="user-name">${user.userName} (${user.age}세)</h2>
+
+        <!-- ⬇⬇ 성별 / 주소 -->
+        <p class="user-info">성별: ${user.gender}</p>
+
+        <!-- ⬇⬇ 태그 목록 -->
+        <div class="tag-box">
+            <c:forEach var="tag" items="${user.tags}">
+                <span class="tag">#${tag}</span>
+            </c:forEach>
+        </div>
+
+        <div id="chatButtonContainer">
+        </div>
+
     </div>
-  </div>
-
-  <!-- 오른쪽 영역 -->
-  <div class="detail-right">
-    <!-- ⬇⬇ 이름 + 나이 -->
-    <h2 class="user-name">${user.userName} (${user.age}세)</h2>
-
-    <!-- ⬇⬇ 성별 / 주소 -->
-    <p class="user-info">성별: ${user.gender}</p>
-
-    <!-- ⬇⬇ 태그 목록 -->
-    <div class="tag-box">
-      <c:forEach var="tag" items="${user.tags}">
-        <span class="tag">#${tag}</span>
-      </c:forEach>
-    </div>
-  </div>
 </main>
 
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 <%
-  String ssUserName = (String) session.getAttribute("SS_USER_NAME");
-  if (ssUserName == null) {
-    ssUserName = "";
-  }
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
 %>
 <script>
-  const userName = "<%= ssUserName %>";
+    const userName = "<%= ssUserName %>";
+
+    function openChat(otherUserId) {
+        console.log("openChat 호출됨:", otherUserId);
+        fetch("/chat/createOrGetRoom?user2Id=" + encodeURIComponent(otherUserId))
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("서버에서 받은 데이터:", data);
+                if (data.roomId) {
+                    const cleanedRoomId = Number(data.roomId);
+                    console.log("➡️ 이동할 채팅방 ID:", cleanedRoomId);
+                    const targetUrl = "/chat/chatRoom?roomId=" + cleanedRoomId;
+                    console.log("이동할 URL:", targetUrl);
+                    window.location.href = targetUrl;
+                } else {
+                    alert("채팅방 생성 실패");
+                }
+            })
+            .catch(err => {
+                console.error("채팅방 생성 중 오류:", err);
+                alert("오류가 발생했습니다.");
+            });
+    }
+
+    // 본인을 제외한 유저 목록 불러오기
+    $(document).ready(function () {
+        $.ajax({
+            url: "/chat/userList",
+            method: "GET",
+            dataType: "json",
+            success: function (userList) {
+                console.log("userList 데이터:", userList);
+
+                const container = $("#chatButtonContainer"); // 버튼을 넣을 div
+                container.empty();
+
+                userList.forEach(function (user) {
+                    if (user.userId === loggedInUserId) return; // 본인은 제외
+
+                    const chatBtn = $('<button>채팅하기</button>');
+                    chatBtn.on('click', function () {
+                        openChat(user.userId);
+                    });
+
+                    container.append(chatBtn);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("유저 목록 불러오기 실패:", error);
+                alert("회원 목록을 불러오는 중 오류가 발생했습니다.");
+            }
+        });
+    });
+
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
