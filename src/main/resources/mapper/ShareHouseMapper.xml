@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 반드시 ISharehouseMapper.java 와 일치 -->
+<mapper namespace="kopo.shallwithme.mapper.ISharehouseMapper">
+
+    <!-- 쉐어하우스 카드 리스트 (페이징) -->
+    <select id="getSharehouseList" resultType="map">
+        SELECT
+        sh.house_id     AS houseId,
+        sh.house_name   AS houseName,
+        sh.location     AS location,
+        sh.deposit      AS deposit,
+        sh.rent         AS rent,
+        sh.available_dt AS availableDt,
+        sh.image_url    AS imageUrl
+        FROM SHAREHOUSE sh
+        WHERE sh.status = 'ACTIVE'   <!-- ✅ 활성 데이터만 -->
+        ORDER BY sh.reg_dt DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 쉐어하우스 상세 조회 -->
+    <select id="findSharehouseById" parameterType="int" resultType="map">
+        SELECT
+            sh.house_id     AS houseId,
+            sh.house_name   AS houseName,
+            sh.location     AS location,
+            sh.deposit      AS deposit,
+            sh.rent         AS rent,
+            sh.available_dt AS availableDt,
+            sh.image_url    AS imageUrl,
+            sh.description  AS description
+        FROM SHAREHOUSE sh
+        WHERE sh.house_id = #{houseId}
+    </select>
+
+    <!-- (옵션) 태그 조회 -->
+    <select id="selectSharehouseTags" parameterType="int" resultType="kopo.shallwithme.dto.UserTagDTO">
+        SELECT
+            st.house_id AS houseId,
+            st.tag_id   AS tagId,
+            t.tag_name  AS tagName
+        FROM SHAREHOUSE_TAG st
+                 JOIN TAG t ON t.tag_id = st.tag_id
+        WHERE st.house_id = #{houseId}
+        ORDER BY st.tag_id DESC
+    </select>
+
+</mapper>
