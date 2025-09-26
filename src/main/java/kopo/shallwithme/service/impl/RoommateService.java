@@ -62,7 +62,7 @@ public class RoommateService implements IRoommateService {
 
         // 태그2 → tagId 15~17 중 DB에 저장된 값
         UserTagDTO tag2 = userTags.stream()
-                .filter(t -> t.getTagId() >= 15 && t.getTagId() <= 17)
+                .filter(t -> t.getTagId() >= 15 && t.getTagId() <= 16)
                 .findAny()
                 .orElse(null);
 
