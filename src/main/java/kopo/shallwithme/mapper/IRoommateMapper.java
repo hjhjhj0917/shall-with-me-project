@@ -1,5 +1,6 @@
 package kopo.shallwithme.mapper;
 
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
@@ -24,4 +25,16 @@ public interface IRoommateMapper {
     List<UserTagDTO> selectUserTags(String userId);
 
     UserProfileDTO findUserProfileById(String userId);
+
+
+    List<UserInfoDTO> selectUsersByPagination(TagDTO tagDTO);
+
+    TagDTO countAllUsers(TagDTO pDTO);
+
+    List<UserInfoDTO> selectUsersByTagsWithPagination(TagDTO pDTO);
+
+    TagDTO countUsersByTags(TagDTO pDTO);
+
+    List<TagDTO> getAllTags() throws Exception;
+
 }
