@@ -34,6 +34,8 @@
     </button>
 </div>
 
+<%-- 챗봇 --%>
+<%@ include file="../includes/chatbot.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
