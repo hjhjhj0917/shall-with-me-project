@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="kopo.shallwithme.mapper.IScheduleMapper">
+
+    <!-- 일정 목록 불러오기-->
+    <select id="getScheduleList" parameterType="UserInfoDTO" resultType="ScheduleDTO">
+        SELECT
+            schedule_id, title, DATE_FORMAT(schedule_dt, '%Y-%m-%dT%H:%i:%s') AS schedule_dt,
+            location, memo, creator_id, participant_id
+        FROM
+            SCHEDULE
+        WHERE
+            creator_id = #{userId} OR participant_id = #{userId}
+    </select>
+
+    <!-- 일정 등록-->
+    <insert id="insertSchedule" parameterType="ScheduleDTO">
+        INSERT INTO SCHEDULE (
+            title, schedule_dt, location, memo, creator_id, participant_id
+        ) VALUES (
+                     #{title}, #{scheduleDt}, #{location}, #{memo}, #{creatorId}, #{participantId}
+                 )
+    </insert>
+
+    <!-- 일정 수정-->
+    <update id="updateSchedule" parameterType="ScheduleDTO">
+        UPDATE SCHEDULE
+        SET title = #{title}, schedule_dt = #{scheduleDt}, location = #{location}, memo = #{memo}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <!-- 일정 삭제-->
+    <delete id="deleteSchedule" parameterType="ScheduleDTO">
+        DELETE FROM SCHEDULE
+        WHERE schedule_id = #{scheduleId}
+    </delete>
+
+    <!-- 일정 상태 업데이트 -->
+    <update id="updateScheduleStatus" parameterType="map">
+        UPDATE CHAT_MESSAGE
+        SET status = #{status}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+    <!-- 일정 ID로 메시지 조회 -->
+    <select id="selectMessageByScheduleId" parameterType="string" resultType="ChatMessageDTO">
+        SELECT
+            message_id,
+            room_id AS roomId,
+            sender_id AS senderId,
+            message,
+            sent_at AS sentAt,
+            message_type AS messageType,
+            schedule -- 복합 타입인 경우 매핑 주의 필요
+        FROM CHAT_MESSAGE
+        WHERE schedule_id = #{scheduleId}
+            LIMIT 1
+    </select>
+
+</mapper>

@@ -1,10 +1,10 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>살며시</title>
-    <link rel="stylesheet" href="/css/index.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css"/>
 </head>
 <body>
 
@@ -18,7 +18,7 @@
 
     <div class="wave-left">
         <svg viewBox="0 0 800 800" preserveAspectRatio="none">
-            <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#f4f9fe" />
+            <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#f4f9fe"/>
         </svg>
     </div>
 
@@ -26,13 +26,13 @@
     <div class="right-panel">
         <div class="wave-left">
             <svg viewBox="0 0 800 800" preserveAspectRatio="none">
-                <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#ffffff" />
+                <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#ffffff"/>
             </svg>
         </div>
         <div class="right-inner">
             <div class="logo">살며시</div>
             <div class="logo-2">Shall With Me</div>
-            <form action="${pageContext.request.contextPath}/start" method="get">
+            <form action="/user/main" method="get">
                 <button type="submit" class="start-button">시작하기</button>
             </form>
         </div>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kopo.shallwithme.mapper.IChatMapper">
+
+    <insert id="insertChatMessage" parameterType="ChatMessageDTO">
+        INSERT INTO CHAT_MESSAGE (room_id, sender_id, message, sent_at)
+        VALUES (#{roomId}, #{senderId}, #{message}, #{sentAt})
+    </insert>
+
+    <select id="getOtherUserId" parameterType="ChatRoomDTO" resultType="ChatRoomDTO">
+        SELECT USER2_ID, USER1_ID, ROOM_ID
+        FROM CHAT_ROOM
+        WHERE ROOM_ID = #{roomId}
+    </select>
+
+    <!--메세지 주고받은 유저만 불러오기-->
+    <select id="selectChatPartnersWithLastMsg"
+            parameterType="UserInfoDTO"
+            resultType="ChatPartnerDTO">
+        SELECT
+            U.USER_ID AS userId,
+            U.USER_NAME AS userName,
+            UP.profile_image_url AS profileImgUrl,
+            LM.MESSAGE AS lastMessage
+        FROM
+            USER_INFO U
+                INNER JOIN (
+                SELECT
+                    CASE
+                        WHEN USER1_ID = #{userId} THEN USER2_ID
+                        ELSE USER1_ID
+                        END AS partner_id,
+                    ROOM_ID
+                FROM CHAT_ROOM
+                WHERE USER1_ID = #{userId} OR USER2_ID = #{userId}
+            ) AS P ON U.USER_ID = P.partner_id
+                LEFT JOIN USER_PROFILE UP ON U.USER_ID = UP.user_id
+                LEFT JOIN (
+                SELECT
+                    ROOM_ID,
+                    MESSAGE,
+                    sent_at,  -- [수정 1] 최종 정렬을 위해 sent_at 컬럼 추가
+                    ROW_NUMBER() OVER(PARTITION BY ROOM_ID ORDER BY sent_at DESC) as rn -- [수정 2] TIMESTAMP -> sent_at
+                FROM CHAT_MESSAGE
+            ) AS LM ON P.ROOM_ID = LM.ROOM_ID AND LM.rn = 1
+        ORDER BY
+            LM.sent_at DESC, -- [수정 3] TIMESTAMP -> sent_at
+            U.USER_NAME ASC
+    </select>
+
+    <insert id="createChatRoom" useGeneratedKeys="true" keyProperty="roomId" parameterType="ChatRoomDTO">
+        INSERT INTO CHAT_ROOM (user1_id, user2_id)
+        VALUES (#{user1Id}, #{user2Id})
+    </insert>
+
+    <select id="getRoomsByUserId" parameterType="UserInfoDTO" resultType="ChatRoomDTO">
+        SELECT room_id, user1_id, user2_id
+        FROM CHAT_ROOM
+        WHERE user1_id = #{userId} OR user2_id = #{userId}
+    </select>
+
+    <select id="selectUserList" resultType="UserInfoDTO">
+        SELECT USER_ID AS user_id, USER_NAME AS user_name
+        FROM USER_INFO
+        ORDER BY USER_NAME
+    </select>
+
+    <!-- 방 조회 : user1_id, user2_id 로 방 검색 -->
+    <select id="findRoomIdByUsers" parameterType="ChatRoomDTO" resultType="ChatRoomDTO">
+        SELECT room_id
+        FROM CHAT_ROOM
+        WHERE user1_id = #{user1Id} AND user2_id = #{user2Id}
+            LIMIT 1
+    </select>
+
+    <!-- 방 생성 -->
+    <insert id="insertChatRoom" parameterType="ChatRoomDTO"
+            useGeneratedKeys="true" keyProperty="roomId">
+        INSERT INTO CHAT_ROOM (user1_id, user2_id)
+        VALUES (#{user1Id}, #{user2Id})
+    </insert>
+
+    <!-- int 타입 수정-->
+    <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatMessageDTO">
+        SELECT message_id, room_id AS roomId, sender_id AS senderId, message, sent_at AS sentAt
+        FROM CHAT_MESSAGE
+        WHERE room_id = #{value}
+        ORDER BY sent_at ASC
+    </select>
+
+    <!--    회원 프로필 이미지 불러오기-->
+    <select id="selectProfileImageUrlByUserId" resultType="UserProfileDTO" parameterType="ChatRoomDTO">
+        SELECT
+            U.USER_ID AS userId,
+            U.USER_NAME AS userName,
+            U.STATUS AS status,
+            P.profile_image_url AS profileImageUrl
+        FROM
+            CHAT_ROOM R
+                INNER JOIN
+            -- CASE 문을 이용해 채팅방의 두 사용자 중 내가 아닌 사람을 찾아 JOIN 합니다.
+                USER_INFO U ON (CASE WHEN R.USER1_ID = #{myUserId} THEN R.USER2_ID ELSE R.USER1_ID END) = U.USER_ID
+                LEFT JOIN
+            USER_PROFILE P ON U.USER_ID = P.user_id
+        WHERE
+            R.room_id = #{roomId}
+    </select>
+
+</mapper>

@@ -1,213 +1,351 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: data8320-16
-  Date: 2025-07-24
-  Time: 오후 4:00
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>살며시</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>살며시: 성향태그 선택</title>
+
     <link rel="stylesheet" href="/css/tag.css"/>
-    <script src="${pageContext.request.contextPath}/js/tag.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
+
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* userRegForm의 폼 Wrapper 디자인 적용 */
+        .register-form-wrapper {
+            width: 1100px;
+            margin: 0 auto;
+            padding: 24px 32px;
+            background-color: #FFFFFF;
+            height: 820px;
+            border-radius: 12px;
+            border-top-right-radius: 0;
+            box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1), 6px 5px 16px rgba(0, 0, 0, 0.27);
+            position: relative;
+            text-align: center;
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        /* 탭 디자인 */
+        .register-tab, .prefer-tab, .profile-tab {
+            margin-bottom: 12px;
+        }
+
+        .register-tab {
+            position: absolute;
+            top: 10.34%;
+            right: -30px;
+            transform: translateY(-50%);
+            background-color: #4da3ff;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            cursor: default;
+            height: 150px;
+            border-bottom-right-radius: 30px;
+            border-top-right-radius: 12px;
+            box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+        }
+
+        .prefer-tab {
+            position: absolute;
+            top: 30.5%;
+            right: -30px;
+            transform: translateY(-50%);
+            background-color: #91C4FB;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            cursor: default;
+            height: 150px;
+            border-bottom-right-radius: 30px;
+            border-top-right-radius: 12px;
+            box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
+            z-index: 1;
+        }
+
+        .profile-tab {
+            position: absolute;
+            top: 51%;
+            right: -30px;
+            transform: translateY(-50%);
+            background-color: #B1B1B1;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            cursor: default;
+            height: 150px;
+            border-bottom-right-radius: 30px;
+            border-top-right-radius: 12px;
+            box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .active-tab {
+            right: -39px;
+            font-size: 20px !important;
+            z-index: 3 !important;
+        }
+
+        .header {
+            padding-bottom: 0;
+        }
+
+    </style>
 </head>
 <body>
 
-<!-- 슬라이드 화살표 -->
-<div class="arrow left" onclick="moveSlide(-1)">&#10092;</div>
-<div class="arrow right" onclick="moveSlide(1)">&#10093;</div>
+<%@ include file="../includes/header.jsp" %>
 
-<div class="header">
-    <div class="logo">살며시</div>
-    <div class="logo-2">Shall With Me</div>
-    <div class="subtitle">홍길동님의 라이프 스타일을 한가지 씩 선택하여 주세요</div>
+<div class="register-form-wrapper">
+    <div class="register-tab">REGISTER</div>
+    <div class="prefer-tab active-tab">PREFER</div>
+    <div class="profile-tab">PROFILE</div>
+
+    <div class="header">
+        <div class="logo">PREFER</div>
+        <div class="logo-2">살며시</div>
+    </div>
+
+    <div class="tag-content-wrapper">
+        <div class="header">
+            <div class="subtitle">
+                <%= session.getAttribute("SS_USER_NAME") %>님의 라이프 스타일을 한가지 씩 선택하여 주세요
+            </div>
+        </div>
+
+        <div class="progress-indicator">
+            <div class="step-wrapper" onclick="goToSlide(0)">
+                <div class="step" data-index="0">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div>생활</div>
+            </div>
+            <div class="line"></div>
+            <div class="step-wrapper" onclick="goToSlide(1)">
+                <div class="step" data-index="1">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div>성격</div>
+            </div>
+            <div class="line"></div>
+            <div class="step-wrapper" onclick="goToSlide(2)">
+                <div class="step" data-index="2">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div>식습관</div>
+            </div>
+            <div class="line"></div>
+            <div class="step-wrapper" onclick="goToSlide(3)">
+                <div class="step" data-index="3">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div>청결</div>
+            </div>
+        </div>
+
+        <div class="slider-container" id="slider">
+            <div class="slide">
+                <div class="section">
+                    <fieldset class="box">
+                        <legend>생활패턴</legend>
+                        <div class="button-group" data-group="lifestyle">
+                            <button onclick="selectButton(this)" data-tag="1">아침형</button>
+                            <button onclick="selectButton(this)" data-tag="2">저녁형</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>활동범위</legend>
+                        <div class="button-group" data-group="activity">
+                            <button onclick="selectButton(this)" data-tag="3">집콕</button>
+                            <button onclick="selectButton(this)" data-tag="4">활동형</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>직업</legend>
+                        <div class="button-group" data-group="job">
+                            <button onclick="selectButton(this)" data-tag="5">학생</button>
+                            <button onclick="selectButton(this)" data-tag="6">직장인</button>
+                            <button onclick="selectButton(this)" data-tag="7">프리랜서/무직</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>퇴근 시간</legend>
+                        <div class="button-group" data-group="worktime">
+                            <button onclick="selectButton(this)" data-tag="8">일정함</button>
+                            <button onclick="selectButton(this)" data-tag="9">변동적</button>
+                            <button onclick="selectButton(this)" data-tag="10">야근 잦음</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>손님초대</legend>
+                        <div class="button-group" data-group="guest">
+                            <button onclick="selectButton(this)" data-tag="11">자주</button>
+                            <button onclick="selectButton(this)" data-tag="12">거의 안함</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>물건공유</legend>
+                        <div class="button-group" data-group="share">
+                            <button onclick="selectButton(this)" data-tag="13">가능</button>
+                            <button onclick="selectButton(this)" data-tag="14">불가능</button>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="slide four-boxes">
+                <div class="section">
+                    <fieldset class="box">
+                        <legend>성격</legend>
+                        <div class="button-group" data-group="personality">
+                            <button onclick="selectButton(this)" data-tag="15">내향적</button>
+                            <button onclick="selectButton(this)" data-tag="16">외향적</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>선호하는 성격</legend>
+                        <div class="button-group" data-group="preferred-personality">
+                            <button onclick="selectButton(this)" data-tag="17">조용한 사람</button>
+                            <button onclick="selectButton(this)" data-tag="18">활발한 사람</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>대화</legend>
+                        <div class="button-group" data-group="talk">
+                            <button onclick="selectButton(this)" data-tag="19">자주</button>
+                            <button onclick="selectButton(this)" data-tag="20">필요할 때</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>갈등</legend>
+                        <div class="button-group" data-group="conflict">
+                            <button onclick="selectButton(this)" data-tag="21">회피형</button>
+                            <button onclick="selectButton(this)" data-tag="22">해결형</button>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="slide four-boxes">
+                <div class="section">
+                    <fieldset class="box">
+                        <legend>요리</legend>
+                        <div class="button-group" data-group="cook">
+                            <button onclick="selectButton(this)" data-tag="23">요리</button>
+                            <button onclick="selectButton(this)" data-tag="24">배달</button>
+                            <button onclick="selectButton(this)" data-tag="25">외식</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>주식</legend>
+                        <div class="button-group" data-group="diet">
+                            <button onclick="selectButton(this)" data-tag="26">채식</button>
+                            <button onclick="selectButton(this)" data-tag="27">육식</button>
+                            <button onclick="selectButton(this)" data-tag="28">둘 다</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>끼니</legend>
+                        <div class="button-group" data-group="meal">
+                            <button onclick="selectButton(this)" data-tag="29">한 끼</button>
+                            <button onclick="selectButton(this)" data-tag="30">두 끼</button>
+                            <button onclick="selectButton(this)" data-tag="31">세 끼</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>음식 냄새</legend>
+                        <div class="button-group" data-group="cook-semll">
+                            <button onclick="selectButton(this)" data-tag="32">예민</button>
+                            <button onclick="selectButton(this)" data-tag="33">상관없음</button>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="slide four-boxes">
+                <div class="section">
+                    <fieldset class="box">
+                        <legend>청결</legend>
+                        <div class="button-group" data-group="clean">
+                            <button onclick="selectButton(this)" data-tag="34">깔끔이</button>
+                            <button onclick="selectButton(this)" data-tag="35">중간이</button>
+                            <button onclick="selectButton(this)" data-tag="36">대충이</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>청소 주기</legend>
+                        <div class="button-group" data-group="clean-circle">
+                            <button onclick="selectButton(this)" data-tag="37">주 1회</button>
+                            <button onclick="selectButton(this)" data-tag="38">주 2회</button>
+                            <button onclick="selectButton(this)" data-tag="39">주 3회 이상</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>쓰레기 배출</legend>
+                        <div class="button-group" data-group="trash">
+                            <button onclick="selectButton(this)" data-tag="40">바로바로</button>
+                            <button onclick="selectButton(this)" data-tag="41">쌓아두기</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="box">
+                        <legend>설거지</legend>
+                        <div class="button-group" data-group="wash-dish">
+                            <button onclick="selectButton(this)" data-tag="42">바로바로</button>
+                            <button onclick="selectButton(this)" data-tag="43">쌓아두기</button>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+
+        <!-- 저장 버튼 -->
+        <button type="button" id="saveButton" class="floating-save">
+            <i class="fa-solid fa-floppy-disk"></i><span>저장</span>
+        </button>
+
+    </div>
 </div>
 
-<div class="slider-container" id="slider">
-    <!-- 슬라이드 1 -->
-    <div class="slide">
+<%@ include file="../includes/customModal.jsp" %>
 
-        <div class="section">
-            <fieldset class="box">
-                <legend>생활패턴</legend>
-                <div class="button-group" data-group="lifestyle">
-                    <button onclick="selectButton(this)">아침형</button>
-                    <button onclick="selectButton(this)">저녁형</button>
-                </div>
-            </fieldset>
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
+<%
+    String ssUserId = (String) session.getAttribute("SS_USER_ID");
+    if (ssUserId == null) {
+        ssUserId = "";
+    }
+%>
+<script>
+    const userId = "<%= ssUserId %>";
+    console.log(userId);
+</script>
 
-            <fieldset class="box">
-                <legend>활동범위</legend>
-                <div class="button-group" data-group="activity">
-                    <button onclick="selectButton(this)">집콕</button>
-                    <button onclick="selectButton(this)">활동형</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>직업</legend>
-                <div class="button-group" data-group="job">
-                    <button onclick="selectButton(this)">학생</button>
-                    <button onclick="selectButton(this)">직장인</button>
-                    <button onclick="selectButton(this)">프리랜서/무직</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>퇴근 시간</legend>
-                <div class="button-group" data-group="worktime">
-                    <button onclick="selectButton(this)">일정함</button>
-                    <button onclick="selectButton(this)">변동적</button>
-                    <button onclick="selectButton(this)">야근 잦음</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>손님초대</legend>
-                <div class="button-group" data-group="guest">
-                    <button onclick="selectButton(this)">자주</button>
-                    <button onclick="selectButton(this)">거의 안함</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>물건공유</legend>
-                <div class="button-group" data-group="share">
-                    <button onclick="selectButton(this)">가능</button>
-                    <button onclick="selectButton(this)">불가능</button>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-
-    <!-- 슬라이드 2 -->
-    <div class="slide">
-
-        <div class="section">
-            <fieldset class="box">
-                <legend>성격</legend>
-                <div class="button-group" data-group="personality">
-                    <button onclick="selectButton(this)">내향적</button>
-                    <button onclick="selectButton(this)">중간</button>
-                    <button onclick="selectButton(this)">외향적</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>선호하는 성격</legend>
-                <div class="button-group" data-group="preferred-personality">
-                    <button onclick="selectButton(this)">조용한 사람</button>
-                    <button onclick="selectButton(this)">활발한 사람</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>대화</legend>
-                <div class="button-group" data-group="talk">
-                    <button onclick="selectButton(this)">자주</button>
-                    <button onclick="selectButton(this)">필요할 때</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>갈등</legend>
-                <div class="button-group" data-group="conflict">
-                    <button onclick="selectButton(this)">회피형</button>
-                    <button onclick="selectButton(this)">해결형</button>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-
-    <!-- 슬라이드 3-->
-    <div class="slide">
-
-        <div class="section">
-            <fieldset class="box">
-                <legend>요리</legend>
-                <div class="button-group" data-group="cook">
-                    <button onclick="selectButton(this)">요리</button>
-                    <button onclick="selectButton(this)">배달</button>
-                    <button onclick="selectButton(this)">외식</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>주식</legend>
-                <div class="button-group" data-group="diet">
-                    <button onclick="selectButton(this)">채식</button>
-                    <button onclick="selectButton(this)">육식</button>
-                    <button onclick="selectButton(this)">둘 다</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>끼니</legend>
-                <div class="button-group" data-group="meal">
-                    <button onclick="selectButton(this)">한 끼</button>
-                    <button onclick="selectButton(this)">두 끼</button>
-                    <button onclick="selectButton(this)">세 끼</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>음식 냄새</legend>
-                <div class="button-group" data-group="cook-semll">
-                    <button onclick="selectButton(this)">예민</button>
-                    <button onclick="selectButton(this)">상관없음</button>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-
-    <!-- 슬라이드 4-->
-    <div class="slide">
-
-        <div class="section">
-            <fieldset class="box">
-                <legend>청결</legend>
-                <div class="button-group" data-group="clean">
-                    <button onclick="selectButton(this)">깔끔이</button>
-                    <button onclick="selectButton(this)">중간이</button>
-                    <button onclick="selectButton(this)">대충이</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>청소 주기</legend>
-                <div class="button-group" data-group="clean-circle">
-                    <button onclick="selectButton(this)">주 1회</button>
-                    <button onclick="selectButton(this)">주 2회</button>
-                    <button onclick="selectButton(this)">주 3회 이상</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>쓰레기 배출</legend>
-                <div class="button-group" data-group="trash">
-                    <button onclick="selectButton(this)">바로바로</button>
-                    <button onclick="selectButton(this)">쌓아두기</button>
-                </div>
-            </fieldset>
-
-            <fieldset class="box">
-                <legend>설거지</legend>
-                <div class="button-group" data-group="wash-dish">
-                    <button onclick="selectButton(this)">바로바로</button>
-                    <button onclick="selectButton(this)">쌓아두기</button>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-</div>
-
-<div class="restore">
-    <button id="saveButton">저장</button>
-</div>
+<script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+<script src="${pageContext.request.contextPath}/js/tag.js"></script>
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
 </body>
 </html>
-

@@ -86,3 +86,7 @@ build/
 
 ### 제외 규칙 확인
 !src/main/resources/application.properties
+
+src/main/resources/application.yaml
+
+/uploads/

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kopo.shallwithme.mapper.INoticeMapper">
+
+    <select id="getPolicyById" parameterType="YouthPolicyDTO" resultType="YouthPolicyDTO">
+        SELECT
+            plcy_no,
+            plcy_nm,
+            plcy_expln_cn,
+            biz_prd_bgng_ymd,
+            biz_prd_end_ymd,
+            aply_url_addr,
+            sprvsn_inst_cd_nm,
+            plcy_sprt_cn,
+            plcy_aply_mthd_cn,
+            sbmsn_dcmnt_cn,
+            sprt_trgt_min_age,
+            sprt_trgt_max_age,
+            earn_min_amt,
+            earn_max_amt,
+            earn_etc_cn,
+            add_aply_qlfc_cnd_cn,
+            ptcp_prp_trgt_cn,
+            ref_url_addr1,
+            ref_url_addr2,
+            oper_inst_cd_nm
+        FROM
+            YOUTH_POLICY
+        WHERE
+            plcy_no = #{plcyNo}
+    </select>
+
+</mapper>

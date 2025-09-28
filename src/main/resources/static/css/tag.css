@@ -1,11 +1,9 @@
 body {
     font-family: 'Noto Sans KR', sans-serif;
-    margin: 0;
-    padding: 0;
     overflow-x: hidden;
     background-color: #f8faff;
     background-image: url("../images/kpaas-background.png");
-
+    z-index: 1;
 }
 
 .slider-container {
@@ -16,14 +14,14 @@ body {
 
 .slide {
     width: 100vw;
-    padding: 40px 20px;
+    padding: 60px 20px;
     box-sizing: border-box;
     flex-shrink: 0;
 }
 
 .header {
     text-align: center;
-    margin-top: 100px;
+    margin-top: 10px;
 
     user-select: none;       /* 텍스트 드래그 금지 */
     pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
@@ -43,14 +41,21 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
-    max-width: 1200px;
-    margin: 60px auto 0;
+    max-width: 1000px;
+}
+
+.four-boxes .section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1000px;
 }
 
 .box {
-    background: #F6F6F6;
-    border: 2px solid #3a7bff;
-    border-radius: 20px;
+    background: #FBFDFF;
+    border: 1px solid #3a7bff;
+    border-radius: 35px;
     padding: 20px;
     width: calc(33.333% - 40px);
     min-width: 280px;
@@ -58,6 +63,26 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.slide.four-boxes .box {
+    background: #FBFDFF;
+    border: 1px solid #3a7bff;
+    border-radius: 35px;
+    padding: 20px;
+    width: calc(50% - 160px);
+    min-width: 280px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.slide.four-boxes {
+    width: 100vw;
+    padding: 60px 20px;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 @media (max-width: 900px) {
@@ -76,6 +101,7 @@ body {
     font-size: 18px;
     font-weight: 330;
     margin-bottom: 10px;
+    color: #1c407d;
 
     user-select: none;       /* 텍스트 드래그 금지 */
     pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
@@ -92,12 +118,12 @@ body {
 }
 
 .button-group button {
-    padding: 8px 18px;
+    padding: 6px 10px;
     border: 1.5px solid #3a7bff;
     background: #fff;
     border-radius: 20px;
     color: #3a7bff;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -118,48 +144,21 @@ body {
     color: white;
 }
 
-.arrow {
+.floating-save {
     position: fixed;
-    top: 52%;
-    transform: translateY(-50%);
-    font-size: 60px;
+    right: 440px;
+    bottom: 70px;
+    z-index: 999;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #3399FFFF;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 22px;
+    font-size: 1rem;
     cursor: pointer;
-    z-index: 10;
-    color: #3a7bff;
-    user-select: none;
-}
-
-.arrow.left {
-    left: 120px;
-}
-
-.arrow.right {
-    right: 120px;
-}
-
-.restore button {
-    position: fixed;
-    top: 80%;
-    right: 5%;
-    border-radius: 30px;
-    font-size: 20px;
-    color: white;
-    width: 200px;
-    height: 60px;
-    background-color: #3a7bff;
-    border: solid 2px white;
-    cursor: pointer;
-
-    user-select: none;       /* 텍스트 드래그 금지 */
-    pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
-    -webkit-user-select: none; /* 크로스브라우징 */
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-.restore button:hover {
-    background: white;
-    color: #3a7bff;
 }
 
 button.selected {
@@ -167,15 +166,56 @@ button.selected {
     color: white;
 }
 
-.logo {
-    color: black;
-    font-size: 50px;
-    font-weight: 250;
+/*페이지 보여주는 영역*/
+.progress-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    padding-bottom: 15px;
 }
 
-.logo-2 {
-    font-size: 18px;
-    margin-top: 5px;
-    color: #555;
-    margin-bottom: 50px;
+.step-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.step {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid #1c407d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: #1c407d;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.step-wrapper div {
+    color: #1c407d;
+}
+
+.step.active {
+    background-color: #1c407d;
+    color: white;
+    border-color: #1c407d;
+}
+
+.step.completed {
+    background-color: #1c407d;
+    color: white;
+    border-color: #1c407d;
+}
+
+.line {
+    flex: none;
+    width: 130px;
+    height: 1px;
+    background-color: #3a7bff;
+    margin: 0 5px;
 }
