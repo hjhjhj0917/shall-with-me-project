@@ -9,7 +9,6 @@ import kopo.shallwithme.mapper.IUserInfoMapper;
 import kopo.shallwithme.service.IRoommateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -22,9 +21,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RoommateService implements IRoommateService {
 
+
+
     private final IRoommateMapper mapper;
     private final IUserInfoMapper userInfoMapper;
     private static final int DEFAULT_PAGE_SIZE = 10;
+
+
 
     @Override
     public List<UserTagDTO> getUserTagsByUserId(String userId) {

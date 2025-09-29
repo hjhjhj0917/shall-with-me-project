@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
      * ===================================================================
      */
 
-    // 모달을 열었던 버튼(트리거) 요소를 저장하기 위한 변수
+        // 모달을 열었던 버튼(트리거) 요소를 저장하기 위한 변수
     let messageModalTrigger = null;
 
     // [수정] #messageBox 버튼 클릭 시 모달 열기

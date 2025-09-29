@@ -2,6 +2,9 @@ package kopo.shallwithme.service;
 
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
+import kopo.shallwithme.dto.UserTagDTO;
+
+import java.util.List;
 
 public interface IMyPageService {
 
@@ -19,5 +22,9 @@ public interface IMyPageService {
 
     // 비활성 계정을 영구 삭제
     int hardDeleteDeactivatedUsers();
+
+    UserInfoDTO myPageUserInfo(UserInfoDTO pDTO) throws Exception;
+
+    List<UserTagDTO> myPageUserTag(UserInfoDTO pDTO) throws Exception;
 
 }

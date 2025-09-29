@@ -1,7 +1,6 @@
 package kopo.shallwithme.service;
 
 import kopo.shallwithme.dto.TagDTO;
-import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import java.util.List;
