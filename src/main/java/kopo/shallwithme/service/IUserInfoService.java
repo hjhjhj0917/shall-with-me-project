@@ -2,6 +2,7 @@ package kopo.shallwithme.service;
 
 
 import kopo.shallwithme.dto.UserInfoDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -38,4 +39,7 @@ public interface IUserInfoService {
     String getImageUrlByUserId(String userId);
 
     List<UserInfoDTO> getAllUsers();
+
+    //✅ 프로필 단건 조회: DTO in/out, void 금지
+    UserProfileDTO findUserProfileByUserId(UserProfileDTO pDTO);
 }

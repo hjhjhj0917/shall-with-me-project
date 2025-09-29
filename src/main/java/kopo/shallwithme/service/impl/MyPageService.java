@@ -3,6 +3,7 @@ package kopo.shallwithme.service.impl;
 import kopo.shallwithme.dto.MailDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.mapper.IMyPageMapper;
 import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.service.IMyPageService;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -105,6 +107,24 @@ public class MyPageService implements IMyPageService {
         log.info("{}.hardDeleteDeactivatedUsers End!", this.getClass().getName());
 
         return res;
+    }
+
+
+
+    @Override
+    public UserInfoDTO myPageUserInfo(UserInfoDTO pDTO) throws Exception {
+        log.info("{}.myPageUserInfo Start!", this.getClass().getName());
+        UserInfoDTO rDTO = myPageMapper.myPageUserInfo(pDTO);
+        log.info("{}.myPageUserInfo End!", this.getClass().getName());
+        return rDTO;
+    }
+
+    @Override
+    public List<UserTagDTO> myPageUserTag(UserInfoDTO pDTO) throws Exception {
+        log.info("{}.myPageUserTag Start!", this.getClass().getName());
+        List<UserTagDTO> rList = myPageMapper.myPageUserTag(pDTO);
+        log.info("{}.myPageUserTag End!", this.getClass().getName());
+        return rList;
     }
 
 }
