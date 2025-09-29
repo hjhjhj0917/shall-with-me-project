@@ -1,0 +1,81 @@
+/* 왼쪽 하단 + 버튼 */
+.sh-fab-left {
+    position: fixed;
+    left: 80px;                 /* 👉 기존 16px → 오른쪽으로 이동 */
+    bottom: 40px;               /* 바닥 여백 */
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9000;
+    transition: transform .15s ease, background-color .15s ease;
+}
+
+.sh-fab-left:hover { transform: scale(1.06); background-color: #f8fbff; }
+.sh-fab-left:active { transform: scale(0.98); }
+
+/* + 아이콘 */
+.sh-fab-left .icon-plus {
+    font-size: 26px;
+    font-weight: 800;
+    color: #3399ff;
+    line-height: 1;
+    transform: translateY(-1px);
+}
+
+/* 버튼 라벨 */
+.sh-fab-label {
+    position: fixed;
+    left: 80px;                    /* 버튼과 같은 위치 */
+    bottom: 100px;                 /* 버튼 위쪽에 배치 */
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c407d;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: rgba(255,255,255,0.85);
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    z-index: 9000;
+}
+
+/* 툴팁 컨테이너 */
+.sh-tooltip {
+    position: fixed;
+    left: 60px;                 /* 버튼과 같은 X축 */
+    bottom: 110px;              /* 버튼 바로 위 */
+    background: #1c407d;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 9000;
+}
+
+/* 꼬리 */
+.sh-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #1c407d transparent transparent transparent;
+}
+
+/* hover 시 툴팁 표시 */
+.sh-fab-left:hover + .sh-tooltip {
+    opacity: 1;
+}

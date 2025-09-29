@@ -1,51 +1,233 @@
 package kopo.shallwithme.controller;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import jakarta.servlet.http.HttpSession;
+import kopo.shallwithme.dto.SharehouseCardDTO;
+import kopo.shallwithme.dto.UserProfileDTO;
+import kopo.shallwithme.service.ISharehouseService;
+import kopo.shallwithme.service.impl.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequestMapping(value = "/sharehouse")
 @RequiredArgsConstructor
 @Controller
 public class SharehouseController {
-    @GetMapping(value = "sharehouseReg")
+
+    private final ISharehouseService sharehouseService;
+    private final UserInfoService userInfoService;
+
+    @Value("${ncp.object-storage.endpoint}")
+    private String endpoint;
+
+    @Value("${ncp.object-storage.region}")
+    private String region;
+
+    @Value("${ncp.object-storage.access-key}")
+    private String accessKey;
+
+    @Value("${ncp.object-storage.secret-key}")
+    private String secretKey;
+
+    @Value("${ncp.object-storage.bucket-name}")
+    private String bucketName;
+
+    @Value("${ncp.object-storage.folder}")
+    private String folder;
+
+    // 등록 페이지
+    @GetMapping("/sharehouseReg")
     public String sharehouseReg() {
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        var req = attrs.getRequest();
+        HttpSession session = req.getSession(false);
+
+        String userId   = (session != null) ? (String) session.getAttribute("SS_USER_ID")   : "";
+        String userName = (session != null) ? (String) session.getAttribute("SS_USER_NAME") : "";
+
+        // 룸메이트와 동일 구조: JSP에서 사용할 값 셋업
+        req.setAttribute("userTags", List.of());      // 필요시 서비스에서 태그 가져와 채우면 됨
+        req.setAttribute("userTagNames", List.of());  // 화면 구조 맞추기용
+        req.setAttribute("SS_USER_NAME", userName);
 
         return "sharehouse/sharehouseReg";
     }
-    @GetMapping("/sharehouseMain") // 아무거나 가능 알아볼수있게 적을것 (만들때)
-    public String sharehouseMain() {
-        return "sharehouse/sharehouseMain"; // 실제경로
+
+    // ✅ 저장 처리 (룸메이트와 동일 구조)
+    @PostMapping("/register")
+    @ResponseBody
+    public ResponseEntity<?> registerProfile(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+                                             @RequestParam(value = "introduction", required = false) String introduction,
+                                             HttpSession session) {
+
+        log.info("{}.registerProfile Start!", this.getClass().getName());
+
+        String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
+        if (userId == null || userId.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("result", "fail", "msg", "로그인이 필요합니다."));
+        }
+
+        try {
+            String imageUrl = null;
+            if (profileImage != null && !profileImage.isEmpty()) {
+                imageUrl = saveProfileImage(profileImage); // 이미지 저장 로직 (S3/NCP)
+            }
+
+            // 룸메이트: saveUserProfile(...)
+            // 쉐어하우스: 주인/매물 등록용 메서드로 위임(더미/DB는 서비스에서 처리)
+            sharehouseService.registerHouse(userId, introduction, null, null, imageUrl);
+
+            // 필요시 세션에 대표 이미지 보관 (화면 구성 동일하게 맞춤용)
+            session.setAttribute("SS_USER_PROFILE_IMG_URL", imageUrl);
+
+            return ResponseEntity.ok(Map.of("result", "success"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("result", "fail", "msg", "서버 오류로 저장에 실패했습니다."));
+        }
     }
 
-    // ★ 무한 스크롤 목록 API (JSON)
+    // S3(NCP) 업로드 – 룸메이트와 동일한 방식/이름 유지
+    private String saveProfileImage(MultipartFile file) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        String ext = StringUtils.getFilenameExtension(originalFilename);
+        String uuidFileName = UUID.randomUUID().toString().replace("-", "") + (ext != null ? "." + ext : "");
+
+        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withPathStyleAccessEnabled(true)
+                .build();
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
+
+        String key = folder + "/" + uuidFileName;
+
+        s3Client.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), metadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        return endpoint + "/" + bucketName + "/" + key;
+    }
+
+    @GetMapping("/sharehouseMain")
+    public String sharehouseMain() {
+        return "sharehouse/sharehouseMain";
+    }
+
+    // 메인 페이지 리스트(룸메이트의 /userList 동일 구조)
+    @GetMapping(value = "/userList", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<Map<String, Object>> getUserList(@RequestParam(defaultValue = "1") int page) {
+        log.info("{}.getUserList Start!", this.getClass().getName());
+
+        int safePage = Math.max(page, 1);
+        int pageSize = 12;
+        int offset = (safePage - 1) * pageSize;
+
+        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
+
+        // 룸메이트와 동일하게 Map으로 변환(tag1, tag2 포함)
+        List<Map<String, Object>> rList = cards.stream().map(c -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("userId",  c.getHouseId()); // 키 이름만 맞추기용(프론트 구조 동일)
+            m.put("profileImgUrl", c.getCoverUrl());
+            m.put("name", c.getTitle());
+            m.put("age", null);
+            m.put("tag1", (c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null);
+            m.put("tag2", (c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null);
+            m.put("gender", null);
+            return m;
+        }).collect(Collectors.toList());
+
+        log.info("{}.getUserList End!", this.getClass().getName());
+        return rList;
+    }
+
+    // ★ 무한 스크롤 목록 API (JSON) – 응답 포맷 { items, lastPage } 동일
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
-        // 페이지당 8개 더미 데이터
-        List<Map<String, Object>> items = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            int id = page * 100 + (i + 1); // 예: page=2 -> 201~208
-            Map<String, Object> it = new HashMap<>();
-            it.put("id", id);
-            it.put("imageUrl", "/images/noimg.png"); // 기본 이미지
-            it.put("location", "송파구");
-            it.put("moveInText", "즉시");
-            it.put("priceText", "월세 55");
-            items.add(it);
-        }
-        boolean lastPage = (page >= 3); // 3페이지에서 끝났다고 가정
+        int safePage = Math.max(page, 1);
+        int pageSize = 12;
+        int offset = (safePage - 1) * pageSize;
+
+        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
+
+        List<Map<String, Object>> items = cards.stream().map(c -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("userId", c.getHouseId());   // 프론트 구조 재사용을 위해 키 이름 맞춤
+            m.put("profileImgUrl", c.getCoverUrl());
+            m.put("name", c.getTitle());
+            m.put("age", null);
+            m.put("tag1", (c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null);
+            m.put("tag2", (c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null);
+            m.put("gender", null);
+            return m;
+        }).collect(Collectors.toList());
+
+        boolean lastPage = items.isEmpty();
         return Map.of("items", items, "lastPage", lastPage);
+    }
+
+    // ✅ 특정 항목의 태그 2개 + 기타정보 조회 API – 룸메이트 /{userId}/info와 동일
+    @GetMapping("/{userId}/info")
+    @ResponseBody
+    public Map<String, Object> getRoommateInfo(@PathVariable String userId) {
+        log.info("getRoommateInfo called for userId={}", userId);
+
+        // houseId로 변환
+        Long houseId;
+        try { houseId = Long.valueOf(userId); }
+        catch (Exception e) { return Map.of("tag1", null, "tag2", null, "gender", null); }
+
+        SharehouseCardDTO c = sharehouseService.getCardById(houseId);
+        String tag1 = (c!=null && c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null;
+        String tag2 = (c!=null && c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null;
+
+        // gender 키도 그대로 내려 프론트 구조를 유지
+        return Map.of("tag1", tag1, "tag2", tag2, "gender", null);
+    }
+
+    // 상세 페이지 – 룸메이트의 roommateDetail과 동일한 흐름/경로 이름만 변경
+    @GetMapping("/sharehouseDetail")
+    public String roommateDetail(UserProfileDTO pDTO, org.springframework.ui.Model model) {
+        String userId = pDTO.getUserId();  // ?userId=xxx
+
+        log.info("sharehouseDetail called with userId={}", userId);
+
+        Long houseId;
+        try { houseId = Long.valueOf(userId); }
+        catch (Exception e) { houseId = 1L; }
+
+        var detail = sharehouseService.getDetail(houseId);
+        model.addAttribute("user", detail); // 키 이름도 user 그대로(뷰 재사용을 위해)
+
+        return "sharehouse/sharehouseDetail";
     }
 }

@@ -1,4 +1,4 @@
-
+/* sharehouseMain.css — roommateMain.css와 1:1 동일 (이미지 파일명만 변경) */
 #sh-sentinel{ height: 1px; }
 #sh-loader{ text-align:center; padding:16px; color:#6b7280; font-size:14px; }
 
@@ -14,15 +14,19 @@ html, body{
     background:var(--sh-bg);
     color:#1f2a37;
     font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-    overflow-y:auto;                 /* 세로 스크롤 가능 */
-    -webkit-overflow-scrolling:touch;/* 모바일 드래그 스크롤 부드럽게 */
+    overflow:hidden;              /* ★ 룸메이트와 동일: 외부 스크롤 제거 */
+    height: 100%;
+    -webkit-overflow-scrolling:touch;
 }
 
 /* 헤더가 fixed라면 겹치지 않도록 여백 */
-#sh-wrapper{
-    max-width:1200px;
-    margin:0 auto;
-    padding:110px 24px 60px; /* 상단 여백은 navbar 높이에 맞게 조절 */
+#sh-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 110px 24px 0;        /* ★ 하단 padding 제거 (룸메이트와 동일) */
+    display: flex;                /* ★ flex 컨테이너 */
+    flex-direction: column;
+    height: calc(100vh - 110px);  /* ★ 헤더 높이 제외 */
 }
 
 /* 검색바 */
@@ -35,11 +39,11 @@ html, body{
     width:100%;
     height:48px;
     border-radius:999px;
-    border:2px solid #2b6cb026; /* 연한 테두리 */
+    border:2px solid #2b6cb026;
     background:#fff;
     padding:0 56px 0 22px;
     font-size:16px;
-    box-shadow:0 6px 12px rgba(28,64,125,.15); /* 스크린샷 느낌 */
+    box-shadow:0 6px 12px rgba(28,64,125,.15);
     outline:none;
 }
 .sh-searchbar button{
@@ -56,7 +60,7 @@ html, body{
 /* 카드 그리드 (4열 고정) */
 .sh-grid{
     display:grid;
-    grid-template-columns:repeat(4, 1fr); /* 요청: 4칸 */
+    grid-template-columns:repeat(4, 1fr);
     gap:24px;
 }
 
@@ -70,56 +74,47 @@ html, body{
 }
 
 /* 썸네일: 4:3 비율 */
-.sh-thumb{
-    height:180px;
-    background:#e9eef7 center/cover no-repeat;
-    background-image: url("../../images/noimg.png");
+.sh-thumb {
+    height: 180px;
+    background: #e9eef7 no-repeat;
+    background-size: cover;
+    background-position: center 15%;  /* ★ 룸메이트와 동일 */
+    background-image: url("../../images/noimg.png");  /* ★ 파일명만 교체 */
 }
 
 /* 텍스트 영역 */
-.sh-info{
-    padding:10px 12px 14px;
-}
-.sh-title{
-    margin:0 0 4px 0;
-    font-weight:600;
-    font-size:14px;
-}
-.sh-sub, .sh-price{
-    margin:0;
-    font-size:13px;
-    color:#4b5563;
-}
+.sh-info{ padding:10px 12px 14px; }
+.sh-title{ margin:0 0 4px 0; font-weight:600; font-size:14px; }
+.sh-sub, .sh-price{ margin:0; font-size:13px; color:#4b5563; }
 
 /* 좌하단 플로팅 버튼 (옵션) */
 .sh-fab{
-    position:fixed;
-    left:18px; bottom:18px;
-    width:44px; height:44px;
-    border-radius:50%;
-    border:none;
-    background:#67a5ff;
-    color:#fff;
-    font-size:18px;
+    position:fixed; left:18px; bottom:18px;
+    width:44px; height:44px; border-radius:50%;
+    border:none; background:#67a5ff; color:#fff; font-size:18px;
     box-shadow:0 10px 24px rgba(0,0,0,.18);
     cursor:pointer;
 }
 
-/* (선택) 화면이 작은 경우 보기 좋게 2열로 바꾸고 싶다면 주석 해제
-@media (max-width: 1024px){
-  .sh-grid{ grid-template-columns:repeat(2, 1fr); }
-}
-*/
-
 .sh-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
 .sh-card:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
 
-
-
-
 /* 무한 스크롤 보조 요소 */
-#sh-sentinel { height: 24px; display:block; }  /* ← 관측 보장 (임시로 24px) */
+#sh-sentinel { height: 24px; display:block; }
 #sh-loader   { text-align:center; padding:16px; color:#6b7280; font-size:14px; }
 
-/* 혹시 다른 CSS가 스크롤을 잠그면 강제로 해제 */
-html, body { overflow-y: auto !important; min-height: 100%; }
+/* 태그 (룸메이트와 동일) */
+.tag-box{ margin-top: 6px; }
+.tag{ display:inline-block; background:#f0f0f0; color:#333; font-size:.8rem; padding:3px 8px; margin-right:4px; border-radius:12px; }
+.tag-box .tag{ margin-right:6px; background:#f2f2f2; padding:4px 8px; border-radius:8px; font-size:13px; }
+.tag-box .gender{ background:#dce6ff; font-weight:600; }
+.tag-box .gender.male{ background:#d0e2ff; color:#1c407d; font-weight:600; }
+.tag-box .gender.female{ background:#ffe0ef; color:#c2185b; font-weight:600; }
+
+/* 카드 리스트 전용 스크롤 박스 (★ 룸메이트와 동일) */
+.sh-scroll-area{
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 8px 80px 0;
+}
