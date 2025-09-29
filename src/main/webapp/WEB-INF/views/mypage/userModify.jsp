@@ -72,12 +72,30 @@
             flex-grow: 1;
         }
 
+        /* === 버튼 공통 & 활성 스타일 (수정됨) === */
+        .card-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none !important;  /* 밑줄 제거 */
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+        }
         .card-action-btn.active {
-            border: 1px solid #3399ff;
-            color: #3399ff;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            background: #3399ff;   /* 파란 배경 */
+            color: #fff;           /* 흰 글씨 */
+            border-color: #3399ff; /* 테두리 파랑 */
+        }
+        .card-action-btn.active:hover,
+        .card-action-btn.active:focus-visible {
+            background: #1c407d;   /* 딥블루 */
+            border-color: #1c407d;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(28, 64, 125, 0.25);
         }
 
         .profile-section {
@@ -175,8 +193,8 @@
         }
 
         /* =========================
-   [FIX] 자기소개 카드 위·왼쪽 정렬 강제
-   ========================= */
+           [FIX] 자기소개 카드 위·왼쪽 정렬 강제
+           ========================= */
         .mypage-card .card-body.intro-body {
             /* 부모가 empty-content 같은 flex/center여도 무력화 */
             display: block !important;
@@ -248,8 +266,20 @@
             flex: 1; /* 가용 너비에서 자연스럽게 줄임표 */
         }
 
+        /* 주소+지도 래퍼 */
+        .addr-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-
+        .addr-map {
+            width: 100%;
+            height: 260px; /* 필요하면 여기 숫자만 조절 */
+            border: 1px solid #e5efff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
     </style>
 
@@ -346,28 +376,40 @@
             <!-- 주소 카드 -->
             <div class="mypage-card">
                 <div class="card-header">
-                    <!-- [ADD] 왼쪽 묶음: 제목 + 주소 값(한 줄) -->
                     <div class="card-header-left">
                         <h3>주소</h3>
                         <span class="header-inline-value">
-                <c:out value="${not empty rDTO.addr1 ? rDTO.addr1 : '등록된 주소가 없습니다.'}"/>
-            </span>
+        <c:out value="${not empty rDTO.addr1 ? rDTO.addr1 : '등록된 주소가 없습니다.'}"/>
+      </span>
                     </div>
                     <a href="#" class="card-link">더보기</a>
                 </div>
 
-                <!-- 본문은 그대로 두되, 중복이 싫으면 이 부분은 지워도 됨 -->
-                <%--<div class="card-body">
-                    <c:choose>
-                        <c:when test="${not empty rDTO.addr1}">
-                            <div class="addr-box"><c:out value="${rDTO.addr1}"/></div>
-                        </c:when>
-                        <c:otherwise>
-                            <span style="color:#6e7b8b">등록된 주소가 없습니다.</span>
-                        </c:otherwise>
-                    </c:choose>
+                <div class="card-body">
+                    <%-- 페이지 스코프로 주소 보존 --%>
+                    <c:set var="addr1" value="${not empty rDTO.addr1 ? rDTO.addr1 : ''}"/>
+                    <div class="addr-row">
+                        <c:if test="${not empty addr1}">
+                            <%--<div class="addr-box"><c:out value="${addr1}"/></div>--%>
+                        </c:if>
+                        <div id="kakaoMap" class="addr-map"></div>
+                    </div>
                 </div>
-            </div>--%>
+            </div>
+
+
+            <!-- 본문은 그대로 두되, 중복이 싫으면 이 부분은 지워도 됨 -->
+            <%--<div class="card-body">
+                <c:choose>
+                    <c:when test="${not empty rDTO.addr1}">
+                        <div class="addr-box"><c:out value="${rDTO.addr1}"/></div>
+                    </c:when>
+                    <c:otherwise>
+                        <span style="color:#6e7b8b">등록된 주소가 없습니다.</span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>--%>
 
 </main>
 
@@ -383,9 +425,77 @@
     const userName = "<%= ssUserName %>";
 </script>
 
+<!-- Kakao Maps SDK: autoload=false로 안전 초기화 -->
+<!-- [FIX] Kakao Maps SDK: services + autoload=false 추가 -->
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=218d70914021664c1d8e3dc194489251&libraries=services&autoload=false"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // JSP에서 내려준 주소(없으면 빈 문자열)
+        // [KEEP] 위에서 c:set var="addr1" 해둔 값을 사용
+        const addrText = "<c:out value='${addr1}'/>".trim();
+        const container = document.getElementById('kakaoMap');
+
+        if (!container) return;
+
+        // [FIX] autoload=false를 썼으니 kakao.maps.load로 안전 초기화
+        kakao.maps.load(function () {
+            // 1) 기본 지도 먼저 (주소 없어도 지도 보이게)
+            const defaultCenter = new kakao.maps.LatLng(37.5665, 126.9780); // 서울시청
+            const map = new kakao.maps.Map(container, { center: defaultCenter, level: 4 });
+
+            // 기본 마커
+            const marker = new kakao.maps.Marker({ position: defaultCenter });
+            marker.setMap(map);
+
+            // 반응형 레이아웃 대응 (사이드바/그리드 영향)
+            function relayoutAndCenter() {
+                map.relayout();
+                map.setCenter(marker.getPosition());
+            }
+            window.addEventListener('resize', relayoutAndCenter);
+            setTimeout(relayoutAndCenter, 0);
+
+            // 2) 주소가 있으면 지오코딩 후 이동
+            if (addrText && addrText.length > 0) {
+                const geocoder = new kakao.maps.services.Geocoder();
+
+                geocoder.addressSearch(addrText, function (result, status) {
+                    if (status === kakao.maps.services.Status.OK && result.length) {
+                        const item = result[0];
+                        const pos = new kakao.maps.LatLng(item.y, item.x);
+
+                        // 마커/지도만 이동
+                        marker.setPosition(pos);
+                        map.setCenter(pos);
+                        map.setLevel(3);
+
+                        // (선택) 마커에 툴팁만 주고 싶으면 title 설정 (마우스 올릴 때 브라우저 기본 툴팁)
+                        // const label =
+                        //   (item.address_name && item.address_name.trim()) ||
+                        //   (item.road_address && item.road_address.address_name && item.road_address.address_name.trim()) ||
+                        //   (addrText && addrText.trim()) || '';
+                        // if (label) marker.setTitle(label);
+
+                        // ✅ 인포윈도우 생성/오픈 코드 완전 제거
+                        // const iw = new kakao.maps.InfoWindow({ content: '...' });
+                        // iw.open(map, marker);
+                    } else {
+                        console.warn('지오코딩 실패:', status, result);
+                    }
+                });
+
+
+            }
+        });
+    });
+</script>
+
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 <script src="${pageContext.request.contextPath}/js/sideBar.js"></script>
+
+
+
 
 </body>
 </html>
