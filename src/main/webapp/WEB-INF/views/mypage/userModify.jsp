@@ -15,14 +15,14 @@
             line-height: 1.5;
         }
 
+        /* 전체 메인 콘텐츠 영역 */
         .sidebar-main-content {
-            padding: 20px;
+            padding: 40px;
         }
 
-        /* [MOD] 여기서 margin-left 값이 박스를 왼쪽으로 이동시킴 */
         .mypage-wrapper {
-            max-width: 1000px;
-            margin: 40px 0 40px 130px; /* ← 왼쪽 여백 130px */
+            max-width: 1200px;
+            margin: 80px auto;
         }
 
         .mypage-title {
@@ -372,6 +372,17 @@
 </main>
 
 <%@ include file="../includes/customModal.jsp" %>
+
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
+
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 <script src="${pageContext.request.contextPath}/js/sideBar.js"></script>
