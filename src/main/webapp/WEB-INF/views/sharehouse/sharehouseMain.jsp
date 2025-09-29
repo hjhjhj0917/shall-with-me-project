@@ -5,12 +5,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
 
     <%-- 방법 A: 룸메이트 CSS를 그대로 사용하면 레이아웃이 100% 동일 --%>
     <link rel="stylesheet" href="/css/roommate/roommateMain.css"/>
 
-    <%-- 방법 B: 만약 별도 파일을 유지하고 싶다면 위 한 줄을 주석 처리하고
-         /css/sharehouse/sharehouseMain.css 안에 roommateMain.css 내용을 그대로 복사하세요. --%>
+    <%-- 방법 B: 별도 파일 유지하려면 위 한 줄 주석 처리 후 아래를 사용 --%>
     <%-- <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/> --%>
 
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
@@ -47,12 +47,6 @@
     <script>
         const ctx = '${pageContext.request.contextPath}';
 
-        $(document).ready(function () {
-            $("#roommateAdd").on("click", function () {
-                openProfileModal(ctx + '/sharehouse/sharehouseReg'); // 경로만 sharehouse
-            });
-        });
-
         function openProfileModal(url) {
             const ov = document.getElementById('profileModalOverlay');
             const frame = document.getElementById('profileModalFrame');
@@ -80,7 +74,7 @@
             bgEls.forEach(el => { if (!el) return; el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); });
 
             frame.src = 'about:blank';
-            document.getElementById('roommateAdd')?.focus();
+            document.getElementById('sharehouseAddBtn')?.focus(); // 포커스 복귀 대상
         }
 
         document.addEventListener('click', (e) => {
@@ -191,7 +185,7 @@
         function loadPage(p) {
             loading = true;
             $.ajax({
-                url: ctx + "/sharehouse/list",   // ← 여기만 sharehouse
+                url: ctx + "/sharehouse/list",
                 type: "GET",
                 data: { page: p },
                 dataType: "json",
@@ -242,5 +236,22 @@
         }
     });
 </script>
+
+<!-- 왼쪽 하단 + 버튼 -->
+<button type="button" class="sh-fab-left" id="sharehouseAddBtn" aria-label="쉐어하우스 등록">
+    <span class="icon-plus">+</span>
+</button>
+<div class="sh-tooltip">쉐어하우스 등록</div>
+
+
+<!-- 버튼 클릭 시 모달 오픈 (DOMContentLoaded 보장) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('sharehouseAddBtn')?.addEventListener('click', function(){
+            openProfileModal(ctx + '/sharehouse/sharehouseReg');
+        });
+    });
+</script>
+
 </body>
 </html>
