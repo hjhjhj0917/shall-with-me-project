@@ -114,7 +114,7 @@
 <div id="profileModalOverlay" aria-hidden="true">
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
         <div class="modal-header">
-            <div id="profileModalTitle" class="modal-title-text">프로필 등록</div>
+            <div id="profileModalTitle" class="modal-title-text">쉐어하우스 등록</div>
             <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기" onclick="closeProfileModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
