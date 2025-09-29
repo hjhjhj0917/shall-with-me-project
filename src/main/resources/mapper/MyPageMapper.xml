@@ -52,4 +52,23 @@
         ]]>
     </delete>
 
+    <select id="myPageUserInfo" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+            SELECT U.EMAIL, U.ADDR1, U.ADDR2, U.AGE, U.GENDER, U.BIRTH_DATE, P.INTRODUCTION
+            FROM USER_INFO U
+            LEFT JOIN USER_PROFILE P ON U.user_id = P.user_id
+            WHERE U.user_id = #{userId}
+
+    </select>
+
+    <select id="myPageUserTag" parameterType="UserInfoDTO" resultType="UserTagDTO">
+        SELECT
+            ut.user_id  AS userId,
+            ut.tag_id   AS tagId,
+            t.tag_name  AS tagName
+        FROM USER_TAG ut
+                 JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+        ORDER BY ut.tag_id DESC
+    </select>
+
 </mapper>

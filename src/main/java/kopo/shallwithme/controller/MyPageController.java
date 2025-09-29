@@ -12,11 +12,13 @@ import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -28,10 +30,31 @@ public class MyPageController {
     private final IMyPageService myPageService;
 
     @GetMapping("userModify")
-    public String userModify() {
+    public String userModify(HttpSession session, ModelMap model) throws Exception {
 
         log.info("{}.userModify Start!", this.getClass().getName());
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        log.info("userId={}", userId);
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserId(userId);
+
+        UserInfoDTO rDTO = myPageService.myPageUserInfo(pDTO);
+        List<UserTagDTO> rList = myPageService.myPageUserTag(pDTO);
+
+        String mail = rDTO.getEmail();
+        rDTO.setEmail(EncryptUtil.decAES128BCBC(mail));
+
+        log.info("rDTO: {}", rDTO);
+
+        model.addAttribute("rDTO", rDTO);
+        model.addAttribute("tList", rList);
+
         log.info("{}.userModify End!", this.getClass().getName());
+
+
 
         return "mypage/userModify";
     }

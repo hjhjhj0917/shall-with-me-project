@@ -2,7 +2,10 @@ package kopo.shallwithme.mapper;
 
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface IMyPageMapper {
@@ -21,4 +24,9 @@ public interface IMyPageMapper {
 
     // 비활성 계정을 영구 삭제
     int deleteOldDeactivatedUsers();
+
+
+    UserInfoDTO myPageUserInfo (UserInfoDTO pDTO) throws Exception;
+
+    List<UserTagDTO> myPageUserTag(UserInfoDTO pDTO) throws Exception;
 }
