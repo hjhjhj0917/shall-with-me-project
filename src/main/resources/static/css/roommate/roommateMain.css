@@ -54,7 +54,6 @@ html, body{
     width:38px; height:38px;
     border-radius:50%;
     border:none; background:#fff;
-    box-shadow: var(--shadow);
     cursor:pointer;
 }
 

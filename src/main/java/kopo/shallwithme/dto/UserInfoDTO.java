@@ -43,4 +43,8 @@ public class UserInfoDTO {
 
     // 룸메이트 태그 (여러 개 가능)
     private List<String> tags;
+    private String tag1;           // 직업 태그 등
+    private String tag2;           // 성격 태그 등
+    private String genderLabel;    // "남", "여", "기타"
+
 }

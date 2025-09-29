@@ -1,5 +1,6 @@
 package kopo.shallwithme.service.impl;
 
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
@@ -8,6 +9,7 @@ import kopo.shallwithme.mapper.IUserInfoMapper;
 import kopo.shallwithme.service.IRoommateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -22,6 +24,7 @@ public class RoommateService implements IRoommateService {
 
     private final IRoommateMapper mapper;
     private final IUserInfoMapper userInfoMapper;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Override
     public List<UserTagDTO> getUserTagsByUserId(String userId) {
@@ -39,9 +42,9 @@ public class RoommateService implements IRoommateService {
 
     /**
      * ✅ 룸메이트 카드에 표시할 태그/성별 가공
-     *  - 태그1: tagId 5~7 중 첫 번째
-     *  - 태그2: tagId 15~17 중 첫 번째
-     *  - 성별: USER_INFO.GENDER → M=남, F=여
+     * - 태그1: tagId 5~7 중 첫 번째
+     * - 태그2: tagId 15~17 중 첫 번째
+     * - 성별: USER_INFO.GENDER → M=남, F=여
      */
     public Map<String, Object> getDisplayInfo(String userId) {
         Map<String, Object> result = new HashMap<>();
@@ -100,7 +103,7 @@ public class RoommateService implements IRoommateService {
     public List<Map<String, Object>> getRoommateList(int page) {
         // ✅ 첫 페이지는 12장, 그 이후는 4장씩
         int pageSize = (page == 1) ? 12 : 4;
-        int offset   = (page == 1) ? 0 : (12 + (page - 2) * 4);
+        int offset = (page == 1) ? 0 : (12 + (page - 2) * 4);
 
         List<Map<String, Object>> baseList = mapper.getRoommateList(offset, pageSize);
 
@@ -145,6 +148,76 @@ public class RoommateService implements IRoommateService {
         return user;
     }
 
+    @Override
+    public TagDTO searchUsersByTags(TagDTO pDTO) {
+        log.info("{}.searchUsersByTags Start!", this.getClass().getName());
 
+        int pageSize = pDTO.getPageSize() > 0 ? pDTO.getPageSize() : DEFAULT_PAGE_SIZE;
+        int page = pDTO.getPage() > 0 ? pDTO.getPage() : 1;
+        int offset = (page - 1) * pageSize;
+        pDTO.setOffset(offset);
+
+        List<Integer> tagIds = pDTO.getTagIds();
+
+        List<UserInfoDTO> users;
+
+        if (tagIds == null || tagIds.isEmpty()) {
+            users = mapper.selectUsersByPagination(pDTO);
+            pDTO = mapper.countAllUsers(pDTO);
+        } else {
+            users = mapper.selectUsersByTagsWithPagination(pDTO);
+            pDTO = mapper.countUsersByTags(pDTO);  // 태그 조건에 맞는 유저 수 count
+        }
+
+        // ⭐️ 사용자별 tag1/tag2/genderLabel 세팅
+        for (UserInfoDTO user : users) {
+            List<UserTagDTO> tags = mapper.selectUserTags(user.getUserId());
+
+            // tag1: 5~7번 중 아무거나
+            String tag1 = tags.stream()
+                    .filter(t -> t.getTagId() >= 5 && t.getTagId() <= 7)
+                    .map(UserTagDTO::getTagName)
+                    .findFirst()
+                    .orElse(null);
+
+            // tag2: 15~16번 중 아무거나
+            String tag2 = tags.stream()
+                    .filter(t -> t.getTagId() >= 15 && t.getTagId() <= 16)
+                    .map(UserTagDTO::getTagName)
+                    .findFirst()
+                    .orElse(null);
+
+            user.setTag1(tag1);
+            user.setTag2(tag2);
+
+            // gender 가공: M → 남, F → 여
+            if ("M".equalsIgnoreCase(user.getGender())) {
+                user.setGenderLabel("남");
+            } else if ("F".equalsIgnoreCase(user.getGender())) {
+                user.setGenderLabel("여");
+            } else {
+                user.setGenderLabel("기타");
+            }
+        }
+
+        pDTO.setUsers(users);
+        pDTO.setTotalCount(pDTO.getCount());
+
+        log.info("{}.searchUsersByTags End!", this.getClass().getName());
+        return pDTO;
+    }
+
+
+    @Override
+    public List<TagDTO> getAllTags() throws Exception {
+        log.info("{}.getAllTags Start!", this.getClass().getName());
+
+        List<TagDTO> rList = mapper.getAllTags();
+        log.info("rList : {}", rList);
+
+        log.info("{}.getAllTags End!", this.getClass().getName());
+
+        return rList;
+    }
 }
 
