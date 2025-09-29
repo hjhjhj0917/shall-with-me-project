@@ -1,9 +1,10 @@
-/*body {*/
-/*    background-image: url("../../images/test2.png");*/
-/*    background-repeat: no-repeat;*/
-/*    background-size: cover;*/
-/*    background-position: center;*/
-/*}*/
+body {
+    background: linear-gradient(to right, #f9f9f9, #E5F2FF);
+
+    /*background-repeat: no-repeat;*/
+    /*background-size: cover;*/
+    /*background-position: center;*/
+}
 
 .detail-wrapper {
     display: flex;
