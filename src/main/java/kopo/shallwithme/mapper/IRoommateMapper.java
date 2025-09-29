@@ -24,4 +24,5 @@ public interface IRoommateMapper {
     List<UserTagDTO> selectUserTags(String userId);
 
     UserProfileDTO findUserProfileById(String userId);
+
 }

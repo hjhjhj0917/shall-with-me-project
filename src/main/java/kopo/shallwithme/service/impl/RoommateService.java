@@ -20,8 +20,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RoommateService implements IRoommateService {
 
+
+
     private final IRoommateMapper mapper;
     private final IUserInfoMapper userInfoMapper;
+
+
 
     @Override
     public List<UserTagDTO> getUserTagsByUserId(String userId) {
