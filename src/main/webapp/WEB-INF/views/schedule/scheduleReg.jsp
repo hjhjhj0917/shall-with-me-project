@@ -200,7 +200,8 @@
 
         .fc .fc-day-today {
             box-sizing: border-box !important;
-            border: 2px solid #3399ff !important;
+            border: 1px solid transparent; /* 기존 테두리 공간 유지를 위해 투명 처리 */
+            box-shadow: 0 0 0 2px #3399ff inset !important; /* 테두리 효과를 안쪽 그림자로 대체 */
             border-radius: 4px;
             background-color: white !important;
             z-index: 1;
@@ -233,6 +234,16 @@
             font-size: 10px;
             color: #888;
             font-weight: 500;
+        }
+
+        .fc-listWeek-view .fc-day-today::before,
+        .fc-listDay-view .fc-day-today::before {
+            content: none !important;
+        }
+
+        .fc-listWeek-view .fc-day-today,
+        .fc-listDay-view .fc-day-today {
+            border: none !important;
         }
 
         /* 요일(header) 배경색 변경 */
@@ -438,6 +449,39 @@
             color: white;
         }
 
+        .shcedule-modal-buttons {
+            margin-top: 14px;
+        }
+
+        /*.schedule-save-btn {*/
+        /*    display: flex;*/
+        /*    width: 100%;*/
+        /*    height: 50px;*/
+        /*    padding: 14px;*/
+        /*    background-color: #3399ff;*/
+        /*    color: white;*/
+        /*    border: none;*/
+        /*    border-radius: 8px;*/
+        /*    font-size: 1rem;*/
+        /*    font-weight: 500;*/
+        /*    cursor: pointer;*/
+        /*    transition: background-color 0.2s;*/
+        /*    justify-content: center;*/
+        /*}*/
+
+        .schedule-save-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #3399ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -519,9 +563,9 @@
             <div class="form-group">
                 <textarea placeholder="메모" id="eventMemoInput"></textarea>
             </div>
-            <div class="modal-buttons">
-                <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>
-                <button type="button" onclick="cancelRegister()">취소</button>
+            <div class="shcedule-modal-buttons">
+<%--                <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>--%>
+<%--                <button type="button" onclick="cancelRegister()">취소</button>--%>
                 <button type="submit" class="schedule-save-btn">저장</button>
             </div>
         </form>
@@ -569,6 +613,7 @@
         const calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'ko',
             initialView: 'dayGridMonth',
+            noEventsText: '등록된 일정이 없습니다.',  // 이 부분만 추가!
             headerToolbar: {
                 left: ' ',
                 center: 'prev title next',

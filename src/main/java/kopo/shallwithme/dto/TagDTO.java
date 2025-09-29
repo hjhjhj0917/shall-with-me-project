@@ -23,4 +23,5 @@ public class TagDTO {
     private List<UserInfoDTO> users;
     private int totalCount;
     private int count;
+    private int tagCount;
 }
