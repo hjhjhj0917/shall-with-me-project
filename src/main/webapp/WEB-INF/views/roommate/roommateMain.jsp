@@ -450,21 +450,29 @@
             const $container = $('#all-tag-list');
             $container.empty();
             const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
+
+            // ✅ 위에서 수정한 tagGroups 배열을 여기에 붙여넣거나, 이 함수 바깥에 두시면 됩니다.
             const tagGroups = [
-                { title: "생활패턴", tags: [1, 2] }, { title: "활동범위", tags: [3, 4] },
-                { title: "직업", tags: [5, 6, 7] }, { title: "퇴근 시간", tags: [8, 9, 10] },
-                { title: "손님초대", tags: [11, 12] }, { title: "물건공유", tags: [13, 14] },
-                { title: "성격", tags: [15, 16] }, { title: "선호하는 성격", tags: [17, 18] },
-                { title: "대화", tags: [19, 20] }, { title: "갈등", tags: [21, 22] },
-                { title: "요리", tags: [23, 24, 25] }, { title: "주식", tags: [26, 27, 28] },
-                { title: "끼니", tags: [29, 30, 31] }, { title: "음식 냄새", tags: [32, 33] },
-                { title: "청결", tags: [34, 35, 36] }, { title: "청소 주기", tags: [37, 38, 39] },
-                { title: "쓰레기 배출", tags: [40, 41] }, { title: "설거지", tags: [42, 43] }
+                { title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2] }, { title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4] },
+                { title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7] }, { title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10] },
+                { title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12] }, { title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14] },
+                { title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16] }, { title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18] },
+                { title: "대화", icon: "fa-solid fa-comments", tags: [19, 20] }, { title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22] },
+                { title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25] }, { title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28] },
+                { title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31] }, { title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33] },
+                { title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36] }, { title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39] },
+                { title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41] }, { title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43] }
             ];
 
             tagGroups.forEach(group => {
                 const $groupDiv = $('<div>').addClass('search-tag-group');
-                const $groupTitle = $('<div>').addClass('search-tag-group__title').text(group.title);
+
+                // ✅ [수정] 아이콘(<i>) 태그를 생성하고 제목(<span>)과 함께 추가
+                const $groupTitle = $('<div>').addClass('search-tag-group__title');
+                const $icon = $('<i>').addClass(group.icon).css({'margin-right': '8px', 'width': '16px'});
+                const $titleText = $('<span>').text(group.title);
+                $groupTitle.append($icon, $titleText);
+
                 const $groupList = $('<div>').addClass('search-tag-group__list');
 
                 group.tags.forEach(tagId => {
