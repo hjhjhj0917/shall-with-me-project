@@ -80,15 +80,21 @@
     </select>
 
     <!-- 태그 필터링 유저 수 조회 -->
-    <select id="countUsersByTags" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
+    <select id="countUsersByTags" parameterType="TagDTO" resultMap="TagDTOResultMap">
         SELECT
-        COUNT(DISTINCT U.USER_ID) AS count
+        COUNT(matching_users.userId) as count
+        FROM (
+        SELECT
+        U.USER_ID AS userId
         FROM USER_INFO U
         JOIN USER_TAG UT ON U.USER_ID = UT.USER_ID
         WHERE UT.TAG_ID IN
         <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
             #{tagId}
         </foreach>
+        GROUP BY U.USER_ID
+        HAVING COUNT(DISTINCT UT.TAG_ID) = #{tagCount}
+        ) AS matching_users
     </select>
 
     <!-- resultMap 정의 -->
@@ -119,17 +125,15 @@
 
 
     <select id="selectUsersByTagsWithPagination" parameterType="TagDTO" resultType="UserInfoDTO">
-        SELECT DISTINCT
+        SELECT
         ui.user_id    AS userId,
         ui.user_name  AS userName,
         ui.age        AS age,
         ui.gender     AS gender,
         up.profile_image_url AS profileImageUrl,
-        up.introduction,
-        GROUP_CONCAT(t.tag_name) AS tagNames -- 태그 이름들을 하나의 문자열로 묶어서 가져오기 (MySQL 기준)
+        up.introduction
         FROM USER_INFO ui
         JOIN USER_TAG ut ON ui.user_id = ut.user_id
-        JOIN TAG t ON ut.tag_id = t.tag_id
         LEFT JOIN USER_PROFILE up ON ui.user_id = up.user_id
         WHERE ui.status = 'ACTIVE'
         AND ut.tag_id IN
@@ -137,6 +141,7 @@
             #{tagId}
         </foreach>
         GROUP BY ui.user_id
+        HAVING COUNT(DISTINCT ut.tag_id) = #{tagCount}
         ORDER BY ui.reg_dt DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>

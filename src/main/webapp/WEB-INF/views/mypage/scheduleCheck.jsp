@@ -192,7 +192,8 @@
 
         .fc .fc-day-today {
             box-sizing: border-box !important;
-            border: 2px solid #3399ff !important;
+            border: 1px solid transparent; /* 기존 테두리 공간 유지를 위해 투명 처리 */
+            box-shadow: 0 0 0 2px #3399ff inset !important; /* 테두리 효과를 안쪽 그림자로 대체 */
             border-radius: 4px;
             background-color: white !important;
             z-index: 1;

@@ -168,6 +168,7 @@ public class RoommateService implements IRoommateService {
             users = mapper.selectUsersByPagination(pDTO);
             pDTO = mapper.countAllUsers(pDTO);
         } else {
+            pDTO.setTagCount(tagIds.size());
             users = mapper.selectUsersByTagsWithPagination(pDTO);
             pDTO = mapper.countUsersByTags(pDTO);  // 태그 조건에 맞는 유저 수 count
         }
