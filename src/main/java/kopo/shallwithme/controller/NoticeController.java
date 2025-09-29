@@ -2,9 +2,11 @@ package kopo.shallwithme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.shallwithme.dto.YouthPolicyDTO;
+import kopo.shallwithme.service.impl.NoticeService;
 import kopo.shallwithme.service.impl.YouthPolicyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ import java.util.List;
 public class NoticeController {
 
     private final YouthPolicyService youthPolicyService;
+    private final NoticeService noticeService;
 
     @GetMapping("/noticeList")
     public String noticeList(ModelMap model) throws Exception {
@@ -38,4 +41,24 @@ public class NoticeController {
 
         return "notice/noticeList";
     }
+
+    @GetMapping("/noticeDetail")
+    public String noticeDetail(YouthPolicyDTO pDTO, ModelMap model) throws Exception {
+        log.info("{}.noticeDetail Start!", this.getClass().getName());
+
+        YouthPolicyDTO rDTO = noticeService.getPolicyById(pDTO);
+        log.info("정책 상세정보 rDTO : {}", rDTO);
+
+        // JSON으로 변환
+        String policyJson = new ObjectMapper().writeValueAsString(rDTO);
+
+        // JavaScript 문자열로 안전하게 Escape
+        String safeJson = StringEscapeUtils.escapeEcmaScript(policyJson);
+
+        model.addAttribute("policyJson", safeJson);
+
+        log.info("{}.noticeDetail End!", this.getClass().getName());
+        return "notice/noticeDetail";
+    }
+
 }

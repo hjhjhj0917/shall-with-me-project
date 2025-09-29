@@ -7,6 +7,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
@@ -27,11 +29,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +68,7 @@ public class RoommateController {
         var req = attrs.getRequest();
         HttpSession session = req.getSession(false);
 
-        String userId   = (session != null) ? (String) session.getAttribute("SS_USER_ID")   : "";
+        String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : "";
         String userName = (session != null) ? (String) session.getAttribute("SS_USER_NAME") : "";
 
         // 태그 조회 (DTO에 tagName 포함)
@@ -193,7 +192,6 @@ public class RoommateController {
     }
 
 
-
     // ✅ 특정 유저의 태그 2개 + 성별 조회 API
     @GetMapping("/{userId}/info")
     @ResponseBody
@@ -228,5 +226,54 @@ public class RoommateController {
         return "roommate/roommateDetail";
     }
 
+    @PostMapping("/searchByTags")
+    @ResponseBody
+    public TagDTO searchByTags(HttpServletRequest request) {
+        log.info("{}.searchByTags Start!", this.getClass().getName());
+
+        TagDTO tagDTO = new TagDTO();
+
+        try {
+            // 요청 본문(JSON)을 문자열로 읽기
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = request.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            String json = sb.toString();
+
+            // Jackson ObjectMapper 또는 Gson을 사용해 JSON 파싱
+            ObjectMapper mapper = new ObjectMapper();
+            tagDTO = mapper.readValue(json, TagDTO.class);
+
+        } catch (IOException e) {
+            log.error("Error reading request body", e);
+            // 예외 처리, 기본값 세팅 등 필요하면 추가
+        }
+
+        log.info("searchByTags called with tagIds={}, page={}, pageSize={}",
+                tagDTO.getTagIds(), tagDTO.getPage(), tagDTO.getPageSize());
+
+        TagDTO result = roommateService.searchUsersByTags(tagDTO);
+
+        log.info("최종 응답 유저 리스트 크기: {}", result.getUsers() == null ? "null" : result.getUsers().size());
+
+        log.info("{}.searchByTags End!", this.getClass().getName());
+
+        return result;
+    }
+
+    @GetMapping("/tagAll")
+    @ResponseBody
+    public List<TagDTO> tagAll() throws Exception{
+        log.info("{}.tagAll Start!", this.getClass().getName());
+
+        List<TagDTO> rList = roommateService.getAllTags();
+
+        log.info("{}.tagAll End!", this.getClass().getName());
+
+        return rList;
+    }
 
 }

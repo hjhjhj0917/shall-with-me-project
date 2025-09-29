@@ -62,6 +62,8 @@
         u.user_name        AS userName,
         u.age              AS age,
         u.gender           AS gender,
+        u.addr1            AS addr1,
+        u.birth_date       AS birthDate,
         p.profile_image_url AS profileImageUrl,  <!-- ✅ 여기를 profile_image_url로 맞춤 -->
         p.introduction     AS introduction
         FROM USER_INFO u
@@ -69,5 +71,74 @@
         WHERE u.user_id = #{userId}
     </select>
 
+
+    <!-- 전체 유저 수 조회 : 양준모 태그를 통한 검색-->
+    <select id="countAllUsers" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
+        SELECT
+            COUNT(user_id) AS count
+        FROM USER_INFO
+    </select>
+
+    <!-- 태그 필터링 유저 수 조회 -->
+    <select id="countUsersByTags" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
+        SELECT
+        COUNT(DISTINCT U.USER_ID) AS count
+        FROM USER_INFO U
+        JOIN USER_TAG UT ON U.USER_ID = UT.USER_ID
+        WHERE UT.TAG_ID IN
+        <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
+            #{tagId}
+        </foreach>
+    </select>
+
+    <!-- resultMap 정의 -->
+    <resultMap id="TagDTOResultMap" type="TagDTO">
+        <result property="count" column="count"/>
+    </resultMap>
+
+    <select id="getAllTags" resultType="TagDTO">
+        SELECT TAG_ID, TAG_NAME
+        FROM TAG
+    </select>
+
+
+    <select id="selectUsersByPagination" parameterType="TagDTO" resultType="UserInfoDTO">
+        SELECT
+            ui.user_id    AS userId,
+            ui.user_name  AS userName,
+            ui.age        AS age,
+            ui.gender     AS gender,
+            up.profile_image_url AS profileImageUrl,
+            up.introduction
+        FROM USER_INFO ui
+                 LEFT JOIN USER_PROFILE up ON ui.user_id = up.user_id
+        WHERE ui.status = 'ACTIVE'
+        ORDER BY ui.reg_dt DESC
+            LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+
+    <select id="selectUsersByTagsWithPagination" parameterType="TagDTO" resultType="UserInfoDTO">
+        SELECT DISTINCT
+        ui.user_id    AS userId,
+        ui.user_name  AS userName,
+        ui.age        AS age,
+        ui.gender     AS gender,
+        up.profile_image_url AS profileImageUrl,
+        up.introduction,
+        GROUP_CONCAT(t.tag_name) AS tagNames -- 태그 이름들을 하나의 문자열로 묶어서 가져오기 (MySQL 기준)
+        FROM USER_INFO ui
+        JOIN USER_TAG ut ON ui.user_id = ut.user_id
+        JOIN TAG t ON ut.tag_id = t.tag_id
+        LEFT JOIN USER_PROFILE up ON ui.user_id = up.user_id
+        WHERE ui.status = 'ACTIVE'
+        AND ut.tag_id IN
+        <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
+            #{tagId}
+        </foreach>
+        GROUP BY ui.user_id
+        ORDER BY ui.reg_dt DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
 
 </mapper>

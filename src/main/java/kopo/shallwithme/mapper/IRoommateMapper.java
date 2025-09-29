@@ -25,4 +25,14 @@ public interface IRoommateMapper {
 
     UserProfileDTO findUserProfileById(String userId);
 
+    List<UserInfoDTO> selectUsersByPagination(TagDTO tagDTO);
+
+    TagDTO countAllUsers(TagDTO pDTO);
+
+    List<UserInfoDTO> selectUsersByTagsWithPagination(TagDTO pDTO);
+
+    TagDTO countUsersByTags(TagDTO pDTO);
+
+    List<TagDTO> getAllTags() throws Exception;
+
 }

@@ -160,6 +160,18 @@
                 }
             });
 
+            // 폼 제출 기본 동작 막기
+            $("#passwordConfirmForm").on("submit", function (e) {
+                e.preventDefault();
+            });
+
+            // 엔터로도 작동하도록 개선 (선택)
+            $("#password").on("keyup", function (e) {
+                if (e.key === "Enter") {
+                    $("#mypagePwCkBtn").click();
+                }
+            });
+
             $("#mypagePwCkBtn").on("click", function () {
                 let f = document.getElementById("passwordConfirmForm");
                 let password = f.password.value.trim();

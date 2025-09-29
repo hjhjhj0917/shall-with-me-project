@@ -80,6 +80,53 @@ public class ScheduleController {
         return res;
     }
 
+    // 일정 수정
+    @PostMapping("/api/events/{id}")
+    @ResponseBody
+    public String updateSchedule(@PathVariable("id") int id, @RequestBody ScheduleDTO pDTO) throws Exception {
+        log.info("{}.updateSchedule Start!", this.getClass().getName());
+
+        log.info("scheduleId : {}", id);
+        log.info("ScheduleDTO: {}", pDTO);
+
+        pDTO.setScheduleId(id);
+
+        int result = scheduleService.updateSchedule(pDTO);
+        String msg;
+
+        if (result > 0) {
+            msg = "일정이 수정되었습니다.";
+        } else {
+            msg = "일정 수정에 실패했습니다.";
+        }
+
+        log.info("{}.updateSchedule End!", this.getClass().getName());
+
+        return msg;
+    }
+
+    // 일정 삭제
+    @PostMapping("/scheduleDelete")
+    @ResponseBody
+    public String deleteSchedule(@RequestBody ScheduleDTO pDTO) throws Exception {
+        log.info("{}.deleteSchedule Start!", this.getClass().getName());
+
+        log.info("ScheduleDTO: {}", pDTO);
+
+        int result = scheduleService.deleteSchedule(pDTO);
+        String msg;
+
+        if (result > 0) {
+            msg = "일정이 삭제되었습니다.";
+        } else {
+            msg = "일정 삭제에 실패했습니다.";
+        }
+
+        log.info("{}.deleteSchedule End!", this.getClass().getName());
+
+        return msg;
+    }
+
     @PostMapping("/api/events/request")
     @ResponseBody
     public ResponseEntity<?> requestSchedule(@RequestBody ScheduleDTO pDTO, HttpSession session) {

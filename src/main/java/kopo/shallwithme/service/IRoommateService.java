@@ -1,6 +1,5 @@
 package kopo.shallwithme.service;
 
-import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import java.util.List;
@@ -16,4 +15,7 @@ public interface IRoommateService {
 
     UserProfileDTO getUserProfile(String userId);
 
+    TagDTO searchUsersByTags(TagDTO pDTO);
+
+    List<TagDTO> getAllTags() throws Exception;
 }

@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
         login: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
         searchUserId: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
         searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
-        chatRoom: ['switchBox'],
         scheduleReg: ['switchBox']
     };
 
