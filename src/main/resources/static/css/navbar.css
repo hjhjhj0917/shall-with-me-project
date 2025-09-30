@@ -199,6 +199,7 @@ header {
     border: 2px solid #DAEDFF;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     object-fit: cover;
+    /*margin-top: 3px;*/
 }
 
 #headerDropdownToggle {
