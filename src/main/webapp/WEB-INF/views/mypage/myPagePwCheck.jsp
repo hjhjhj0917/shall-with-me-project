@@ -12,6 +12,10 @@
 
         /* 전체 메인 콘텐츠 영역 패딩 */
 
+        body {
+            background: linear-gradient(to right, white, #f9f9f9);
+        }
+
         .sidebar-main-content {
             margin-top: 50px;
             padding: 40px;

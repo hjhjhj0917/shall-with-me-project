@@ -1,6 +1,8 @@
 body {
-    background-image: url("../../images/kpaas-background.png");
+    /*background-image: url("../../images/kpaas-background.png");*/
+    background: linear-gradient(to right, #f9f9f9, #E5F2FF);
 }
+
 
 /* 상단 버튼 전체를 감싸는 컨테이너 */
 .top-buttons {
@@ -185,9 +187,11 @@ body {
     gap: 10px;
     padding: 12px;
     border-radius: 30px;
-    border: 1px solid #3399ff;
     background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 .input-area input {
     flex: 1;
