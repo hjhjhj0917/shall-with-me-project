@@ -87,15 +87,6 @@ html, body{
 .sh-title{ margin:0 0 4px 0; font-weight:600; font-size:14px; }
 .sh-sub, .sh-price{ margin:0; font-size:13px; color:#4b5563; }
 
-/* 좌하단 플로팅 버튼 (옵션) */
-.sh-fab{
-    position:fixed; left:18px; bottom:18px;
-    width:44px; height:44px; border-radius:50%;
-    border:none; background:#67a5ff; color:#fff; font-size:18px;
-    box-shadow:0 10px 24px rgba(0,0,0,.18);
-    cursor:pointer;
-}
-
 .sh-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
 .sh-card:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
 
