@@ -26,8 +26,9 @@
     <style>
         /* 페이지 전체 배경 */
         body {
-            background-image: url("../images/test1.png");
+            /*background-image: url("../images/test1.png");*/
             overflow: hidden;
+            background: linear-gradient(to right, #f9f9f9, #E5F2FF);
         }
 
         /* 메인 컨테이너 */
@@ -771,31 +772,34 @@
                 roomId: roomId
             };
 
-            $.ajax({
-                url: '/schedule/api/events/request',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(eventData),
-                success: function(savedEvent) {
-                    console.log("요청 응답:", savedEvent);   // 여기에 schedule 객체 확인
-                    $('#step2').hide();
-                    $('#step1').show();
-                    calendar.refetchEvents();
+            showCustomConfirm("일정을 등록하시겠습니까?", function () {
+                $.ajax({
+                    url: '/schedule/api/events',
+                    // url: '/schedule/api/events/request', 나중에 수정
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(eventData),
+                    success: function(savedEvent) {
+                        console.log("요청 응답:", savedEvent);   // 여기에 schedule 객체 확인
+                        $('#step2').hide();
+                        $('#step1').show();
+                        calendar.refetchEvents();
 
-                    if (stompClient && stompClient.connected) {
-                        const scheduleMessage = {
-                            roomId: roomId,
-                            senderId: myUserId,
-                            messageType: 'SCHEDULE',
-                            schedule: savedEvent,
-                            sentAt: new Date().toISOString()
-                        };
-                        stompClient.send("/app/chat/send", {}, JSON.stringify(scheduleMessage));
+                        if (stompClient && stompClient.connected) {
+                            const scheduleMessage = {
+                                roomId: roomId,
+                                senderId: myUserId,
+                                messageType: 'SCHEDULE',
+                                schedule: savedEvent,
+                                sentAt: new Date().toISOString()
+                            };
+                            stompClient.send("/app/chat/send", {}, JSON.stringify(scheduleMessage));
+                        }
+                    },
+                    error: function(err) {
+                        alert("일정 저장에 실패했습니다.");
                     }
-                },
-                error: function(err) {
-                    alert("일정 저장에 실패했습니다.");
-                }
+                });
             });
         });
 

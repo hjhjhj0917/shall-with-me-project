@@ -34,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
         userRegForm: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
         login: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
         searchUserId: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
-        searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox'],
-        scheduleReg: ['switchBox']
+        searchPassword: ['userNameBox', 'switchBox', 'menuBox', 'messageBox']
     };
 
     if (hideBoxByPage[pageName]) {
