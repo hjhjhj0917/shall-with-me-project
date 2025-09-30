@@ -22,89 +22,72 @@
         #tagSelectModalOverlay {
             position: absolute;
             top: 100%;
-            left: 30%;
+            left: 35%;
             transform: translateX(-50%);
             z-index: 9999;
             width: 100%;
-            max-width: 370px;
+            max-width: 440px;
             background: white;
             border-radius: 25px;
             margin-top: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* ✅ [수정] 모달 시트를 Flexbox 컨테이너로 변경 */
         #tagSelectModalOverlay .modal-sheet {
             border: none;
             box-shadow: none;
             height: auto;
             max-height: 450px;
-            display: flex; /* Flex 컨테이너로 설정 */
-            flex-direction: column; /* 자식 요소들을 세로로 쌓음 */
-            overflow: hidden; /* 시트 자체의 스크롤은 숨김 */
-            border-radius: 25px; /* 부모 radius 상속 */
-        }
-
-        #tagSelectModalOverlay .modal-header {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 14px;
-            /*border-bottom: 1px solid #eee;*/
-            position: sticky;
-            top: 0;
-            background-color: white;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 25px;
         }
 
-        #tagSelectModalOverlay .modal-title-text {
-            font-weight: 600;
-            color: #1c407d;
-            font-size: 1rem;
-        }
-
-        #tagSelectModalOverlay .modal-close {
-            font-size: 1.1rem;
-            color: #666;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: color 0.2s;
-            margin-top: 17px;
-            margin-right: 8px;
-        }
-
-        #tagSelectModalOverlay .modal-close:hover {
-            color: #1c407d;
-        }
-
+        /* ✅ [수정] 헤더가 삭제됨에 따라 body의 패딩을 재조정 */
         #tagSelectModalOverlay .modal-body {
-            padding: 8px 20px 20px 20px; /* 패딩 위치 이동 */
-            overflow-y: auto; /* Y축 스크롤을 본문에서 담당 */
-            flex: 1; /* 남은 공간을 모두 차지하도록 설정 */
+            padding: 20px !important; /* 상하좌우 여백 통일 */
+            overflow-y: auto;
+            flex: 1;
         }
 
-        /* ✅ [수정] 외부 스타일 덮어쓰기를 위해 ID 선택자로 우선순위 높이고 !important 추가 */
+        /* --- 태그 그룹 레이아웃 --- */
         #tagSelectModalOverlay .search-tag-group {
-            width: 100% !important;
-            margin-bottom: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            margin-bottom: 20px !important;
+            border-radius: 12px;
         }
+
+        /* --- 태그 그룹 제목 스타일 --- */
         #tagSelectModalOverlay .search-tag-group__title {
+            flex-shrink: 0 !important;
+            width: 110px !important;
+            background-color: white !important;
+            border-radius: 12px !important;
+            padding: 8px 12px !important;
+            text-align: center !important;
             font-weight: 600 !important;
             color: #333 !important;
-            margin-bottom: 12px !important;
-            padding-bottom: 6px !important;
-            border-bottom: 1px solid #f0f0f0 !important;
-            font-size: 0.95rem !important;
-            text-align: left !important;
+            font-size: 0.9rem !important;
+            height: 77px !important;
+            display: flex !important;
+            justify-content: center !important; /* 수평 중앙 정렬 */
+            align-items: center !important;     /* 수직 중앙 정렬 */
+
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
+
+        /* --- 태그 버튼 목록 스타일 --- */
         #tagSelectModalOverlay .search-tag-group__list {
             display: flex !important;
             flex-wrap: wrap !important;
             gap: 8px !important;
-            justify-content: flex-start !important;
-            margin-top: 40px !important;
-            margin-left: 20px !important;
+            padding-left: 16px !important;
+            margin-top: 35px !important;
         }
+
 
         #tagSelectModalOverlay .tag-btn {
             display: inline-block !important;
@@ -208,15 +191,13 @@
         }
 
         /* --- 모달 스크롤바 스타일 --- */
-        /* Firefox */
         #tagSelectModalOverlay .modal-body {
             scrollbar-width: thin;
             scrollbar-color: #c4c4c4 white;
         }
 
-        /* Webkit (Chrome, Safari, Edge) */
         #tagSelectModalOverlay .modal-body::-webkit-scrollbar {
-            width: 10px; /* ✅ 핸들과 여백을 고려해 너비 약간 조정 */
+            width: 10px;
         }
         #tagSelectModalOverlay .modal-body::-webkit-scrollbar-track {
             background: transparent;
@@ -224,7 +205,7 @@
         #tagSelectModalOverlay .modal-body::-webkit-scrollbar-thumb {
             background: #c4c4c4;
             border-radius: 10px;
-            border: 4px solid transparent; /* ✅ [수정] 투명 여백을 4px로 늘려 핸들이 더 짧아보이게 함 */
+            border: 4px solid transparent;
             background-clip: content-box;
         }
         #tagSelectModalOverlay .modal-body::-webkit-scrollbar-thumb:hover {
@@ -252,12 +233,6 @@
 
         <div id="tagSelectModalOverlay" style="display: none;">
             <div class="modal-sheet">
-                <div class="modal-header">
-<%--                    <div class="modal-title-text">태그 선택</div>--%>
-                    <button type="button" class="modal-close" onclick="closeTagModal()">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
                 <div class="modal-body">
                     <div id="all-tag-list">
                     </div>
@@ -451,7 +426,6 @@
             $container.empty();
             const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
 
-            // ✅ 위에서 수정한 tagGroups 배열을 여기에 붙여넣거나, 이 함수 바깥에 두시면 됩니다.
             const tagGroups = [
                 { title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2] }, { title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4] },
                 { title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7] }, { title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10] },
@@ -467,7 +441,6 @@
             tagGroups.forEach(group => {
                 const $groupDiv = $('<div>').addClass('search-tag-group');
 
-                // ✅ [수정] 아이콘(<i>) 태그를 생성하고 제목(<span>)과 함께 추가
                 const $groupTitle = $('<div>').addClass('search-tag-group__title');
                 const $icon = $('<i>').addClass(group.icon).css({'margin-right': '8px', 'width': '16px'});
                 const $titleText = $('<span>').text(group.title);
