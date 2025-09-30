@@ -1,19 +1,24 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html>
+<%
+  // 모달(iframe)로 열릴 때는 ?inModal=Y 로 호출
+  boolean inModal = "Y".equals(request.getParameter("inModal"));
+%>
+<!DOCTYPE html>
+<html lang="ko">
 <head>
+    <meta charset="UTF-8" />
     <title>살며시: 쉐어하우스 정보 등록</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/navbar.css"/>
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/modal.css"/>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <%-- 필요하면 전용 CSS 연결
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseReg.css"/>
+    --%>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         /* 바깥 컨테이너: 가운데 정렬 */
         .roommate-container {
@@ -34,16 +39,7 @@
         }
 
         /* 좌/우 박스 */
-        .roommate-right {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 48px;
-            display: flex;
-            flex-direction: column;
-            min-height: 600px;
-        }
-
+        .roommate-right,
         .roommate-left {
             background: #fff;
             border: 1px solid #ddd;
@@ -55,16 +51,12 @@
         }
 
         /* 내부 요소 */
-        .form-group {
-            margin-bottom: 32px;
-        }
-
+        .form-group { margin-bottom: 32px; }
         .form-group label {
             display: block;
             font-weight: 600;
             margin-bottom: 12px;
         }
-
         .form-group input[type="text"] {
             width: 100%;
             padding: 16px;
@@ -79,7 +71,6 @@
             gap: 20px;
             margin-bottom: 32px;
         }
-
         .upload-box {
             position: relative;
             display: flex;
@@ -88,7 +79,6 @@
             justify-content: center;
             border: 2px dashed #bbb;
             border-radius: 8px;
-            /* ⬇️ 고정 크기 */
             width: 180px;
             height: 180px;
             padding: 0;
@@ -97,139 +87,69 @@
             transition: border-color .2s ease, background-color .2s ease;
             text-align: center;
         }
-
-        .upload-box:hover {
-            border-color: #3399ff;
-            background-color: #f7fbff;
-        }
-
-        .upload-box i {
-            color: #999;
-            margin-bottom: 12px;
-        }
-
-        .upload-box span {
-            font-size: 14px;
-            color: #666;
-        }
-
+        .upload-box:hover { border-color: #3399ff; background-color: #f7fbff; }
+        .upload-box i { color: #999; margin-bottom: 12px; }
+        .upload-box span { font-size: 14px; color: #666; }
         .upload-box input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
         }
-
-        /* 미리보기 상태 */
-        .upload-box.has-image {
-            border-color: #3399ff;
-            background: #f7fbff;
-        }
-
+        .upload-box.has-image { border-color: #3399ff; background: #f7fbff; }
         .upload-box.has-image i,
-        .upload-box.has-image span {
-            display: none;
-        }
-
+        .upload-box.has-image span { display: none; }
         .upload-box img.preview {
-            /* ⬇️ 박스 꽉 채우는 고정 표시 */
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 6px;
-            display: block;
+            width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: block;
         }
-
-        /* 삭제 버튼을 항상 위로 */
         .upload-box .remove-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            z-index: 3;
-            border: 1px solid #ddd;
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            background: #fff;
-            font-size: 0.85rem;
+            position: absolute; top: 8px; right: 8px; z-index: 3;
+            border: 1px solid #ddd; padding: 6px 10px; border-radius: 6px;
+            cursor: pointer; background: #fff; font-size: 0.85rem;
         }
+        .upload-box.has-image input[type="file"] { pointer-events: none; }
 
-        /* 파일 인풋 클릭 막기 (삭제 버튼 클릭 가능) */
-        .upload-box.has-image input[type="file"] {
-            pointer-events: none;
-        }
-
-        /* 자기소개 버튼 */
+        /* 자기소개 */
         .intro-btn {
             align-self: flex-start;
             margin-bottom: 16px;
             padding: 10px 18px;
             background-color: #3399ff;
             color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
+            border: none; border-radius: 6px;
+            cursor: pointer; font-size: 0.95rem;
         }
-
-        /* textarea */
         textarea#introTextarea {
-            flex: 1;
-            width: 500px;
-            min-height: 100px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            resize: vertical;
-            font-family: inherit;
-            line-height: 1.5;
+            flex: 1; width: 500px; min-height: 100px;
+            padding: 20px; border: 1px solid #ccc; border-radius: 6px;
+            resize: vertical; font-family: inherit; line-height: 1.5;
         }
 
-        /* ✅ 태그 표시용 스타일 추가 */
-        .tag-chip-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 6px;
-        }
-
+        /* 태그 표시 */
+        .tag-chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
         .tag-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: #f2f6ff;
-            color: #1c407d;
-            font-size: 0.9rem;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 6px 10px; border-radius: 999px;
+            background: #f2f6ff; color: #1c407d; font-size: 0.9rem;
             border: 1px solid #d9e6ff;
         }
-
-        .tag-type {
-            color: #6b7da6;
-            font-size: 0.78rem;
-        }
-
-        .tag-empty {
-            color: #888;
-            margin-left: 8px;
-        }
+        .tag-type { color: #6b7da6; font-size: 0.78rem; }
+        .tag-empty { color: #888; margin-left: 8px; }
 
         /* 반응형 */
         @media (max-width: 1100px) {
-            #roommateForm {
-                flex-direction: column;
-            }
-
-            .roommate-left,
-            .roommate-right {
-                flex: 1 1 auto;
-                min-height: 520px;
-            }
+            #roommateForm { flex-direction: column; }
+            .roommate-left, .roommate-right { flex: 1 1 auto; min-height: 520px; }
         }
+
+        /* 모달로 열릴 때 헤더/여백 보정 */
+        <% if (inModal) { %>
+        header { display: none; }
+        .roommate-container { padding-top: 24px; }
+        body { background: #fff; }
+        <% } %>
     </style>
 </head>
 <body>
+
+<% if (!inModal) { %>
 <header>
     <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
@@ -265,17 +185,33 @@
         </div>
     </div>
 </header>
+<% } %>
 
 <main class="roommate-container">
+    <!-- 절대: form 속성 사이에 주석 넣지 말 것 -->
     <form id="roommateForm"
-          action="/roommate/register"
+          action="/sharehouse/register"
           method="post"
           enctype="multipart/form-data">
         <!-- 왼쪽 -->
         <section class="roommate-left">
+
+            <%-- 로그인 이름을 JSTL 변수로 보관 --%>
+            <c:set var="loginName" value="${sessionScope.SS_USER_NAME}" />
+
             <div class="form-group name-group">
-                <label>이름 :
-                    <span><%= session.getAttribute("SS_USER_NAME") != null ? session.getAttribute("SS_USER_NAME") : "" %></span></label>
+                <label>
+                    <span>
+                        <c:choose>
+                            <c:when test="${not empty loginName}">
+                            <c:out value="${loginName}"/> 의 쉐어하우스
+                        </c:when>
+                            <c:otherwise>
+                                내 쉐어하우스
+                            </c:otherwise>
+                        </c:choose>
+                    </span>
+                </label>
             </div>
 
             <div class="image-upload-grid">
@@ -301,7 +237,7 @@
                 </div>
             </div>
 
-            <!-- ✅ 보여질 태그: 입력창 제거, 태그명만 표시 -->
+            <!-- 보여질 태그 -->
             <div class="form-group tag-group">
                 <label>보여질 태그 :</label>
                 <c:choose>
@@ -309,13 +245,13 @@
                         <div class="tag-chip-wrap">
                             <c:forEach var="t" items="${userTags}">
                                 <span class="tag-chip">
-                                    #<c:out value="${t.tagName != null ? t.tagName : t.tag_name}"/>
-                                    <small class="tag-type">
-                                        <c:choose>
-                                            <c:when test="${(t.tagType != null ? t.tagType : t.tag_type) == 'ME'}">· 나</c:when>
-                                            <c:when test="${(t.tagType != null ? t.tagType : t.tag_type) == 'PREF'}">· 선호</c:when>
-                                        </c:choose>
-                                    </small>
+                                  #<c:out value="${t.tagName != null ? t.tagName : t.tag_name}"/>
+                                  <small class="tag-type">
+                                    <c:choose>
+                                      <c:when test="${(t.tagType != null ? t.tagType : t.tag_type) == 'ME'}">· 나</c:when>
+                                      <c:when test="${(t.tagType != null ? t.tagType : t.tag_type) == 'PREF'}">· 선호</c:when>
+                                    </c:choose>
+                                  </small>
                                 </span>
                             </c:forEach>
                         </div>
@@ -326,12 +262,11 @@
                 </c:choose>
             </div>
             <!-- /보여질 태그 -->
-
         </section>
 
         <!-- 오른쪽 -->
         <section class="roommate-right">
-            <button type="button" class="intro-btn">자기 소개</button>
+            <button type="button" class="intro-btn">쉐어하우스 소개</button>
             <textarea id="introTextarea"
                       name="introduction"
                       placeholder="소개글 시작"></textarea>
@@ -344,60 +279,62 @@
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
-    if (ssUserName == null) {
-        ssUserName = "";
-    }
+    if (ssUserName == null) { ssUserName = ""; }
 %>
 
-<!-- JS: 미리보기 + 삭제 기능 (유지) -->
+<!-- JS: 미리보기 + 삭제 기능 -->
 <script>
-    document.querySelectorAll('.upload-box input[type="file"]').forEach((input) => {
-        input.addEventListener('change', (e) => {
-            const file = e.target.files && e.target.files[0];
-            const box = e.target.closest('.upload-box');
-            if (!file) return;
+  document.querySelectorAll('.upload-box input[type="file"]').forEach((input) => {
+    input.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      const box = e.target.closest('.upload-box');
+      if (!file) return;
 
-            if (!file.type.startsWith('image/')) {
-                alert('이미지 파일만 업로드할 수 있어요.');
-                e.target.value = '';
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('파일 용량이 너무 커요. (최대 5MB)');
-                e.target.value = '';
-                return;
-            }
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드할 수 있어요.');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('파일 용량이 너무 커요. (최대 5MB)');
+        e.target.value = '';
+        return;
+      }
 
-            const reader = new FileReader();
-            reader.onload = () => {
-                box.classList.add('has-image');
+      const reader = new FileReader();
+      reader.onload = () => {
+        box.classList.add('has-image');
 
-                let img = box.querySelector('img.preview');
-                if (!img) {
-                    img = document.createElement('img');
-                    img.className = 'preview';
-                    box.appendChild(img);
+        let img = box.querySelector('img.preview');
+        if (!img) {
+          img = document.createElement('img');
+          img.className = 'preview';
+          box.appendChild(img);
 
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'remove-btn';
-                    btn.textContent = '이미지 삭제';
-                    btn.addEventListener('click', () => {
-                        // 파일 선택 해제
-                        input.value = '';
-                        // 프리뷰/버튼 제거
-                        img.remove();
-                        btn.remove();
-                        // 상태 복원
-                        box.classList.remove('has-image');
-                    });
-                    box.appendChild(btn);
-                }
-                img.src = reader.result;
-            };
-            reader.readAsDataURL(file);
-        });
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'remove-btn';
+          btn.textContent = '이미지 삭제';
+          btn.addEventListener('click', () => {
+            input.value = '';
+            img.remove();
+            btn.remove();
+            box.classList.remove('has-image');
+          });
+          box.appendChild(btn);
+        }
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
     });
+  });
+
+  // 백업: 만약 파라미터 누락되어도 iframe 안에서 열렸다면 헤더 제거
+  if (window.self !== window.top) {
+    document.querySelector('header')?.remove();
+    document.querySelector('.roommate-container')?.style.setProperty('padding-top', '24px');
+    document.body.style.background = '#fff';
+  }
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>

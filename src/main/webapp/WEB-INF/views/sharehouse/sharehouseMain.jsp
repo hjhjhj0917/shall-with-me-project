@@ -7,15 +7,10 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
 
-    <%-- 방법 A: 룸메이트 CSS를 그대로 사용하면 레이아웃이 100% 동일 --%>
-    <link rel="stylesheet" href="/css/roommate/roommateMain.css"/>
+    <%-- ✅ [수정] 일관성을 위해 sharehouseMain.css를 사용하고, contextPath를 적용했습니다. --%>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
 
-    <%-- 방법 B: 별도 파일 유지하려면 위 한 줄 주석 처리 후 아래를 사용 --%>
-    <%-- <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/> --%>
-
-    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-
-    <!-- 큰 모달 + 배경 상호작용 차단 (룸메이트와 동일) -->
     <style>
         body.modal-open { overflow: hidden; }
         body.modal-open header,
@@ -91,7 +86,6 @@
 <%@ include file="../includes/header.jsp" %>
 
 <main id="sh-wrapper">
-    <!-- 검색바 (클래스/DOM 구조 동일) -->
     <div class="sh-searchbar">
         <input type="text" placeholder="원하는 지역, 조건 검색" id="sh-q">
         <button type="button" id="sh-search-btn" aria-label="검색">
@@ -99,22 +93,16 @@
         </button>
     </div>
 
-    <!-- 스크롤 박스 + 카드 그리드 (구조 동일) -->
     <div class="sh-scroll-area">
         <section class="sh-grid">
-            <!-- Ajax로 아이템 붙음 -->
         </section>
     </div>
-
-    <%-- 플로팅 등록 버튼 필요시 해제 --%>
-    <%-- <button class="sh-fab" title="등록" id="roommateAdd"><i class="fa-solid fa-plus"></i></button> --%>
 </main>
 
-<!-- 큰 모달 -->
 <div id="profileModalOverlay" aria-hidden="true">
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
         <div class="modal-header">
-            <div id="profileModalTitle" class="modal-title-text">프로필 등록</div>
+            <div id="profileModalTitle" class="modal-title-text">쉐어하우스 등록</div>
             <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기" onclick="closeProfileModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -134,7 +122,6 @@
 %>
 <script> const userName = "<%= ssUserName %>"; </script>
 
-<!-- 카드 클릭 → 상세 (경로만 sharehouse) -->
 <script>
     (function () {
         const grid = document.querySelector('.sh-grid');
@@ -157,7 +144,6 @@
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
-<!-- 무한 스크롤 (룸메이트와 동일 / API만 sharehouse로) -->
 <script>
     $(document).ready(function () {
         let page = 1;
@@ -204,23 +190,62 @@
             });
         }
 
-        // 룸메이트 렌더 함수 그대로 사용 — 컨트롤러가 같은 키(userId, profileImageUrl, name 등)를 내려줌
+        // ✅ [수정] 이미지 로딩 로직을 안정적으로 개선했습니다.
         function renderUserCards(items) {
             const loginUserId = "${sessionScope.SS_USER_ID}";
+            const noimgUrl = ctx + "/images/noimg.png";
 
             $.each(items, function (i, it) {
                 if (it.userId === loginUserId) return true;
 
-                const imgUrl = it.profileImgUrl || (ctx + "/images/noimg.png");
+                // ================== 👇 여기 디버깅 코드를 추가! 👇 ==================
+                console.log("--- 카드 데이터 확인 ---");
+                console.log("서버에서 받은 it 객체:", it);
+                console.log("it 객체 안의 userId 값:", it.userId);
+                // =================================================================
+
+                // --- HTML 요소 생성 ---
                 const nickname = it.name || "알 수 없음";
                 const age = it.age ? it.age + "세" : "";
 
-                const $card = $("<article>").addClass("sh-card").attr("data-id", it.userId);
-                const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
-
-                const $info = $("<div>").addClass("sh-info")
+                const $card  = $("<article>").addClass("sh-card").attr("data-id", it.userId);
+                const $thumb = $("<div>").addClass("sh-thumb");
+                const $info  = $("<div>").addClass("sh-info")
                     .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
 
+                // --- 이미지 URL 결정 및 로딩 로직 ---
+                let finalImageUrl = noimgUrl; // 기본값은 noimg
+
+                // 1. 서버에서 받은 프로필 이미지가 유효한지 확인
+                if (it.profileImgUrl && it.profileImgUrl.trim() !== "") {
+                    // 2. 경로가 http로 시작하지 않으면(외부 이미지가 아니면) ctx를 붙여줌
+                    if (it.profileImgUrl.startsWith('http')) {
+                        finalImageUrl = it.profileImgUrl;
+                    } else {
+                        finalImageUrl = ctx + "/" + it.profileImgUrl;
+                    }
+                }
+                // 3. 프로필 이미지가 없으면 샘플 hero 이미지 사용
+                else {
+                    finalImageUrl = `${ctx}/images/sample/${it.userId}/hero.jpg`;
+                }
+
+                // 4. 로딩 중 빈칸이 보이지 않도록 먼저 기본 이미지를 설정
+                $thumb.css("background-image", `url('${noimgUrl}')`);
+
+                // 5. 최종 결정된 이미지를 미리 로드(probe) 시도
+                const probe = new Image();
+                probe.onload = () => {
+                    // 6. 로딩 성공 시 썸네일 배경을 해당 이미지로 교체
+                    $thumb.css("background-image", `url('${finalImageUrl}')`);
+                };
+                probe.onerror = () => {
+                    // 7. 로딩 실패 시 아무것도 하지 않음 (기본 noimg가 유지됨)
+                };
+                probe.src = finalImageUrl;
+
+
+                // --- 태그 생성 (기존과 동일) ---
                 const $tagBox = $("<div>").addClass("tag-box");
                 if (it.tag1) $tagBox.append($("<span>").addClass("tag").text(it.tag1));
                 if (it.tag2) $tagBox.append($("<span>").addClass("tag").text(it.tag2));
@@ -228,23 +253,21 @@
                     const genderClass = (it.gender === "남" || it.gender === "M") ? "male" : "female";
                     $tagBox.append($("<span>").addClass("tag gender " + genderClass).text(it.gender));
                 }
-
                 $info.append($tagBox);
+
                 $card.append($thumb).append($info);
-                $grid.append($card);
+                $(".sh-grid").append($card);
             });
         }
     });
 </script>
 
-<!-- 왼쪽 하단 + 버튼 -->
 <button type="button" class="sh-fab-left" id="sharehouseAddBtn" aria-label="쉐어하우스 등록">
     <span class="icon-plus">+</span>
 </button>
 <div class="sh-tooltip">쉐어하우스 등록</div>
 
 
-<!-- 버튼 클릭 시 모달 오픈 (DOMContentLoaded 보장) -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('sharehouseAddBtn')?.addEventListener('click', function(){
