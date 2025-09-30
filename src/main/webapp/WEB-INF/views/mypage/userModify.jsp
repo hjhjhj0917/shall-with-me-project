@@ -13,6 +13,7 @@
         body {
             font-size: 15px;
             line-height: 1.5;
+            background: linear-gradient(to right, white, #f9f9f9);
         }
 
         /* 전체 메인 콘텐츠 영역 */

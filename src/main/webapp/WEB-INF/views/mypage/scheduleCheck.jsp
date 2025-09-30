@@ -23,6 +23,10 @@
 
     <style>
 
+        body {
+            background: linear-gradient(to right, white, #f9f9f9);
+        }
+
         /* 메인 컨테이너 */
         .schedule-container {
             display: flex;
