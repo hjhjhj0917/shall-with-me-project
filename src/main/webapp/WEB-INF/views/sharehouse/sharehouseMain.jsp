@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
-
-    <%-- ✅ [수정] 일관성을 위해 sharehouseMain.css를 사용하고, contextPath를 적용했습니다. --%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
 
@@ -15,10 +13,7 @@
         body.modal-open { overflow: hidden; }
         body.modal-open header,
         body.modal-open #sh-wrapper {
-            pointer-events: none;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: none;
+            pointer-events: none; -webkit-user-select: none; user-select: none; touch-action: none;
         }
         #profileModalOverlay {
             position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
@@ -46,14 +41,11 @@
             const ov = document.getElementById('profileModalOverlay');
             const frame = document.getElementById('profileModalFrame');
             if (!ov || !frame) return;
-
             frame.src = url;
             ov.style.display = 'flex';
             document.body.classList.add('modal-open');
-
             const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
-            bgEls.forEach(el => { if (!el) return; el.setAttribute('inert',''); el.setAttribute('aria-hidden','true'); });
-
+            bgEls.forEach(el => { if (el) { el.setAttribute('inert',''); el.setAttribute('aria-hidden','true'); }});
             document.getElementById('profileModalClose')?.focus();
         }
 
@@ -61,21 +53,17 @@
             const ov = document.getElementById('profileModalOverlay');
             const frame = document.getElementById('profileModalFrame');
             if (!ov || !frame) return;
-
             ov.style.display = 'none';
             document.body.classList.remove('modal-open');
-
             const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
-            bgEls.forEach(el => { if (!el) return; el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); });
-
+            bgEls.forEach(el => { if (el) { el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); }});
             frame.src = 'about:blank';
-            document.getElementById('sharehouseAddBtn')?.focus(); // 포커스 복귀 대상
+            document.getElementById('sharehouseAddBtn')?.focus();
         }
 
         document.addEventListener('click', (e) => {
             const ov = document.getElementById('profileModalOverlay');
-            if (!ov || ov.style.display !== 'flex') return;
-            if (e.target === ov) closeProfileModal();
+            if (ov && ov.style.display === 'flex' && e.target === ov) closeProfileModal();
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeProfileModal();
@@ -94,8 +82,7 @@
     </div>
 
     <div class="sh-scroll-area">
-        <section class="sh-grid">
-        </section>
+        <section class="sh-grid"></section>
     </div>
 </main>
 
@@ -125,19 +112,17 @@
 <script>
     (function () {
         const grid = document.querySelector('.sh-grid');
-        if (!grid) return;
-
-        grid.addEventListener('click', (e) => {
-            const card = e.target.closest('.sh-card');
-            if (!card || !grid.contains(card)) return;
-            const id = card.dataset.id;
-            if (!id) return;
-
-            window.open(
-                ctx + '/sharehouse/sharehouseDetail?userId=' + encodeURIComponent(id),
-                '_blank'
-            );
-        });
+        if (grid) {
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.sh-card');
+                if (card && grid.contains(card)) {
+                    const id = card.dataset.id;
+                    if (id) {
+                        window.open(ctx + '/sharehouse/sharehouseDetail?userId=' + encodeURIComponent(id), '_blank');
+                    }
+                }
+            });
+        }
     })();
 </script>
 
@@ -157,11 +142,9 @@
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
-
             const scrollTop = $scrollArea.scrollTop();
             const innerHeight = $scrollArea.innerHeight();
             const scrollHeight = $scrollArea[0].scrollHeight;
-
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
                 page++;
                 loadPage(page);
@@ -183,69 +166,43 @@
                     renderUserCards(data.items);
                     if (data.lastPage) lastPage = true;
                 },
-                error: function (xhr, status, err) {
-                    console.error("목록 불러오기 실패:", err);
-                },
+                error: function (xhr, status, err) { console.error("목록 불러오기 실패:", err); },
                 complete: function () { loading = false; }
             });
         }
 
-        // ✅ [수정] 이미지 로딩 로직을 안정적으로 개선했습니다.
         function renderUserCards(items) {
             const loginUserId = "${sessionScope.SS_USER_ID}";
-            const noimgUrl = ctx + "/images/noimg.png";
+            const stamp = Date.now();                   // 캐시 버스터
+            const noimg = ctx + "/images/noimg.png";
+            const $grid = $(".sh-grid");
 
             $.each(items, function (i, it) {
-                if (it.userId === loginUserId) return true;
+                if (String(it.userId) === String(loginUserId)) return true;
 
-                // ================== 👇 여기 디버깅 코드를 추가! 👇 ==================
-                console.log("--- 카드 데이터 확인 ---");
-                console.log("서버에서 받은 it 객체:", it);
-                console.log("it 객체 안의 userId 값:", it.userId);
-                // =================================================================
-
-                // --- HTML 요소 생성 ---
                 const nickname = it.name || "알 수 없음";
-                const age = it.age ? it.age + "세" : "";
+                const age = it.age ? (it.age + "세") : "";
 
+                // 카드 뼈대
                 const $card  = $("<article>").addClass("sh-card").attr("data-id", it.userId);
-                const $thumb = $("<div>").addClass("sh-thumb");
+                const $thumb = $("<div>").addClass("sh-thumb")
+                    .css("background-image", "url('" + noimg + "')");  // 회색 방지용 기본값
                 const $info  = $("<div>").addClass("sh-info")
                     .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
 
-                // --- 이미지 URL 결정 및 로딩 로직 ---
-                let finalImageUrl = noimgUrl; // 기본값은 noimg
+                // 우선순위: (서버 프로필) → (샘플 hero)
+                const sampleHero = ctx + "/images/sample/" + it.userId + "/hero.jpg?v=" + stamp;
+                const wanted = (it.profileImgUrl && it.profileImgUrl.trim() !== "")
+                    ? (it.profileImgUrl + (it.profileImgUrl.indexOf("?") >= 0 ? "&" : "?") + "v=" + stamp)
+                    : sampleHero;
 
-                // 1. 서버에서 받은 프로필 이미지가 유효한지 확인
-                if (it.profileImgUrl && it.profileImgUrl.trim() !== "") {
-                    // 2. 경로가 http로 시작하지 않으면(외부 이미지가 아니면) ctx를 붙여줌
-                    if (it.profileImgUrl.startsWith('http')) {
-                        finalImageUrl = it.profileImgUrl;
-                    } else {
-                        finalImageUrl = ctx + "/" + it.profileImgUrl;
-                    }
-                }
-                // 3. 프로필 이미지가 없으면 샘플 hero 이미지 사용
-                else {
-                    finalImageUrl = `${ctx}/images/sample/${it.userId}/hero.jpg`;
-                }
-
-                // 4. 로딩 중 빈칸이 보이지 않도록 먼저 기본 이미지를 설정
-                $thumb.css("background-image", `url('${noimgUrl}')`);
-
-                // 5. 최종 결정된 이미지를 미리 로드(probe) 시도
+                // 미리 로드해서 성공 시 교체, 실패면 noimg 유지
                 const probe = new Image();
-                probe.onload = () => {
-                    // 6. 로딩 성공 시 썸네일 배경을 해당 이미지로 교체
-                    $thumb.css("background-image", `url('${finalImageUrl}')`);
-                };
-                probe.onerror = () => {
-                    // 7. 로딩 실패 시 아무것도 하지 않음 (기본 noimg가 유지됨)
-                };
-                probe.src = finalImageUrl;
+                probe.onload  = function(){ $thumb.css("background-image", "url('" + wanted + "')"); };
+                probe.onerror = function(){ $thumb.css("background-image", "url('" + noimg + "')"); };
+                probe.src = wanted;
 
-
-                // --- 태그 생성 (기존과 동일) ---
+                // 태그들
                 const $tagBox = $("<div>").addClass("tag-box");
                 if (it.tag1) $tagBox.append($("<span>").addClass("tag").text(it.tag1));
                 if (it.tag2) $tagBox.append($("<span>").addClass("tag").text(it.tag2));
@@ -256,7 +213,7 @@
                 $info.append($tagBox);
 
                 $card.append($thumb).append($info);
-                $(".sh-grid").append($card);
+                $grid.append($card);
             });
         }
     });
@@ -267,12 +224,14 @@
 </button>
 <div class="sh-tooltip">쉐어하우스 등록</div>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('sharehouseAddBtn')?.addEventListener('click', function(){
-            openProfileModal(ctx + '/sharehouse/sharehouseReg');
-        });
+        const addBtn = document.getElementById('sharehouseAddBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', function(){
+                openProfileModal(ctx + '/sharehouse/sharehouseReg');
+            });
+        }
     });
 </script>
 
