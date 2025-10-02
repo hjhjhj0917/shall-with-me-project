@@ -80,21 +80,27 @@
     </select>
 
     <!-- 태그 필터링 유저 수 조회 -->
-    <select id="countUsersByTags" parameterType="TagDTO" resultMap="TagDTOResultMap">
+    <select id="countUsersByTags" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
         SELECT
-        COUNT(matching_users.userId) as count
-        FROM (
-        SELECT
-        U.USER_ID AS userId
+        COUNT(DISTINCT U.USER_ID) as count
         FROM USER_INFO U
-        JOIN USER_TAG UT ON U.USER_ID = UT.USER_ID
-        WHERE UT.TAG_ID IN
-        <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
-            #{tagId}
-        </foreach>
-        GROUP BY U.USER_ID
-        HAVING COUNT(DISTINCT UT.TAG_ID) = #{tagCount}
-        ) AS matching_users
+        <where>
+            <if test="location != null and location != ''">
+                U.ADDR1 LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
+            </if>
+            <if test="tagIds != null and tagIds.size() > 0">
+                AND U.USER_ID IN (
+                SELECT USER_ID
+                FROM USER_TAG
+                WHERE TAG_ID IN
+                <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
+                    #{tagId}
+                </foreach>
+                GROUP BY USER_ID
+                HAVING COUNT(DISTINCT TAG_ID) = #{tagCount}
+                )
+            </if>
+        </where>
     </select>
 
     <!-- resultMap 정의 -->
@@ -133,15 +139,24 @@
         up.profile_image_url AS profileImageUrl,
         up.introduction
         FROM USER_INFO ui
-        JOIN USER_TAG ut ON ui.user_id = ut.user_id
         LEFT JOIN USER_PROFILE up ON ui.user_id = up.user_id
-        WHERE ui.status = 'ACTIVE'
-        AND ut.tag_id IN
-        <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
-            #{tagId}
-        </foreach>
-        GROUP BY ui.user_id
-        HAVING COUNT(DISTINCT ut.tag_id) = #{tagCount}
+        <where>
+            ui.status = 'ACTIVE'
+            <if test="location != null and location != ''">
+                AND ui.ADDR1 LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
+            </if>
+            <if test="tagIds != null and tagIds.size() > 0">
+                AND ui.user_id IN (
+                SELECT USER_ID
+                FROM USER_TAG
+                WHERE TAG_ID IN
+                <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
+                    #{tagId}
+                </foreach> GROUP BY USER_ID
+                HAVING COUNT(DISTINCT TAG_ID) = #{tagCount}
+                )
+            </if>
+        </where>
         ORDER BY ui.reg_dt DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
