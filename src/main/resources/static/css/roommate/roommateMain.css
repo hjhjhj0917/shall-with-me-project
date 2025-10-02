@@ -21,7 +21,7 @@ html, body{
 
 /* 헤더가 fixed라면 겹치지 않도록 여백 */
 #sh-wrapper {
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 110px 24px 0;    /* 하단 padding 제거 */
     display: flex;            /* flex 컨테이너 선언 */
@@ -60,7 +60,7 @@ html, body{
 /* 카드 그리드 (4열 고정) */
 .sh-grid{
     display:grid;
-    grid-template-columns:repeat(4, 1fr); /* 요청: 4칸 */
+    grid-template-columns:repeat(5, 1fr); /* 요청: 4칸 */
     gap:24px;
 }
 
