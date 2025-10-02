@@ -105,8 +105,8 @@ public class RoommateService implements IRoommateService {
     @Override
     public List<Map<String, Object>> getRoommateList(int page) {
         // ✅ 첫 페이지는 12장, 그 이후는 4장씩
-        int pageSize = (page == 1) ? 12 : 4;
-        int offset = (page == 1) ? 0 : (12 + (page - 2) * 4);
+        int pageSize = (page == 1) ? 15 : 5;
+        int offset = (page == 1) ? 0 : (15 + (page - 2) * 5);
 
         List<Map<String, Object>> baseList = mapper.getRoommateList(offset, pageSize);
 
