@@ -22,7 +22,7 @@
         <%--회원 이름 , 프로필--%>
         <div class="header-user-name-container pinned" id="userNameBox">
             <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-            <span class="user-name-text" id="userNameText">
+            <span class="user-name-text" id="userNameText" onclick="location.href='/mypage/userModify'">
                 <%= session.getAttribute("SS_USER_NAME") %>님
             </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
