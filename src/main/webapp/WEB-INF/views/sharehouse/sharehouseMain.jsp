@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <link rel="stylesheet" href="/css/roommate/roommateMain.css"/>
+    <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
@@ -130,7 +130,7 @@
 <%@ include file="../includes/chatbot.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
-    <%
+<%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
     if (ssUserName == null) ssUserName = "";
 %>
@@ -352,12 +352,33 @@
             const noimg = ctx + "/images/noimg.png";
             items.forEach(house => {
                 const $card = $("<article>").addClass("sh-card").attr("data-id", house.houseId);
+
                 const imgUrl = house.thumbnailUrl || noimg;
-                const $thumb = $("<div>").addClass("sh-thumb").css("background-image", `url('${imgUrl}')`);
+                const $thumb = $("<div>").addClass("sh-thumb")
+                    .css("background-image", "url('" + imgUrl + "')");
 
                 const $info = $("<div>").addClass("sh-info");
                 const title = house.title || "제목 없음";
                 const city = house.city || "";
                 const price = (house.rent != null) ? (house.rent + "만원") : "";
 
-                const
+                const $title = $("<p>").addClass("sh-title").text(title);
+                // 도시 · 가격, 가격은 pill로 선택 표시
+                const $sub   = $("<p>").addClass("sh-sub");
+                if (city) $sub.append(document.createTextNode(city));
+                if (price) $sub.append($("<span>").addClass("price-pill").text(price));
+
+                const $tagBox = $("<div>").addClass("tag-box");
+                if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
+                if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
+
+                $info.append($title, $sub, $tagBox);
+                $card.append($thumb, $info);
+                $grid.append($card);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
