@@ -9,257 +9,311 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
+        /* (검색창 및 다른 부분 스타일은 이전과 동일) */
         .sh-searchbar {
             display: flex;
             align-items: center;
             background-color: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 50px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
             position: relative;
-        }
-
-        #tagSelectModalOverlay {
-            position: absolute;
-            top: 100%;
-            left: 35%;
-            transform: translateX(-50%);
-            z-index: 9999;
+            height: 66px;
+            padding: 0 10px;
             width: 100%;
-            max-width: 440px;
-            background: white;
-            border-radius: 25px;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 850px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        #tagSelectModalOverlay .modal-sheet {
-            border: none;
-            box-shadow: none;
-            height: auto;
-            max-height: 450px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border-radius: 25px;
-        }
-
-        /* ✅ [수정] 헤더가 삭제됨에 따라 body의 패딩을 재조정 */
-        #tagSelectModalOverlay .modal-body {
-            padding: 20px !important; /* 상하좌우 여백 통일 */
-            overflow-y: auto;
+        .search-section {
             flex: 1;
-        }
-
-        /* --- 태그 그룹 레이아웃 --- */
-        #tagSelectModalOverlay .search-tag-group {
-            display: flex !important;
-            align-items: center !important;
-            margin-bottom: 20px !important;
-            border-radius: 12px;
-        }
-
-        /* --- 태그 그룹 제목 스타일 --- */
-        #tagSelectModalOverlay .search-tag-group__title {
-            flex-shrink: 0 !important;
-            width: 110px !important;
-            background-color: white !important;
-            border-radius: 12px !important;
-            padding: 8px 12px !important;
-            text-align: center !important;
-            font-weight: 600 !important;
-            color: #333 !important;
-            font-size: 0.9rem !important;
-            height: 77px !important;
-            display: flex !important;
-            justify-content: center !important; /* 수평 중앙 정렬 */
-            align-items: center !important;     /* 수직 중앙 정렬 */
-
-            border: 2px solid #DAEDFF;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* --- 태그 버튼 목록 스타일 --- */
-        #tagSelectModalOverlay .search-tag-group__list {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 8px !important;
-            padding-left: 16px !important;
-            margin-top: 35px !important;
-        }
-
-
-        #tagSelectModalOverlay .tag-btn {
-            display: inline-block !important;
-            width: auto !important;
-            height: auto !important;
-            position: static !important;
-            text-align: center !important;
-            vertical-align: middle !important;
-            background-color: #f0f4ff !important;
-            border: 1px solid #c2d1ff !important;
-            border-radius: 16px !important;
-            padding: 6px 14px !important;
-            font-size: 0.9rem !important;
-            color: #1c407d !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            user-select: none !important;
-        }
-
-        #tagSelectModalOverlay .tag-btn.selected {
-            background-color: #1c407d !important;
-            border-color: #15426b !important;
-            color: white !important;
-            font-weight: 500 !important;
-        }
-
-        .tag-btn:hover:not(.selected) {
-            background-color: #e0e9ff !important;
-            border-color: #afc4ff !important;
-        }
-
-        .tag-input-wrapper {
-            flex-grow: 1;
-            position: relative;
+            padding: 8px 24px;
             cursor: pointer;
+            border-radius: 30px;
+            transition: background-color 0.2s;
+            min-width: 0;
         }
 
-        #selected-tags {
-            position: absolute;
+        .search-section:hover {
+            background-color: #f7f7f7;
+        }
+
+        .search-section + .search-section {
+            border-left: 1px solid #eee;
+        }
+
+        .search-section-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .search-section-placeholder {
+            font-size: 14px;
+            color: #717171;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #sh-search-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #66B2FF, #3399ff);
+            color: white;
+            border: none;
+            font-size: 16px;
+            margin-left: 10px;
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        #sh-search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .modal-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 0 10px;
-            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+
+        #locationSelectModalOverlay .modal-sheet,
+        #tagSelectModalOverlay .modal-sheet {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 12px;
+            animation: fadeIn 0.3s;
+            overflow: hidden;
+        }
+
+        #locationSelectModalOverlay .modal-sheet {
+            max-width: 500px;
+        }
+
+        #locationSelectModalOverlay .modal-header,
+        #tagSelectModalOverlay .modal-header {
             display: flex;
             align-items: center;
-            gap: 6px;
-            pointer-events: none;
+            justify-content: center;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            position: relative;
         }
 
-        #tag-search-input.has-tags {
-            text-indent: -9999px;
+        #locationSelectModalOverlay .modal-title-text,
+        #tagSelectModalOverlay .modal-title-text {
+            font-weight: 700;
+            color: #222;
         }
 
-        #tag-search-input {
-            width: 100%;
+        #locationSelectModalOverlay .modal-close,
+        #tagSelectModalOverlay .modal-close {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #222;
+            background: #f7f7f7;
             border: none;
-            outline: none;
-            padding: 13px 10px;
-            font-size: 16px;
-            background-color: transparent;
-            box-sizing: border-box;
-            pointer-events: none;
-        }
-
-        #sh-search-btn {
-            flex-shrink: 0;
-            margin-left: 8px;
-        }
-
-        #selected-tags .tag-badge {
-            pointer-events: auto;
-        }
-
-        #tag-search-input.has-tags::placeholder {
-            color: transparent;
-        }
-
-        .tag-badge {
-            display: inline-flex;
-            align-items: center;
-            background-color: #e5f2ff;
-            color: #1c407d;
-            font-weight: 500;
-            border-radius: 16px;
-            padding: 5px 12px;
-            font-size: 14px;
-            white-space: nowrap;
-            cursor: default;
-        }
-
-        .badge-remove {
-            margin-left: 8px;
             cursor: pointer;
-            font-size: 12px;
-            color: #5a7aab;
-        }
-        .badge-remove:hover {
-            color: #1c407d;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* --- 모달 스크롤바 스타일 --- */
+        #locationSelectModalOverlay .modal-body,
         #tagSelectModalOverlay .modal-body {
-            scrollbar-width: thin;
-            scrollbar-color: #c4c4c4 white;
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 20px;
         }
 
-        #tagSelectModalOverlay .modal-body::-webkit-scrollbar {
-            width: 10px;
-        }
-        #tagSelectModalOverlay .modal-body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #tagSelectModalOverlay .modal-body::-webkit-scrollbar-thumb {
-            background: #c4c4c4;
-            border-radius: 10px;
-            border: 4px solid transparent;
-            background-clip: content-box;
-        }
-        #tagSelectModalOverlay .modal-body::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
 
+        .location-item {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s, font-weight 0.2s;
+            font-size: 14px;
+        }
+
+        .location-item:hover {
+            border-color: #222;
+        }
+
+        .location-item.selected {
+            background-color: #f7f7f7;
+            border-color: #222;
+            font-weight: 600;
+        }
+
+        /* ✅ [수정] 태그 모달 그룹 UI 전체 변경 */
+        .search-tag-group {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .search-tag-group + .search-tag-group {
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .search-tag-group__icon-wrapper {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-tag-group__icon-wrapper i {
+            font-size: 30px;
+            color: #495057;
+        }
+
+        .search-tag-group__content-wrapper {
+            flex-grow: 1;
+            padding-left: 24px;
+        }
+
+        .search-tag-group__title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #343a40;
+            margin-bottom: 12px;
+        }
+
+        .search-tag-group__list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-btn {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag-btn.selected {
+            background-color: #3399ff;
+            border-color: #3399ff;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tag-btn:hover:not(.selected) {
+            border-color: #495057;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
-
-    <script>
-        const ctx = '${pageContext.request.contextPath}';
-    </script>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
 
 <main id="sh-wrapper">
     <div class="sh-searchbar">
-        <div class="tag-input-wrapper">
-            <input type="text" placeholder="ㅤ원하는 조건으로 검색하세요" id="tag-search-input" readonly/>
-            <div id="selected-tags" class="selected-tags"></div>
+        <div class="search-section" id="location-search-trigger">
+            <div class="search-section-label">지역</div>
+            <div class="search-section-placeholder" id="location-selection-text">지역 선택</div>
+        </div>
+        <div class="search-section" id="tag-search-trigger">
+            <div class="search-section-label">태그</div>
+            <div class="search-section-placeholder" id="tag-selection-text">원하는 조건 추가</div>
         </div>
         <button type="button" id="sh-search-btn" aria-label="검색">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
-
-        <div id="tagSelectModalOverlay" style="display: none;">
-            <div class="modal-sheet">
-                <div class="modal-body">
-                    <div id="all-tag-list">
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="sh-scroll-area">
-        <section class="sh-grid">
-        </section>
+        <section class="sh-grid"></section>
     </div>
-
 </main>
 
-<%-- 챗봇 --%>
+<div class="modal-overlay" id="locationSelectModalOverlay">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <button type="button" class="modal-close" onclick="closeLocationModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-title-text">지역 선택</div>
+        </div>
+        <div class="modal-body">
+            <div class="location-grid" id="location-grid-container"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="tagSelectModalOverlay">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <button type="button" class="modal-close" onclick="closeTagModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-title-text">태그 선택</div>
+        </div>
+        <div class="modal-body">
+            <div id="all-tag-list"></div>
+        </div>
+    </div>
+</div>
+
 <%@ include file="../includes/chatbot.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
-    if (ssUserName == null) {
-        ssUserName = "";
-    }
+    if (ssUserName == null) ssUserName = "";
 %>
 
 <script>
+    const ctx = '${pageContext.request.contextPath}';
     const userName = "<%= ssUserName %>";
 </script>
 
@@ -267,7 +321,6 @@
     (function () {
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
-
         grid.addEventListener('click', (e) => {
             const card = e.target.closest('.sh-card');
             if (!card || !grid.contains(card)) return;
@@ -283,12 +336,10 @@
 
 <script>
     $(document).ready(function () {
-        let page = 1;
-        let loading = false;
-        let lastPage = false;
-        let isSearching = false;
-        let currentTagFilter = [];
-        const pageSize = 10;
+        // (변수 선언 및 기본 로직은 이전과 동일)
+        let page = 1, loading = false, lastPage = false, isSearching = false;
+        let selectedLocation = "";
+        const selectedTags = new Map();
         const $grid = $(".sh-grid");
         const $scrollArea = $(".sh-scroll-area");
 
@@ -301,255 +352,235 @@
             let scrollHeight = $scrollArea[0].scrollHeight;
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
                 page++;
-                if (isSearching) {
-                    loadFilteredPage(page);
-                } else {
-                    loadPage(page);
-                }
+                const loadFunc = isSearching ? loadFilteredPage : loadPage;
+                loadFunc(page);
             }
         });
 
-        function loadPage(p) {
-            loading = true;
-            $.ajax({
-                url: ctx + "/roommate/list",
-                type: "GET",
-                data: {page: p},
-                dataType: "json",
-                success: function (data) {
-                    if (!data || !data.items || data.items.length === 0) {
-                        lastPage = true;
-                        return;
-                    }
-                    renderUserCards(data.items);
-                    if (data.lastPage) {
-                        lastPage = true;
-                    }
-                },
-                error: function (xhr, status, err) {
-                    console.error("회원 정보 불러오기 실패:", err);
-                },
-                complete: function () {
-                    loading = false;
-                }
-            });
-        }
-
-        function loadFilteredPage(p) {
-            loading = true;
-            const reqData = {
-                tagIds: currentTagFilter,
-                page: p,
-                pageSize: pageSize
-            };
-            $.ajax({
-                url: '/roommate/searchByTags',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(reqData),
-                dataType: 'json',
-                success: function (data) {
-                    if (!data || !data.users || data.users.length === 0) {
-                        lastPage = true;
-                        return;
-                    }
-                    renderUserCards(data.users);
-                },
-                error: function (err) {
-                    console.error('검색 실패', err);
-                },
-                complete: function () {
-                    loading = false;
-                }
-            });
-        }
-
+        $('#location-search-trigger').on('click', openLocationModal);
+        $('#tag-search-trigger').on('click', openTagModal);
         $('#sh-search-btn').on('click', function () {
-            const selected = getSelectedTagIds();
             isSearching = true;
-            currentTagFilter = selected;
             page = 1;
             lastPage = false;
             $('.sh-grid').empty();
             loadFilteredPage(page);
         });
 
-        $('.tag-input-wrapper').on('click', function (e) {
-            e.stopPropagation();
-            openTagModal();
-        });
+        function handleApiResponse(data) {
+            const users = data.users || data.items || [];
+            if (users.length === 0) {
+                lastPage = true;
+                return;
+            }
+            renderUserCards(users);
+            if (data.lastPage) {
+                lastPage = true;
+            }
+        }
+
+        function loadPage(p) {
+            loading = true;
+            $.ajax({
+                url: ctx + "/roommate/list", type: "GET", data: {page: p}, dataType: "json",
+                success: handleApiResponse,
+                error: (xhr, status, err) => console.error("회원 정보 불러오기 실패:", err),
+                complete: () => loading = false
+            });
+        }
+
+        function loadFilteredPage(p) {
+            loading = true;
+            const reqData = {
+                tagIds: Array.from(selectedTags.keys()),
+                location: selectedLocation,
+                page: p,
+                pageSize: 10
+            };
+            $.ajax({
+                url: '/roommate/searchByTags', type: 'POST', contentType: 'application/json',
+                data: JSON.stringify(reqData), dataType: 'json',
+                success: handleApiResponse,
+                error: (err) => console.error('검색 실패', err),
+                complete: () => loading = false
+            });
+        }
+
+        function openLocationModal() {
+            renderLocations();
+            $('#locationSelectModalOverlay').css('display', 'flex');
+        }
+
+        window.closeLocationModal = function () {
+            $('#locationSelectModalOverlay').hide();
+        }
+
+        function renderLocations() {
+            const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
+            const $container = $('#location-grid-container').empty();
+            locations.forEach(loc => {
+                const $item = $('<div>').addClass('location-item').text(loc);
+                if (loc === selectedLocation) $item.addClass('selected');
+                $item.on('click', function () {
+                    if (selectedLocation === loc) {
+                        selectedLocation = "";
+                        $('#location-selection-text').text('지역 선택').css('color', '');
+                    } else {
+                        selectedLocation = loc;
+                        $('#location-selection-text').text(loc).css('color', '#222');
+                    }
+                    renderLocations();
+                    closeLocationModal();
+                });
+                $container.append($item);
+            });
+        }
 
         function openTagModal() {
-            const $modal = $('#tagSelectModalOverlay');
-            if ($modal.is(':visible')) return;
-
-            const $searchbar = $('.sh-searchbar');
-            const width = $searchbar.outerWidth();
-
-            $modal.css({
-                width: width + 'px',
-                display: 'block'
-            });
-
             loadAllTags();
-
-            setTimeout(function() {
-                $(document).on('click.tagModal', function (e) {
-                    if (!$modal.is(e.target) && $modal.has(e.target).length === 0 && !$(e.target).closest('.sh-searchbar').length) {
-                        closeTagModal();
-                    }
-                });
-            }, 0);
+            $('#tagSelectModalOverlay').css('display', 'flex');
         }
 
         window.closeTagModal = function () {
             $('#tagSelectModalOverlay').hide();
-            $(document).off('click.tagModal');
         };
 
         function loadAllTags() {
             $.ajax({
-                url: '/roommate/tagAll',
-                type: 'GET',
-                dataType: 'json',
-                success: function (tags) {
-                    renderAllTags(tags);
-                },
-                error: function (err) {
-                    console.error('태그 불러오기 실패', err);
-                }
+                url: '/roommate/tagAll', type: 'GET', dataType: 'json',
+                success: (tags) => renderAllTags(tags),
+                error: (err) => console.error('태그 불러오기 실패', err)
             });
         }
 
+        // ✅ [수정] renderAllTags 함수 전체 변경
         function renderAllTags(tagsFromServer) {
-            const $container = $('#all-tag-list');
-            $container.empty();
+            const $container = $('#all-tag-list').empty();
             const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
-
             const tagGroups = [
-                { title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2] }, { title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4] },
-                { title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7] }, { title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10] },
-                { title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12] }, { title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14] },
-                { title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16] }, { title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18] },
-                { title: "대화", icon: "fa-solid fa-comments", tags: [19, 20] }, { title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22] },
-                { title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25] }, { title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28] },
-                { title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31] }, { title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33] },
-                { title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36] }, { title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39] },
-                { title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41] }, { title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43] }
+                {title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]}, {
+                    title: "활동범위",
+                    icon: "fa-solid fa-map-location-dot",
+                    tags: [3, 4]
+                },
+                {title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]}, {
+                    title: "퇴근 시간",
+                    icon: "fa-solid fa-business-time",
+                    tags: [8, 9, 10]
+                },
+                {title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]}, {
+                    title: "물건공유",
+                    icon: "fa-solid fa-handshake",
+                    tags: [13, 14]
+                },
+                {title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]}, {
+                    title: "선호하는 성격",
+                    icon: "fa-solid fa-heart",
+                    tags: [17, 18]
+                },
+                {title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]}, {
+                    title: "갈등",
+                    icon: "fa-solid fa-people-arrows",
+                    tags: [21, 22]
+                },
+                {title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]}, {
+                    title: "주식",
+                    icon: "fa-solid fa-bowl-food",
+                    tags: [26, 27, 28]
+                },
+                {title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]}, {
+                    title: "음식 냄새",
+                    icon: "fa-solid fa-wind",
+                    tags: [32, 33]
+                },
+                {title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]}, {
+                    title: "청소 주기",
+                    icon: "fa-solid fa-broom",
+                    tags: [37, 38, 39]
+                },
+                {title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]}, {
+                    title: "설거지",
+                    icon: "fa-solid fa-sink",
+                    tags: [42, 43]
+                }
             ];
 
             tagGroups.forEach(group => {
+                // 1. 메인 그룹 div (flex row)
                 const $groupDiv = $('<div>').addClass('search-tag-group');
 
-                const $groupTitle = $('<div>').addClass('search-tag-group__title');
-                const $icon = $('<i>').addClass(group.icon).css({'margin-right': '8px', 'width': '16px'});
-                const $titleText = $('<span>').text(group.title);
-                $groupTitle.append($icon, $titleText);
+                // 2. 왼쪽 아이콘 영역
+                const $iconWrapper = $('<div>').addClass('search-tag-group__icon-wrapper');
+                const $icon = $('<i>').addClass(group.icon);
+                $iconWrapper.append($icon);
 
+                // 3. 오른쪽 콘텐츠 영역 (제목 + 버튼 목록)
+                const $contentWrapper = $('<div>').addClass('search-tag-group__content-wrapper');
+                const $groupTitle = $('<div>').addClass('search-tag-group__title').text(group.title);
                 const $groupList = $('<div>').addClass('search-tag-group__list');
 
                 group.tags.forEach(tagId => {
                     if (tagMap.has(tagId)) {
                         const tag = tagMap.get(tagId);
-                        const $btn = $('<button>')
-                            .addClass('tag-btn')
-                            .text(tag.tagName)
-                            .attr('data-id', tag.tagId);
-                        if (isTagSelected(tag.tagId)) {
-                            $btn.addClass('selected');
-                        }
-                        $btn.on('click', function () {
-                            toggleTagSelection(tag.tagId, tag.tagName, $(this));
-                        });
+                        const $btn = $('<button>').addClass('tag-btn').text(tag.tagName).attr('data-id', tag.tagId);
+                        if (selectedTags.has(tag.tagId)) $btn.addClass('selected');
+                        $btn.on('click', () => toggleTagSelection(tag.tagId, tag.tagName));
                         $groupList.append($btn);
                     }
                 });
 
-                if ($groupList.children().length > 0) {
-                    $groupDiv.append($groupTitle).append($groupList);
-                    $container.append($groupDiv);
-                }
+                // 4. 조립
+                $contentWrapper.append($groupTitle, $groupList);
+                $groupDiv.append($iconWrapper, $contentWrapper);
+                $container.append($groupDiv);
             });
         }
 
-        const selectedTags = new Map();
-
-        function isTagSelected(tagId) {
-            return selectedTags.has(tagId);
+        function toggleTagSelection(tagId, tagName) {
+            if (selectedTags.has(tagId)) selectedTags.delete(tagId);
+            else selectedTags.set(tagId, tagName);
+            updateTagDisplay();
         }
 
-        function toggleTagSelection(tagId, tagName, $btn) {
-            if (isTagSelected(tagId)) {
-                selectedTags.delete(tagId);
-                $btn.removeClass('selected');
+        function updateTagDisplay() {
+            $('#all-tag-list .tag-btn').each(function () {
+                $(this).toggleClass('selected', selectedTags.has($(this).data('id')));
+            });
+            const tagCount = selectedTags.size;
+            const $tagText = $('#tag-selection-text');
+            if (tagCount > 0) {
+                const firstTagName = selectedTags.values().next().value;
+                const displayText = tagCount > 1 ? firstTagName + " 외 " + (tagCount - 1) + "개" : firstTagName;
+                $tagText.text(displayText).css('color', '#222');
             } else {
-                selectedTags.set(tagId, tagName);
-                $btn.addClass('selected');
+                $tagText.text('원하는 조건 추가').css('color', '');
             }
-            renderSelectedTags();
-        }
-
-        function renderSelectedTags() {
-            const $wrapper = $('#selected-tags');
-            const $input = $('#tag-search-input');
-            $wrapper.empty();
-
-            selectedTags.forEach((tagName, tagId) => {
-                const $span = $('<span>').addClass('tag-badge').text(tagName);
-                const $x = $('<i>').addClass('fa-solid fa-xmark badge-remove').attr('data-id', tagId);
-                $span.append($x);
-                $wrapper.append($span);
-            });
-
-            if (selectedTags.size > 0) {
-                $input.addClass('has-tags');
-            } else {
-                $input.removeClass('has-tags');
-            }
-
-            $('.badge-remove').off('click').on('click', function (e) {
-                e.stopPropagation();
-                const tid = $(this).data('id');
-                if (selectedTags.has(tid)) {
-                    selectedTags.delete(tid);
-                    renderSelectedTags();
-                    $('#all-tag-list .tag-btn[data-id="' + tid + '"]').removeClass('selected');
-                }
-            });
-        }
-
-        function getSelectedTagIds() {
-            return Array.from(selectedTags.keys());
         }
 
         function renderUserCards(users) {
             const loginUserId = "${sessionScope.SS_USER_ID}";
             $.each(users, function (i, user) {
                 if (user.userId === loginUserId) return true;
-
-                var imgUrl = user.profileImageUrl || (ctx + "/images/noimg.png");
-                var nickname = user.userName || "알 수 없음";
-                var age = user.age ? user.age + "세" : "";
-                var $card = $("<article>").addClass("sh-card").attr("data-id", user.userId);
-                var $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
-                var $info = $("<div>").addClass("sh-info").append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
-                var $tagBox = $("<div>").addClass("tag-box");
-
+                const imgUrl = user.profileImageUrl || (ctx + "/images/noimg.png");
+                const nickname = user.userName || "알 수 없음";
+                const age = user.age ? user.age + "세" : "";
+                const $card = $("<article>").addClass("sh-card").attr("data-id", user.userId);
+                const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
+                const $info = $("<div>").addClass("sh-info").append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
+                const $tagBox = $("<div>").addClass("tag-box");
                 if (user.tag1) $tagBox.append($("<span>").addClass("tag").text(user.tag1));
                 if (user.tag2) $tagBox.append($("<span>").addClass("tag").text(user.tag2));
-
                 if (user.gender) {
-                    var genderText = user.gender === "M" ? "남" : user.gender === "F" ? "여" : user.gender;
-                    var genderClass = (genderText === "남") ? "male" : "female";
+                    const genderText = user.gender === "M" ? "남" : "여";
+                    const genderClass = (genderText === "남") ? "male" : "female";
                     $tagBox.append($("<span>").addClass("tag gender " + genderClass).text(genderText));
                 }
                 $info.append($tagBox);
-                $card.append($thumb).append($info);
+                $card.append($thumb, $info);
                 $grid.append($card);
             });
         }
     });
 </script>
-
 </body>
 </html>

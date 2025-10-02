@@ -24,4 +24,5 @@ public class TagDTO {
     private int totalCount;
     private int count;
     private int tagCount;
+    private String location;
 }

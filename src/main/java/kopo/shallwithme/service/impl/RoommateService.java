@@ -155,36 +155,45 @@ public class RoommateService implements IRoommateService {
     public TagDTO searchUsersByTags(TagDTO pDTO) {
         log.info("{}.searchUsersByTags Start!", this.getClass().getName());
 
-        int pageSize = pDTO.getPageSize() > 0 ? pDTO.getPageSize() : DEFAULT_PAGE_SIZE;
+        int pageSize = pDTO.getPageSize() > 0 ? pDTO.getPageSize() : 10; // 기본 페이지 크기를 10으로 가정
         int page = pDTO.getPage() > 0 ? pDTO.getPage() : 1;
         int offset = (page - 1) * pageSize;
         pDTO.setOffset(offset);
 
         List<Integer> tagIds = pDTO.getTagIds();
-
+        String location = pDTO.getLocation();
         List<UserInfoDTO> users;
 
-        if (tagIds == null || tagIds.isEmpty()) {
+        // ✅ [수정] 태그 또는 지역 조건이 있는지 확인하는 boolean 변수 추가
+        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+        boolean hasLocation = location != null && !location.isEmpty();
+
+        // ✅ [수정] 태그나 지역 둘 중 하나라도 조건이 있으면 필터링 쿼리 실행
+        if (hasTags || hasLocation) {
+            log.info("Filtering search with Tags and/or Location.");
+            // 태그가 있을 때만 tagCount를 설정 (NPE 방지)
+            if (hasTags) {
+                pDTO.setTagCount(tagIds.size());
+            }
+            users = mapper.selectUsersByTagsWithPagination(pDTO);
+            pDTO = mapper.countUsersByTags(pDTO);
+        } else {
+            // 아무 조건도 없으면 전체 목록 조회
+            log.info("No filters. Fetching all users with pagination.");
             users = mapper.selectUsersByPagination(pDTO);
             pDTO = mapper.countAllUsers(pDTO);
-        } else {
-            pDTO.setTagCount(tagIds.size());
-            users = mapper.selectUsersByTagsWithPagination(pDTO);
-            pDTO = mapper.countUsersByTags(pDTO);  // 태그 조건에 맞는 유저 수 count
         }
 
-        // ⭐️ 사용자별 tag1/tag2/genderLabel 세팅
+        // 사용자별 tag1/tag2/genderLabel 세팅 (기존과 동일)
         for (UserInfoDTO user : users) {
             List<UserTagDTO> tags = mapper.selectUserTags(user.getUserId());
 
-            // tag1: 5~7번 중 아무거나
             String tag1 = tags.stream()
                     .filter(t -> t.getTagId() >= 5 && t.getTagId() <= 7)
                     .map(UserTagDTO::getTagName)
                     .findFirst()
                     .orElse(null);
 
-            // tag2: 15~16번 중 아무거나
             String tag2 = tags.stream()
                     .filter(t -> t.getTagId() >= 15 && t.getTagId() <= 16)
                     .map(UserTagDTO::getTagName)
@@ -194,7 +203,6 @@ public class RoommateService implements IRoommateService {
             user.setTag1(tag1);
             user.setTag2(tag2);
 
-            // gender 가공: M → 남, F → 여
             if ("M".equalsIgnoreCase(user.getGender())) {
                 user.setGenderLabel("남");
             } else if ("F".equalsIgnoreCase(user.getGender())) {
@@ -210,7 +218,6 @@ public class RoommateService implements IRoommateService {
         log.info("{}.searchUsersByTags End!", this.getClass().getName());
         return pDTO;
     }
-
 
     @Override
     public List<TagDTO> getAllTags() throws Exception {
