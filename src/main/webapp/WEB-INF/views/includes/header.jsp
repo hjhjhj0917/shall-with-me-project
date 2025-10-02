@@ -3,7 +3,8 @@
     <%--    메인으로 가는 사이트 로고--%>
     <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
-            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
+<%--            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>--%>
+            <img src="../images/logo.png">
         </div>
         <div class="header-logo">살며시</div>
     </div>
