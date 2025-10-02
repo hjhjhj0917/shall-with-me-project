@@ -74,10 +74,6 @@
             transition: transform 0.1s;
         }
 
-        #sh-search-btn:hover {
-            transform: scale(1.05);
-        }
-
         .modal-overlay {
             position: fixed;
             top: 0;
