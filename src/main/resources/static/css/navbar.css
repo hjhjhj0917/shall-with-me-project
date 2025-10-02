@@ -179,6 +179,12 @@ header {
     opacity: 1;
 }
 
+.header-icon-stack img {
+    width: 120px;
+    height: auto;
+    margin-left: -40px; /* 원하는 만큼 음수로 조절 */
+}
+
 /* 아이콘은 항상 가운데 */
 .header-user-name-container .header-dropdown-toggle {
     z-index: 1;
