@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
     <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
@@ -379,6 +380,19 @@
         }
     });
 </script>
+
+<script>
+    document.getElementById('sharehouseAddBtn')?.addEventListener('click', function () {
+        // 등록 페이지로 이동/모달 열기 등
+        // 예: location.href = ctx + '/sharehouse/sharehouseReg';
+    });
+</script>
+
+<!-- 왼쪽 하단 + 버튼 -->
+<button type="button" class="sh-fab-left" id="sharehouseAddBtn" aria-label="쉐어하우스 등록">
+    <i class="fa-solid fa-plus icon-plus"></i>
+</button>
+<div class="sh-tooltip">쉐어하우스 등록</div>
 
 </body>
 </html>
