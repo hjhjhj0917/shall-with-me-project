@@ -88,17 +88,19 @@
             <if test="location != null and location != ''">
                 U.ADDR1 LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
             </if>
-            <if test="tagIds != null and tagIds.size() > 0">
-                AND U.USER_ID IN (
-                SELECT USER_ID
-                FROM USER_TAG
-                WHERE TAG_ID IN
-                <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
-                    #{tagId}
+            <if test="tagGroupMap != null and !tagGroupMap.isEmpty()">
+                <foreach collection="tagGroupMap" item="tagIdList">
+                    <if test="tagIdList != null and tagIdList.size() > 0">
+                        AND EXISTS (
+                        SELECT 1
+                        FROM USER_TAG ut
+                        WHERE ut.user_id = U.USER_ID AND ut.tag_id IN
+                        <foreach collection="tagIdList" item="tagId" open="(" separator="," close=")">
+                            #{tagId}
+                        </foreach>
+                        )
+                    </if>
                 </foreach>
-                GROUP BY USER_ID
-                HAVING COUNT(DISTINCT TAG_ID) = #{tagCount}
-                )
             </if>
         </where>
     </select>
@@ -145,16 +147,19 @@
             <if test="location != null and location != ''">
                 AND ui.ADDR1 LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
             </if>
-            <if test="tagIds != null and tagIds.size() > 0">
-                AND ui.user_id IN (
-                SELECT USER_ID
-                FROM USER_TAG
-                WHERE TAG_ID IN
-                <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
-                    #{tagId}
-                </foreach> GROUP BY USER_ID
-                HAVING COUNT(DISTINCT TAG_ID) = #{tagCount}
-                )
+            <if test="tagGroupMap != null and !tagGroupMap.isEmpty()">
+                <foreach collection="tagGroupMap" item="tagIdList">
+                    <if test="tagIdList != null and tagIdList.size() > 0">
+                        AND EXISTS (
+                        SELECT 1
+                        FROM USER_TAG ut
+                        WHERE ut.user_id = ui.user_id AND ut.tag_id IN
+                        <foreach collection="tagIdList" item="tagId" open="(" separator="," close=")">
+                            #{tagId}
+                        </foreach>
+                        )
+                    </if>
+                </foreach>
             </if>
         </where>
         ORDER BY ui.reg_dt DESC

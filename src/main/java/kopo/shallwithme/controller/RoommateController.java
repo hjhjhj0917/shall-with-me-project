@@ -228,32 +228,11 @@ public class RoommateController {
 
     @PostMapping("/searchByTags")
     @ResponseBody
-    public TagDTO searchByTags(HttpServletRequest request) {
+    public TagDTO searchByTags(@RequestBody TagDTO tagDTO) { // ✅ [수정] @RequestBody로 자동 변환
         log.info("{}.searchByTags Start!", this.getClass().getName());
 
-        TagDTO tagDTO = new TagDTO();
-
-        try {
-            // 요청 본문(JSON)을 문자열로 읽기
-            StringBuilder sb = new StringBuilder();
-            BufferedReader reader = request.getReader();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            String json = sb.toString();
-
-            // Jackson ObjectMapper 또는 Gson을 사용해 JSON 파싱
-            ObjectMapper mapper = new ObjectMapper();
-            tagDTO = mapper.readValue(json, TagDTO.class);
-
-        } catch (IOException e) {
-            log.error("Error reading request body", e);
-            // 예외 처리, 기본값 세팅 등 필요하면 추가
-        }
-
-        log.info("searchByTags called with tagIds={}, page={}, pageSize={}",
-                tagDTO.getTagIds(), tagDTO.getPage(), tagDTO.getPageSize());
+        log.info("searchByTags called with location={}, tagGroupMap={}, page={}, pageSize={}",
+                tagDTO.getLocation(), tagDTO.getTagGroupMap(), tagDTO.getPage(), tagDTO.getPageSize());
 
         TagDTO result = roommateService.searchUsersByTags(tagDTO);
 
