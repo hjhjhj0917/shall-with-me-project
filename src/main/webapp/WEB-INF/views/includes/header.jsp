@@ -3,7 +3,8 @@
     <%--    메인으로 가는 사이트 로고--%>
     <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
-            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>
+<%--            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>--%>
+            <img src="../images/logo.png">
         </div>
         <div class="header-logo">살며시</div>
     </div>
@@ -22,7 +23,7 @@
         <%--회원 이름 , 프로필--%>
         <div class="header-user-name-container pinned" id="userNameBox">
             <span class="slide-bg"></span> <!-- 둥근 반스도 역할 -->
-            <span class="user-name-text" id="userNameText">
+            <span class="user-name-text" id="userNameText" onclick="location.href='/mypage/userModify'">
                 <%= session.getAttribute("SS_USER_NAME") %>님
             </span>
             <button class="header-dropdown-toggle" id="userIconToggle">

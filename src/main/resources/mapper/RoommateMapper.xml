@@ -82,13 +82,27 @@
     <!-- 태그 필터링 유저 수 조회 -->
     <select id="countUsersByTags" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
         SELECT
-        COUNT(DISTINCT U.USER_ID) AS count
+        COUNT(DISTINCT U.USER_ID) as count
         FROM USER_INFO U
-        JOIN USER_TAG UT ON U.USER_ID = UT.USER_ID
-        WHERE UT.TAG_ID IN
-        <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
-            #{tagId}
-        </foreach>
+        <where>
+            <if test="location != null and location != ''">
+                U.ADDR1 LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
+            </if>
+            <if test="tagGroupMap != null and !tagGroupMap.isEmpty()">
+                <foreach collection="tagGroupMap" item="tagIdList">
+                    <if test="tagIdList != null and tagIdList.size() > 0">
+                        AND EXISTS (
+                        SELECT 1
+                        FROM USER_TAG ut
+                        WHERE ut.user_id = U.USER_ID AND ut.tag_id IN
+                        <foreach collection="tagIdList" item="tagId" open="(" separator="," close=")">
+                            #{tagId}
+                        </foreach>
+                        )
+                    </if>
+                </foreach>
+            </if>
+        </where>
     </select>
 
     <!-- resultMap 정의 -->
@@ -119,24 +133,35 @@
 
 
     <select id="selectUsersByTagsWithPagination" parameterType="TagDTO" resultType="UserInfoDTO">
-        SELECT DISTINCT
+        SELECT
         ui.user_id    AS userId,
         ui.user_name  AS userName,
         ui.age        AS age,
         ui.gender     AS gender,
         up.profile_image_url AS profileImageUrl,
-        up.introduction,
-        GROUP_CONCAT(t.tag_name) AS tagNames -- 태그 이름들을 하나의 문자열로 묶어서 가져오기 (MySQL 기준)
+        up.introduction
         FROM USER_INFO ui
-        JOIN USER_TAG ut ON ui.user_id = ut.user_id
-        JOIN TAG t ON ut.tag_id = t.tag_id
         LEFT JOIN USER_PROFILE up ON ui.user_id = up.user_id
-        WHERE ui.status = 'ACTIVE'
-        AND ut.tag_id IN
-        <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
-            #{tagId}
-        </foreach>
-        GROUP BY ui.user_id
+        <where>
+            ui.status = 'ACTIVE'
+            <if test="location != null and location != ''">
+                AND ui.ADDR1 LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
+            </if>
+            <if test="tagGroupMap != null and !tagGroupMap.isEmpty()">
+                <foreach collection="tagGroupMap" item="tagIdList">
+                    <if test="tagIdList != null and tagIdList.size() > 0">
+                        AND EXISTS (
+                        SELECT 1
+                        FROM USER_TAG ut
+                        WHERE ut.user_id = ui.user_id AND ut.tag_id IN
+                        <foreach collection="tagIdList" item="tagId" open="(" separator="," close=")">
+                            #{tagId}
+                        </foreach>
+                        )
+                    </if>
+                </foreach>
+            </if>
+        </where>
         ORDER BY ui.reg_dt DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>

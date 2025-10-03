@@ -11,6 +11,7 @@
     <style>
         body {
             overflow: hidden;
+            background: linear-gradient(to right, white, #f9f9f9);
         }
 
         .logo {

@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(to right, white, #f9f9f9);
+        }
+    </style>
 </head>
 <body>
 <%--헤더--%>

@@ -5,227 +5,380 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
-    <link rel="icon" href="${pageContext.request.contextPath}/images/noimg.png">
-    <%-- js --%>
+    <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* (검색창 및 다른 부분 스타일은 룸메이트와 동일) */
+        .sh-searchbar {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 50px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            height: 66px;
+            padding: 0 10px;
+            width: 100%;
+            max-width: 850px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .search-section { flex: 1; padding: 8px 24px; cursor: pointer; border-radius: 30px; transition: background-color 0.2s; min-width: 0; }
+        .search-section:hover { background-color: #f7f7f7; }
+        .search-section + .search-section { border-left: 1px solid #eee; }
+        .search-section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+        .search-section-placeholder { font-size: 14px; color: #717171; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #sh-search-btn {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(to right, #66B2FF, #3399ff);
+            color: white; border: none; font-size: 16px; margin-left: 10px;
+            flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center; z-index: 9998; }
+
+        #locationSelectModalOverlay .modal-sheet,
+        #tagSelectModalOverlay .modal-sheet {
+            width: 100%; max-width: 500px; background: white; border-radius: 12px; animation: fadeIn 0.3s; overflow: hidden;
+        }
+        .modal-header { display: flex; align-items: center; justify-content: center; padding: 16px; border-bottom: 1px solid #eee; position: relative; }
+        .modal-title-text { font-weight: 700; color: #222; }
+        .modal-close { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: #222; background: #f7f7f7; border: none; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .modal-body { max-height: 450px; overflow-y: auto; padding: 20px; }
+
+        .location-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .location-item { padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; transition: border-color 0.2s, background-color 0.2s, font-weight 0.2s; font-size: 14px; }
+        .location-item:hover { border-color: #222; }
+        .location-item.selected { background-color: #f7f7f7; border-color: #222; font-weight: 600; }
+
+        /* 태그 모달 그룹 UI (룸메이트와 동일) */
+        .search-tag-group { display: flex; align-items: center; padding: 16px 0; }
+        .search-tag-group + .search-tag-group { border-top: 1px solid #f0f0f0; }
+        .search-tag-group__icon-wrapper { flex-shrink: 0; width: 80px; height: 80px; border-radius: 50%; background-color: #f8f9fa; border: 1px solid #e9ecef; display: flex; align-items: center; justify-content: center; }
+        .search-tag-group__icon-wrapper i { font-size: 30px; color: #495057; }
+        .search-tag-group__content-wrapper { flex-grow: 1; padding-left: 24px; }
+        .search-tag-group__title { font-weight: 600; font-size: 1rem; color: #343a40; margin-bottom: 12px; }
+        .search-tag-group__list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag-btn { background-color: #fff; border: 1px solid #dee2e6; border-radius: 20px; padding: 8px 16px; font-size: 0.9rem; color: #495057; cursor: pointer; transition: all 0.2s ease; }
+        .tag-btn.selected { background-color: #3399ff; border-color: #3399ff; color: white; font-weight: 600; }
+        .tag-btn:hover:not(.selected) { border-color: #495057; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* 쉐어하우스 카드 일부 텍스트 라인 보정 (선택) */
+        .price-pill { display:inline-block; font-size:12px; background:#eef6ff; border-radius:999px; padding:2px 8px; }
+        .sh-info .sh-sub { display:flex; gap:8px; align-items:center; }
+    </style>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
-<%--내가 프론트 만들부분--%>
+
 <main id="sh-wrapper">
-    <!-- 검색바 -->
     <div class="sh-searchbar">
-        <input type="text" placeholder="원하는 지역, 조건 검색" id="sh-q">
+        <div class="search-section" id="location-search-trigger">
+            <div class="search-section-label">지역</div>
+            <div class="search-section-placeholder" id="location-selection-text">지역 선택</div>
+        </div>
+        <div class="search-section" id="tag-search-trigger">
+            <div class="search-section-label">태그</div>
+            <div class="search-section-placeholder" id="tag-selection-text">원하는 조건 추가</div>
+        </div>
         <button type="button" id="sh-search-btn" aria-label="검색">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
     </div>
 
-    <!-- 카드 그리드: 위 4개 + 아래 4개 = 총 8개 -->
-    <section class="sh-grid">
-        <!-- 1 -->
-        <article class="sh-card" data-id="101">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 2 -->
-        <article class="sh-card" data-id="102">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 3 -->
-        <article class="sh-card" data-id="103">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 4 -->
-        <article class="sh-card" data-id="104">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 5 -->
-        <article class="sh-card" data-id="105">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 6 -->
-        <article class="sh-card" data-id="106">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 7 -->
-        <article class="sh-card" data-id="107">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-
-        <!-- 8 -->
-        <article class="sh-card" data-id="108">
-            <div class="sh-thumb"></div>
-            <div class="sh-info">
-                <p class="sh-title">위치 : 동래구의 아파트</p>
-                <p class="sh-sub">숙박일 : 9월 5일~7일</p>
-                <p class="sh-price">비용 : 5,000,000</p>
-            </div>
-        </article>
-    </section>
-
-    <!-- (선택) 좌하단 등록 플로팅 버튼 -->
-    <button class="sh-fab" title="등록">
-        <i class="fa-solid fa-plus"></i>
-    </button>
+    <div class="sh-scroll-area">
+        <section class="sh-grid"></section>
+    </div>
 </main>
 
-<!-- 커스텀 알림창 -->
+<!-- 지역 선택 모달 -->
+<div class="modal-overlay" id="locationSelectModalOverlay">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <button type="button" class="modal-close" onclick="closeLocationModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-title-text">지역 선택</div>
+        </div>
+        <div class="modal-body">
+            <div class="location-grid" id="location-grid-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 태그 선택 모달 -->
+<div class="modal-overlay" id="tagSelectModalOverlay">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <button type="button" class="modal-close" onclick="closeTagModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-title-text">태그 선택</div>
+        </div>
+        <div class="modal-body">
+            <div id="all-tag-list"></div>
+        </div>
+    </div>
+</div>
+
+<%@ include file="../includes/chatbot.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
-    if (ssUserName == null) {
-        ssUserName = "";
-    }
+    if (ssUserName == null) ssUserName = "";
 %>
 
 <script>
+    const ctx = '${pageContext.request.contextPath}';
     const userName = "<%= ssUserName %>";
 </script>
 
+<!-- 카드 클릭 → 상세 새 탭 (엔드포인트만 sharehouse로) -->
 <script>
-    const ctx = '${pageContext.request.contextPath}';
-    // 카드 클릭 → 상세 이동
     (function () {
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
-
         grid.addEventListener('click', (e) => {
             const card = e.target.closest('.sh-card');
             if (!card || !grid.contains(card)) return;
-            const id = card.dataset.id;
+            const id = card.dataset.id; // houseId
             if (!id) return;
-            location.href = ctx + '/sharehouse/detail?id=' + encodeURIComponent(id);
+            window.open(ctx + '/sharehouse/detail?houseId=' + encodeURIComponent(id), '_blank');
         });
-
-    })();
-</script>
-
-<script>
-    (function () {
-        const grid = document.querySelector('.sh-grid');
-        if (!grid) return;
-
-        let page = 1, loading = false, last = false;
-
-        const sentinel = document.createElement('div');
-        sentinel.id = 'sh-sentinel';
-        grid.after(sentinel);
-
-        const loader = document.createElement('div');
-        loader.id = 'sh-loader';
-        loader.textContent = '불러오는 중...';
-        loader.style.display = 'none';
-        sentinel.after(loader);
-
-        async function fetchNext() {
-            if (loading || last) return;
-            loading = true;
-            loader.style.display = 'block';
-            try {
-                const url = ctx + '/sharehouse/list?page=' + (page + 1);  // ← 백틱 제거
-                const res = await fetch(url, {headers: {'Accept': 'application/json'}});
-                if (!res.ok) throw new Error('network error');
-                const data = await res.json();
-                renderCards(data.items || []);
-                page++;
-                last = !!data.lastPage || (data.items && data.items.length === 0);
-                if (last) io.disconnect();
-            } catch (err) {
-                console.error(err);
-            } finally {
-                loading = false;
-                loader.style.display = 'none';
-            }
-        }
-
-        const io = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) fetchNext();
-        }, {root: null, rootMargin: '300px 0px', threshold: 0.01});
-
-        io.observe(sentinel);
-
-        // 초기 1회 강제 로드 (화면을 꽉 못 채울 때 대비)
-        setTimeout(fetchNext, 0);
-
-        function renderCards(items) {
-            const frag = document.createDocumentFragment();
-            items.forEach(function (it) {
-                const article = document.createElement('article');
-                article.className = 'sh-card';
-                article.dataset.id = it.id;
-
-                const thumb = document.createElement('div');
-                thumb.className = 'sh-thumb';
-                thumb.style.backgroundImage = "url('" + (it.imageUrl || '/images/noimg.png') + "')"; // ← 백틱 제거
-
-                const info = document.createElement('div');
-                info.className = 'sh-info';
-
-                const t = document.createElement('p');
-                t.className = 'sh-title';
-                t.textContent = '위치 : ' + (it.location || ''); // ← 백틱 제거
-
-                const s = document.createElement('p');
-                s.className = 'sh-sub';
-                s.textContent = it.moveInText ? ('입주일 : ' + it.moveInText) : ''; // ← 백틱 제거
-
-                const p = document.createElement('p');
-                p.className = 'sh-price';
-                p.textContent = it.priceText ? ('비용 : ' + it.priceText) : ''; // ← 백틱 제거
-
-                info.append(t, s, p);
-                article.append(thumb, info);
-                frag.append(article);
-            });
-            grid.append(frag);
-        }
     })();
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // 룸메이트와 동일 규칙: 첫 15장, 이후 5장
+        let page = 1, loading = false, lastPage = false, isSearching = false;
+        let selectedLocation = "";
+        const selectedTags = new Map();
+        const $grid = $(".sh-grid");
+        const $scrollArea = $(".sh-scroll-area");
+
+        loadPage(page);
+
+        $scrollArea.on("scroll", function () {
+            if (loading || lastPage) return;
+            let scrollTop = $scrollArea.scrollTop();
+            let innerHeight = $scrollArea.innerHeight();
+            let scrollHeight = $scrollArea[0].scrollHeight;
+            if (scrollTop + innerHeight + 100 >= scrollHeight) {
+                page++;
+                const loadFunc = isSearching ? loadFilteredPage : loadPage;
+                loadFunc(page);
+            }
+        });
+
+        $('#location-search-trigger').on('click', openLocationModal);
+        $('#tag-search-trigger').on('click', openTagModal);
+        $('#sh-search-btn').on('click', function () {
+            isSearching = true;
+            page = 1;
+            lastPage = false;
+            $grid.empty();
+            loadFilteredPage(page);
+        });
+
+        // 공통 응답 처리 (빈 데이터여도 안전)
+        function handleApiResponse(data) {
+            const items = data.items || data.list || data || [];
+            if (!items || items.length === 0) { lastPage = true; return; }
+            renderHouseCards(items);
+            if (data.lastPage === true) lastPage = true;
+        }
+
+        // 기본 목록: 서버에서 15/5 규칙 적용 가능
+        function loadPage(p) {
+            loading = true;
+            $.ajax({
+                url: ctx + "/sharehouse/list",
+                type: "GET",
+                data: { page: p },
+                dataType: "json",
+                success: handleApiResponse,
+                error: (xhr, status, err) => console.error("쉐어하우스 목록 불러오기 실패:", err),
+                complete: () => loading = false
+            });
+        }
+
+        // 필터 검색
+        function loadFilteredPage(p) {
+            loading = true;
+            const reqData = {
+                tagIds: Array.from(selectedTags.keys()),
+                location: selectedLocation,
+                page: p,
+                pageSize: 10
+            };
+            $.ajax({
+                url: ctx + "/sharehouse/search",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(reqData),
+                dataType: "json",
+                success: handleApiResponse,
+                error: (err) => console.error('검색 실패', err),
+                complete: () => loading = false
+            });
+        }
+
+        // 지역 모달
+        function openLocationModal() {
+            renderLocations();
+            $('#locationSelectModalOverlay').css('display', 'flex');
+        }
+        window.closeLocationModal = function () { $('#locationSelectModalOverlay').hide(); }
+
+        function renderLocations() {
+            const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
+            const $container = $('#location-grid-container').empty();
+            locations.forEach(loc => {
+                const $item = $('<div>').addClass('location-item').text(loc);
+                if (loc === selectedLocation) $item.addClass('selected');
+                $item.on('click', function () {
+                    if (selectedLocation === loc) {
+                        selectedLocation = "";
+                        $('#location-selection-text').text('지역 선택').css('color', '');
+                    } else {
+                        selectedLocation = loc;
+                        $('#location-selection-text').text(loc).css('color', '#222');
+                    }
+                    renderLocations();
+                    closeLocationModal();
+                });
+                $container.append($item);
+            });
+        }
+
+        // 태그 모달
+        function openTagModal() {
+            loadAllTags();
+            $('#tagSelectModalOverlay').css('display', 'flex');
+        }
+        window.closeTagModal = function () { $('#tagSelectModalOverlay').hide(); };
+
+        function loadAllTags() {
+            $.ajax({
+                url: ctx + '/sharehouse/tagAll',
+                type: 'GET',
+                dataType: 'json',
+                success: (tags) => renderAllTags(tags),
+                error: (err) => console.error('태그 불러오기 실패', err)
+            });
+        }
+
+        // (룸메이트와 동일한 레이아웃 렌더)
+        function renderAllTags(tagsFromServer) {
+            const $container = $('#all-tag-list').empty();
+            const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
+            const tagGroups = [
+                {title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]},
+                {title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4]},
+                {title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]},
+                {title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10]},
+                {title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]},
+                {title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14]},
+                {title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]},
+                {title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18]},
+                {title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]},
+                {title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22]},
+                {title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]},
+                {title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28]},
+                {title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]},
+                {title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33]},
+                {title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]},
+                {title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39]},
+                {title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]},
+                {title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
+            ];
+            tagGroups.forEach(group => {
+                const $groupDiv = $('<div>').addClass('search-tag-group');
+                const $iconWrapper = $('<div>').addClass('search-tag-group__icon-wrapper').append($('<i>').addClass(group.icon));
+                const $contentWrapper = $('<div>').addClass('search-tag-group__content-wrapper');
+                const $groupTitle = $('<div>').addClass('search-tag-group__title').text(group.title);
+                const $groupList = $('<div>').addClass('search-tag-group__list');
+
+                group.tags.forEach(tagId => {
+                    if (tagMap.has(tagId)) {
+                        const tag = tagMap.get(tagId);
+                        const $btn = $('<button>').addClass('tag-btn').text(tag.tagName).attr('data-id', tag.tagId);
+                        if (selectedTags.has(tag.tagId)) $btn.addClass('selected');
+                        $btn.on('click', () => toggleTagSelection(tag.tagId, tag.tagName));
+                        $groupList.append($btn);
+                    }
+                });
+
+                $contentWrapper.append($groupTitle, $groupList);
+                $groupDiv.append($iconWrapper, $contentWrapper);
+                $container.append($groupDiv);
+            });
+        }
+
+        function toggleTagSelection(tagId, tagName) {
+            if (selectedTags.has(tagId)) selectedTags.delete(tagId);
+            else selectedTags.set(tagId, tagName);
+            updateTagDisplay();
+        }
+        function updateTagDisplay() {
+            $('#all-tag-list .tag-btn').each(function () {
+                $(this).toggleClass('selected', selectedTags.has($(this).data('id')));
+            });
+            const tagCount = selectedTags.size;
+            const $tagText = $('#tag-selection-text');
+            if (tagCount > 0) {
+                const firstTagName = selectedTags.values().next().value;
+                const displayText = tagCount > 1 ? firstTagName + " 외 " + (tagCount - 1) + "개" : firstTagName;
+                $tagText.text(displayText).css('color', '#222');
+            } else {
+                $tagText.text('원하는 조건 추가').css('color', '');
+            }
+        }
+
+        // 카드 렌더링 (쉐어하우스용: houseId/title/city/rent/thumbnailUrl/tag1/tag2)
+        function renderHouseCards(items) {
+            const $grid = $(".sh-grid");
+            const noimg = ctx + "/images/noimg.png";
+            items.forEach(house => {
+                const $card = $("<article>").addClass("sh-card").attr("data-id", house.houseId);
+
+                const imgUrl = house.thumbnailUrl || noimg;
+                const $thumb = $("<div>").addClass("sh-thumb")
+                    .css("background-image", "url('" + imgUrl + "')");
+
+                const $info = $("<div>").addClass("sh-info");
+                const title = house.title || "제목 없음";
+                const city = house.city || "";
+                const price = (house.rent != null) ? (house.rent + "만원") : "";
+
+                const $title = $("<p>").addClass("sh-title").text(title);
+                // 도시 · 가격, 가격은 pill로 선택 표시
+                const $sub   = $("<p>").addClass("sh-sub");
+                if (city) $sub.append(document.createTextNode(city));
+                if (price) $sub.append($("<span>").addClass("price-pill").text(price));
+
+                const $tagBox = $("<div>").addClass("tag-box");
+                if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
+                if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
+
+                $info.append($title, $sub, $tagBox);
+                $card.append($thumb, $info);
+                $grid.append($card);
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

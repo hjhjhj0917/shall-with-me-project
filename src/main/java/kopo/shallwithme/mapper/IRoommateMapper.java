@@ -1,9 +1,9 @@
 package kopo.shallwithme.mapper;
 
-import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
+import kopo.shallwithme.dto.TagDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -25,7 +25,6 @@ public interface IRoommateMapper {
     List<UserTagDTO> selectUserTags(String userId);
 
     UserProfileDTO findUserProfileById(String userId);
-
 
     List<UserInfoDTO> selectUsersByPagination(TagDTO tagDTO);
 
