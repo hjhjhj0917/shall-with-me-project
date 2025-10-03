@@ -407,25 +407,34 @@
         document.getElementById('sharehouseAddBtn')?.focus();
     }
 
-    // 바깥 클릭 / ESC 닫기
-    document.addEventListener('click', (e) => {
-        const ov = document.getElementById('sharehouseRegOverlay');
-        if (!ov || ov.style.display !== 'flex') return;
-        if (e.target === ov) closeSharehouseRegModal();
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeSharehouseRegModal();
-    });
-    document.getElementById('sharehouseRegClose')?.addEventListener('click', closeSharehouseRegModal);
+    // ✅ 1) 배경 클릭으로는 닫히지 않게 (유지)
+    // document 클릭 리스너 "삭제" 또는 사용 안 함
+    // (배경 클릭 닫기 코드였던 줄은 그대로 주석 유지)
+    // document.addEventListener('click', (e) => {
+    //   const ov = document.getElementById('sharehouseRegOverlay');
+    //   if (!ov || ov.style.display !== 'flex') return;
+    //   // if (e.target === ov) closeSharehouseRegModal();  // ← 배경 클릭 닫기 금지
+    // });
 
-    // ✅ 버튼 클릭 핸들러 (DOMContentLoaded로 안전하게)
-    document.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('sharehouseAddBtn');
-        if (!btn) return;
-        btn.addEventListener('click', function () {
-            // ✅ inModal=Y 로 열기 (reg.jsp가 모달용 레이아웃으로 전환)
-            openSharehouseRegModal(`${ctx}/sharehouse/sharehouseReg?inModal=Y`);
-        });
+    // ✅ 2) ESC로 닫기 — 전역에서 한 번만 등록 (중첩 금지)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSharehouseRegModal();  // ← ESC 정상 작동
+    });
+
+    // ✅ 3) X 버튼으로 닫기 — DOM 준비된 후에 안전하게 리스너 부착
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('sharehouseRegClose');
+        if (btn) {
+            btn.addEventListener('click', closeSharehouseRegModal); // ← X 정상 작동
+        }
+
+        // (참고) 등록 버튼로 모달 열기 리스너도 여기에서 붙이면 안전
+        const openBtn = document.getElementById('sharehouseAddBtn');
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                openSharehouseRegModal(`${ctx}/sharehouse/sharehouseReg?inModal=Y`);
+            });
+        }
     });
 </script>
 
