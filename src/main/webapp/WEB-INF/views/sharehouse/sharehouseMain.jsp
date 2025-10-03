@@ -382,9 +382,50 @@
 </script>
 
 <script>
-    document.getElementById('sharehouseAddBtn')?.addEventListener('click', function () {
-        // 등록 페이지로 이동/모달 열기 등
-        // 예: location.href = ctx + '/sharehouse/sharehouseReg';
+    // 모달 열기/닫기
+    function openSharehouseRegModal(url) {
+        const ov = document.getElementById('sharehouseRegOverlay');
+        const frame = document.getElementById('sharehouseRegFrame');
+        if (!ov || !frame) return;
+
+        frame.src = url;
+        ov.style.display = 'flex';
+        document.body.classList.add('modal-open');
+        // 포커스 이동
+        document.getElementById('sharehouseRegClose')?.focus();
+    }
+
+    function closeSharehouseRegModal() {
+        const ov = document.getElementById('sharehouseRegOverlay');
+        const frame = document.getElementById('sharehouseRegFrame');
+        if (!ov || !frame) return;
+
+        ov.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        frame.src = 'about:blank';
+        // 포커스 복귀
+        document.getElementById('sharehouseAddBtn')?.focus();
+    }
+
+    // 바깥 클릭 / ESC 닫기
+    document.addEventListener('click', (e) => {
+        const ov = document.getElementById('sharehouseRegOverlay');
+        if (!ov || ov.style.display !== 'flex') return;
+        if (e.target === ov) closeSharehouseRegModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSharehouseRegModal();
+    });
+    document.getElementById('sharehouseRegClose')?.addEventListener('click', closeSharehouseRegModal);
+
+    // ✅ 버튼 클릭 핸들러 (DOMContentLoaded로 안전하게)
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('sharehouseAddBtn');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            // ✅ inModal=Y 로 열기 (reg.jsp가 모달용 레이아웃으로 전환)
+            openSharehouseRegModal(`${ctx}/sharehouse/sharehouseReg?inModal=Y`);
+        });
     });
 </script>
 
@@ -393,6 +434,21 @@
     <i class="fa-solid fa-plus icon-plus"></i>
 </button>
 <div class="sh-tooltip">쉐어하우스 등록</div>
+
+<!-- 쉐어하우스 등록 모달(iframe) -->
+<div class="modal-overlay" id="sharehouseRegOverlay" style="display:none; z-index:10000;">
+    <div class="modal-sheet" style="width:min(1200px,95vw); height:min(90vh, 100svh - 40px); background:#fff; border-radius:16px; overflow:hidden;">
+        <div class="modal-header" style="justify-content:space-between;">
+            <div class="modal-title-text">쉐어하우스 등록</div>
+            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding:0; height:calc(100% - 56px); overflow:hidden;">
+            <iframe id="sharehouseRegFrame" title="쉐어하우스 등록 화면" style="width:100%; height:100%; border:0;"></iframe>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
