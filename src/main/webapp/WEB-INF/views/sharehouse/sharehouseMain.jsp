@@ -5,77 +5,88 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css"/>
-    <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
-        body.modal-open { overflow: hidden; }
-        body.modal-open header,
-        body.modal-open #sh-wrapper {
-            pointer-events: none; -webkit-user-select: none; user-select: none; touch-action: none;
+        /* (검색창 및 다른 부분 스타일은 룸메이트와 동일) */
+        .sh-searchbar {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 50px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            height: 66px;
+            padding: 0 10px;
+            width: 100%;
+            max-width: 850px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        #profileModalOverlay {
-            position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-            background: rgba(0,0,0,.45); z-index: 10000; pointer-events: auto;
+        .search-section { flex: 1; padding: 8px 24px; cursor: pointer; border-radius: 30px; transition: background-color 0.2s; min-width: 0; }
+        .search-section:hover { background-color: #f7f7f7; }
+        .search-section + .search-section { border-left: 1px solid #eee; }
+        .search-section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+        .search-section-placeholder { font-size: 14px; color: #717171; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #sh-search-btn {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(to right, #66B2FF, #3399ff);
+            color: white; border: none; font-size: 16px; margin-left: 10px;
+            flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.1s;
         }
-        #profileModalOverlay .modal-sheet {
-            width: min(1200px,95vw); height: min(90vh,100svh - 40px);
-            background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.25);
-            display:flex; flex-direction:column; overflow:hidden;
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center; z-index: 9998; }
+
+        #locationSelectModalOverlay .modal-sheet,
+        #tagSelectModalOverlay .modal-sheet {
+            width: 100%; max-width: 500px; background: white; border-radius: 12px; animation: fadeIn 0.3s; overflow: hidden;
         }
-        #profileModalOverlay .modal-header {
-            display:flex; align-items:center; justify-content:space-between; gap:12px;
-            padding:14px 18px; border-bottom:1px solid #eee; background:#f7faff;
-        }
-        #profileModalOverlay .modal-title-text { font-size:1.1rem; font-weight:700; color:#1c407d; }
-        #profileModalOverlay .modal-close { border:0; background:transparent; cursor:pointer; padding:6px; font-size:1.1rem; }
-        #profileModalOverlay .modal-body { flex:1 1 auto; padding:0; overflow:hidden; }
-        #profileModalFrame { width:100%; height:100%; display:block; border:0; }
+        .modal-header { display: flex; align-items: center; justify-content: center; padding: 16px; border-bottom: 1px solid #eee; position: relative; }
+        .modal-title-text { font-weight: 700; color: #222; }
+        .modal-close { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: #222; background: #f7f7f7; border: none; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .modal-body { max-height: 450px; overflow-y: auto; padding: 20px; }
+
+        .location-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .location-item { padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; transition: border-color 0.2s, background-color 0.2s, font-weight 0.2s; font-size: 14px; }
+        .location-item:hover { border-color: #222; }
+        .location-item.selected { background-color: #f7f7f7; border-color: #222; font-weight: 600; }
+
+        /* 태그 모달 그룹 UI (룸메이트와 동일) */
+        .search-tag-group { display: flex; align-items: center; padding: 16px 0; }
+        .search-tag-group + .search-tag-group { border-top: 1px solid #f0f0f0; }
+        .search-tag-group__icon-wrapper { flex-shrink: 0; width: 80px; height: 80px; border-radius: 50%; background-color: #f8f9fa; border: 1px solid #e9ecef; display: flex; align-items: center; justify-content: center; }
+        .search-tag-group__icon-wrapper i { font-size: 30px; color: #495057; }
+        .search-tag-group__content-wrapper { flex-grow: 1; padding-left: 24px; }
+        .search-tag-group__title { font-weight: 600; font-size: 1rem; color: #343a40; margin-bottom: 12px; }
+        .search-tag-group__list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag-btn { background-color: #fff; border: 1px solid #dee2e6; border-radius: 20px; padding: 8px 16px; font-size: 0.9rem; color: #495057; cursor: pointer; transition: all 0.2s ease; }
+        .tag-btn.selected { background-color: #3399ff; border-color: #3399ff; color: white; font-weight: 600; }
+        .tag-btn:hover:not(.selected) { border-color: #495057; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* 쉐어하우스 카드 일부 텍스트 라인 보정 (선택) */
+        .price-pill { display:inline-block; font-size:12px; background:#eef6ff; border-radius:999px; padding:2px 8px; }
+        .sh-info .sh-sub { display:flex; gap:8px; align-items:center; }
     </style>
-
-    <script>
-        const ctx = '${pageContext.request.contextPath}';
-
-        function openProfileModal(url) {
-            const ov = document.getElementById('profileModalOverlay');
-            const frame = document.getElementById('profileModalFrame');
-            if (!ov || !frame) return;
-            frame.src = url;
-            ov.style.display = 'flex';
-            document.body.classList.add('modal-open');
-            const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
-            bgEls.forEach(el => { if (el) { el.setAttribute('inert',''); el.setAttribute('aria-hidden','true'); }});
-            document.getElementById('profileModalClose')?.focus();
-        }
-
-        function closeProfileModal() {
-            const ov = document.getElementById('profileModalOverlay');
-            const frame = document.getElementById('profileModalFrame');
-            if (!ov || !frame) return;
-            ov.style.display = 'none';
-            document.body.classList.remove('modal-open');
-            const bgEls = [document.querySelector('header'), document.getElementById('sh-wrapper')];
-            bgEls.forEach(el => { if (el) { el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); }});
-            frame.src = 'about:blank';
-            document.getElementById('sharehouseAddBtn')?.focus();
-        }
-
-        document.addEventListener('click', (e) => {
-            const ov = document.getElementById('profileModalOverlay');
-            if (ov && ov.style.display === 'flex' && e.target === ov) closeProfileModal();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeProfileModal();
-        });
-    </script>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
 
 <main id="sh-wrapper">
     <div class="sh-searchbar">
-        <input type="text" placeholder="원하는 지역, 조건 검색" id="sh-q">
+        <div class="search-section" id="location-search-trigger">
+            <div class="search-section-label">지역</div>
+            <div class="search-section-placeholder" id="location-selection-text">지역 선택</div>
+        </div>
+        <div class="search-section" id="tag-search-trigger">
+            <div class="search-section-label">태그</div>
+            <div class="search-section-placeholder" id="tag-selection-text">원하는 조건 추가</div>
+        </div>
         <button type="button" id="sh-search-btn" aria-label="검색">
             <i class="fa-solid fa-magnifying-glass"></i>
         </button>
@@ -86,16 +97,32 @@
     </div>
 </main>
 
-<div id="profileModalOverlay" aria-hidden="true">
-    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+<!-- 지역 선택 모달 -->
+<div class="modal-overlay" id="locationSelectModalOverlay">
+    <div class="modal-sheet">
         <div class="modal-header">
-            <div id="profileModalTitle" class="modal-title-text">쉐어하우스 등록</div>
-            <button type="button" class="modal-close" id="profileModalClose" aria-label="닫기" onclick="closeProfileModal()">
+            <button type="button" class="modal-close" onclick="closeLocationModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
+            <div class="modal-title-text">지역 선택</div>
         </div>
         <div class="modal-body">
-            <iframe id="profileModalFrame" title="쉐어하우스 등록 화면"></iframe>
+            <div class="location-grid" id="location-grid-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 태그 선택 모달 -->
+<div class="modal-overlay" id="tagSelectModalOverlay">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <button type="button" class="modal-close" onclick="closeTagModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-title-text">태그 선택</div>
+        </div>
+        <div class="modal-body">
+            <div id="all-tag-list"></div>
         </div>
     </div>
 </div>
@@ -105,24 +132,26 @@
 
 <%
     String ssUserName = (String) session.getAttribute("SS_USER_NAME");
-    if (ssUserName == null) { ssUserName = ""; }
+    if (ssUserName == null) ssUserName = "";
 %>
-<script> const userName = "<%= ssUserName %>"; </script>
 
+<script>
+    const ctx = '${pageContext.request.contextPath}';
+    const userName = "<%= ssUserName %>";
+</script>
+
+<!-- 카드 클릭 → 상세 새 탭 (엔드포인트만 sharehouse로) -->
 <script>
     (function () {
         const grid = document.querySelector('.sh-grid');
-        if (grid) {
-            grid.addEventListener('click', (e) => {
-                const card = e.target.closest('.sh-card');
-                if (card && grid.contains(card)) {
-                    const id = card.dataset.id;
-                    if (id) {
-                        window.open(ctx + '/sharehouse/sharehouseDetail?userId=' + encodeURIComponent(id), '_blank');
-                    }
-                }
-            });
-        }
+        if (!grid) return;
+        grid.addEventListener('click', (e) => {
+            const card = e.target.closest('.sh-card');
+            if (!card || !grid.contains(card)) return;
+            const id = card.dataset.id; // houseId
+            if (!id) return;
+            window.open(ctx + '/sharehouse/detail?houseId=' + encodeURIComponent(id), '_blank');
+        });
     })();
 </script>
 
@@ -131,10 +160,10 @@
 
 <script>
     $(document).ready(function () {
-        let page = 1;
-        let loading = false;
-        let lastPage = false;
-
+        // 룸메이트와 동일 규칙: 첫 15장, 이후 5장
+        let page = 1, loading = false, lastPage = false, isSearching = false;
+        let selectedLocation = "";
+        const selectedTags = new Map();
         const $grid = $(".sh-grid");
         const $scrollArea = $(".sh-scroll-area");
 
@@ -142,15 +171,35 @@
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
-            const scrollTop = $scrollArea.scrollTop();
-            const innerHeight = $scrollArea.innerHeight();
-            const scrollHeight = $scrollArea[0].scrollHeight;
+            let scrollTop = $scrollArea.scrollTop();
+            let innerHeight = $scrollArea.innerHeight();
+            let scrollHeight = $scrollArea[0].scrollHeight;
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
                 page++;
-                loadPage(page);
+                const loadFunc = isSearching ? loadFilteredPage : loadPage;
+                loadFunc(page);
             }
         });
 
+        $('#location-search-trigger').on('click', openLocationModal);
+        $('#tag-search-trigger').on('click', openTagModal);
+        $('#sh-search-btn').on('click', function () {
+            isSearching = true;
+            page = 1;
+            lastPage = false;
+            $grid.empty();
+            loadFilteredPage(page);
+        });
+
+        // 공통 응답 처리 (빈 데이터여도 안전)
+        function handleApiResponse(data) {
+            const items = data.items || data.list || data || [];
+            if (!items || items.length === 0) { lastPage = true; return; }
+            renderHouseCards(items);
+            if (data.lastPage === true) lastPage = true;
+        }
+
+        // 기본 목록: 서버에서 15/5 규칙 적용 가능
         function loadPage(p) {
             loading = true;
             $.ajax({
@@ -158,78 +207,174 @@
                 type: "GET",
                 data: { page: p },
                 dataType: "json",
-                success: function (data) {
-                    if (!data || !data.items || data.items.length === 0) {
-                        lastPage = true;
-                        return;
+                success: handleApiResponse,
+                error: (xhr, status, err) => console.error("쉐어하우스 목록 불러오기 실패:", err),
+                complete: () => loading = false
+            });
+        }
+
+        // 필터 검색
+        function loadFilteredPage(p) {
+            loading = true;
+            const reqData = {
+                tagIds: Array.from(selectedTags.keys()),
+                location: selectedLocation,
+                page: p,
+                pageSize: 10
+            };
+            $.ajax({
+                url: ctx + "/sharehouse/search",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(reqData),
+                dataType: "json",
+                success: handleApiResponse,
+                error: (err) => console.error('검색 실패', err),
+                complete: () => loading = false
+            });
+        }
+
+        // 지역 모달
+        function openLocationModal() {
+            renderLocations();
+            $('#locationSelectModalOverlay').css('display', 'flex');
+        }
+        window.closeLocationModal = function () { $('#locationSelectModalOverlay').hide(); }
+
+        function renderLocations() {
+            const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
+            const $container = $('#location-grid-container').empty();
+            locations.forEach(loc => {
+                const $item = $('<div>').addClass('location-item').text(loc);
+                if (loc === selectedLocation) $item.addClass('selected');
+                $item.on('click', function () {
+                    if (selectedLocation === loc) {
+                        selectedLocation = "";
+                        $('#location-selection-text').text('지역 선택').css('color', '');
+                    } else {
+                        selectedLocation = loc;
+                        $('#location-selection-text').text(loc).css('color', '#222');
                     }
-                    renderUserCards(data.items);
-                    if (data.lastPage) lastPage = true;
-                },
-                error: function (xhr, status, err) { console.error("목록 불러오기 실패:", err); },
-                complete: function () { loading = false; }
+                    renderLocations();
+                    closeLocationModal();
+                });
+                $container.append($item);
             });
         }
 
-        function renderUserCards(items) {
-            const loginUserId = "${sessionScope.SS_USER_ID}";
-            const stamp = Date.now();                   // 캐시 버스터
-            const noimg = ctx + "/images/noimg.png";
+        // 태그 모달
+        function openTagModal() {
+            loadAllTags();
+            $('#tagSelectModalOverlay').css('display', 'flex');
+        }
+        window.closeTagModal = function () { $('#tagSelectModalOverlay').hide(); };
+
+        function loadAllTags() {
+            $.ajax({
+                url: ctx + '/sharehouse/tagAll',
+                type: 'GET',
+                dataType: 'json',
+                success: (tags) => renderAllTags(tags),
+                error: (err) => console.error('태그 불러오기 실패', err)
+            });
+        }
+
+        // (룸메이트와 동일한 레이아웃 렌더)
+        function renderAllTags(tagsFromServer) {
+            const $container = $('#all-tag-list').empty();
+            const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
+            const tagGroups = [
+                {title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]},
+                {title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4]},
+                {title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]},
+                {title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10]},
+                {title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]},
+                {title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14]},
+                {title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]},
+                {title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18]},
+                {title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]},
+                {title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22]},
+                {title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]},
+                {title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28]},
+                {title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]},
+                {title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33]},
+                {title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]},
+                {title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39]},
+                {title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]},
+                {title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
+            ];
+            tagGroups.forEach(group => {
+                const $groupDiv = $('<div>').addClass('search-tag-group');
+                const $iconWrapper = $('<div>').addClass('search-tag-group__icon-wrapper').append($('<i>').addClass(group.icon));
+                const $contentWrapper = $('<div>').addClass('search-tag-group__content-wrapper');
+                const $groupTitle = $('<div>').addClass('search-tag-group__title').text(group.title);
+                const $groupList = $('<div>').addClass('search-tag-group__list');
+
+                group.tags.forEach(tagId => {
+                    if (tagMap.has(tagId)) {
+                        const tag = tagMap.get(tagId);
+                        const $btn = $('<button>').addClass('tag-btn').text(tag.tagName).attr('data-id', tag.tagId);
+                        if (selectedTags.has(tag.tagId)) $btn.addClass('selected');
+                        $btn.on('click', () => toggleTagSelection(tag.tagId, tag.tagName));
+                        $groupList.append($btn);
+                    }
+                });
+
+                $contentWrapper.append($groupTitle, $groupList);
+                $groupDiv.append($iconWrapper, $contentWrapper);
+                $container.append($groupDiv);
+            });
+        }
+
+        function toggleTagSelection(tagId, tagName) {
+            if (selectedTags.has(tagId)) selectedTags.delete(tagId);
+            else selectedTags.set(tagId, tagName);
+            updateTagDisplay();
+        }
+        function updateTagDisplay() {
+            $('#all-tag-list .tag-btn').each(function () {
+                $(this).toggleClass('selected', selectedTags.has($(this).data('id')));
+            });
+            const tagCount = selectedTags.size;
+            const $tagText = $('#tag-selection-text');
+            if (tagCount > 0) {
+                const firstTagName = selectedTags.values().next().value;
+                const displayText = tagCount > 1 ? firstTagName + " 외 " + (tagCount - 1) + "개" : firstTagName;
+                $tagText.text(displayText).css('color', '#222');
+            } else {
+                $tagText.text('원하는 조건 추가').css('color', '');
+            }
+        }
+
+        // 카드 렌더링 (쉐어하우스용: houseId/title/city/rent/thumbnailUrl/tag1/tag2)
+        function renderHouseCards(items) {
             const $grid = $(".sh-grid");
+            const noimg = ctx + "/images/noimg.png";
+            items.forEach(house => {
+                const $card = $("<article>").addClass("sh-card").attr("data-id", house.houseId);
 
-            $.each(items, function (i, it) {
-                if (String(it.userId) === String(loginUserId)) return true;
-
-                const nickname = it.name || "알 수 없음";
-                const age = it.age ? (it.age + "세") : "";
-
-                // 카드 뼈대
-                const $card  = $("<article>").addClass("sh-card").attr("data-id", it.userId);
+                const imgUrl = house.thumbnailUrl || noimg;
                 const $thumb = $("<div>").addClass("sh-thumb")
-                    .css("background-image", "url('" + noimg + "')");  // 회색 방지용 기본값
-                const $info  = $("<div>").addClass("sh-info")
-                    .append($("<p>").addClass("sh-sub").text("이름 : " + nickname + (age ? " (" + age + ")" : "")));
+                    .css("background-image", "url('" + imgUrl + "')");
 
-                // 우선순위: (서버 프로필) → (샘플 hero)
-                const sampleHero = ctx + "/images/sample/" + it.userId + "/hero.jpg?v=" + stamp;
-                const wanted = (it.profileImgUrl && it.profileImgUrl.trim() !== "")
-                    ? (it.profileImgUrl + (it.profileImgUrl.indexOf("?") >= 0 ? "&" : "?") + "v=" + stamp)
-                    : sampleHero;
+                const $info = $("<div>").addClass("sh-info");
+                const title = house.title || "제목 없음";
+                const city = house.city || "";
+                const price = (house.rent != null) ? (house.rent + "만원") : "";
 
-                // 미리 로드해서 성공 시 교체, 실패면 noimg 유지
-                const probe = new Image();
-                probe.onload  = function(){ $thumb.css("background-image", "url('" + wanted + "')"); };
-                probe.onerror = function(){ $thumb.css("background-image", "url('" + noimg + "')"); };
-                probe.src = wanted;
+                const $title = $("<p>").addClass("sh-title").text(title);
+                // 도시 · 가격, 가격은 pill로 선택 표시
+                const $sub   = $("<p>").addClass("sh-sub");
+                if (city) $sub.append(document.createTextNode(city));
+                if (price) $sub.append($("<span>").addClass("price-pill").text(price));
 
-                // 태그들
                 const $tagBox = $("<div>").addClass("tag-box");
-                if (it.tag1) $tagBox.append($("<span>").addClass("tag").text(it.tag1));
-                if (it.tag2) $tagBox.append($("<span>").addClass("tag").text(it.tag2));
-                if (it.gender) {
-                    const genderClass = (it.gender === "남" || it.gender === "M") ? "male" : "female";
-                    $tagBox.append($("<span>").addClass("tag gender " + genderClass).text(it.gender));
-                }
-                $info.append($tagBox);
+                if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
+                if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
 
-                $card.append($thumb).append($info);
+                $info.append($title, $sub, $tagBox);
+                $card.append($thumb, $info);
                 $grid.append($card);
-            });
-        }
-    });
-</script>
-
-<button type="button" class="sh-fab-left" id="sharehouseAddBtn" aria-label="쉐어하우스 등록">
-    <span class="icon-plus">+</span>
-</button>
-<div class="sh-tooltip">쉐어하우스 등록</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const addBtn = document.getElementById('sharehouseAddBtn');
-        if (addBtn) {
-            addBtn.addEventListener('click', function(){
-                openProfileModal(ctx + '/sharehouse/sharehouseReg');
             });
         }
     });
