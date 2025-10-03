@@ -155,26 +155,23 @@ public class RoommateService implements IRoommateService {
     public TagDTO searchUsersByTags(TagDTO pDTO) {
         log.info("{}.searchUsersByTags Start!", this.getClass().getName());
 
-        int pageSize = pDTO.getPageSize() > 0 ? pDTO.getPageSize() : 10; // 기본 페이지 크기를 10으로 가정
+        int pageSize = pDTO.getPageSize() > 0 ? pDTO.getPageSize() : DEFAULT_PAGE_SIZE;
         int page = pDTO.getPage() > 0 ? pDTO.getPage() : 1;
         int offset = (page - 1) * pageSize;
         pDTO.setOffset(offset);
 
-        List<Integer> tagIds = pDTO.getTagIds();
+        // DTO에서 새로운 필드들을 가져옴
+        Map<String, List<Integer>> tagGroupMap = pDTO.getTagGroupMap();
         String location = pDTO.getLocation();
         List<UserInfoDTO> users;
 
-        // ✅ [수정] 태그 또는 지역 조건이 있는지 확인하는 boolean 변수 추가
-        boolean hasTags = tagIds != null && !tagIds.isEmpty();
+        // 태그 또는 지역 조건이 있는지 확인
+        boolean hasTags = tagGroupMap != null && !tagGroupMap.isEmpty();
         boolean hasLocation = location != null && !location.isEmpty();
 
-        // ✅ [수정] 태그나 지역 둘 중 하나라도 조건이 있으면 필터링 쿼리 실행
+        // 태그나 지역 둘 중 하나라도 조건이 있으면 필터링 쿼리 실행
         if (hasTags || hasLocation) {
             log.info("Filtering search with Tags and/or Location.");
-            // 태그가 있을 때만 tagCount를 설정 (NPE 방지)
-            if (hasTags) {
-                pDTO.setTagCount(tagIds.size());
-            }
             users = mapper.selectUsersByTagsWithPagination(pDTO);
             pDTO = mapper.countUsersByTags(pDTO);
         } else {
@@ -184,7 +181,7 @@ public class RoommateService implements IRoommateService {
             pDTO = mapper.countAllUsers(pDTO);
         }
 
-        // 사용자별 tag1/tag2/genderLabel 세팅 (기존과 동일)
+        // 사용자별 tag1/tag2/genderLabel 세팅 (이 로직은 재사용)
         for (UserInfoDTO user : users) {
             List<UserTagDTO> tags = mapper.selectUserTags(user.getUserId());
 
@@ -218,6 +215,7 @@ public class RoommateService implements IRoommateService {
         log.info("{}.searchUsersByTags End!", this.getClass().getName());
         return pDTO;
     }
+
 
     @Override
     public List<TagDTO> getAllTags() throws Exception {

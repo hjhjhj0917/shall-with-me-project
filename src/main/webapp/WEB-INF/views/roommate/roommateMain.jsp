@@ -332,13 +332,35 @@
 
 <script>
     $(document).ready(function () {
-        // (변수 선언 및 기본 로직은 이전과 동일)
+        // --- 전역 변수 ---
         let page = 1, loading = false, lastPage = false, isSearching = false;
         let selectedLocation = "";
-        const selectedTags = new Map();
+        const selectedTagGroups = new Map(); // 데이터 구조: Map { groupKey => Map { tagId => tagName } }
         const $grid = $(".sh-grid");
         const $scrollArea = $(".sh-scroll-area");
 
+        const tagGroups = [
+            { key: "lifePattern", title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2] },
+            { key: "activity", title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4] },
+            { key: "job", title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7] },
+            { key: "workTime", title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10] },
+            { key: "guest", title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12] },
+            { key: "share", title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14] },
+            { key: "personality", title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16] },
+            { key: "prefer", title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18] },
+            { key: "conversation", title: "대화", icon: "fa-solid fa-comments", tags: [19, 20] },
+            { key: "conflict", title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22] },
+            { key: "cook", title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25] },
+            { key: "food", title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28] },
+            { key: "meal", title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31] },
+            { key: "smell", title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33] },
+            { key: "clean", title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36] },
+            { key: "cleanCircle", title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39] },
+            { key: "garbage", title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41] },
+            { key: "dishWash", title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43] }
+        ];
+
+        // --- 초기화 및 이벤트 핸들러 ---
         loadPage(page);
 
         $scrollArea.on("scroll", function () {
@@ -359,10 +381,11 @@
             isSearching = true;
             page = 1;
             lastPage = false;
-            $('.sh-grid').empty();
+            $grid.empty();
             loadFilteredPage(page);
         });
 
+        // --- API 호출 및 데이터 처리 ---
         function handleApiResponse(data) {
             const users = data.users || data.items || [];
             if (users.length === 0) {
@@ -387,12 +410,11 @@
 
         function loadFilteredPage(p) {
             loading = true;
-            const reqData = {
-                tagIds: Array.from(selectedTags.keys()),
-                location: selectedLocation,
-                page: p,
-                pageSize: 10
-            };
+            const tagGroupMap = {};
+            selectedTagGroups.forEach((tagMap, groupKey) => {
+                tagGroupMap[groupKey] = Array.from(tagMap.keys());
+            });
+            const reqData = { location: selectedLocation, tagGroupMap: tagGroupMap, page: p, pageSize: 10 };
             $.ajax({
                 url: '/roommate/searchByTags', type: 'POST', contentType: 'application/json',
                 data: JSON.stringify(reqData), dataType: 'json',
@@ -402,22 +424,21 @@
             });
         }
 
+        // --- 지역 모달 ---
         function openLocationModal() {
             renderLocations();
             $('#locationSelectModalOverlay').css('display', 'flex');
         }
-
         window.closeLocationModal = function () {
             $('#locationSelectModalOverlay').hide();
         }
-
         function renderLocations() {
             const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
             const $container = $('#location-grid-container').empty();
             locations.forEach(loc => {
                 const $item = $('<div>').addClass('location-item').text(loc);
                 if (loc === selectedLocation) $item.addClass('selected');
-                $item.on('click', function () {
+                $item.on('click', function() {
                     if (selectedLocation === loc) {
                         selectedLocation = "";
                         $('#location-selection-text').text('지역 선택').css('color', '');
@@ -432,15 +453,14 @@
             });
         }
 
+        // --- 태그 모달 ---
         function openTagModal() {
             loadAllTags();
             $('#tagSelectModalOverlay').css('display', 'flex');
         }
-
         window.closeTagModal = function () {
             $('#tagSelectModalOverlay').hide();
         };
-
         function loadAllTags() {
             $.ajax({
                 url: '/roommate/tagAll', type: 'GET', dataType: 'json',
@@ -449,68 +469,13 @@
             });
         }
 
-        // ✅ [수정] renderAllTags 함수 전체 변경
         function renderAllTags(tagsFromServer) {
             const $container = $('#all-tag-list').empty();
             const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
-            const tagGroups = [
-                {title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]}, {
-                    title: "활동범위",
-                    icon: "fa-solid fa-map-location-dot",
-                    tags: [3, 4]
-                },
-                {title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]}, {
-                    title: "퇴근 시간",
-                    icon: "fa-solid fa-business-time",
-                    tags: [8, 9, 10]
-                },
-                {title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]}, {
-                    title: "물건공유",
-                    icon: "fa-solid fa-handshake",
-                    tags: [13, 14]
-                },
-                {title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]}, {
-                    title: "선호하는 성격",
-                    icon: "fa-solid fa-heart",
-                    tags: [17, 18]
-                },
-                {title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]}, {
-                    title: "갈등",
-                    icon: "fa-solid fa-people-arrows",
-                    tags: [21, 22]
-                },
-                {title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]}, {
-                    title: "주식",
-                    icon: "fa-solid fa-bowl-food",
-                    tags: [26, 27, 28]
-                },
-                {title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]}, {
-                    title: "음식 냄새",
-                    icon: "fa-solid fa-wind",
-                    tags: [32, 33]
-                },
-                {title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]}, {
-                    title: "청소 주기",
-                    icon: "fa-solid fa-broom",
-                    tags: [37, 38, 39]
-                },
-                {title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]}, {
-                    title: "설거지",
-                    icon: "fa-solid fa-sink",
-                    tags: [42, 43]
-                }
-            ];
 
             tagGroups.forEach(group => {
-                // 1. 메인 그룹 div (flex row)
                 const $groupDiv = $('<div>').addClass('search-tag-group');
-
-                // 2. 왼쪽 아이콘 영역
-                const $iconWrapper = $('<div>').addClass('search-tag-group__icon-wrapper');
-                const $icon = $('<i>').addClass(group.icon);
-                $iconWrapper.append($icon);
-
-                // 3. 오른쪽 콘텐츠 영역 (제목 + 버튼 목록)
+                const $iconWrapper = $('<div>').addClass('search-tag-group__icon-wrapper').append($('<i>').addClass(group.icon));
                 const $contentWrapper = $('<div>').addClass('search-tag-group__content-wrapper');
                 const $groupTitle = $('<div>').addClass('search-tag-group__title').text(group.title);
                 const $groupList = $('<div>').addClass('search-tag-group__list');
@@ -519,40 +484,62 @@
                     if (tagMap.has(tagId)) {
                         const tag = tagMap.get(tagId);
                         const $btn = $('<button>').addClass('tag-btn').text(tag.tagName).attr('data-id', tag.tagId);
-                        if (selectedTags.has(tag.tagId)) $btn.addClass('selected');
-                        $btn.on('click', () => toggleTagSelection(tag.tagId, tag.tagName));
+
+                        const selectedGroup = selectedTagGroups.get(group.key);
+                        if (selectedGroup && selectedGroup.has(tag.tagId)) {
+                            $btn.addClass('selected');
+                        }
+
+                        $btn.on('click', function() {
+                            toggleTagSelection(group.key, tag.tagId, tag.tagName, $(this));
+                        });
                         $groupList.append($btn);
                     }
                 });
 
-                // 4. 조립
                 $contentWrapper.append($groupTitle, $groupList);
                 $groupDiv.append($iconWrapper, $contentWrapper);
                 $container.append($groupDiv);
             });
         }
 
-        function toggleTagSelection(tagId, tagName) {
-            if (selectedTags.has(tagId)) selectedTags.delete(tagId);
-            else selectedTags.set(tagId, tagName);
-            updateTagDisplay();
+        function toggleTagSelection(groupKey, tagId, tagName, $btn) {
+            if (!selectedTagGroups.has(groupKey)) {
+                selectedTagGroups.set(groupKey, new Map());
+            }
+            const groupMap = selectedTagGroups.get(groupKey);
+
+            if (groupMap.has(tagId)) {
+                groupMap.delete(tagId);
+                if (groupMap.size === 0) selectedTagGroups.delete(groupKey);
+            } else {
+                groupMap.set(tagId, tagName);
+            }
+
+            $btn.toggleClass('selected');
+            updateSearchBarText();
         }
 
-        function updateTagDisplay() {
-            $('#all-tag-list .tag-btn').each(function () {
-                $(this).toggleClass('selected', selectedTags.has($(this).data('id')));
+        function updateSearchBarText() {
+            let totalCount = 0;
+            let firstTagName = "";
+            selectedTagGroups.forEach((groupMap) => {
+                totalCount += groupMap.size;
+                if (!firstTagName && groupMap.size > 0) {
+                    firstTagName = groupMap.values().next().value;
+                }
             });
-            const tagCount = selectedTags.size;
+
             const $tagText = $('#tag-selection-text');
-            if (tagCount > 0) {
-                const firstTagName = selectedTags.values().next().value;
-                const displayText = tagCount > 1 ? firstTagName + " 외 " + (tagCount - 1) + "개" : firstTagName;
+            if (totalCount > 0) {
+                const displayText = totalCount > 1 ? firstTagName + " 외 " + (totalCount - 1) + "개" : firstTagName;
                 $tagText.text(displayText).css('color', '#222');
             } else {
                 $tagText.text('원하는 조건 추가').css('color', '');
             }
         }
 
+        // --- 카드 렌더링 ---
         function renderUserCards(users) {
             const loginUserId = "${sessionScope.SS_USER_ID}";
             $.each(users, function (i, user) {
