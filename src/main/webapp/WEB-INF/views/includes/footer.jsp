@@ -92,7 +92,7 @@
             </div>
             <div class="footer-info">
                 <span>(주)살며시</span>
-                <span>대표: 양준모</span>
+                <span>팀장: 양준모</span>
                 <span>메일: yjmo0309@gmail.com</span>
                 <br>
                 <span>주소: 서울 강서구 우장산로10길 112 한국폴리텍대학서울강서캠퍼스</span>

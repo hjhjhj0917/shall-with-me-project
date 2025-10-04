@@ -119,9 +119,9 @@
             }
         }
 
-        document.getElementById("genderArea").textContent = "성별: " + genderName;
-        document.getElementById("regionArea").textContent = "지역: " + bigRegion;
-        document.getElementById("birthArea").textContent = "생일: " + formattedBirthDate;
+        document.getElementById("genderArea").innerHTML = '<i class="fa-solid fa-venus-mars" style="color: #1c407d;"></i> ' + genderName;
+        document.getElementById("regionArea").innerHTML = ' <i class="fa-solid fa-location-dot" style="color: #1c407d;"></i> ' + bigRegion;
+        document.getElementById("birthArea").innerHTML = ' <i class="fa-solid fa-cake-candles" style="color: #1c407d;"></i> ' + formattedBirthDate;
     };
 
 </script>

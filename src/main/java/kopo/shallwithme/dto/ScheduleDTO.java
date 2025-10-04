@@ -19,7 +19,7 @@ public class ScheduleDTO {
     private String participantId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    private String status;
     private String roomId;
 
 }

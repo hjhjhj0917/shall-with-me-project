@@ -169,7 +169,7 @@ body {
 
 .message-bubble.long-text { white-space: normal; }
 .message-wrapper.me .message-bubble { background-color: #e0f7fa; }
-.message-wrapper.other .message-bubble { background-color: #f1f1f1; }
+.message-wrapper.other .message-bubble { background-color: white; }
 
 /* 시간 표시 */
 .message-time {

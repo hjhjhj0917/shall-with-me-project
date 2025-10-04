@@ -66,38 +66,46 @@ public class ScheduleService implements IScheduleService {
         return res;
     }
 
+    public ScheduleDTO insertScheduleRequest(ScheduleDTO pDTO) {
+        log.info("{}.insertScheduleRequest Start!", this.getClass().getName());
+
+        // 1. DTO에 상태 값을 'PENDING'으로 설정
+        pDTO.setStatus("PENDING");
+
+        // 2. DB에 삽입합니다.
+        // (주의) Mapper의 insert 쿼리가 실행된 후, 생성된 schedule_id를 pDTO에 다시 담아주는 기능이 필요합니다.
+        // MyBatis의 <selectKey> 또는 @Options(useGeneratedKeys=true, keyProperty="scheduleId") 어노테이션을 사용하세요.
+        scheduleMapper.insertShareSchedule(pDTO);
+
+        log.info("Saved Pending Schedule with ID: {}", pDTO.getScheduleId());
+        log.info("{}.insertScheduleRequest End!", this.getClass().getName());
+
+        // ID가 포함된 DTO를 컨트롤러로 반환
+        return pDTO;
+    }
+
     // 일정 상태 업데이트
     @Override
-    public void updateScheduleStatus(String scheduleId, String status, String userId) {
-        log.info("{}.updateScheduleStatus Start! scheduleId={}, status={}, userId={}",
-                this.getClass().getName(), scheduleId, status, userId);
+    public void updateScheduleStatus(int scheduleId, String status) {
+        log.info("Updating scheduleId: {} to status: {}", scheduleId, status);
 
-        try {
-            // 일정 상태 변경 쿼리 실행
-            scheduleMapper.updateScheduleStatus(scheduleId, status, userId);
-        } catch (Exception e) {
-            log.error("일정 상태 변경 실패! scheduleId={}, status={}, userId={}",
-                    scheduleId, status, userId, e);
-        }
+        ScheduleDTO pDTO = new ScheduleDTO();
+        pDTO.setScheduleId(scheduleId);
+        pDTO.setStatus(status);
 
-        log.info("{}.updateScheduleStatus End!", this.getClass().getName());
+        // 상태만 업데이트하는 Mapper 메서드를 호출합니다.
+        scheduleMapper.updateShareScheduleStatus(pDTO);
+
+        log.info("Update complete.");
     }
 
-    // 일정 ID로 일정 메시지 조회 (상태가 변경된 메시지 최신 정보를 다시 가져오기 위함)
-    @Override
-    public ChatMessageDTO getChatMessageByScheduleId(String scheduleId) {
-        log.info("{}.getChatMessageByScheduleId Start! scheduleId={}",
-                this.getClass().getName(), scheduleId);
+    public ScheduleDTO getScheduleById(int scheduleId) {
+        log.info("{}.getScheduleById Start! scheduleId={}", this.getClass().getName(), scheduleId);
 
-        ChatMessageDTO message = null;
-        try {
-            message = scheduleMapper.selectMessageByScheduleId(scheduleId);
-        } catch (Exception e) {
-            log.error("일정 메시지 조회 실패! scheduleId={}", scheduleId, e);
-        }
+        ScheduleDTO rDTO = scheduleMapper.getScheduleById(scheduleId);
 
-        log.info("{}.getChatMessageByScheduleId End!", this.getClass().getName());
-
-        return message;
+        log.info("{}.getScheduleById End!", this.getClass().getName());
+        return rDTO;
     }
+
 }

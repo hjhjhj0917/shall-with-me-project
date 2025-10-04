@@ -153,35 +153,28 @@ public class RoommateService implements IRoommateService {
 
     @Override
     public TagDTO searchUsersByTags(TagDTO pDTO) {
-        log.info("{}.searchUsersByTags Start!", this.getClass().getName());
-
-        int pageSize = pDTO.getPageSize() > 0 ? pDTO.getPageSize() : DEFAULT_PAGE_SIZE;
-        int page = pDTO.getPage() > 0 ? pDTO.getPage() : 1;
-        int offset = (page - 1) * pageSize;
-        pDTO.setOffset(offset);
+        log.info("{}.searchUsersByTags Start! Received DTO: {}", this.getClass().getName(), pDTO.toString());
 
         // DTO에서 새로운 필드들을 가져옴
         Map<String, List<Integer>> tagGroupMap = pDTO.getTagGroupMap();
         String location = pDTO.getLocation();
         List<UserInfoDTO> users;
+        int totalCount; // long 타입으로 변경하여 더 큰 숫자를 안전하게 처리
 
         // 태그 또는 지역 조건이 있는지 확인
         boolean hasTags = tagGroupMap != null && !tagGroupMap.isEmpty();
         boolean hasLocation = location != null && !location.isEmpty();
 
-        // 태그나 지역 둘 중 하나라도 조건이 있으면 필터링 쿼리 실행
+        // pDTO 객체는 offset과 pageSize 값을 이미 가지고 매퍼로 전달됩니다.
         if (hasTags || hasLocation) {
-            log.info("Filtering search with Tags and/or Location.");
             users = mapper.selectUsersByTagsWithPagination(pDTO);
-            pDTO = mapper.countUsersByTags(pDTO);
+            totalCount = mapper.countUsersByTags(pDTO).getCount();
         } else {
-            // 아무 조건도 없으면 전체 목록 조회
-            log.info("No filters. Fetching all users with pagination.");
             users = mapper.selectUsersByPagination(pDTO);
-            pDTO = mapper.countAllUsers(pDTO);
+            totalCount = mapper.countAllUsers(pDTO).getCount();
         }
 
-        // 사용자별 tag1/tag2/genderLabel 세팅 (이 로직은 재사용)
+        // 사용자별 tag1/tag2/genderLabel 세팅 (이 로직은 그대로 유지)
         for (UserInfoDTO user : users) {
             List<UserTagDTO> tags = mapper.selectUserTags(user.getUserId());
 
@@ -210,7 +203,15 @@ public class RoommateService implements IRoommateService {
         }
 
         pDTO.setUsers(users);
-        pDTO.setTotalCount(pDTO.getCount());
+        pDTO.setTotalCount(totalCount);
+
+        // [수정] DTO에 담겨온 offset 값을 사용하여 isLast 계산
+        boolean isLast = (pDTO.getOffset() + users.size()) >= totalCount;
+        pDTO.setLastPage(isLast);
+
+        // [수정] DTO에 담겨온 값으로 로그 출력
+        log.info("Pagination Info -> PageSize: {}, Offset: {}, UsersOnPage: {}, TotalCount: {}, IsLastPage: {}",
+                pDTO.getPageSize(), pDTO.getOffset(), users.size(), totalCount, isLast);
 
         log.info("{}.searchUsersByTags End!", this.getClass().getName());
         return pDTO;

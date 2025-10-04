@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 dataType: 'json',
                 success: function (data) {
                     const transformedEvents = data.map(event => {
-                        const isPersonal = event.participantId === myUserId;
+                        const isPersonal = event.creatorId === event.participantId;
                         return {
                             id: event.scheduleId,
                             title: event.title,
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
 flatpickr("#timePicker", {
     enableTime: true,
     noCalendar: true,
-    dateFormat: "H:i",
-    time_24hr: true,
+    dateFormat: "h:i",
+    time_24hr: false,
     minuteIncrement: 5
 });

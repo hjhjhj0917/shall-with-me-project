@@ -19,7 +19,7 @@
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
             position: relative;
             height: 66px;
-            padding: 0 10px;
+            padding: 7px 10px;
             width: 100%;
             max-width: 850px;
             margin-left: auto;
@@ -333,36 +333,36 @@
 
 <script>
     $(document).ready(function () {
-        // --- 전역 변수 ---
-        let page = 1, loading = false, lastPage = false, isSearching = false;
+        // --- 전역 변수: page 대신 offset 사용 ---
+        let offset = 0, loading = false, lastPage = false;
         let selectedLocation = "";
-        const selectedTagGroups = new Map(); // 데이터 구조: Map { groupKey => Map { tagId => tagName } }
+        const selectedTagGroups = new Map();
         const $grid = $(".sh-grid");
         const $scrollArea = $(".sh-scroll-area");
 
         const tagGroups = [
-            { key: "lifePattern", title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2] },
-            { key: "activity", title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4] },
-            { key: "job", title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7] },
-            { key: "workTime", title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10] },
-            { key: "guest", title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12] },
-            { key: "share", title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14] },
-            { key: "personality", title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16] },
-            { key: "prefer", title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18] },
-            { key: "conversation", title: "대화", icon: "fa-solid fa-comments", tags: [19, 20] },
-            { key: "conflict", title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22] },
-            { key: "cook", title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25] },
-            { key: "food", title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28] },
-            { key: "meal", title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31] },
-            { key: "smell", title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33] },
-            { key: "clean", title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36] },
-            { key: "cleanCircle", title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39] },
-            { key: "garbage", title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41] },
-            { key: "dishWash", title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43] }
+            {key: "lifePattern", title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]},
+            {key: "activity", title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4]},
+            {key: "job", title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]},
+            {key: "workTime", title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10]},
+            {key: "guest", title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]},
+            {key: "share", title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14]},
+            {key: "personality", title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]},
+            {key: "prefer", title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18]},
+            {key: "conversation", title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]},
+            {key: "conflict", title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22]},
+            {key: "cook", title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]},
+            {key: "food", title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28]},
+            {key: "meal", title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]},
+            {key: "smell", title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33]},
+            {key: "clean", title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]},
+            {key: "cleanCircle", title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39]},
+            {key: "garbage", title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]},
+            {key: "dishWash", title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
         ];
 
         // --- 초기화 및 이벤트 핸들러 ---
-        loadPage(page);
+        loadInitialData(); // 1. 페이지 첫 로드 시 15개 요청
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
@@ -370,57 +370,64 @@
             let innerHeight = $scrollArea.innerHeight();
             let scrollHeight = $scrollArea[0].scrollHeight;
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
-                page++;
-                const loadFunc = isSearching ? loadFilteredPage : loadPage;
-                loadFunc(page);
+                loadMoreData(); // 2. 스크롤 시 5개 요청
             }
         });
 
         $('#location-search-trigger').on('click', openLocationModal);
         $('#tag-search-trigger').on('click', openTagModal);
+
         $('#sh-search-btn').on('click', function () {
-            isSearching = true;
-            page = 1;
+            offset = 0; // 오프셋 초기화
             lastPage = false;
             $grid.empty();
-            loadFilteredPage(page);
+            loadInitialData(); // 3. 검색 버튼 클릭 시에도 새로 15개 요청
         });
 
-        // --- API 호출 및 데이터 처리 ---
-        function handleApiResponse(data) {
-            const users = data.users || data.items || [];
-            if (users.length === 0) {
-                lastPage = true;
-                return;
-            }
-            renderUserCards(users);
-            if (data.lastPage) {
-                lastPage = true;
-            }
+        // --- API 호출 함수 ---
+
+        function loadInitialData() {
+            loadData(0, 15); // offset: 0, pageSize: 15
         }
 
-        function loadPage(p) {
-            loading = true;
-            $.ajax({
-                url: ctx + "/roommate/list", type: "GET", data: {page: p}, dataType: "json",
-                success: handleApiResponse,
-                error: (xhr, status, err) => console.error("회원 정보 불러오기 실패:", err),
-                complete: () => loading = false
-            });
+        function loadMoreData() {
+            loadData(offset, 5); // 현재 offset에서 5개 추가
         }
 
-        function loadFilteredPage(p) {
+        // 모든 API 호출을 처리하는 통합 함수
+        function loadData(currentOffset, size) {
             loading = true;
+
             const tagGroupMap = {};
             selectedTagGroups.forEach((tagMap, groupKey) => {
                 tagGroupMap[groupKey] = Array.from(tagMap.keys());
             });
-            const reqData = { location: selectedLocation, tagGroupMap: tagGroupMap, page: p, pageSize: 10 };
+
+            // pageSize와 offset을 동적으로 전달
+            const reqData = {
+                location: selectedLocation,
+                tagGroupMap: tagGroupMap,
+                offset: currentOffset,
+                pageSize: size
+            };
+
             $.ajax({
-                url: '/roommate/searchByTags', type: 'POST', contentType: 'application/json',
-                data: JSON.stringify(reqData), dataType: 'json',
-                success: handleApiResponse,
-                error: (err) => console.error('검색 실패', err),
+                url: '/roommate/searchByTags',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(reqData),
+                dataType: 'json',
+                success: function (data) {
+                    const users = data.users || [];
+                    if (users.length > 0) {
+                        renderUserCards(users);
+                        offset += users.length; // 불러온 만큼 offset 증가
+                    }
+                    if (data.lastPage) {
+                        lastPage = true;
+                    }
+                },
+                error: (err) => console.error('데이터 로드 실패', err),
                 complete: () => loading = false
             });
         }
@@ -430,16 +437,18 @@
             renderLocations();
             $('#locationSelectModalOverlay').css('display', 'flex');
         }
+
         window.closeLocationModal = function () {
             $('#locationSelectModalOverlay').hide();
         }
+
         function renderLocations() {
             const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
             const $container = $('#location-grid-container').empty();
             locations.forEach(loc => {
                 const $item = $('<div>').addClass('location-item').text(loc);
                 if (loc === selectedLocation) $item.addClass('selected');
-                $item.on('click', function() {
+                $item.on('click', function () {
                     if (selectedLocation === loc) {
                         selectedLocation = "";
                         $('#location-selection-text').text('지역 선택').css('color', '');
@@ -459,9 +468,11 @@
             loadAllTags();
             $('#tagSelectModalOverlay').css('display', 'flex');
         }
+
         window.closeTagModal = function () {
             $('#tagSelectModalOverlay').hide();
         };
+
         function loadAllTags() {
             $.ajax({
                 url: '/roommate/tagAll', type: 'GET', dataType: 'json',
@@ -491,7 +502,7 @@
                             $btn.addClass('selected');
                         }
 
-                        $btn.on('click', function() {
+                        $btn.on('click', function () {
                             toggleTagSelection(group.key, tag.tagId, tag.tagName, $(this));
                         });
                         $groupList.append($btn);
