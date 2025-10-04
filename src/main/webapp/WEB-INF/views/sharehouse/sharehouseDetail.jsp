@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     String ctx = request.getContextPath();
-    String userId = request.getParameter("userId"); // 101, 102 ...
+    String houseId = request.getParameter("houseId"); // 101, 102 ...
 %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -100,9 +100,11 @@
     </section>
 </main>
 
+<%@ include file="../includes/footer.jsp" %>
+
 <script>
     const ctx = '<%=ctx%>';
-    const uid = '<%=userId != null ? userId : ""%>';
+    const uid = '<%=houseId != null ? houseId : ""%>';
     const STAMP = Date.now(); // 캐시 버스터
 
     // ✅ 캐시 버스팅 헬퍼 (항상 최신 이미지 로드)

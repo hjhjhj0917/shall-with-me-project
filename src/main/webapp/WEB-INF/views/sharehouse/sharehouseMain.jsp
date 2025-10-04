@@ -74,6 +74,7 @@
         .price-pill { display:inline-block; font-size:12px; background:#eef6ff; border-radius:999px; padding:2px 8px; }
         .sh-info .sh-sub { display:flex; gap:8px; align-items:center; }
     </style>
+
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
@@ -141,20 +142,32 @@
     const userName = "<%= ssUserName %>";
 </script>
 
-<!-- 카드 클릭 → 상세 새 탭 (엔드포인트만 sharehouse로) -->
 <script>
     (function () {
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
+
+        // 기존 이벤트 제거 후 다시 등록
         grid.addEventListener('click', (e) => {
             const card = e.target.closest('.sh-card');
-            if (!card || !grid.contains(card)) return;
-            const id = card.dataset.id; // houseId
-            if (!id) return;
-            window.open(ctx + '/sharehouse/detail?houseId=' + encodeURIComponent(id), '_blank');
+            if (!card) return;
+
+            const id = card.getAttribute('data-id'); // ← 여기! dataset 대신 attr
+            console.log("🧩 클릭된 카드 ID:", id);
+
+            if (!id) {
+                alert("houseId 누락 - data-id 확인 필요");
+                return;
+            }
+
+            // 새 창으로 열기
+            const url = ctx + '/sharehouse/detail?houseId=' + encodeURIComponent(id);
+            console.log("🔗 이동 URL:", url);
+            window.open(url, "_blank");
         });
     })();
 </script>
+
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
@@ -352,30 +365,45 @@
             const $grid = $(".sh-grid");
             const noimg = ctx + "/images/noimg.png";
             items.forEach(house => {
-                const $card = $("<article>").addClass("sh-card").attr("data-id", house.houseId);
+                /* 임시: 어떤 키로 오는지 로그로 한번 확인 */
+                console.log('sharehouse item keys:', Object.keys(house), house);
 
+                const hid =
+                    house.houseId ?? house.HOUSE_ID ??
+                    house.id ?? house.ID ??
+                    house.house_id ??
+                    house.sharehouseId ?? house.SHAREHOUSE_ID ??
+                    house.shId ?? house.SH_ID ??
+                    house.seq ?? house.SEQ ?? house.idx ?? house.IDX ?? null;
+
+                const $card = $("<article>").addClass("sh-card");
+                /* data-id는 비어 있어도 일단 넣어두자(디버깅 편함) */
+                $card.attr("data-id", hid ?? "");
+
+
+                // 3) 썸네일/정보
                 const imgUrl = house.thumbnailUrl || noimg;
-                const $thumb = $("<div>").addClass("sh-thumb")
-                    .css("background-image", "url('" + imgUrl + "')");
+                const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
 
-                const $info = $("<div>").addClass("sh-info");
-                const title = house.title || "제목 없음";
-                const city = house.city || "";
-                const price = (house.rent != null) ? (house.rent + "만원") : "";
+                const $info  = $("<div>").addClass("sh-info");
+                const title  = house.title || "제목 없음";
+                const city   = house.city  || "";
+                const price  = (house.rent != null) ? (house.rent + "만원") : "";
 
                 const $title = $("<p>").addClass("sh-title").text(title);
-                // 도시 · 가격, 가격은 pill로 선택 표시
                 const $sub   = $("<p>").addClass("sh-sub");
-                if (city) $sub.append(document.createTextNode(city));
+                if (city)  $sub.append(document.createTextNode(city));
                 if (price) $sub.append($("<span>").addClass("price-pill").text(price));
 
                 const $tagBox = $("<div>").addClass("tag-box");
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
 
+// 4) 조립
                 $info.append($title, $sub, $tagBox);
                 $card.append($thumb, $info);
                 $grid.append($card);
+
             });
         }
     });
@@ -432,7 +460,7 @@
         const openBtn = document.getElementById('sharehouseAddBtn');
         if (openBtn) {
             openBtn.addEventListener('click', () => {
-                openSharehouseRegModal(`${ctx}/sharehouse/sharehouseReg?inModal=Y`);
+                openSharehouseRegModal(ctx + '/sharehouse/sharehouseReg?inModal=Y');
             });
         }
     });
