@@ -18,6 +18,7 @@ public class TagDTO {
 
     // offset 계산용 필드
     private int offset;
+    private boolean lastPage;
 
     // 결과용 필드
     private List<UserInfoDTO> users;

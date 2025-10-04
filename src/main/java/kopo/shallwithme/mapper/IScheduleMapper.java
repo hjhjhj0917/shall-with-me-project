@@ -23,8 +23,12 @@ public interface IScheduleMapper {
     int deleteSchedule(ScheduleDTO pDTO) throws Exception;
 
     // 일정 상태 업데이트 쿼리
-    void updateScheduleStatus(String scheduleId, String status, String userId);
+    void updateShareScheduleStatus(ScheduleDTO pDTO);
 
     // 일정 ID로 메시지 조회 쿼리
     ChatMessageDTO selectMessageByScheduleId(String scheduleId);
+
+    ScheduleDTO getScheduleById(int scheduleId);
+
+    void insertShareSchedule(ScheduleDTO pDTO);
 }

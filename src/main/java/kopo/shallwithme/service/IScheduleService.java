@@ -20,10 +20,10 @@ public interface IScheduleService {
     // 일정 삭제
     int deleteSchedule(ScheduleDTO pDTO) throws Exception;
 
+    ScheduleDTO insertScheduleRequest(ScheduleDTO pDTO);
 
-    // 일정 상태 변경
-    void updateScheduleStatus(String scheduleId, String status, String userId);
+    void updateScheduleStatus(int scheduleId, String status);
 
-    // 일정 ID로 채팅 메시지 조회
-    ChatMessageDTO getChatMessageByScheduleId(String scheduleId);
+    ScheduleDTO getScheduleById(int scheduleId);
+
 }

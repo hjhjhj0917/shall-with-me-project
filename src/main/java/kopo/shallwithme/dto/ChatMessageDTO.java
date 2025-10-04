@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ChatMessageDTO {
     private String messageId;
     private String roomId;
@@ -17,4 +18,6 @@ public class ChatMessageDTO {
 
     private String messageType; // "TEXT", "SCHEDULE", 등
     private ScheduleDTO schedule; // 일정 메시지인 경우 일정 정보 포함
+
+    private ScheduleDTO scheduleRequest;
 }

@@ -12,15 +12,15 @@
         FROM
             SCHEDULE
         WHERE
-            creator_id = #{userId} OR participant_id = #{userId}
+            (creator_id = #{userId} OR participant_id = #{userId}) AND status = 'CONFIRMED'
     </select>
 
     <!-- 일정 등록-->
     <insert id="insertSchedule" parameterType="ScheduleDTO">
         INSERT INTO SCHEDULE (
-            title, schedule_dt, location, memo, creator_id, participant_id
+            title, schedule_dt, location, memo, creator_id, participant_id, status
         ) VALUES (
-                     #{title}, #{scheduleDt}, #{location}, #{memo}, #{creatorId}, #{participantId}
+                     #{title}, #{scheduleDt}, #{location}, #{memo}, #{creatorId}, #{participantId}, 'CONFIRMED'
                  )
     </insert>
 
@@ -37,11 +37,13 @@
         WHERE schedule_id = #{scheduleId}
     </delete>
 
-    <!-- 일정 상태 업데이트 -->
-    <update id="updateScheduleStatus" parameterType="map">
-        UPDATE CHAT_MESSAGE
-        SET status = #{status}
-        WHERE schedule_id = #{scheduleId}
+    <update id="updateShareScheduleStatus" parameterType="ScheduleDTO">
+        UPDATE
+            SCHEDULE
+        SET
+            STATUS = #{status}
+        WHERE
+            SCHEDULE_ID = #{scheduleId}
     </update>
 
     <!-- 일정 ID로 메시지 조회 -->
@@ -58,5 +60,47 @@
         WHERE schedule_id = #{scheduleId}
             LIMIT 1
     </select>
+
+    <select id="getScheduleById" parameterType="int" resultType="ScheduleDTO">
+        SELECT
+            SCHEDULE_ID,
+            TITLE,
+            SCHEDULE_DT,
+            LOCATION,
+            MEMO,
+            CREATOR_ID,
+            PARTICIPANT_ID,
+            STATUS,
+            ROOM_ID
+        FROM
+            SCHEDULE
+        WHERE
+            SCHEDULE_ID = #{scheduleId}
+    </select>
+
+    <insert id="insertShareSchedule" parameterType="ScheduleDTO">
+        <selectKey keyProperty="scheduleId" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO SCHEDULE (
+        TITLE,
+        SCHEDULE_DT,
+        LOCATION,
+        MEMO,
+        CREATOR_ID,
+        PARTICIPANT_ID,
+        STATUS,
+        ROOM_ID
+        ) VALUES (
+        #{title},
+        #{scheduleDt},
+        #{location},
+        #{memo},
+        #{creatorId},
+        #{participantId},
+        #{status},
+        #{roomId}
+        )
+    </insert>
 
 </mapper>

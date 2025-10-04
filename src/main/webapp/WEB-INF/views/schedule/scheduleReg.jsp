@@ -639,7 +639,7 @@
                     dataType: 'json',
                     success: function (data) {
                         const transformedEvents = data.map(function (event) {
-                            const isPersonal = event.participantId === myUserId;
+                            const isPersonal = event.creatorId === event.participantId;
                             return {
                                 id: event.scheduleId,
                                 title: event.title,
@@ -776,8 +776,7 @@
 
             showCustomConfirm("일정을 등록하시겠습니까?", function () {
                 $.ajax({
-                    url: '/schedule/api/events',
-                    // url: '/schedule/api/events/request', 나중에 수정
+                    url: '/schedule/api/events/request',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(eventData),
@@ -791,12 +790,15 @@
                             const scheduleMessage = {
                                 roomId: roomId,
                                 senderId: myUserId,
-                                messageType: 'SCHEDULE',
-                                schedule: savedEvent,
+                                messageType: 'SCHEDULE_REQUEST',
+                                scheduleRequest: savedEvent,
                                 sentAt: new Date().toISOString()
                             };
                             stompClient.send("/app/chat/send", {}, JSON.stringify(scheduleMessage));
                         }
+                        showCustomAlert("상대방에게 일정 요청을 보냈습니다.", function (){
+                            location.href = '/chat/chatRoom?roomId=' + roomId;
+                        });
                     },
                     error: function(err) {
                         alert("일정 저장에 실패했습니다.");

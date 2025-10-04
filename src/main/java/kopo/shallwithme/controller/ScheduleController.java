@@ -129,65 +129,69 @@ public class ScheduleController {
 
     @PostMapping("/api/events/request")
     @ResponseBody
-    public ResponseEntity<?> requestSchedule(@RequestBody ScheduleDTO pDTO, HttpSession session) {
-        String userId = (String) session.getAttribute("SS_USER_ID");
-        String roomId = pDTO.getRoomId();
+    public ResponseEntity<ScheduleDTO> requestSchedule(@RequestBody ScheduleDTO pDTO, HttpSession session) {
+        log.info("{}.requestSchedule (Refactored) Start!", this.getClass().getName());
 
+        String userId = (String) session.getAttribute("SS_USER_ID");
         pDTO.setCreatorId(userId);
 
-        // DB 저장 없이 수락 요청 메시지 생성
-        ChatMessageDTO chatMessage = new ChatMessageDTO();
-        chatMessage.setRoomId(roomId);
-        chatMessage.setSenderId(userId);
-        chatMessage.setMessageType("SCHEDULE");
-        chatMessage.setSchedule(pDTO);
-        chatMessage.setSentAt(LocalDateTime.now());
+        // 1. 서비스 계층을 통해 'PENDING' 상태로 DB에 먼저 저장하고, ID가 부여된 객체를 반환받음
+        ScheduleDTO savedSchedule = scheduleService.insertScheduleRequest(pDTO);
 
-        // WebSocket으로 수락 요청 메시지 전송
-        messagingTemplate.convertAndSend("/topic/chatroom/" + roomId, chatMessage);
+        // 2. 채팅 메시지 생성 시, DB에 저장되어 ID가 부여된 객체를 사용
+        ChatMessageDTO chatMessage = ChatMessageDTO.builder()
+                .roomId(savedSchedule.getRoomId())
+                .senderId(userId)
+                .messageType("SCHEDULE_REQUEST") // 프론트와 약속한 타입명 사용
+                .scheduleRequest(savedSchedule) // ID가 포함된 스케줄 정보
+                .sentAt(LocalDateTime.now())
+                .build();
 
-        return ResponseEntity.ok().build();
+        // 3. WebSocket으로 요청 메시지 전송
+        messagingTemplate.convertAndSend("/topic/chatroom/" + savedSchedule.getRoomId(), chatMessage);
+
+        log.info("{}.requestSchedule (Refactored) End!", this.getClass().getName());
+
+        // 4. 요청이 성공적으로 처리되었음을 프론트에 알림 (저장된 객체 반환)
+        return ResponseEntity.ok(savedSchedule);
     }
 
-    @PostMapping("/api/events/accept")
+    @PostMapping("/api/events/{scheduleId}/confirm")
     @ResponseBody
-    public ResponseEntity<?> acceptSchedule(@RequestBody Map<String, String> payload) {
-        String scheduleId = payload.get("scheduleId");
-        String userId = payload.get("userId");
+    public ResponseEntity<String> acceptSchedule(@PathVariable("scheduleId") int scheduleId) {
+        log.info("acceptSchedule for ID: {}", scheduleId);
 
-        try {
-            // 실제 일정 저장/업데이트 로직 수행
-            scheduleService.updateScheduleStatus(scheduleId, "ACCEPTED", userId);
+        // 1. 서비스 계층을 통해 상태를 'CONFIRMED'로 변경
+        scheduleService.updateScheduleStatus(scheduleId, "CONFIRMED");
 
-            // 업데이트된 메시지 가져오기 (필요시)
-            ChatMessageDTO updatedMsg = scheduleService.getChatMessageByScheduleId(scheduleId);
+        // 2. 채팅방에 알릴 정보 조회
+        ScheduleDTO confirmedSchedule = scheduleService.getScheduleById(scheduleId);
 
-            // WebSocket으로 변경된 일정 메시지 전송 (알림용)
-            messagingTemplate.convertAndSend("/topic/chatroom/" + updatedMsg.getRoomId(), updatedMsg);
+        // 3. 채팅방에 '수락됨' 알림 메시지 전송
+        ChatMessageDTO noticeMessage = ChatMessageDTO.builder()
+                .roomId(confirmedSchedule.getRoomId())
+                .messageType("SCHEDULE_CONFIRMED") // 수락 알림 타입
+                .message(confirmedSchedule.getTitle() + " 일정이 확정되었습니다.")
+                // .senderId("system") // 시스템 메시지로 보낼 수도 있음
+                .sentAt(LocalDateTime.now())
+                .build();
 
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일정 수락 처리 실패");
-        }
+        messagingTemplate.convertAndSend("/topic/chatroom/" + confirmedSchedule.getRoomId(), noticeMessage);
+
+        return ResponseEntity.ok("일정을 수락했습니다.");
     }
 
-    @PostMapping("/api/events/reject")
+    @PostMapping("/api/events/{scheduleId}/reject")
     @ResponseBody
-    public ResponseEntity<?> rejectSchedule(@RequestBody Map<String, String> payload) {
-        String scheduleId = payload.get("scheduleId");
-        String userId = payload.get("userId");
+    public ResponseEntity<String> rejectSchedule(@PathVariable("scheduleId") int scheduleId) {
+        log.info("rejectSchedule for ID: {}", scheduleId);
 
-        try {
-            scheduleService.updateScheduleStatus(scheduleId, "REJECTED", userId);
+        // 1. 서비스 계층을 통해 상태를 'REJECTED'로 변경
+        scheduleService.updateScheduleStatus(scheduleId, "REJECTED");
 
-            ChatMessageDTO updatedMsg = scheduleService.getChatMessageByScheduleId(scheduleId);
+        // ... (거절됨 알림 메시지를 WebSocket으로 보내는 로직 추가) ...
 
-            messagingTemplate.convertAndSend("/topic/chatroom/" + updatedMsg.getRoomId(), updatedMsg);
-
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일정 거절 처리 실패");
-        }
+        return ResponseEntity.ok("일정을 거절했습니다.");
     }
 
 
