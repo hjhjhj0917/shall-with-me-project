@@ -10,7 +10,6 @@
 
     <style>
         body {
-            overflow: hidden;
             background: linear-gradient(to right, white, #f9f9f9);
         }
 
@@ -352,84 +351,88 @@
 <%--헤더--%>
 <%@ include file="../includes/header.jsp" %>
 
-<%--사이드바--%>
-<%@ include file="../includes/sideBar.jsp" %>
+<div class="main-container">
+    <%--사이드바--%>
+    <%@ include file="../includes/sideBar.jsp" %>
 
-<main class="sidebar-main-content">
-    <div id="step1" class="login-form-wrapper">
+    <main class="sidebar-main-content">
+        <div id="step1" class="login-form-wrapper">
 
-        <div class="header">
-            <div class="logo">회원 탈퇴하기</div>
-            <div class="logo-2">
-                <p>회원 탈퇴를 진행하기 전에 아래 내용을 반드시 확인해주시기 바랍니다. 탈퇴 시 모든 정보는 어떤 경우에도 복구가 불가능합니다.</p>
-                <br>
-                <strong>삭제되는 정보:</strong>
-                <ul>
-                    <li><strong>계정 정보:</strong> 아이디, 이름, 이메일을 포함한 모든 개인 정보</li>
-                    <li>
-                        <strong>활동 기록:</strong> 프로필 정보, 성향 태그, 쉐어하우스 및 룸메이트
-                        <br>ㅤㅤㅤㅤㅤ관련 정보
-                    </li>
-                    <li><strong>커뮤니케이션 기록:</strong> 모든 대화 상대와의 채팅 기록 및 약속 일정</li>
-                </ul>
-                <br>
-                <p>위 내용에 모두 동의하시고 탈퇴를 계속 진행하시려면, 계정 소유자 확인을 위해 이메일 주소를 입력 후 '다음' 버튼을 눌러주세요.</p>
+            <div class="header">
+                <div class="logo">회원 탈퇴하기</div>
+                <div class="logo-2">
+                    <p>회원 탈퇴를 진행하기 전에 아래 내용을 반드시 확인해주시기 바랍니다. 탈퇴 시 모든 정보는 어떤 경우에도 복구가 불가능합니다.</p>
+                    <br>
+                    <strong>삭제되는 정보:</strong>
+                    <ul>
+                        <li><strong>계정 정보:</strong> 아이디, 이름, 이메일을 포함한 모든 개인 정보</li>
+                        <li>
+                            <strong>활동 기록:</strong> 프로필 정보, 성향 태그, 쉐어하우스 및 룸메이트
+                            <br>ㅤㅤㅤㅤㅤ관련 정보
+                        </li>
+                        <li><strong>커뮤니케이션 기록:</strong> 모든 대화 상대와의 채팅 기록 및 약속 일정</li>
+                    </ul>
+                    <br>
+                    <p>위 내용에 모두 동의하시고 탈퇴를 계속 진행하시려면, 계정 소유자 확인을 위해 이메일 주소를 입력 후 '다음' 버튼을 눌러주세요.</p>
+                </div>
             </div>
+
+            <div id="withdrawErrorMessage" class="error-message"></div>
+
+            <form id="f">
+
+                <input type="email" name="email" id="email" class="login-input" placeholder="이메일"/>
+                <button id="withdrawNextBtn" type="button" class="login-btn">다음</button>
+
+                <div class="signup-link">
+                    회원 탈퇴를 진행하시면 더이상 사이트를 이용하실 수 없습니다.
+                </div>
+
+                <div class="login-options">
+                    <a>ㅤ</a>
+                    <a>ㅤ</a>
+                </div>
+            </form>
         </div>
 
-        <div id="withdrawErrorMessage" class="error-message"></div>
+        <!-- 회원 탈퇴 비밀번호 확인 -->
+        <div id="step2" class="login-form-wrapper">
 
-        <form id="f">
-
-            <input type="email" name="email" id="email" class="login-input" placeholder="이메일"/>
-            <button id="withdrawNextBtn" type="button" class="login-btn">다음</button>
-
-            <div class="signup-link">
-                회원 탈퇴를 진행하시면 더이상 사이트를 이용하실 수 없습니다.
+            <div class="header">
+                <div class="logo">회원 탈퇴하기</div>
+                <div class="logo-2">
+                    <p>본인 확인이 완료되었습니다. 회원 탈퇴를 계속 진행하려면 계정의 비밀번호를 입력해주세요.</p>
+                    <br>
+                    <p>'탈퇴하기' 버튼을 누르는 즉시 계정 삭제 절차가 시작되며, 이는 최종적이고 취소할 수 없습니다.
+                        <br>이전에 안내된 바와 같이 회원님의 모든 개인정보, 프로필, 채팅 기록, 일정 등 모든 데이터가 영구적으로 파기됩니다.
+                        <br>모든 내용에 동의하시는 경우에만 비밀번호를 입력하고 탈퇴를 완료해주시기 바랍니다.</p>
+                </div>
             </div>
 
-            <div class="login-options">
-                <a>ㅤ</a>
-                <a>ㅤ</a>
-            </div>
-        </form>
-    </div>
+            <div id="withdrawErrorMessage1" class="error-message"></div>
 
-    <!-- 회원 탈퇴 비밀번호 확인 -->
-    <div id="step2" class="login-form-wrapper">
+            <form id="f2">
+                <input type="password" name="userPw" id="userPw" class="login-input" placeholder="비밀번호"/>
+                <input type="password" name="pwCheck" id="pwCheck" class="login-input" placeholder="비밀번호 확인"/>
 
-        <div class="header">
-            <div class="logo">회원 탈퇴하기</div>
-            <div class="logo-2">
-                <p>본인 확인이 완료되었습니다. 회원 탈퇴를 계속 진행하려면 계정의 비밀번호를 입력해주세요.</p>
-                <br>
-                <p>'탈퇴하기' 버튼을 누르는 즉시 계정 삭제 절차가 시작되며, 이는 최종적이고 취소할 수 없습니다.
-                    <br>이전에 안내된 바와 같이 회원님의 모든 개인정보, 프로필, 채팅 기록, 일정 등 모든 데이터가 영구적으로 파기됩니다.
-                    <br>모든 내용에 동의하시는 경우에만 비밀번호를 입력하고 탈퇴를 완료해주시기 바랍니다.</p>
-            </div>
+                <button id="btnUpdatePw" type="button" class="login-btn">회원 탈퇴</button>
+
+                <div class="signup-link">
+                    회원 탈퇴를 진행하시면 더이상 사이트를 이용하실 수 없습니다.
+                </div>
+
+                <div class="login-options">
+                    <a>ㅤ</a>
+                    <a>ㅤ</a>
+                </div>
+            </form>
         </div>
 
-        <div id="withdrawErrorMessage1" class="error-message"></div>
+    </main>
+</div>
 
-        <form id="f2">
-            <input type="password" name="userPw" id="userPw" class="login-input" placeholder="비밀번호"/>
-            <input type="password" name="pwCheck" id="pwCheck" class="login-input" placeholder="비밀번호 확인"/>
-
-            <button id="btnUpdatePw" type="button" class="login-btn">회원 탈퇴</button>
-
-            <div class="signup-link">
-                회원 탈퇴를 진행하시면 더이상 사이트를 이용하실 수 없습니다.
-            </div>
-
-            <div class="login-options">
-                <a>ㅤ</a>
-                <a>ㅤ</a>
-            </div>
-        </form>
-    </div>
-
-</main>
-
+<%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 

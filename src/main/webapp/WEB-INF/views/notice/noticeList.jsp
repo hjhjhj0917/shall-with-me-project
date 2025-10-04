@@ -43,6 +43,7 @@
 </div>
 
 <%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
 <%

@@ -465,7 +465,8 @@
             cursor: pointer;
             transition: background-color 0.2s;
             justify-content: center;
-            margin-top: 0; !important;
+            margin-top: 0;
+        !important;
             margin-bottom: 5px;
         }
 
@@ -506,83 +507,87 @@
 <%--헤더--%>
 <%@ include file="../includes/header.jsp" %>
 
-<%--사이드바--%>
-<%@ include file="../includes/sideBar.jsp" %>
+<div class="main-container">
+    <%--사이드바--%>
+    <%@ include file="../includes/sideBar.jsp" %>
 
-<main class="sidebar-main-content">
+    <main class="sidebar-main-content">
 
-    <main class="schedule-container">
-        <%-- 왼쪽: 일정 정보 패널 --%>
-        <aside id="step1" class="schedule-info">
-            <div class="host-info">
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/withdraw-profile-img.png" %>"
-                     alt="프로필 사진" class="host-profile-pic">
-                <div class="host-name" id="hostName"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
-            </div>
-            <div class="event-title">
-                <h2 id="eventTitleDisplay">일정을 선택해주세요</h2>
-            </div>
-            <ul class="event-meta">
-                <li id="eventTimeMeta" style="display: none;"><i class="fa-regular fa-clock"></i><span
-                        id="eventTimeDisplay"></span></li>
-                <li id="eventLocationMeta" style="display: none;"><i class="fa-solid fa-location-dot"></i><span
-                        id="eventLocationDisplay"></span></li>
-            </ul>
-            <p class="event-description" id="eventDescriptionDisplay">
-                달력에서 등록된 일정을 클릭하여 상세 내용을 확인하거나, 비어있는 날짜를 클릭하여 새 일정을 추가할 수 있습니다.
-            </p>
-            <div class="schedule-footer">
-                <button type="button" class="btn-event-action btn-add" style="display:none;">새 일정 등록하기</button>
-            </div>
-        </aside>
-
-
-        <aside id="step2" class="schedule-info">
-
-            <div class="host-info">
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
-                     alt="프로필 사진" class="host-profile-pic">
-                <div class="host-name"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
-            </div>
-
-            <div class="event-title">
-                <h2 id="regTitleDisplay">일정을 등록하세요</h2>
-            </div>
-            <form id="eventForm">
-                <input type="hidden" id="eventScheduleId">
-                <input type="hidden" id="eventStartDate">
-                <div class="form-group input-with-icon">
-                    <i class="fa-solid fa-bars" style="color: #1c407d;"></i>
-                    <input type="text" id="eventTitleInput" class="login-input" placeholder="일정 제목">
+        <main class="schedule-container">
+            <%-- 왼쪽: 일정 정보 패널 --%>
+            <aside id="step1" class="schedule-info">
+                <div class="host-info">
+                    <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/withdraw-profile-img.png" %>"
+                         alt="프로필 사진" class="host-profile-pic">
+                    <div class="host-name" id="hostName"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
                 </div>
-                <div id="titleErrorMessage" class="error-message"></div>
-                <label class="form-group input-with-icon" id="timeInputWrapper">
-                    <i class="fa-solid fa-clock" style="color: #1c407d;"></i>
-                    <input type="text" id="timePicker" placeholder="시간을 선택하세요" class="form-control"/>
-                </label>
-                <div id="timeErrorMessage" class="error-message"></div>
-                <div class="form-group input-with-icon">
-                    <i class="fa-solid fa-location-dot" style="color: #1c407d;"></i>
-                    <input type="text" placeholder="위치" id="eventLocationInput" class="login-input">
+                <div class="event-title">
+                    <h2 id="eventTitleDisplay">일정을 선택해주세요</h2>
                 </div>
-                <div id="locationErrorMessage" class="error-message"></div>
-                <div class="form-group">
-                    <textarea placeholder="메모" id="eventMemoInput"></textarea>
+                <ul class="event-meta">
+                    <li id="eventTimeMeta" style="display: none;"><i class="fa-regular fa-clock"></i><span
+                            id="eventTimeDisplay"></span></li>
+                    <li id="eventLocationMeta" style="display: none;"><i class="fa-solid fa-location-dot"></i><span
+                            id="eventLocationDisplay"></span></li>
+                </ul>
+                <p class="event-description" id="eventDescriptionDisplay">
+                    달력에서 등록된 일정을 클릭하여 상세 내용을 확인하거나, 비어있는 날짜를 클릭하여 새 일정을 추가할 수 있습니다.
+                </p>
+                <div class="schedule-footer">
+                    <button type="button" class="btn-event-action btn-add" style="display:none;">새 일정 등록하기</button>
                 </div>
-                <div class="schedule-modal-buttons">
-                    <button type="submit" class="schedule-btn btn-register">일정 등록하기</button>
-                    <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>
-                </div>
-            </form>
-        </aside>
+            </aside>
 
-        <%-- 오른쪽: 캘린더 --%>
-        <section class="schedule-picker">
-            <div id='calendar'></div>
-        </section>
+
+            <aside id="step2" class="schedule-info">
+
+                <div class="host-info">
+                    <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") != null ? session.getAttribute("SS_USER_PROFILE_IMG_URL") : "/images/noimg.png" %>"
+                         alt="프로필 사진" class="host-profile-pic">
+                    <div class="host-name"><%= session.getAttribute("SS_USER_NAME")%>님의 일정</div>
+                </div>
+
+                <div class="event-title">
+                    <h2 id="regTitleDisplay">일정을 등록하세요</h2>
+                </div>
+                <form id="eventForm">
+                    <input type="hidden" id="eventScheduleId">
+                    <input type="hidden" id="eventStartDate">
+                    <div class="form-group input-with-icon">
+                        <i class="fa-solid fa-bars" style="color: #1c407d;"></i>
+                        <input type="text" id="eventTitleInput" class="login-input" placeholder="일정 제목">
+                    </div>
+                    <div id="titleErrorMessage" class="error-message"></div>
+                    <label class="form-group input-with-icon" id="timeInputWrapper">
+                        <i class="fa-solid fa-clock" style="color: #1c407d;"></i>
+                        <input type="text" id="timePicker" placeholder="시간을 선택하세요" class="form-control"/>
+                    </label>
+                    <div id="timeErrorMessage" class="error-message"></div>
+                    <div class="form-group input-with-icon">
+                        <i class="fa-solid fa-location-dot" style="color: #1c407d;"></i>
+                        <input type="text" placeholder="위치" id="eventLocationInput" class="login-input">
+                    </div>
+                    <div id="locationErrorMessage" class="error-message"></div>
+                    <div class="form-group">
+                        <textarea placeholder="메모" id="eventMemoInput"></textarea>
+                    </div>
+                    <div class="schedule-modal-buttons">
+                        <button type="submit" class="schedule-btn btn-register">일정 등록하기</button>
+                        <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>
+                    </div>
+                </form>
+            </aside>
+
+            <%-- 오른쪽: 캘린더 --%>
+            <section class="schedule-picker">
+                <div id='calendar'></div>
+            </section>
+        </main>
     </main>
-</main>
+</div>
 
+<%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 

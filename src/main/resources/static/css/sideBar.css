@@ -1,13 +1,25 @@
+.main-container {
+    display: flex;
+    align-items: flex-start; /* 콘텐츠 높이가 달라도 위쪽을 기준으로 정렬 */
+}
+
+footer {
+    margin-top: 50px !important;
+}
+
 /* 사이드바 기본 스타일 */
 .sidebar {
-    position: fixed;
-    height: 85%;
+    position: sticky;       /* 👈 fixed 에서 sticky 로 변경 */
+    top: 20px;              /* 👈 화면 상단에서 20px 떨어진 곳에 붙도록 설정 */
+    height: calc(100vh - 130px); /* 👈 뷰포트 높이에 맞춰 조절 (상하 여백 고려) */
+
+    /* 아래는 기존 스타일 유지 */
     width: 260px;
     padding: 20px 14px;
     border-right: 1px solid #eee;
     transition: width 0.3s ease;
-    display: flex; /* [추가] Flexbox 레이아웃 적용 */
-    flex-direction: column; /* 세로로 쌓기 */
+    display: flex;
+    flex-direction: column;
 }
 
 /* 헤더 (로고, 토글 버튼) */
@@ -151,16 +163,16 @@
 }
 
 .sidebar-main-content {
-    /* position: relative; */ /* relative는 필요 없습니다. */
-    transition: margin-left 0.3s ease, width 0.3s ease;
-    margin-left: 260px; /* 펼쳐진 사이드바 너비만큼 왼쪽 여백 */
-    width: calc(100% - 260px); /* 전체 너비에서 사이드바 너비를 뺀 값 */
+    flex-grow: 1; /* 👈 남은 공간을 모두 차지하도록 설정 */
+    /* margin-left: 260px; */ /* 👈 flex 레이아웃이 간격을 자동 조절하므로 제거! */
+    width: auto; /* 👈 너비도 flex가 알아서 계산하도록 변경 */
+    transition: width 0.3s ease; /* margin-left 전환 효과 제거 */
     padding: 20px;
-    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+    box-sizing: border-box;
 }
 
 /* 사이드바가 접혔을 때 메인 콘텐츠의 위치와 너비 조정 */
 .sidebar.collapsed ~ .sidebar-main-content {
-    margin-left: 88px; /* 접힌 사이드바 너비만큼 왼쪽 여백 */
-    width: calc(100% - 88px);
+    /* margin-left: 88px; */ /* 👈 이 부분도 제거합니다. */
+    width: auto;
 }

@@ -7,7 +7,7 @@
         padding: 50px 0;
         font-size: 14px;
         border-top: 1px solid #e9ecef;
-        margin-top: 300px;
+        margin-top: 100px;
     }
 
     .footer-container {
