@@ -54,6 +54,7 @@
 
 <%-- 챗봇 --%>
 <%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 <%
