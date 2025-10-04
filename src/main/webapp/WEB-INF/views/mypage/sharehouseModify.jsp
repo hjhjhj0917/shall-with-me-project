@@ -18,13 +18,17 @@
 <%--헤더--%>
 <%@ include file="../includes/header.jsp" %>
 
-<%--사이드바--%>
-<%@ include file="../includes/sideBar.jsp" %>
+<div class="main-container">
+    <%--사이드바--%>
+    <%@ include file="../includes/sideBar.jsp" %>
 
-<main class="sidebar-main-content">
-    <h1>쉐어하우스 정보 수정</h1>
-</main>
+    <main class="sidebar-main-content">
+        <h1>쉐어하우스 정보 수정</h1>
+    </main>
+</div>
 
+<%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 

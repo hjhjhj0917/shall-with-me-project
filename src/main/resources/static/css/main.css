@@ -6,8 +6,8 @@
     overflow: hidden;
 }
 
-body{
-    overflow: hidden;
+footer {
+    margin-top: 0 !important;
 }
 
 .right-panel {

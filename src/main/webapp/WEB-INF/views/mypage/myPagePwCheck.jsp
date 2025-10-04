@@ -32,8 +32,8 @@
 
         /* 상단 헤더 (제목, 설명) */
         .confirm-header {
-            display: flex;           /* ✅ Flexbox 레이아웃 적용 */
-            flex-direction: column;  /* ✅ 자식 요소(h1, p)를 세로로 쌓기 */
+            display: flex; /* ✅ Flexbox 레이아웃 적용 */
+            flex-direction: column; /* ✅ 자식 요소(h1, p)를 세로로 쌓기 */
             align-items: center; /* ✅ 왼쪽 정렬 */
             text-align: left;
             border-bottom: 1px solid #e9ecef;
@@ -58,6 +58,7 @@
             padding: 20px 0;
             border-bottom: 1px solid #e9ecef;
         }
+
         .form-row:last-of-type {
             border-bottom: none;
         }
@@ -100,6 +101,7 @@
             margin-top: 30px;
             text-align: right;
         }
+
         .confirm-btn {
             padding: 12px 28px;
             background-color: #3399ff;
@@ -111,6 +113,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
+
         .confirm-btn:hover {
             background-color: #1c84ff;
         }
@@ -119,15 +122,15 @@
         .error-message {
             color: #3399ff;
             font-size: 14px;
-            text-align: left;          /* 왼쪽 정렬 */
-            height: 5px;              /* 고정 높이로 레이아웃 안정 */
+            text-align: left; /* 왼쪽 정렬 */
+            height: 5px; /* 고정 높이로 레이아웃 안정 */
             padding-left: 150px;
             padding-top: 10px;
-            visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
         }
 
         .error-message.visible {
-            visibility: visible;       /* 메시지가 있을 때 표시 */
+            visibility: visible; /* 메시지가 있을 때 표시 */
         }
 
         /*input 디자인*/
@@ -207,7 +210,7 @@
                     url: "/mypage/pwCheckProc",
                     type: "post",
                     dataType: "JSON",
-                    data: {"password" : password},
+                    data: {"password": password},
                     success: function (json) {
                         if (json.result === 1) {
 
@@ -238,35 +241,39 @@
 <%--헤더--%>
 <%@ include file="../includes/header.jsp" %>
 
-<%--사이드바--%>
-<%@ include file="../includes/sideBar.jsp" %>
+<div class="main-container">
+    <%--사이드바--%>
+    <%@ include file="../includes/sideBar.jsp" %>
 
-<main class="sidebar-main-content">
-    <div class="confirm-password-wrapper">
-        <div class="confirm-header">
-            <h1>마이페이지</h1>
-            <p>회원님의 정보를 안전하게 보호하기 위해 비밀번호를 다시 한번 확인합니다.</p>
+    <main class="sidebar-main-content">
+        <div class="confirm-password-wrapper">
+            <div class="confirm-header">
+                <h1>마이페이지</h1>
+                <p>회원님의 정보를 안전하게 보호하기 위해 비밀번호를 다시 한번 확인합니다.</p>
+            </div>
+
+            <form id="passwordConfirmForm" class="confirm-form">
+
+                <div class="form-row">
+                    <label>아이디</label>
+                    <span class="user-id-display"><%= session.getAttribute("SS_USER_ID") %></span>
+                </div>
+                <div class="error-message" id="mypageErrorMessage"></div>
+                <div class="form-row">
+                    <label for="password">현재 비밀번호</label>
+                    <input type="password" id="password" name="password" class="login-input" placeholder="비밀번호를 입력하세요">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="mypagePwCkBtn" class="confirm-btn">확인</button>
+                </div>
+            </form>
         </div>
+    </main>
+</div>
 
-        <form id="passwordConfirmForm" class="confirm-form">
-
-            <div class="form-row">
-                <label>아이디</label>
-                <span class="user-id-display"><%= session.getAttribute("SS_USER_ID") %></span>
-            </div>
-            <div class="error-message" id="mypageErrorMessage"></div>
-            <div class="form-row">
-                <label for="password">현재 비밀번호</label>
-                <input type="password" id="password" name="password" class="login-input" placeholder="비밀번호를 입력하세요" >
-            </div>
-
-            <div class="form-actions">
-                <button type="button" id="mypagePwCkBtn" class="confirm-btn">확인</button>
-            </div>
-        </form>
-    </div>
-</main>
-
+<%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 

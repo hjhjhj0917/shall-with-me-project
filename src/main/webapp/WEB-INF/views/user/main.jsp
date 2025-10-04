@@ -74,6 +74,7 @@
     </div>
 </div>
 
+<%@ include file="../includes/footer.jsp" %>
 <!-- 커스텀 알림창 -->
 <%@ include file="../includes/customModal.jsp" %>
 
