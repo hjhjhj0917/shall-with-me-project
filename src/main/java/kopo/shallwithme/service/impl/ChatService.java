@@ -6,8 +6,11 @@ import kopo.shallwithme.service.IChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -16,18 +19,25 @@ public class ChatService implements IChatService {
 
     private final IChatMapper chatMapper;
 
-    @Override
-    public void saveMessage(ChatMessageDTO pDTO) {
 
+    @Override
+    public ChatMessageDTO saveMessage(ChatMessageDTO pDTO) throws Exception {
         log.info("{}.saveMessage Start!", this.getClass().getName());
 
-        try {
-            chatMapper.insertChatMessage(pDTO);
-        } catch (Exception e) {
-            log.error("메시지 전송 및 저장 중 오류 발생 : {}", pDTO.toString(), e);
-        }
+        // [핵심] DB에 저장하기 전, isRead 상태를 false로 명시적으로 설정
+        pDTO.setRead(false);
 
+        // DB에 메시지 저장
+        chatMapper.insertChatMessage(pDTO);
+
+        // 상대방의 unread_count를 1 증가시키는 로직 (기존에 있었다면 유지)
+        chatMapper.incrementUnreadCount(pDTO);
+
+        log.info("Message saved: {}", pDTO);
         log.info("{}.saveMessage End!", this.getClass().getName());
+
+        // isRead 상태가 설정된 DTO를 컨트롤러로 반환
+        return pDTO;
     }
 
     @Override
@@ -80,6 +90,30 @@ public class ChatService implements IChatService {
         log.info("{}.createRoom End!", this.getClass().getName());
 
         return rList;
+    }
+
+// ChatService.java
+
+    @Override
+    @Transactional
+    public void updateReadStatus(String roomId, String readerId) throws Exception {
+        log.info("✅ updateReadStatus Service: START. (roomId: {}, readerId: {})", roomId, readerId);
+
+        try {
+            log.info("  -> STEP 1: Calling chatMapper.updateMessageReadStatus...");
+            chatMapper.updateMessageReadStatus(roomId, readerId);
+            log.info("  <- STEP 1: FINISHED chatMapper.updateMessageReadStatus.");
+
+            log.info("  -> STEP 2: Calling chatMapper.resetUnreadCount...");
+            chatMapper.resetUnreadCount(roomId, readerId);
+            log.info("  <- STEP 2: FINISHED chatMapper.resetUnreadCount.");
+
+        } catch (Exception e) {
+            log.error("❌ EXCEPTION occurred inside updateReadStatus!", e);
+            throw e; // 예외를 다시 던져서 전체 트랜잭션을 롤백하고, 상위 호출자에게 알림
+        }
+
+        log.info("✅ updateReadStatus Service: END.");
     }
 
     // 메세지 주고받은 유저만 불러오기

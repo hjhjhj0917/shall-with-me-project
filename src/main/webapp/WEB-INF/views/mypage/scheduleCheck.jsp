@@ -421,26 +421,23 @@
             gap: 6px; /* 시/분/AMPM 간격 */
         }
 
-        .schedule-modal-buttons {
-            margin-top: 14px;
-        }
-
         .schedule-btn,
         .btn-register,
         .btn-edit {
             display: flex;
             width: 100%;
             padding: 14px;
-            background-color: #3399ff;
-            color: white;
-            border: none;
-            border-radius: 8px;
+            background-color: white;
+            color: #3399ff;
+            border-radius: 45px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
             justify-content: center;
             margin-top: 25px;
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         /* 이벤트가 없을 때 메시지 배경 흰색으로 변경 */
@@ -456,33 +453,35 @@
             display: flex;
             width: 100%;
             padding: 14px;
-            background-color: #3399ff;
-            color: white;
-            border: none;
-            border-radius: 8px;
+            background-color: white;
+            color: #3399ff;
+            border-radius: 45px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
             justify-content: center;
             margin-top: 0;
-        !important;
+            !important;
             margin-bottom: 5px;
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         #deleteEventBtn {
             display: none;
             width: 100%;
             padding: 14px;
-            background-color: #c2c2c2;
-            color: white;
-            border: none;
-            border-radius: 8px;
+            background-color: white;
+            color: #dc3545;
+            border-radius: 45px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
             margin-bottom: 15px;
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
 

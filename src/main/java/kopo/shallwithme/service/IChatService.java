@@ -7,7 +7,7 @@ import java.util.List;
 public interface IChatService {
 
     // 채팅 내용을 저장
-    void saveMessage(ChatMessageDTO pDTO);
+    ChatMessageDTO saveMessage(ChatMessageDTO pDTO) throws Exception;
 
     ChatRoomDTO getOtherUserId(ChatRoomDTO pDTO);
 
@@ -31,5 +31,7 @@ public interface IChatService {
 
     // 채팅방 상대 프로필 이미지 불러오기
     UserProfileDTO getImageUrlByUserId(ChatRoomDTO pDTO) throws Exception;
+
+    void updateReadStatus(String roomId, String readerId) throws Exception;
 
 }

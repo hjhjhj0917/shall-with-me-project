@@ -9,33 +9,27 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <style>
         * {
-            user-select: none;       /* 텍스트 드래그 금지 */
-            pointer-events: auto;    /* 클릭 이벤트는 그대로 작동 */
-            -webkit-user-select: none; /* 크로스브라우징 */
+            user-select: none;
+            pointer-events: auto;
+            -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
         }
-        /* 기본 스타일 초기화 */
         body, html {
-
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: white;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE, Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         body::-webkit-scrollbar, html::-webkit-scrollbar {
-            display: none; /* Chrome, Safari */
+            display: none;
         }
-
-        /* 채팅 목록을 감싸는 컨테이너 */
         .chat-list-container {
             max-width: 600px;
             background-color: white;
             border-radius: 16px;
         }
-
-        /* 각 채팅 상대 아이템 */
         .chat-partner-item {
             display: flex;
             align-items: center;
@@ -47,69 +41,90 @@
             background-color: #FBFDFF;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-
         .chat-partner-item:hover {
             background-color: #f5f5f5;
         }
-
-        /* 프로필 사진 */
         .profile-pic {
             width: 50px;
             height: 50px;
-            border-radius: 50%; /* 이미지를 동그랗게 */
-            object-fit: cover; /* 이미지 비율 유지 */
+            border-radius: 50%;
+            object-fit: cover;
             margin-right: 15px;
-            background-color: #e0e0e0; /* 이미지가 없을 경우 배경색 */
+            background-color: #e0e0e0;
         }
-
-        /* 아이디와 메시지 정보 영역 */
         .info {
             flex: 1;
-            overflow: hidden; /* ellipsis 효과를 위해 필수 */
+            overflow: hidden;
+            /* [추가] min-width는 flex 아이템의 ellipsis 효과를 위해 필요합니다 */
+            min-width: 0;
         }
-
-        /* 아이디 (List item title) */
         .title {
             font-weight: 400;
             font-size: 14px;
             color: #3399ff;
         }
-
-        /* 마지막 메시지 (List item subtitle) */
         .subtitle {
             font-size: 12px;
             color: #666;
-
-            /* 긴 메시지를 ...으로 처리하는 스타일 */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* 목록이 비어있을 때 컨테이너 스타일 */
-        .chat-list-container.is-empty {
-            display: flex;
-            justify-content: center; /* 수평 중앙 */
-            align-items: center;   /* 수직 중앙 */
-            min-height: 80vh;
+        .timestamp {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+            margin-top: 4px; /* 뱃지 아래 약간의 간격 */
         }
 
-        /* [추가] 비어있을 때 표시되는 메시지 자체의 스타일 */
+        .chat-list-container.is-empty {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
         .chat-list-container.is-empty p {
             color: #888;
             font-size: 1rem;
             font-weight: 500;
         }
-
         p {
             margin-top: 30px;
             padding-top: 30px;
+        }
+
+        .unread-badge {
+            background-color: #ff3b30;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            height: 18px;
+            box-sizing: border-box;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* 기존 margin-left 제거 */
+            margin-left: 0;
+        }
+
+        .right-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* 우측 정렬 */
+            justify-content: center;
+            margin-left: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-<%-- JSP Scriptlet으로 로그인된 사용자 ID를 JavaScript 변수로 전달 --%>
 <%
     String ssUserId = (String) session.getAttribute("SS_USER_ID");
 %>
@@ -117,13 +132,9 @@
     const loggedInUserId = "<%= ssUserId %>";
 </script>
 
+<div class="chat-list-container" id="chatList"></div>
 
-<div class="chat-list-container" id="chatList">
-
-</div>
-
-
-<%-- [수정] 화면에 보이지 않는 HTML '틀(template)'을 만듭니다. --%>
+<%-- [수정] 화면에 보이지 않는 HTML '틀(template)'에 시간 영역을 추가합니다. --%>
 <div id="chat-item-template" style="display: none;">
     <div class="chat-partner-item">
         <img class="profile-pic">
@@ -131,29 +142,62 @@
             <div class="title"></div>
             <div class="subtitle"></div>
         </div>
+
+        <div class="right-info">
+            <div class="unread-badge"></div>
+            <div class="timestamp"></div>
+        </div>
     </div>
 </div>
 
-
 <script>
+
+    function formatTimeAgo(dateString) {
+        // 1. 날짜 데이터가 없으면 빈 문자열 반환
+        if (!dateString) return "";
+
+        // 2. 'T'를 포함한 표준 형식이므로 바로 Date 객체로 변환
+        const messageDate = new Date(dateString);
+        const now = new Date();
+
+        // 3. 혹시라도 날짜 변환에 실패하면 빈 문자열 반환
+        if (isNaN(messageDate.getTime())) {
+            console.error("잘못된 날짜 형식으로 변환에 실패했습니다:", dateString);
+            return "";
+        }
+
+        // 4. 시간 차이를 '초' 단위로 계산
+        const secondsAgo = Math.round((now.getTime() - messageDate.getTime()) / 1000);
+
+        // 5. 조건에 따라 정확한 상대 시간으로 변환
+        if (secondsAgo < 60) {
+            return '방금 전';
+        }
+        if (secondsAgo < 3600) { // 1시간 미만
+            return Math.floor(secondsAgo / 60) + '분 전';
+        }
+        if (secondsAgo < 86400) { // 하루 미만
+            return Math.floor(secondsAgo / 3600) + '시간 전';
+        }
+        if (secondsAgo < 604800) { // 7일 미만
+            return Math.floor(secondsAgo / 86400) + '일 전';
+        }
+
+        // 7일 이상은 '월 일' 형식으로 표시
+        return messageDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+    }
+
     // 채팅방으로 이동하는 함수
     function openChat(otherUserId) {
-        console.log("openChat 호출됨:", otherUserId);
+        // ... (기존과 동일)
         fetch("/chat/createOrGetRoom?user2Id=" + encodeURIComponent(otherUserId))
             .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
             })
             .then(data => {
-                console.log("서버에서 받은 데이터:", data);
                 if (data.roomId) {
-                    const cleanedRoomId = Number(data.roomId);
-                    console.log("➡️ 이동할 채팅방 ID:", cleanedRoomId);
-                    const targetUrl = "/chat/chatRoom?roomId=" + cleanedRoomId;
-                    console.log("이동할 URL:", targetUrl);
-                    parent.location.href = targetUrl;
+                    parent.location.href = "/chat/chatRoom?roomId=" + Number(data.roomId);
                 } else {
                     alert("채팅방 생성 실패");
                 }
@@ -164,26 +208,43 @@
             });
     }
 
-    // [수정] user 객체를 받아서 HTML 요소를 생성하고 반환하는 함수
+
     function createChatItem(user) {
         var template = document.getElementById('chat-item-template');
-        var clone = template.cloneNode(true); // 템플릿 복제
+        var clone = template.cloneNode(true);
 
-        clone.removeAttribute('id'); // ID 속성 제거
-        clone.style.display = ''; // 보이도록 설정
+        clone.removeAttribute('id');
+        clone.style.display = '';
 
-        // 데이터-ID 속성을 추가하여 나중에 쉽게 찾을 수 있도록 함
         clone.querySelector('.chat-partner-item').setAttribute('data-userid', user.userId);
         clone.querySelector('.chat-partner-item').onclick = function() { openChat(user.userId); };
 
-        var profileImgSrc = user.profileImgUrl || '/images/default-profile.png';
+        var profileImgSrc = user.profileImgUrl || '/images/noimg.png';
         clone.querySelector('.profile-pic').src = profileImgSrc;
         clone.querySelector('.profile-pic').alt = user.userName + "의 프로필 사진";
 
         clone.querySelector('.title').textContent = user.userName;
         clone.querySelector('.subtitle').textContent = user.lastMessage || '대화 내용이 없습니다.';
 
-        return clone.firstElementChild; // <div class="chat-partner-item">...</div> 요소 반환
+        if (user.lastMessageTimestamp) {
+            clone.querySelector('.timestamp').textContent = formatTimeAgo(user.lastMessageTimestamp);
+        }
+
+        // [추가] 안 읽은 메시지 뱃지 처리 로직
+        const badge = clone.querySelector('.unread-badge');
+        if (user.unreadCount && user.unreadCount > 0) {
+            if (user.unreadCount >= 50) {
+                badge.textContent = '50+';
+            } else {
+                badge.textContent = user.unreadCount;
+            }
+            badge.style.visibility = 'visible'; // ✅ 내용이 있을 때는 보임
+        } else {
+            badge.textContent = '';              // ✅ 내용 제거
+            badge.style.visibility = 'hidden';  // ✅ 공간은 유지, 안 보이게
+        }
+
+        return clone.firstElementChild;
     }
 
     // 페이지 로드 시 채팅 목록을 가져오는 AJAX
@@ -195,15 +256,11 @@
             success: function (userList) {
                 var container = $("#chatList");
                 container.empty();
-
-                // [추가] 이전 상태 초기화를 위해 is-empty 클래스를 먼저 제거합니다.
                 container.removeClass('is-empty');
 
                 if (userList.length === 0) {
-                    // [수정] is-empty 클래스를 추가하고, 스타일이 없는 p 태그를 넣습니다.
                     container.addClass('is-empty');
                     container.append('<p>대화 상대가 없습니다.</p>');
-
                 } else {
                     $.each(userList, function (index, user) {
                         var chatItem = createChatItem(user);
@@ -212,47 +269,45 @@
                 }
             },
             error: function (xhr) {
-                // ... 에러 처리 ...
+                console.error("채팅 목록을 불러오는 데 실패했습니다.", xhr.responseText);
+                var container = $("#chatList");
+                container.addClass('is-empty');
+                container.append('<p>오류가 발생했습니다.</p>');
             }
         });
 
-        // [추가] WebSocket 연결
         connectWebSocket();
     });
 
-    // [추가] WebSocket 연결 및 구독 설정
+    // WebSocket 연결 및 구독 설정
     function connectWebSocket() {
         if (loggedInUserId && loggedInUserId !== 'null') {
-            var socket = new SockJS('/ws'); // WebSocket 접속 주소
+            var socket = new SockJS('/ws');
             var stompClient = Stomp.over(socket);
+            stompClient.debug = null; // 콘솔 디버그 메시지 끄기
 
             stompClient.connect({}, function (frame) {
                 console.log('STOMP Connected: ' + frame);
-
-                // 개인 채널을 구독해서 목록 업데이트 알림을 받음
                 stompClient.subscribe('/topic/user/' + loggedInUserId, function (message) {
                     var updatedPartnerInfo = JSON.parse(message.body);
-
-                    // 실시간으로 목록 업데이트
                     updateChatList(updatedPartnerInfo);
                 });
             });
         }
     }
 
-    // [추가] 실시간으로 채팅 목록을 업데이트하는 함수
+    // 실시간으로 채팅 목록을 업데이트하는 함수
     function updateChatList(user) {
         var container = $("#chatList");
-
-        // 기존에 있던 목록 아이템을 찾아서 삭제
         container.find('.chat-partner-item[data-userid="' + user.userId + '"]').remove();
-
-        // 새로 받은 정보로 목록 아이템을 생성해서 맨 위에 추가
         var newChatItem = createChatItem(user);
         container.prepend(newChatItem);
 
-        // "대화 상대가 없습니다" 메시지가 있다면 제거
-        container.find('p').remove();
+        // 목록이 비어있다가 첫 대화가 생기는 경우 "대화 상대가 없습니다" 메시지 제거
+        if(container.hasClass('is-empty')) {
+            container.removeClass('is-empty');
+            container.find('p').remove();
+        }
     }
 </script>
 

@@ -113,14 +113,15 @@
         .confirm-btn {
             width: 100%;
             padding: 14px;
-            background-color: #3399ff;
-            color: white;
-            border: none;
-            border-radius: 8px;
+            background-color: white;
+            color: #3399ff;
+            border-radius: 45px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         /* 오른쪽: 날짜 선택 */
@@ -445,11 +446,6 @@
             gap: 6px; /* 시/분/AMPM 간격 */
         }
 
-        .schedule-save-btn {
-            background-color: #3399ff;
-            color: white;
-        }
-
         .shcedule-modal-buttons {
             margin-top: 14px;
         }
@@ -473,14 +469,15 @@
         .schedule-save-btn {
             width: 100%;
             padding: 12px;
-            background-color: #3399ff;
-            color: white;
-            border: none;
-            border-radius: 8px;
+            background-color: white;
+            color: #3399ff;
+            border-radius: 45px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
+            border: 2px solid #DAEDFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
     </style>

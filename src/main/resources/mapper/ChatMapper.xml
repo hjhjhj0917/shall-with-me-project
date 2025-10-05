@@ -24,30 +24,29 @@
             U.USER_ID AS userId,
             U.USER_NAME AS userName,
             UP.profile_image_url AS profileImgUrl,
-            LM.MESSAGE AS lastMessage
+            LM.MESSAGE AS lastMessage,
+            DATE_FORMAT(LM.sent_at, '%Y-%m-%dT%H:%i:%s') AS lastMessageTimestamp,
+
+            CASE
+                WHEN CR.user1_id = #{userId} THEN CR.user1_unread_count
+                ELSE CR.user2_unread_count
+                END AS unreadCount
         FROM
             USER_INFO U
-                INNER JOIN (
-                SELECT
-                    CASE
-                        WHEN USER1_ID = #{userId} THEN USER2_ID
-                        ELSE USER1_ID
-                        END AS partner_id,
-                    ROOM_ID
-                FROM CHAT_ROOM
-                WHERE USER1_ID = #{userId} OR USER2_ID = #{userId}
-            ) AS P ON U.USER_ID = P.partner_id
+                INNER JOIN CHAT_ROOM CR ON (CR.USER1_ID = U.USER_ID AND CR.USER2_ID = #{userId}) OR (CR.USER2_ID = U.USER_ID AND CR.USER1_ID = #{userId})
                 LEFT JOIN USER_PROFILE UP ON U.USER_ID = UP.user_id
                 LEFT JOIN (
                 SELECT
                     ROOM_ID,
                     MESSAGE,
-                    sent_at,  -- [수정 1] 최종 정렬을 위해 sent_at 컬럼 추가
-                    ROW_NUMBER() OVER(PARTITION BY ROOM_ID ORDER BY sent_at DESC) as rn -- [수정 2] TIMESTAMP -> sent_at
+                    sent_at,
+                    ROW_NUMBER() OVER(PARTITION BY ROOM_ID ORDER BY sent_at DESC) as rn
                 FROM CHAT_MESSAGE
-            ) AS LM ON P.ROOM_ID = LM.ROOM_ID AND LM.rn = 1
+            ) AS LM ON CR.ROOM_ID = LM.ROOM_ID AND LM.rn = 1
+        WHERE
+            U.USER_ID != #{userId}
         ORDER BY
-            LM.sent_at DESC, -- [수정 3] TIMESTAMP -> sent_at
+            LM.sent_at DESC,
             U.USER_NAME ASC
     </select>
 
@@ -85,10 +84,19 @@
 
     <!-- int 타입 수정-->
     <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatMessageDTO">
-        SELECT message_id, room_id AS roomId, sender_id AS senderId, message, sent_at AS sentAt
-        FROM CHAT_MESSAGE
-        WHERE room_id = #{value}
-        ORDER BY sent_at ASC
+        SELECT
+            message_id,
+            room_id AS roomId,
+            sender_id AS senderId,
+            message,
+            sent_at AS sentAt,
+            is_read AS "read"
+        FROM
+            CHAT_MESSAGE
+        WHERE
+            room_id = #{value}
+        ORDER BY
+            sent_at ASC
     </select>
 
     <!--    회원 프로필 이미지 불러오기-->
@@ -108,5 +116,31 @@
         WHERE
             R.room_id = #{roomId}
     </select>
+
+    <update id="updateMessageReadStatus">
+        UPDATE CHAT_MESSAGE
+        SET is_read = TRUE
+        WHERE room_id = #{roomId}
+          AND sender_id != #{readerId}
+          AND is_read = FALSE
+    </update>
+
+    <update id="resetUnreadCount">
+        UPDATE CHAT_ROOM
+        SET
+            user1_unread_count = CASE WHEN user1_id = #{readerId} THEN 0 ELSE user1_unread_count END,
+            user2_unread_count = CASE WHEN user2_id = #{readerId} THEN 0 ELSE user2_unread_count END
+        WHERE
+            room_id = #{roomId}
+    </update>
+
+    <update id="incrementUnreadCount" parameterType="ChatMessageDTO">
+        UPDATE CHAT_ROOM
+        SET
+            user1_unread_count = CASE WHEN user2_id = #{senderId} THEN user1_unread_count + 1 ELSE user1_unread_count END,
+            user2_unread_count = CASE WHEN user1_id = #{senderId} THEN user2_unread_count + 1 ELSE user2_unread_count END
+        WHERE
+            room_id = #{roomId}
+    </update>
 
 </mapper>

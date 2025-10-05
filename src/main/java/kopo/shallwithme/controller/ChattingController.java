@@ -45,12 +45,13 @@ public class ChattingController {
         log.info("{}.sendMessage Start!", this.getClass().getName());
 
         try {
-            // 클라이언트에서 보내는 sentAt 무시하고 서버 시간으로 덮어쓰기
             chatMessage.setSentAt(LocalDateTime.now());
 
-            chatService.saveMessage(chatMessage);
+            // [핵심 수정] 서비스로부터 isRead가 설정된 새로운 DTO를 반환받음
+            ChatMessageDTO savedMessage = chatService.saveMessage(chatMessage);
 
-            messagingTemplate.convertAndSend("/topic/chatroom/" + chatMessage.getRoomId(), chatMessage);
+            // 반환받은 'savedMessage' 객체를 브로드캐스팅
+            messagingTemplate.convertAndSend("/topic/chatroom/" + savedMessage.getRoomId(), savedMessage);
 
         } catch (Exception e) {
             log.error("메시지 전송 및 저장 중 오류 발생: {}", chatMessage.toString(), e);
@@ -229,6 +230,31 @@ public class ChattingController {
         log.info("{}.createOrGetRoom End!", this.getClass().getName());
 
         return response;
+    }
+
+    @MessageMapping("/chat.readMessage")
+    public void readMessage(ChatMessageDTO readMessage) {
+        log.info("{}.readMessage Start!", this.getClass().getName());
+
+        // --- [핵심 수정] readerId가 유효한지 반드시 확인 ---
+        if (readMessage.getReaderId() == null || readMessage.getReaderId().isBlank() || readMessage.getReaderId().equals("null")) {
+            log.warn("비정상적인 readerId를 수신하여 읽음 처리를 중단합니다. DTO: {}", readMessage.toString());
+            return; // readerId가 없으면 아무 작업도 하지 않고 종료
+        }
+        // --------------------------------------------------
+
+        try {
+            // 1. DB 업데이트: 서비스 로직을 호출
+            chatService.updateReadStatus(readMessage.getRoomId(), readMessage.getReaderId());
+
+            // 2. 실시간 브로드캐스팅: 상대방에게 "메시지 읽음" 사실을 전송
+            messagingTemplate.convertAndSend("/topic/read/" + readMessage.getRoomId(), readMessage);
+
+        } catch (Exception e) {
+            log.error("메시지 읽음 처리 중 오류 발생: {}", readMessage.toString(), e);
+        }
+
+        log.info("{}.readMessage End!", this.getClass().getName());
     }
 
 }
