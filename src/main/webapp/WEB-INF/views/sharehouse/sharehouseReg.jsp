@@ -13,9 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <%-- 필요하면 전용 CSS 연결
+    <!-- ▼ 이번 작업에서 사용하는 전용 CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseReg.css"/>
-    --%>
 
     <style>
         * { box-sizing: border-box; }
@@ -28,7 +27,7 @@
             margin: 0 auto;
         }
 
-        /* 폼을 가로 플렉스로 만들어 좌/우 수평 정렬 */
+        /* 폼 레이아웃: 좌/우 2열 */
         #roommateForm {
             display: flex;
             flex-direction: row;
@@ -39,8 +38,8 @@
         }
 
         /* 좌/우 박스 */
-        .roommate-right,
-        .roommate-left {
+        .roommate-left,
+        .roommate-right {
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -50,76 +49,12 @@
             min-height: 600px;
         }
 
-        /* 내부 요소 */
+        /* 공통 폼 요소 */
         .form-group { margin-bottom: 32px; }
         .form-group label {
             display: block;
             font-weight: 600;
             margin-bottom: 12px;
-        }
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        /* 이미지 업로드 */
-        .image-upload-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-        .upload-box {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 2px dashed #bbb;
-            border-radius: 8px;
-            width: 180px;
-            height: 180px;
-            padding: 0;
-            overflow: hidden;
-            cursor: pointer;
-            transition: border-color .2s ease, background-color .2s ease;
-            text-align: center;
-        }
-        .upload-box:hover { border-color: #3399ff; background-color: #f7fbff; }
-        .upload-box i { color: #999; margin-bottom: 12px; }
-        .upload-box span { font-size: 14px; color: #666; }
-        .upload-box input[type="file"] {
-            position: absolute; inset: 0; opacity: 0; cursor: pointer;
-        }
-        .upload-box.has-image { border-color: #3399ff; background: #f7fbff; }
-        .upload-box.has-image i,
-        .upload-box.has-image span { display: none; }
-        .upload-box img.preview {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: block;
-        }
-        .upload-box .remove-btn {
-            position: absolute; top: 8px; right: 8px; z-index: 3;
-            border: 1px solid #ddd; padding: 6px 10px; border-radius: 6px;
-            cursor: pointer; background: #fff; font-size: 0.85rem;
-        }
-        .upload-box.has-image input[type="file"] { pointer-events: none; }
-
-        /* 자기소개 */
-        .intro-btn {
-            align-self: flex-start;
-            margin-bottom: 16px;
-            padding: 10px 18px;
-            background-color: #3399ff;
-            color: #fff;
-            border: none; border-radius: 6px;
-            cursor: pointer; font-size: 0.95rem;
-        }
-        textarea#introTextarea {
-            flex: 1; width: 500px; min-height: 100px;
-            padding: 20px; border: 1px solid #ccc; border-radius: 6px;
-            resize: vertical; font-family: inherit; line-height: 1.5;
         }
 
         /* 태그 표시 */
@@ -193,6 +128,7 @@
           action="/sharehouse/register"
           method="post"
           enctype="multipart/form-data">
+
         <!-- 왼쪽 -->
         <section class="roommate-left">
 
@@ -204,38 +140,57 @@
                     <span>
                         <c:choose>
                             <c:when test="${not empty loginName}">
-                            <c:out value="${loginName}"/> 의 쉐어하우스
-                        </c:when>
-                            <c:otherwise>
-                                내 쉐어하우스
-                            </c:otherwise>
+                                <c:out value="${loginName}"/> 의 쉐어하우스
+                            </c:when>
+                            <c:otherwise>내 쉐어하우스</c:otherwise>
                         </c:choose>
                     </span>
                 </label>
             </div>
 
-            <div class="image-upload-grid">
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*"/>
-                </div>
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*"/>
-                </div>
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*"/>
-                </div>
-                <div class="upload-box">
-                    <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                    <span>이미지 업로드</span>
-                    <input type="file" name="images" accept="image/*"/>
-                </div>
+            <!-- ▼ 사진 5장 + 소개글 (새 레이아웃) ▼ -->
+            <div class="sh-modal-body sh-reg">
+                <!-- 사진 5장 -->
+                <section class="sh-uploader-5">
+                    <!-- 큰 썸네일(메인 카드 썸네일 전용) -->
+                    <label class="uploader thumb">
+                        <input type="file" name="thumbnail" accept="image/*" hidden>
+                        <span>대표 이미지(썸네일)</span>
+                        <img class="preview" alt="" hidden>
+                    </label>
+
+                    <!-- 추가 이미지 4장 -->
+                    <label class="uploader small">
+                        <input type="file" name="images" accept="image/*" hidden>
+                        <span>이미지 업로드</span>
+                        <img class="preview" alt="" hidden>
+                    </label>
+                    <label class="uploader small">
+                        <input type="file" name="images" accept="image/*" hidden>
+                        <span>이미지 업로드</span>
+                        <img class="preview" alt="" hidden>
+                    </label>
+                    <label class="uploader small">
+                        <input type="file" name="images" accept="image/*" hidden>
+                        <span>이미지 업로드</span>
+                        <img class="preview" alt="" hidden>
+                    </label>
+                    <label class="uploader small">
+                        <input type="file" name="images" accept="image/*" hidden>
+                        <span>이미지 업로드</span>
+                        <img class="preview" alt="" hidden>
+                    </label>
+                </section>
+
+                <!-- 소개글: 사진 영역 아래 -->
+                <section class="sh-reg-intro">
+                    <div class="form-group">
+                        <label>쉐어하우스 소개</label>
+                        <textarea id="introTextarea" name="introduction" rows="10" placeholder="소개글 시작"></textarea>
+                    </div>
+                </section>
             </div>
+            <!-- ▲ 사진 5장 + 소개글 (새 레이아웃) ▲ -->
 
             <!-- 보여질 태그 -->
             <div class="form-group tag-group">
@@ -264,12 +219,12 @@
             <!-- /보여질 태그 -->
         </section>
 
-        <!-- 오른쪽 -->
+        <!-- 오른쪽: 여기는 추후 가격/주소 등 다른 필드 넣을 자리 -->
         <section class="roommate-right">
-            <button type="button" class="intro-btn">쉐어하우스 소개</button>
-            <textarea id="introTextarea"
-                      name="introduction"
-                      placeholder="소개글 시작"></textarea>
+            <div class="form-group">
+                <label>추가 정보</label>
+                <p style="color:#6b7280; margin:0;">향후 보증금/월세, 주소, 옵션 등을 배치할 공간입니다.</p>
+            </div>
         </section>
     </form>
 </main>
@@ -282,59 +237,37 @@
     if (ssUserName == null) { ssUserName = ""; }
 %>
 
-<!-- JS: 미리보기 + 삭제 기능 -->
+<!-- JS: 업로더 클릭/미리보기(대표+4장) -->
 <script>
-  document.querySelectorAll('.upload-box input[type="file"]').forEach((input) => {
-    input.addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
-      const box = e.target.closest('.upload-box');
-      if (!file) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.sh-uploader-5 .uploader input[type="file"]').forEach(input => {
+      const wrap = input.closest('.uploader');
+      const span = wrap.querySelector('span');
+      const img  = wrap.querySelector('.preview');
 
-      if (!file.type.startsWith('image/')) {
-        alert('이미지 파일만 업로드할 수 있어요.');
-        e.target.value = '';
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        alert('파일 용량이 너무 커요. (최대 5MB)');
-        e.target.value = '';
-        return;
-      }
+      // 클릭으로 파일 선택 열기
+      wrap.addEventListener('click', () => input.click());
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        box.classList.add('has-image');
+      // 파일 선택 시 미리보기
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) { img.hidden = true; span.hidden = false; return; }
 
-        let img = box.querySelector('img.preview');
-        if (!img) {
-          img = document.createElement('img');
-          img.className = 'preview';
-          box.appendChild(img);
+        if (!file.type.startsWith('image/')) { alert('이미지 파일만 업로드 가능합니다.'); input.value = ''; return; }
+        if (file.size > 5 * 1024 * 1024) { alert('최대 5MB까지만 업로드 가능합니다.'); input.value = ''; return; }
 
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'remove-btn';
-          btn.textContent = '이미지 삭제';
-          btn.addEventListener('click', () => {
-            input.value = '';
-            img.remove();
-            btn.remove();
-            box.classList.remove('has-image');
-          });
-          box.appendChild(btn);
-        }
-        img.src = reader.result;
-      };
-      reader.readAsDataURL(file);
+        const url = URL.createObjectURL(file);
+        img.src = url; img.hidden = false; span.hidden = true;
+      });
     });
-  });
 
-  // 백업: 만약 파라미터 누락되어도 iframe 안에서 열렸다면 헤더 제거
-  if (window.self !== window.top) {
-    document.querySelector('header')?.remove();
-    document.querySelector('.roommate-container')?.style.setProperty('padding-top', '24px');
-    document.body.style.background = '#fff';
-  }
+    // 백업: 만약 파라미터 누락되어도 iframe 안에서 열렸다면 헤더 제거
+    if (window.self !== window.top) {
+      document.querySelector('header')?.remove();
+      document.querySelector('.roommate-container')?.style.setProperty('padding-top', '24px');
+      document.body.style.background = '#fff';
+    }
+  });
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
