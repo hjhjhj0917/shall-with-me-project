@@ -3,7 +3,7 @@
     <%--    메인으로 가는 사이트 로고--%>
     <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
-<%--            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>--%>
+            <%--            <i class="fa-solid fa-people-roof fa-xs" style="color: #3399ff;"></i>--%>
             <img src="../images/logo.png">
         </div>
         <div class="header-logo">살며시</div>
@@ -27,16 +27,24 @@
                 <%= session.getAttribute("SS_USER_NAME") %>님
             </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진" class="user-profile-img">
+                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진"
+                     class="user-profile-img">
             </button>
         </div>
 
         <%--메세지 확인--%>
-        <div class="header-message-container" id="messageBox">
-            <span class="slide-bg4"></span> <!-- 둥근 반스도 역할 -->
-            <button class="header-dropdown-toggle" id="messageIconToggle">
-                <i class="fa-solid fa-envelope fa-sm" style="color: #1c407d;"></i>
-            </button>
+        <div class="header-icon-wrapper">
+
+            <span class="notification-badge" id="totalUnreadBadge" style="display: none;"></span>
+
+            <%--메세지 확인--%>
+            <div class="header-message-container" id="messageBox">
+                <span class="slide-bg4"></span>
+                <button class="header-dropdown-toggle" id="messageIconToggle">
+                    <i class="fa-solid fa-envelope fa-sm" style="color: #1c407d;"></i>
+                </button>
+            </div>
+
         </div>
 
         <%--메뉴--%>
@@ -60,3 +68,49 @@
         </div>
     </div>
 </div>
+
+<script>
+    // 뱃지 UI를 업데이트하는 함수
+    function updateTotalUnreadBadge(count) {
+        const badge = document.getElementById('totalUnreadBadge');
+        if (!badge) return;
+
+        if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    // 로그인한 사용자 ID가 있을 때만 실행
+    const loggedInHeaderUserId = "<%= session.getAttribute("SS_USER_ID") %>";
+    if (loggedInHeaderUserId && loggedInHeaderUserId !== 'null') {
+
+        // 1. 페이지 로드 시 전체 안 읽은 개수 가져오기 (AJAX)
+        fetch('/chat/totalUnreadCount')
+            .then(res => res.json())
+            .then(data => {
+                if (data.totalCount !== undefined) {
+                    updateTotalUnreadBadge(data.totalCount);
+                }
+            })
+            .catch(err => console.error('Total unread count fetch error:', err));
+
+        // 2. 실시간 업데이트를 위한 WebSocket 연결
+        const headerSocket = new SockJS("/ws"); // WebSocketConfig와 주소 일치
+        const headerStompClient = Stomp.over(headerSocket);
+        headerStompClient.debug = null;
+
+        headerStompClient.connect({}, function () {
+            // 안 읽은 개수 변경 알림을 받을 개인 채널 구독
+            headerStompClient.subscribe('/topic/user/' + loggedInHeaderUserId, function (message) {
+                const updateInfo = JSON.parse(message.body);
+                // 서버에서 totalUnreadCount를 보내준다고 가정
+                if (updateInfo.totalUnreadCount !== undefined) {
+                    updateTotalUnreadBadge(updateInfo.totalUnreadCount);
+                }
+            });
+        });
+    }
+</script>

@@ -488,3 +488,39 @@ header {
 body.modal-open {
     overflow: hidden; /* 이 속성이 body의 스크롤을 막습니다. */
 }
+
+/* 메시지 아이콘 버튼을 감싸는 컨테이너 */
+.header-message-container {
+    position: relative; /* 뱃지 위치의 기준점 */
+}
+
+/* 아이콘과 뱃지를 감싸는 전체 컨테이너를 위치 기준점으로 설정 */
+.header-icon-wrapper {
+    position: relative;
+    display: flex; /* 내부 요소들을 정렬하기 위함 */
+    align-items: center;
+}
+
+/* 알림 뱃지 스타일 */
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(17%, -22%); /* 모서리에 걸치도록 위치 미세 조정 */
+
+    /* --- 나머지 스타일 --- */
+    background-color: #ff3b30;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px 5px;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    z-index: 1; /* 다른 요소들 위로 올라오도록 설정 */
+}

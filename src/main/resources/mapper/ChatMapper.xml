@@ -26,7 +26,6 @@
             UP.profile_image_url AS profileImgUrl,
             LM.MESSAGE AS lastMessage,
             DATE_FORMAT(LM.sent_at, '%Y-%m-%dT%H:%i:%s') AS lastMessageTimestamp,
-
             CASE
                 WHEN CR.user1_id = #{userId} THEN CR.user1_unread_count
                 ELSE CR.user2_unread_count
@@ -35,7 +34,7 @@
             USER_INFO U
                 INNER JOIN CHAT_ROOM CR ON (CR.USER1_ID = U.USER_ID AND CR.USER2_ID = #{userId}) OR (CR.USER2_ID = U.USER_ID AND CR.USER1_ID = #{userId})
                 LEFT JOIN USER_PROFILE UP ON U.USER_ID = UP.user_id
-                LEFT JOIN (
+                INNER JOIN (
                 SELECT
                     ROOM_ID,
                     MESSAGE,
@@ -142,5 +141,15 @@
         WHERE
             room_id = #{roomId}
     </update>
+
+    <select id="getTotalUnreadCount" parameterType="String" resultType="int">
+        SELECT COALESCE(SUM(CASE
+                                WHEN user1_id = #{userId} THEN user1_unread_count
+                                WHEN user2_id = #{userId} THEN user2_unread_count
+                                ELSE 0
+            END), 0)
+        FROM CHAT_ROOM
+        WHERE user1_id = #{userId} OR user2_id = #{userId}
+    </select>
 
 </mapper>

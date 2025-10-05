@@ -34,10 +34,11 @@ public interface IChatMapper {
 
     void incrementUnreadCount(ChatMessageDTO pDTO) throws Exception;
 
-
     void updateMessageReadStatus(@Param("roomId") String roomId, @Param("readerId") String readerId) throws Exception;
 
     void resetUnreadCount(@Param("roomId") String roomId, @Param("readerId") String readerId) throws Exception;
+
+    int getTotalUnreadCount(String userId) throws Exception;
 
 }
 
