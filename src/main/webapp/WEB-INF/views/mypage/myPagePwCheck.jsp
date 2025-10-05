@@ -104,15 +104,14 @@
 
         .confirm-btn {
             padding: 12px 28px;
-            background-color: white;
-            color: #3399ff;
+            background-color: #3399ff;
+            color: white;
             border-radius: 8px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
-            border: 2px solid #DAEDFF;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: none;
         }
 
         /*에러 메시지*/
