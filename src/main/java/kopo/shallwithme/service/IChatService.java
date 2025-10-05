@@ -34,4 +34,5 @@ public interface IChatService {
 
     void updateReadStatus(String roomId, String readerId) throws Exception;
 
+    int getTotalUnreadCount(String userId) throws Exception;
 }

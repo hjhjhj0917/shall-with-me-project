@@ -5,6 +5,7 @@ import kopo.shallwithme.mapper.IChatMapper;
 import kopo.shallwithme.service.IChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,25 +19,40 @@ import java.util.Map;
 public class ChatService implements IChatService {
 
     private final IChatMapper chatMapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     @Override
     public ChatMessageDTO saveMessage(ChatMessageDTO pDTO) throws Exception {
         log.info("{}.saveMessage Start!", this.getClass().getName());
 
-        // [핵심] DB에 저장하기 전, isRead 상태를 false로 명시적으로 설정
         pDTO.setRead(false);
-
-        // DB에 메시지 저장
         chatMapper.insertChatMessage(pDTO);
-
-        // 상대방의 unread_count를 1 증가시키는 로직 (기존에 있었다면 유지)
         chatMapper.incrementUnreadCount(pDTO);
+
+        // [수정] getOtherUserId가 필요로 하는 ChatRoomDTO를 새로 생성
+        ChatRoomDTO roomDTOForQuery = new ChatRoomDTO();
+        roomDTOForQuery.setRoomId(Integer.parseInt(pDTO.getRoomId())); // pDTO에서 roomId를 꺼내 설정
+
+        // 새로 만든 DTO를 파라미터로 전달하여 roomInfo 조회
+        ChatRoomDTO roomInfo = chatMapper.getOtherUserId(roomDTOForQuery);
+        String recipientId;
+
+        if (pDTO.getSenderId().equals(roomInfo.getUser1Id())) {
+            recipientId = roomInfo.getUser2Id();
+        } else {
+            recipientId = roomInfo.getUser1Id();
+        }
+
+        int newTotalCount = chatMapper.getTotalUnreadCount(recipientId);
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("totalUnreadCount", newTotalCount);
+        messagingTemplate.convertAndSend("/topic/user/" + recipientId, payload);
 
         log.info("Message saved: {}", pDTO);
         log.info("{}.saveMessage End!", this.getClass().getName());
 
-        // isRead 상태가 설정된 DTO를 컨트롤러로 반환
         return pDTO;
     }
 
@@ -198,6 +214,12 @@ public class ChatService implements IChatService {
         log.info("{}.getMessagesByRoomId End!", this.getClass().getName());
 
         return rList;
+    }
+
+    @Override
+    public int getTotalUnreadCount(String userId) throws Exception {
+        log.info(this.getClass().getName() + ".getTotalUnreadCount Start!");
+        return chatMapper.getTotalUnreadCount(userId);
     }
 
 }

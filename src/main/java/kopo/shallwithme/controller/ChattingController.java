@@ -257,4 +257,23 @@ public class ChattingController {
         log.info("{}.readMessage End!", this.getClass().getName());
     }
 
+    @GetMapping("/totalUnreadCount")
+    @ResponseBody
+    public ResponseEntity<Map<String, Integer>> getTotalUnreadCount(HttpSession session) {
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인 안했을 경우
+        }
+
+        Map<String, Integer> response = new HashMap<>();
+        try {
+            int totalCount = chatService.getTotalUnreadCount(userId);
+            response.put("totalCount", totalCount);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Total unread count 조회 중 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
