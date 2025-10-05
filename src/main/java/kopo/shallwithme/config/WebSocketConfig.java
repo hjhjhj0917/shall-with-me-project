@@ -16,10 +16,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // 채팅방 페이지에서 사용하는 엔드포인트
-        registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*").withSockJS();
-
-        // 채팅 목록 페이지에서 사용하는 엔드포인트
+        // [수정] 모든 웹소켓 연결은 /ws 주소 하나만 사용하도록 통일합니다.
         registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
     }
 }

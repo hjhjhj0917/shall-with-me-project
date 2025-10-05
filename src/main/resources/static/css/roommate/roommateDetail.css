@@ -132,3 +132,7 @@ body {
 .detail-msg-btn:hover {
     transform: scale(1.05); /* 5% 확대 */
 }
+
+footer {
+    margin-top: 150px !important;
+}

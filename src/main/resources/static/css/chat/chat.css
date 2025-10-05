@@ -121,7 +121,7 @@ body {
 }
 
 .message-wrapper.me .bubble-wrapper {
-    flex-direction: row-reverse; /* 내 메시지는 시간 순서 뒤집기 */
+    flex-direction: row; /* 내 메시지는 시간 순서 뒤집기 */
 }
 
 /* 상대방 이름 스타일 */

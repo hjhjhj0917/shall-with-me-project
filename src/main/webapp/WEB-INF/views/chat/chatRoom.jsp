@@ -15,12 +15,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <style>
         /* chat.css 파일에 추가 */
-
         /* 일정 요청 카드 스타일 */
         .message-bubble.schedule-request {
             background-color: white;
             padding: 16px;
-            width: 280px; /* 너비 고정 */
+            width: 280px;
         }
 
         .schedule-request-title {
@@ -115,6 +114,15 @@
             background-color: #ffffff;
             caret-color: transparent;
         }
+
+        .read-marker {
+            font-size: 10px;
+            color: #888;
+            margin: 0 5px;
+            align-self: flex-end;
+            font-weight: 500;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -136,7 +144,6 @@
     </button>
 </div>
 
-<%-- 챗봇 --%>
 <%@ include file="../includes/chatbot.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
@@ -177,13 +184,15 @@
         }
     });
 
-    // WebSocket 연결
+    // [최종] WebSocket 연결 함수
+    // [최종 수정] connect 함수를 이 코드로 전체 교체해주세요.
     function connect() {
         if (!roomId) {
             showCustomAlert("채팅방 ID가 없습니다. 올바른 경로로 접속해 주세요.");
             return;
         }
-        const socket = new SockJS("/ws-chat");
+        // 서버 WebSocketConfig와 주소 일치 (필요시 '/ws-chat' -> '/ws' 등으로 변경)
+        const socket = new SockJS("/ws");
         stompClient = Stomp.over(socket);
         stompClient.debug = null;
 
@@ -192,55 +201,62 @@
             fetch(`/chat/messages?roomId=${roomId}`)
                 .then(res => res.json())
                 .then(messages => {
-                    messages.forEach(msg => {
-                        // --- 이 부분이 추가/수정되었습니다 ---
-                        if (msg.messageType === 'SCHEDULE_REQUEST') {
-                            renderScheduleRequest(msg); // 과거의 일정 요청도 올바르게 렌더링
-                        } else if (msg.messageType === 'SCHEDULE_CONFIRMED' || msg.messageType === 'SCHEDULE_REJECTED') {
-                            renderSystemMessage(msg.message); // 과거의 시스템 알림도 올바르게 렌더링
-                        } else {
-                            appendMessage(msg); // 과거의 일반 메시지
-                        }
-                    });
+                    messages.forEach(msg => appendMessage(msg));
                     const chatBox = document.getElementById("chatBox");
                     chatBox.scrollTop = chatBox.scrollHeight;
+
+                    // [핵심] 페이지 로드가 완료된 후, "나 이제 입장해서 다 읽었어" 라는 신호를 보냅니다.
+                    // 이 코드가 상대방이 접속했을 때 '1'을 지워주는 역할을 합니다.
+                    if (myUser.id && myUser.id !== 'null' && myUser.id !== '') {
+                        stompClient.send("/app/chat.readMessage", {}, JSON.stringify({
+                            roomId: roomId,
+                            readerId: myUser.id
+                        }));
+                    }
                 });
 
-            // 2. WebSocket 구독
+            // 2. 새로운 메시지 수신 구독
             stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
                 const msg = JSON.parse(message.body);
 
-                console.log("서버로부터 받은 메시지:", msg);
+                // 서버에서 온 메시지(내 것, 상대 것 모두)를 화면에 그림
+                appendMessage(msg);
 
-                if (msg.senderId === myUser.id) {
-                    console.log("내가 보낸 메시지를 서버로부터 수신했으므로 무시합니다.");
-                    return;
+                // [핵심] 상대방이 이미 접속해 있는 상태에서 새 메시지를 받았을 때,
+                // "방금 온 메시지도 바로 읽었어" 라는 신호를 보냅니다.
+                if (msg.senderId === otherUser.id) {
+                    if (myUser.id && myUser.id !== 'null' && myUser.id !== '') {
+                        stompClient.send("/app/chat.readMessage", {}, JSON.stringify({
+                            roomId: roomId,
+                            readerId: myUser.id
+                        }));
+                    }
                 }
+            });
 
-                if (msg.messageType === 'SCHEDULE_REQUEST') {
-                    renderScheduleRequest(msg);
-                } else if (msg.messageType === 'SCHEDULE_CONFIRMED' || msg.messageType === 'SCHEDULE_REJECTED') {
-                    renderSystemMessage(msg.message);
-                } else {
-                    appendMessage(msg);
+            // 3. 상대방이 내 메시지를 읽었음을 감지하고 '1'을 지우는 구독 (기존과 동일)
+            stompClient.subscribe("/topic/read/" + roomId, function(readUpdate) {
+                const updateInfo = JSON.parse(readUpdate.body);
+                if (updateInfo.readerId === otherUser.id) {
+                    const unreadMarkers = document.querySelectorAll('.read-marker.is-unread');
+                    unreadMarkers.forEach(marker => {
+                        marker.textContent = '';
+                        marker.classList.remove('is-unread');
+                    });
                 }
             });
         });
     }
 
-    // 메시지 전송
+    // [최종] 메시지 전송 함수
     function sendMessage() {
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
 
         if (otherUser.status === 'DEACTIVATED') {
             showCustomAlert("탈퇴한 회원입니다. 채팅할 수 없습니다.");
-            messageInput.disabled = true;
-            messageInput.value = '';
-            document.querySelector(".send-btn").disabled = true;
             return;
         }
-
         if (!message) return;
 
         const msg = {
@@ -249,26 +265,27 @@
             message: message,
             sentAt: new Date().toISOString()
         };
-        appendMessage(msg); // 내가 보낸 메시지 즉시 표시
+
+        // 서버로 메시지 전송만 함 (화면에 미리 그리지 않음)
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(msg));
+
         messageInput.value = '';
     }
 
-    // 일반 메시지를 화면에 추가하는 함수
+    // [최종] 일반 메시지를 화면에 추가하는 함수
     function appendMessage(msg) {
+        if (!msg.message) {
+            return;
+        }
         const chatBox = document.getElementById("chatBox");
         if (!chatBox) return;
-
-        let sentAtStr = msg.sentAt;
-        if (sentAtStr) sentAtStr = sentAtStr.replace('T', ' ');
-
+        const isScrolledToBottom = chatBox.scrollHeight - chatBox.clientHeight <= chatBox.scrollTop + 1;
         const senderId = msg.senderId;
         const text = msg.message;
-        const time = sentAtStr ? new Date(sentAtStr) : new Date();
+        const time = msg.sentAt ? new Date(msg.sentAt) : new Date();
         const msgDate = new Date(time);
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
         const timeStr = msgDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-
         if (lastMessageDate !== dateStr) {
             const dateSeparator = document.createElement("div");
             dateSeparator.className = "date-separator";
@@ -276,58 +293,55 @@
             chatBox.appendChild(dateSeparator);
         }
         lastMessageDate = dateStr;
-
         const isMe = (senderId === myUser.id);
         const profileImageUrl = isMe ? myUser.imageUrl : otherUser.imageUrl;
-
         const wrapper = document.createElement("div");
         wrapper.className = "message-wrapper " + (isMe ? "me" : "other");
-
         const profileImg = document.createElement("div");
         profileImg.className = "profile-img";
         const img = document.createElement("img");
         img.src = profileImageUrl;
         profileImg.appendChild(img);
-
         const msgContent = document.createElement("div");
         msgContent.className = "message-content";
-
         if (!isMe) {
             const senderNameElem = document.createElement("div");
             senderNameElem.className = "sender-name";
             senderNameElem.textContent = otherUser.otherName;
             msgContent.appendChild(senderNameElem);
         }
-
         const bubbleWrapper = document.createElement("div");
         bubbleWrapper.className = "bubble-wrapper";
-
         const messageBubble = document.createElement("div");
         messageBubble.className = "message-bubble";
-        if (isMe) {
-            messageBubble.style.borderRadius = '18px 2px 18px 18px';
-        } else {
-            messageBubble.style.borderRadius = '2px 18px 18px 18px';
-        }
-        messageBubble.textContent = text ? text.replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
-
+        messageBubble.textContent = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const timeElem = document.createElement("div");
         timeElem.className = "message-time";
         timeElem.textContent = timeStr;
-
         if (isMe) {
+            const readMarker = document.createElement("div");
+            readMarker.className = "read-marker";
+
+            // [핵심 수정] 숫자 0, boolean false, null, undefined 모두 '안 읽음'으로 처리하는
+            // 더 안전한 방식으로 변경합니다.
+            if (!msg.read) {
+                readMarker.textContent = "1";
+                readMarker.classList.add("is-unread");
+            }
+            bubbleWrapper.appendChild(readMarker);
             bubbleWrapper.appendChild(timeElem);
             bubbleWrapper.appendChild(messageBubble);
         } else {
             bubbleWrapper.appendChild(messageBubble);
             bubbleWrapper.appendChild(timeElem);
         }
-
         msgContent.appendChild(bubbleWrapper);
         wrapper.appendChild(profileImg);
         wrapper.appendChild(msgContent);
         chatBox.appendChild(wrapper);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        if (isMe || isScrolledToBottom) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
     }
 
     // 일정 '요청' UI를 렌더링하는 함수
@@ -365,7 +379,6 @@
             year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
-        // ✅ [수정] 일정의 'status'와 내가 보낸 요청인지('isMe')에 따라 버튼/텍스트를 다르게 설정합니다.
         let actionButtonsHTML = '';
         if (!isMe) { // 내가 요청을 받은 경우
             if (request.status === 'PENDING') {
@@ -407,16 +420,13 @@
 
     // 수락/거절 버튼 클릭을 처리하는 함수
     function handleScheduleAction(scheduleId, action) {
-
         fetch('/schedule/api/events/' + scheduleId + '/' + action, {
             method: 'POST'
         }).then(res => {
             if (res.ok) {
-
                 const actionsDiv = document.getElementById('actions-' + scheduleId);
                 if (actionsDiv) {
-                    const actionText = action === 'confirm' ? '수락됨' : '거절됨';
-
+                    const actionText = action === 'confirm' ? '✅ 수락됨' : '❌ 거절됨';
                     actionsDiv.innerHTML = '<span class="action-completed-text">' + actionText + '</span>';
                 }
             } else {
@@ -444,7 +454,6 @@
         }
         location.href = '/schedule/scheduleReg?targetUserId=' + otherUser.id + '&roomId=' + roomId;
     });
-
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>

@@ -2,8 +2,10 @@ package kopo.shallwithme.mapper;
 
 import kopo.shallwithme.dto.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface IChatMapper {
@@ -29,4 +31,13 @@ public interface IChatMapper {
 
     // 채팅방 상대 프로필 이미지 불러오기
     UserProfileDTO selectProfileImageUrlByUserId(ChatRoomDTO pDTO);
+
+    void incrementUnreadCount(ChatMessageDTO pDTO) throws Exception;
+
+
+    void updateMessageReadStatus(@Param("roomId") String roomId, @Param("readerId") String readerId) throws Exception;
+
+    void resetUnreadCount(@Param("roomId") String roomId, @Param("readerId") String readerId) throws Exception;
+
 }
+
