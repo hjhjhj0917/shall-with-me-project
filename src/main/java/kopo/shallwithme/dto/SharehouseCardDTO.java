@@ -5,10 +5,21 @@ import java.util.List;
 
 @Data
 public class SharehouseCardDTO {
-    private Long houseId;      // 상세로 이동할 키
-    private String title;      // 예: "동래구의 아파트"
-    private String subText;    // 예: "9월 5일~7일" 또는 "부산 동래구"
-    private Integer price;     // 표시 금액(월세/총비용 등)
-    private String coverUrl;   // 대표 이미지 URL
-    private List<String> tags; // 옵션: 카드 하단 태그 0~3개
+
+    private Long houseId;
+
+    private String title;
+    private String subText;
+
+    // INSERT 및 상세용
+    private String address;        // DB가 NOT NULL이면 반드시 값 채워야 함
+    private String coverUrl;       // SHARE_HOUSE.image_url
+    private String thumbnailUrl;   // 목록/단건 서브쿼리 결과용
+
+    // 카드 표시용
+    private Integer price;
+    private List<String> tags;
+
+    // INSERT 시 바인딩 (XML에서 #{regId})
+    private String regId;
 }

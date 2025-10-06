@@ -6,76 +6,10 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
-    <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css?v=20251006"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-
-    <style>
-        /* (검색창 및 다른 부분 스타일은 룸메이트와 동일) */
-        .sh-searchbar {
-            display: flex;
-            align-items: center;
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 50px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            position: relative;
-            height: 66px;
-            padding: 0 10px;
-            width: 100%;
-            max-width: 850px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .search-section { flex: 1; padding: 8px 24px; cursor: pointer; border-radius: 30px; transition: background-color 0.2s; min-width: 0; }
-        .search-section:hover { background-color: #f7f7f7; }
-        .search-section + .search-section { border-left: 1px solid #eee; }
-        .search-section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
-        .search-section-placeholder { font-size: 14px; color: #717171; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #sh-search-btn {
-            width: 48px; height: 48px; border-radius: 50%;
-            background: linear-gradient(to right, #66B2FF, #3399ff);
-            color: white; border: none; font-size: 16px; margin-left: 10px;
-            flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: transform 0.1s;
-        }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center; z-index: 9998; }
-
-        #locationSelectModalOverlay .modal-sheet,
-        #tagSelectModalOverlay .modal-sheet {
-            width: 100%; max-width: 500px; background: white; border-radius: 12px; animation: fadeIn 0.3s; overflow: hidden;
-        }
-        .modal-header { display: flex; align-items: center; justify-content: center; padding: 16px; border-bottom: 1px solid #eee; position: relative; }
-        .modal-title-text { font-weight: 700; color: #222; }
-        .modal-close { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: #222; background: #f7f7f7; border: none; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .modal-body { max-height: 450px; overflow-y: auto; padding: 20px; }
-
-        .location-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .location-item { padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; transition: border-color 0.2s, background-color 0.2s, font-weight 0.2s; font-size: 14px; }
-        .location-item:hover { border-color: #222; }
-        .location-item.selected { background-color: #f7f7f7; border-color: #222; font-weight: 600; }
-
-        /* 태그 모달 그룹 UI (룸메이트와 동일) */
-        .search-tag-group { display: flex; align-items: center; padding: 16px 0; }
-        .search-tag-group + .search-tag-group { border-top: 1px solid #f0f0f0; }
-        .search-tag-group__icon-wrapper { flex-shrink: 0; width: 80px; height: 80px; border-radius: 50%; background-color: #f8f9fa; border: 1px solid #e9ecef; display: flex; align-items: center; justify-content: center; }
-        .search-tag-group__icon-wrapper i { font-size: 30px; color: #495057; }
-        .search-tag-group__content-wrapper { flex-grow: 1; padding-left: 24px; }
-        .search-tag-group__title { font-weight: 600; font-size: 1rem; color: #343a40; margin-bottom: 12px; }
-        .search-tag-group__list { display: flex; flex-wrap: wrap; gap: 10px; }
-        .tag-btn { background-color: #fff; border: 1px solid #dee2e6; border-radius: 20px; padding: 8px 16px; font-size: 0.9rem; color: #495057; cursor: pointer; transition: all 0.2s ease; }
-        .tag-btn.selected { background-color: #3399ff; border-color: #3399ff; color: white; font-weight: 600; }
-        .tag-btn:hover:not(.selected) { border-color: #495057; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        /* 쉐어하우스 카드 일부 텍스트 라인 보정 (선택) */
-        .price-pill { display:inline-block; font-size:12px; background:#eef6ff; border-radius:999px; padding:2px 8px; }
-        .sh-info .sh-sub { display:flex; gap:8px; align-items:center; }
-    </style>
-
 </head>
+
 <body>
 <%@ include file="../includes/header.jsp" %>
 
@@ -410,16 +344,28 @@
 </script>
 
 <script>
-    // 모달 열기/닫기
+    let __pageScrollY = 0;  // ← 파일 상단 스코프(함수 밖) 아무데나 한 줄 선언
+
     function openSharehouseRegModal(url) {
         const ov = document.getElementById('sharehouseRegOverlay');
         const frame = document.getElementById('sharehouseRegFrame');
         if (!ov || !frame) return;
 
-        frame.src = url;
+        const bust = Date.now(); // 캐시 방지 토큰
+        frame.src = url + (url.includes('?') ? '&' : '?') + 'v=' + bust;
+
         ov.style.display = 'flex';
+        document.documentElement.classList.add('modal-open');   // ← html에도 잠금 클래스
+
+        // ★ 배경 스크롤 완전 잠금 (iOS 대응)
+        __pageScrollY = window.scrollY || document.documentElement.scrollTop || 0;
         document.body.classList.add('modal-open');
-        // 포커스 이동
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${__pageScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+
         document.getElementById('sharehouseRegClose')?.focus();
     }
 
@@ -429,9 +375,18 @@
         if (!ov || !frame) return;
 
         ov.style.display = 'none';
-        document.body.classList.remove('modal-open');
         frame.src = 'about:blank';
-        // 포커스 복귀
+        document.documentElement.classList.remove('modal-open'); // ← html 쪽 잠금 해제
+
+        // ★ 배경 스크롤 잠금 해제 + 위치 복원
+        document.body.classList.remove('modal-open');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+
+        window.scrollTo(0, __pageScrollY);
         document.getElementById('sharehouseAddBtn')?.focus();
     }
 
@@ -474,14 +429,14 @@
 
 <!-- 쉐어하우스 등록 모달(iframe) -->
 <div class="modal-overlay" id="sharehouseRegOverlay" style="display:none; z-index:10000;">
-    <div class="modal-sheet" style="width:min(1200px,95vw); height:min(90vh, 100svh - 40px); background:#fff; border-radius:16px; overflow:hidden;">
+    <div class="modal-sheet">
         <div class="modal-header" style="justify-content:space-between;">
             <div class="modal-title-text">쉐어하우스 등록</div>
-            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+<%--            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">--%>
+<%--                <i class="fa-solid fa-xmark"></i>--%>
+<%--            </button> 닫기버튼 임시삭제--%>
         </div>
-        <div class="modal-body" style="padding:0; height:calc(100% - 56px); overflow:hidden;">
+        <div class="modal-body">
             <iframe id="sharehouseRegFrame" title="쉐어하우스 등록 화면" style="width:100%; height:100%; border:0;"></iframe>
         </div>
     </div>

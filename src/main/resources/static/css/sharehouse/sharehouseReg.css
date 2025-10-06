@@ -1,96 +1,228 @@
-/* ===============================
-   5장 업로더 – 심플&깔끔 리디자인
-   왼쪽: 대표 큰 이미지(2x 높이) / 오른쪽: 2×2 정사각 / 아래: 소개글
-   =============================== */
+/* ============== 등록 페이지(iframe 내부) ============== */
 
-/* 바깥(왼쪽 카드 내부)의 섹션 간격은 유지하되, 안쪽 레이아웃만 그리드로 */
-.sh-modal-body.sh-reg{
-    display: block;             /* 바깥은 블록으로 둠 (좌/우 카드 구조 침범 X) */
+/* 컨테이너 */
+.roommate-container{
     width: 100%;
+    max-width: none;
+    padding: 16px 12px;
+    margin: 0 auto;
 }
 
-/* 사진 영역: 왼쪽 대표 넓게, 오른쪽 2열 */
-.sh-uploader-5{
+/* 폼 레이아웃 */
+#roommateForm{
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+.roommate-left{
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+    flex: 1 1 100%;
+    max-width: 100%;
+}
+@media (max-width:1100px){
+    #roommateForm{ flex-direction: column; }
+    .roommate-left{ min-height: 520px; }
+}
+
+/* 폼 공통 */
+.form-group{ margin-bottom: 32px; }
+.form-group label{
+    display: block;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* 업로더(좌) + 태그패널(우) */
+.sh-top-row{
     display: grid;
-    grid-template-columns: minmax(460px, 2fr) 1fr 1fr; /* 대표를 시원하게, 작은칸 2열 */
-    grid-auto-rows: 190px;                              /* 작은칸 한 줄 높이(대표는 2줄 차지 → 380px) */
+    grid-template-columns: minmax(0,1fr) 280px;
+    align-items: stretch;
     gap: 16px;
-    width: 100%;
+    margin-bottom: 20px;
+}
+.sh-top-row > *{ min-width: 0; }
+
+/* Safari 대비(선택): 왼쪽 그리드도 줄어들 수 있게 */
+.sh-top-row > .sh-uploader-5{ min-height: 0; }
+
+@media (max-width:1200px){
+    .sh-top-row{ grid-template-columns: 1fr; }
+
+    /* 모바일에선 패널을 자연 높이로 */
+    .inline-tag-panel.inline-right{
+        position: static;
+        align-self: auto;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
 }
 
-/* 공통 업로더 카드 스타일 */
-.uploader{
+/* 태그 패널(우) */
+.inline-tag-panel.inline-right{
+    background: #fff;
+    border: 1px solid #e9eef7;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 4px 14px rgba(17,24,39,.06);
+    position: relative;        /* sticky 해제 */
+    align-self: stretch;
+    height: 100%;              /* 그리드 셀 높이를 꽉 채움 */
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;            /* 내용 많으면 내부 스크롤 */
+}
+.inline-tag-title{
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+.inline-tag-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 36px;
+}
+.inline-tag-empty{
+    color: #9aa1ac;
+    font-size: 13px;
+}
+.tag-pill{
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 10px;
+    border: 1px solid #e0e7ff;
+    background: #f5f8ff;
+    color: #233876;
+    border-radius: 999px;
+}
+
+/* ============== Airbnb 5장 모자이크 ============== */
+/* 4×2 + 2:1 (셀 정사각), grid-areas로 고정 */
+.roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    grid-template-rows: repeat(2,1fr);
+    grid-template-areas:
+    "A A B C"
+    "A A D E";
+    gap: 14px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/1;
+}
+
+/* 카드 공통 */
+.sh-uploader-5 > .uploader{
     position: relative;
     display: grid;
     place-items: center;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: auto;
     border: 1.5px dashed #d7deea;
-    border-radius: 14px;
+    border-radius: 16px;
     background: linear-gradient(180deg,#fafcff 0%,#f7fbff 100%);
     box-shadow: 0 4px 16px rgba(17,24,39,.04);
-    cursor: pointer;
     overflow: hidden;
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    cursor: pointer;
 }
-.uploader:hover{
-    transform: translateY(-1px);
-    border-color: #a9c4ff;
-    box-shadow: 0 8px 22px rgba(17,24,39,.08);
-}
-.uploader:focus-within{ outline: 2px solid #98b7ff; outline-offset: 2px; }
-
-.uploader input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
-
-.uploader span{
-    color:#7b8aa3;
-    font-size:14px;
-    letter-spacing:.2px;
+.sh-uploader-5 > .uploader .preview{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: inherit;
 }
 
-/* 미리보기 이미지 */
-.uploader .preview{
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    object-fit:cover;
-    border-radius: 12px;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.6);
+/* 위치(직계 5자식) */
+.sh-uploader-5 > .uploader:nth-of-type(1){
+    grid-area: A;
+    border-radius: 16px 0 0 16px;
+}
+.sh-uploader-5 > .uploader:nth-of-type(2){ grid-area: B; }
+.sh-uploader-5 > .uploader:nth-of-type(3){
+    grid-area: C;
+    border-top-right-radius: 16px;
+}
+.sh-uploader-5 > .uploader:nth-of-type(4){ grid-area: D; }
+.sh-uploader-5 > .uploader:nth-of-type(5){
+    grid-area: E;
+    border-bottom-right-radius: 16px;
 }
 
-/* 왼쪽 큰 썸네일: 세로 2칸 차지 (= 높이 2배) */
-.uploader.thumb{
-    grid-column: 1 / 2;
-    grid-row: 1 / span 2;   /* auto-rows(190px) × 2 = 약 380px */
-    min-height: 360px;      /* 모달 넓을 때도 볼륨 유지 */
+/* 모바일(≤1200px) : 대표 16:9 + 아래 2×2 */
+@media (max-width:1200px){
+    .roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5{
+        grid-template-columns: repeat(2,1fr);
+        grid-template-rows: auto;
+        grid-template-areas:
+      "A A"
+      "B C"
+      "D E";
+        aspect-ratio: auto;
+    }
+    .sh-uploader-5 > .uploader:nth-of-type(1){
+        aspect-ratio: 16/9;
+        border-radius: 16px;
+    }
+    .sh-uploader-5 > .uploader:nth-of-type(n+2):nth-of-type(-n+5){
+        aspect-ratio: 1/1;
+    }
 }
 
-/* 오른쪽 4칸: 정사각 */
-.uploader.small{
-    aspect-ratio: 1 / 1;    /* 정사각, auto-rows와 함께 자연 비율 유지 */
-}
-
-/* 아래 소개글은 전체 폭 가로지르며 사진 블록과 간격 */
+/* 소개글 */
 .sh-reg-intro{
     grid-column: 1 / -1;
     margin-top: 18px;
 }
 
-/* 모바일/좁은 화면: 위에 대표 가로 꽉, 그 아래 2×2 */
-@media (max-width: 980px){
-    .sh-uploader-5{
-        grid-template-columns: 1fr 1fr;
-        grid-auto-rows: 150px;
-    }
-    .uploader.thumb{
-        grid-column: 1 / -1;  /* 상단 가로 가득 */
-        grid-row: auto;
-        aspect-ratio: 16 / 9; /* 가로형으로 보기 좋게 */
-        min-height: unset;
-    }
+/* 소개 textarea — 태그패널과 동일 룩 */
+#introTextarea{
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 180px;
+    padding: 14px 16px;
+    border: 1px solid #e9eef7;            /* 태그패널과 동일 */
+    border-radius: 14px;                   /* 태그패널과 동일 */
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(17,24,39,.06); /* 태그패널과 동일 */
+    resize: vertical;                      /* 세로로만 리사이즈 */
 }
+#introTextarea:focus{
+    outline: 2px solid #98b7ff;
+    outline-offset: 0;
+    border-color: #a9c4ff;
+    box-shadow: 0 6px 18px rgba(17,24,39,.08);
+}
+#introTextarea::placeholder{ color:#9aa1ac; }
 
-/* 더 깔끔한 빈 상태(아이콘/텍스트 정렬) */
-.uploader::before{
-    content: ""; width:56px; height:56px; border-radius:50%;
-    background: rgba(51,153,255,.1);
-    position:absolute; opacity:.8; transform: translateY(-10px);
+/* 공통 버튼 */
+.btn{
+    appearance:none;
+    border:0;
+    cursor:pointer;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:600;
+    box-shadow:0 2px 8px rgba(17,24,39,.08);
+    transition:transform .08s ease, filter .15s ease;
 }
-.uploader i{ position:relative; color:#8aa9e6; font-size:20px; margin-bottom:8px; z-index:1; }
+.btn:active{ transform:translateY(1px); }
+
+.btn-cancel{ background:#f3f5f9; color:#475569; }
+.btn-primary{ background:#3399ff; color:#fff; }
+.btn-primary:hover{ filter:brightness(1.03); }
+
+

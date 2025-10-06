@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kopo.shallwithme.mapper.ISharehouseImageMapper">
+
+    <!-- 명시적 매핑: 컬럼 → DTO 필드 -->
+    <resultMap id="SharehouseImageResultMap" type="kopo.shallwithme.dto.SharehouseImageDTO">
+        <id     property="imgId"     column="img_id"/>
+        <result property="houseId"   column="house_id"/>
+        <result property="url"       column="url"/>
+        <result property="isMain"    column="is_main"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="regDt"     column="reg_dt"/>
+    </resultMap>
+
+    <!-- 단건 저장 -->
+    <insert id="insertImage" parameterType="kopo.shallwithme.dto.SharehouseImageDTO">
+        INSERT INTO SHARE_HOUSE_IMAGE
+            (house_id, url, is_main, sort_order, reg_dt)
+        VALUES
+            (#{houseId}, #{url}, #{isMain}, #{sortOrder}, NOW())
+    </insert>
+
+    <!-- 여러 장 저장 (리스트 반복 insert) -->
+    <!-- 인터페이스는 List<SharehouseImageDTO> pList 를 받지만,
+         XML에서는 collection="list" 로 접근하면 됨 -->
+    <insert id="insertImages" parameterType="list">
+        INSERT INTO SHARE_HOUSE_IMAGE
+        (house_id, url, is_main, sort_order, reg_dt)
+        VALUES
+        <foreach collection="list" item="p" separator=",">
+            (#{p.houseId}, #{p.url}, #{p.isMain}, #{p.sortOrder}, NOW())
+        </foreach>
+    </insert>
+
+    <!-- 하우스의 모든 이미지 조회 (대표 먼저, 그 다음 정렬순/등록순) -->
+    <select id="selectByHouseId"
+            parameterType="kopo.shallwithme.dto.SharehouseImageDTO"
+            resultMap="SharehouseImageResultMap">
+        SELECT img_id, house_id, url, is_main, sort_order, reg_dt
+        FROM SHARE_HOUSE_IMAGE
+        WHERE house_id = #{houseId}
+        ORDER BY is_main DESC, sort_order ASC, img_id ASC
+    </select>
+
+    <!-- 대표 이미지 1장 조회 -->
+    <select id="selectMainByHouseId"
+            parameterType="kopo.shallwithme.dto.SharehouseImageDTO"
+            resultMap="SharehouseImageResultMap">
+        SELECT img_id, house_id, url, is_main, sort_order, reg_dt
+        FROM SHARE_HOUSE_IMAGE
+        WHERE house_id = #{houseId}
+          AND is_main = 1
+        ORDER BY img_id ASC
+            LIMIT 1
+    </select>
+
+    <!-- 단건 삭제 -->
+    <delete id="deleteById" parameterType="kopo.shallwithme.dto.SharehouseImageDTO">
+        DELETE FROM SHARE_HOUSE_IMAGE
+        WHERE img_id = #{imgId}
+    </delete>
+
+    <!-- 하우스의 이미지 전체 삭제 -->
+    <delete id="deleteByHouseId" parameterType="kopo.shallwithme.dto.SharehouseImageDTO">
+        DELETE FROM SHARE_HOUSE_IMAGE
+        WHERE house_id = #{houseId}
+    </delete>
+
+</mapper>
