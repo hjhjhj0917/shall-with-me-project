@@ -75,39 +75,66 @@ public class SharehouseController {
         return "sharehouse/sharehouseReg";
     }
 
-    // ✅ 저장 처리 (룸메이트와 동일 구조)
-    @PostMapping("/register")
+    // ✅ 저장 처리 (쉐어하우스 등록: 썸네일 + 추가 이미지들 수신)
+    @PostMapping(
+            value = "/register",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseBody
-    public ResponseEntity<?> registerProfile(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-                                             @RequestParam(value = "introduction", required = false) String introduction,
-                                             HttpSession session) {
-
-        log.info("{}.registerProfile Start!", this.getClass().getName());
-
+    public ResponseEntity<?> register(
+            @RequestParam("thumbnail") MultipartFile thumbnail,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam(value = "introduction", required = false) String introduction,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage, // 프론트 호환(있으면 사용)
+            HttpSession session
+    ){
         String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
         if (userId == null || userId.isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("result", "fail", "msg", "로그인이 필요합니다."));
+                    .body(Map.of("result", 0, "msg", "로그인이 필요합니다."));
         }
 
         try {
-            String imageUrl = null;
-            if (profileImage != null && !profileImage.isEmpty()) {
-                imageUrl = saveProfileImage(profileImage); // 이미지 저장 로직 (S3/NCP)
+            // 1) 대표 이미지 업로드 (profileImage가 오면 우선 사용, 없으면 thumbnail 사용)
+            MultipartFile cover = (profileImage != null && !profileImage.isEmpty()) ? profileImage : thumbnail;
+            String coverUrl = (cover != null && !cover.isEmpty()) ? saveProfileImage(cover) : null;
+
+            // 2) 추가 이미지 업로드 (선택)
+            List<String> imageUrls = new ArrayList<>();
+            if (images != null) {
+                for (MultipartFile f : images) {
+                    if (f != null && !f.isEmpty()) {
+                        imageUrls.add(saveProfileImage(f));
+                    }
+                }
             }
 
-            // 룸메이트: saveUserProfile(...)
-            // 쉐어하우스: 주인/매물 등록용 메서드로 위임(더미/DB는 서비스에서 처리)
-            sharehouseService.registerHouse(userId, introduction, null, null, imageUrl);
+            sharehouseService.registerHouse(
+                    userId,
+                    (introduction != null && !introduction.isBlank()) ? introduction : "제목 없음", // title
+                    "",     // subText (NOT NULL 대비: 빈 문자열)
+                    0,      // price   (NOT NULL 대비: 기본값 0)
+                    coverUrl
+            );
 
-            // 필요시 세션에 대표 이미지 보관 (화면 구성 동일하게 맞춤용)
-            session.setAttribute("SS_USER_PROFILE_IMG_URL", imageUrl);
-
-            return ResponseEntity.ok(Map.of("result", "success"));
+            return ResponseEntity.ok(Map.of("result", 1));
         } catch (Exception e) {
+            // 루트 원인 추출
+            Throwable root = e;
+            while (root.getCause() != null) root = root.getCause();
+
+            log.error("sharehouse/register failed", e);
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("result", "fail", "msg", "서버 오류로 저장에 실패했습니다."));
+                    .body(Map.of(
+                            "result", 0,
+                            "msg", "DB오류: " +
+                                    root.getClass().getSimpleName() + " - " +
+                                    (root.getMessage() != null ? root.getMessage() : "")
+                    ));
         }
+
     }
 
     // S3(NCP) 업로드 – 룸메이트와 동일한 방식/이름 유지

@@ -93,7 +93,7 @@
         INSERT INTO SHARE_HOUSE
             (house_name, address, description, image_url, reg_id, reg_dt)
         VALUES
-            (#{title}, #{address}, #{subText}, #{coverUrl}, #{regId}, NOW())
+            (#{title}, COALESCE(#{address}, ''), #{subText}, #{coverUrl}, #{regId}, NOW())
     </insert>
 
 </mapper>

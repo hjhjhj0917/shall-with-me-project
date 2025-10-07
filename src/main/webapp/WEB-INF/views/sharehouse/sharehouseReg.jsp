@@ -201,6 +201,85 @@
   });
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('roommateForm');
+    const btn  = document.getElementById('btnSave');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 간단 검증
+      const thumb = form.querySelector('input[name="thumbnail"]')?.files?.[0];
+      if (!thumb) { alert('대표 이미지를 선택해 주세요.'); return; }
+      const imgs = [...form.querySelectorAll('input[name="images"]')]
+              .map(i => i.files?.[0]).filter(Boolean);
+      if (imgs.length < 1) { alert('추가 이미지를 최소 1장 선택해 주세요.'); return; }
+
+      btn.disabled = true; btn.textContent = '저장중...';
+
+      const fd = new FormData(form); // name="images" 여러개 자동 포함
+      // 룸메이트와 동일 구조: thumbnail을 profileImage로도 같이 전송
+      fd.append('profileImage', form.querySelector('input[name="thumbnail"]').files[0]);
+
+
+      try {
+        const url = (typeof ctx !== 'undefined' ? ctx : '') + '/sharehouse/register';
+        const res = await fetch(url, {
+          method: 'POST',
+          body: fd,
+          credentials: 'include', // 세션 쿠키 포함
+        });
+
+        let json = null;
+        try { json = await res.clone().json(); } catch (_) { /* ignore */ }
+
+// 리다이렉트/불투명 응답(상태코드 0) 대비
+        if (res.status === 0 || res.type === 'opaqueredirect') {
+          alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.');
+          return;
+        }
+
+// 일반 실패 처리
+        if (!res.ok) {
+          const text =
+                  (json && json.msg) ||
+                  (await res.text().catch(() => '')) ||
+                  '서버 오류';
+          alert(`저장 실패 (${res.status})\n${text}`);
+          return;
+        }
+
+        json = json || {};
+
+        if (json.result === 1 || json.result === 'success') {
+          // 부모창에 목록 리로드 신호 (data 없을 수도 있으니 안전 처리)
+          const savedId = json?.data?.shId ?? null;
+          if (window.parent) {
+            window.parent.postMessage({ type: 'SH_SAVED', shId: savedId }, '*');
+          }
+
+          // 모달 닫기 (함수가 있으면)
+          try {
+            if (window.parent && typeof window.parent.closeSharehouseRegModal === 'function') {
+              window.parent.closeSharehouseRegModal();
+            }
+          } catch(_) {}
+
+          // 단독 페이지로 연 경우엔 메인 이동
+          if (window === window.parent) location.href = '/sharehouse/main';
+        } else {
+          alert(json.msg || '저장에 실패했습니다.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('서버 통신 중 오류가 발생했습니다.');
+      } finally {
+        btn.disabled = false; btn.textContent = '저장';
+      }
+    });
+  });
+</script>
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 </body>

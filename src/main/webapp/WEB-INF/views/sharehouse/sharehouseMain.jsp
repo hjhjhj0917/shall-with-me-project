@@ -81,12 +81,12 @@
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
 
-        // 기존 이벤트 제거 후 다시 등록
+        // 카드 클릭 시 상세 새창
         grid.addEventListener('click', (e) => {
             const card = e.target.closest('.sh-card');
             if (!card) return;
 
-            const id = card.getAttribute('data-id'); // ← 여기! dataset 대신 attr
+            const id = card.getAttribute('data-id');
             console.log("🧩 클릭된 카드 ID:", id);
 
             if (!id) {
@@ -94,14 +94,12 @@
                 return;
             }
 
-            // 새 창으로 열기
             const url = ctx + '/sharehouse/detail?houseId=' + encodeURIComponent(id);
             console.log("🔗 이동 URL:", url);
             window.open(url, "_blank");
         });
     })();
 </script>
-
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
@@ -139,7 +137,7 @@
             loadFilteredPage(page);
         });
 
-        // 공통 응답 처리 (빈 데이터여도 안전)
+        // 공통 응답 처리
         function handleApiResponse(data) {
             const items = data.items || data.list || data || [];
             if (!items || items.length === 0) { lastPage = true; return; }
@@ -147,7 +145,7 @@
             if (data.lastPage === true) lastPage = true;
         }
 
-        // 기본 목록: 서버에서 15/5 규칙 적용 가능
+        // 기본 목록
         function loadPage(p) {
             loading = true;
             $.ajax({
@@ -294,12 +292,11 @@
             }
         }
 
-        // 카드 렌더링 (쉐어하우스용: houseId/title/city/rent/thumbnailUrl/tag1/tag2)
+        // 카드 렌더링 (쉐어하우스용)
         function renderHouseCards(items) {
             const $grid = $(".sh-grid");
             const noimg = ctx + "/images/noimg.png";
             items.forEach(house => {
-                /* 임시: 어떤 키로 오는지 로그로 한번 확인 */
                 console.log('sharehouse item keys:', Object.keys(house), house);
 
                 const hid =
@@ -311,11 +308,8 @@
                     house.seq ?? house.SEQ ?? house.idx ?? house.IDX ?? null;
 
                 const $card = $("<article>").addClass("sh-card");
-                /* data-id는 비어 있어도 일단 넣어두자(디버깅 편함) */
                 $card.attr("data-id", hid ?? "");
 
-
-                // 3) 썸네일/정보
                 const imgUrl = house.thumbnailUrl || noimg;
                 const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
 
@@ -333,31 +327,37 @@
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
 
-// 4) 조립
                 $info.append($title, $sub, $tagBox);
                 $card.append($thumb, $info);
                 $grid.append($card);
-
             });
         }
+
+        /* ✅ 추가: 첫 페이지 다시 로드(외부에서 호출) */
+        window.loadSharehouseFirstPage = function () {
+            page = 1;
+            lastPage = false;
+            $grid.empty();
+            const loadFunc = isSearching ? loadFilteredPage : loadPage;
+            loadFunc(page);
+        };
     });
 </script>
 
 <script>
-    let __pageScrollY = 0;  // ← 파일 상단 스코프(함수 밖) 아무데나 한 줄 선언
+    let __pageScrollY = 0;
 
     function openSharehouseRegModal(url) {
         const ov = document.getElementById('sharehouseRegOverlay');
         const frame = document.getElementById('sharehouseRegFrame');
         if (!ov || !frame) return;
 
-        const bust = Date.now(); // 캐시 방지 토큰
+        const bust = Date.now();
         frame.src = url + (url.includes('?') ? '&' : '?') + 'v=' + bust;
 
         ov.style.display = 'flex';
-        document.documentElement.classList.add('modal-open');   // ← html에도 잠금 클래스
+        document.documentElement.classList.add('modal-open');
 
-        // ★ 배경 스크롤 완전 잠금 (iOS 대응)
         __pageScrollY = window.scrollY || document.documentElement.scrollTop || 0;
         document.body.classList.add('modal-open');
         document.body.style.position = 'fixed';
@@ -376,9 +376,8 @@
 
         ov.style.display = 'none';
         frame.src = 'about:blank';
-        document.documentElement.classList.remove('modal-open'); // ← html 쪽 잠금 해제
+        document.documentElement.classList.remove('modal-open');
 
-        // ★ 배경 스크롤 잠금 해제 + 위치 복원
         document.body.classList.remove('modal-open');
         document.body.style.position = '';
         document.body.style.top = '';
@@ -390,33 +389,35 @@
         document.getElementById('sharehouseAddBtn')?.focus();
     }
 
-    // ✅ 1) 배경 클릭으로는 닫히지 않게 (유지)
-    // document 클릭 리스너 "삭제" 또는 사용 안 함
-    // (배경 클릭 닫기 코드였던 줄은 그대로 주석 유지)
-    // document.addEventListener('click', (e) => {
-    //   const ov = document.getElementById('sharehouseRegOverlay');
-    //   if (!ov || ov.style.display !== 'flex') return;
-    //   // if (e.target === ov) closeSharehouseRegModal();  // ← 배경 클릭 닫기 금지
-    // });
-
-    // ✅ 2) ESC로 닫기 — 전역에서 한 번만 등록 (중첩 금지)
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeSharehouseRegModal();  // ← ESC 정상 작동
+        if (e.key === 'Escape') closeSharehouseRegModal();
     });
 
-    // ✅ 3) X 버튼으로 닫기 — DOM 준비된 후에 안전하게 리스너 부착
     document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('sharehouseRegClose');
-        if (btn) {
-            btn.addEventListener('click', closeSharehouseRegModal); // ← X 정상 작동
-        }
+        if (btn) btn.addEventListener('click', closeSharehouseRegModal);
 
-        // (참고) 등록 버튼로 모달 열기 리스너도 여기에서 붙이면 안전
         const openBtn = document.getElementById('sharehouseAddBtn');
         if (openBtn) {
             openBtn.addEventListener('click', () => {
                 openSharehouseRegModal(ctx + '/sharehouse/sharehouseReg?inModal=Y');
             });
+        }
+    });
+</script>
+
+<script>
+    // 저장 완료(postMessage) 받으면 목록 초기화 후 재조회
+    window.addEventListener('message', (e) => {
+        if (e?.data?.type === 'SH_SAVED') {
+            if (typeof closeSharehouseRegModal === 'function') closeSharehouseRegModal();
+
+            /* ✅ 변경: 한 줄로 리로드 */
+            if (typeof window.loadSharehouseFirstPage === 'function') {
+                window.loadSharehouseFirstPage();
+            } else {
+                location.reload();
+            }
         }
     });
 </script>
@@ -432,9 +433,9 @@
     <div class="modal-sheet">
         <div class="modal-header" style="justify-content:space-between;">
             <div class="modal-title-text">쉐어하우스 등록</div>
-<%--            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">--%>
-<%--                <i class="fa-solid fa-xmark"></i>--%>
-<%--            </button> 닫기버튼 임시삭제--%>
+            <%--            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">--%>
+            <%--                <i class="fa-solid fa-xmark"></i>--%>
+            <%--            </button> 닫기버튼 임시삭제--%>
         </div>
         <div class="modal-body">
             <iframe id="sharehouseRegFrame" title="쉐어하우스 등록 화면" style="width:100%; height:100%; border:0;"></iframe>
