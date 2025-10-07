@@ -58,11 +58,23 @@
         <label>
           <span>
             <c:choose>
-              <c:when test="${not empty loginName}"><c:out value="${loginName}"/> 의 쉐어하우스</c:when>
+              <c:when test="${not empty loginName}"><c:out value="${loginName}"/>의 쉐어하우스</c:when>
               <c:otherwise>내 쉐어하우스</c:otherwise>
             </c:choose>
           </span>
         </label>
+      </div>
+
+      <!-- ✅ 추가: 쉐어하우스 이름 입력 -->
+      <div class="form-group">
+        <label>쉐어하우스 이름 <span style="color:#999; font-size:0.9em;">(최대 15자)</span></label>
+        <input type="text"
+               name="houseName"
+               id="houseName"
+               maxlength="15"
+               placeholder="예: 강남 따뜻한 쉐어하우스"
+               required
+               style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
       </div>
 
       <div class="sh-modal-body sh-reg">
@@ -209,7 +221,18 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // 간단 검증
+      const houseName = document.getElementById('houseName')?.value?.trim();
+      if (!houseName) {
+        alert('쉐어하우스 이름을 입력해 주세요.');
+        document.getElementById('houseName')?.focus();
+        return;
+      }
+      if (houseName.length > 15) {
+        alert('쉐어하우스 이름은 최대 15자까지 입력 가능합니다.');
+        return;
+      }
+
+      // ✅ 이름 검증 추가
       const thumb = form.querySelector('input[name="thumbnail"]')?.files?.[0];
       if (!thumb) { alert('대표 이미지를 선택해 주세요.'); return; }
       const imgs = [...form.querySelectorAll('input[name="images"]')]

@@ -87,6 +87,7 @@ public class SharehouseController {
     public ResponseEntity<?> register(
             @RequestParam("thumbnail") MultipartFile thumbnail,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam(value = "houseName", required = false) String houseName,  // ✅ 추가
             @RequestParam(value = "introduction", required = false) String introduction,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
             HttpSession session
@@ -100,11 +101,12 @@ public class SharehouseController {
         try {
             log.info("=== 쉐어하우스 등록 요청 시작 ===");
             log.info("userId: {}", userId);
+            log.info("houseName: {}", houseName);
             log.info("introduction: {}", introduction);
             log.info("thumbnail: {}", thumbnail != null ? thumbnail.getOriginalFilename() : "null");
             log.info("추가 이미지 개수: {}", images != null ? images.size() : 0);
 
-            // ★★★ 핵심 변경: 이미지 URL 배열 생성 ★★★
+            // 이미지 URL 배열 생성
             List<String> imageUrls = new ArrayList<>();
 
             // 1) 썸네일 (대표 이미지)
@@ -127,11 +129,11 @@ public class SharehouseController {
 
             log.info("총 업로드된 이미지: {}개", imageUrls.size());
 
-            // ★★★ 새로운 Service 메서드 호출 ★★★
+            // ✅ houseName을 title로, introduction을 subText로 저장
             Long houseId = sharehouseService.registerHouseWithImages(
                     userId,
-                    (introduction != null && !introduction.isBlank()) ? introduction : "제목 없음",
-                    "",      // subText
+                    (houseName != null && !houseName.isBlank()) ? houseName : "제목 없음",  // title
+                    (introduction != null && !introduction.isBlank()) ? introduction : "",  // subText
                     "",      // address
                     imageUrls
             );
