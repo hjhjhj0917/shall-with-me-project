@@ -106,14 +106,14 @@
 
 <script>
     $(document).ready(function () {
-        // 룸메이트와 동일 규칙: 첫 15장, 이후 5장
-        let page = 1, loading = false, lastPage = false, isSearching = false;
+        // ✅ 룸메이트와 동일한 offset 기반 로직
+        let offset = 0, loading = false, lastPage = false;
         let selectedLocation = "";
         const selectedTags = new Map();
         const $grid = $(".sh-grid");
         const $scrollArea = $(".sh-scroll-area");
 
-        loadPage(page);
+        loadInitialData(); // 첫 로드: 15개
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
@@ -121,61 +121,54 @@
             let innerHeight = $scrollArea.innerHeight();
             let scrollHeight = $scrollArea[0].scrollHeight;
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
-                page++;
-                const loadFunc = isSearching ? loadFilteredPage : loadPage;
-                loadFunc(page);
+                loadMoreData(); // 추가 로드: 5개
             }
         });
 
         $('#location-search-trigger').on('click', openLocationModal);
         $('#tag-search-trigger').on('click', openTagModal);
         $('#sh-search-btn').on('click', function () {
-            isSearching = true;
-            page = 1;
+            offset = 0;
             lastPage = false;
             $grid.empty();
-            loadFilteredPage(page);
+            loadInitialData();
         });
 
-        // 공통 응답 처리
-        function handleApiResponse(data) {
-            const items = data.items || data.list || data || [];
-            if (!items || items.length === 0) { lastPage = true; return; }
-            renderHouseCards(items);
-            if (data.lastPage === true) lastPage = true;
+        // ✅ 초기 데이터 로드 (15개)
+        function loadInitialData() {
+            loadData(0, 15);
         }
 
-        // 기본 목록
-        function loadPage(p) {
+        // ✅ 추가 데이터 로드 (5개)
+        function loadMoreData() {
+            loadData(offset, 5);
+        }
+
+        // ✅ 통합 데이터 로드 함수
+        function loadData(currentOffset, size) {
             loading = true;
+
             $.ajax({
                 url: ctx + "/sharehouse/list",
                 type: "GET",
-                data: { page: p },
+                data: {
+                    offset: currentOffset,
+                    pageSize: size,
+                    location: selectedLocation || null,
+                    tagIds: Array.from(selectedTags.keys())
+                },
                 dataType: "json",
-                success: handleApiResponse,
+                success: function (data) {
+                    const items = data.items || data.list || data || [];
+                    if (items.length > 0) {
+                        renderHouseCards(items);
+                        offset += items.length;
+                    }
+                    if (items.length < size || data.lastPage) {
+                        lastPage = true;
+                    }
+                },
                 error: (xhr, status, err) => console.error("쉐어하우스 목록 불러오기 실패:", err),
-                complete: () => loading = false
-            });
-        }
-
-        // 필터 검색
-        function loadFilteredPage(p) {
-            loading = true;
-            const reqData = {
-                tagIds: Array.from(selectedTags.keys()),
-                location: selectedLocation,
-                page: p,
-                pageSize: 10
-            };
-            $.ajax({
-                url: ctx + "/sharehouse/search",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(reqData),
-                dataType: "json",
-                success: handleApiResponse,
-                error: (err) => console.error('검색 실패', err),
                 complete: () => loading = false
             });
         }
@@ -225,7 +218,6 @@
             });
         }
 
-        // (룸메이트와 동일한 레이아웃 렌더)
         function renderAllTags(tagsFromServer) {
             const $container = $('#all-tag-list').empty();
             const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
@@ -277,6 +269,7 @@
             else selectedTags.set(tagId, tagName);
             updateTagDisplay();
         }
+
         function updateTagDisplay() {
             $('#all-tag-list .tag-btn').each(function () {
                 $(this).toggleClass('selected', selectedTags.has($(this).data('id')));
@@ -293,46 +286,29 @@
         }
 
         function renderHouseCards(items) {
-            const $grid = $(".sh-grid");
             const noimg = ctx + "/images/noimg.png";
             items.forEach(house => {
-                console.log('sharehouse item:', house);
-
-                const hid = house.userId;  // userId가 houseId
-
-                const $card = $("<article>").addClass("sh-card");
-                $card.attr("data-id", hid ?? "");
-
-                const imgUrl = house.profileImgUrl || noimg;  // profileImgUrl이 이미지
+                const hid = house.userId || house.houseId;
+                const $card = $("<article>").addClass("sh-card").attr("data-id", hid ?? "");
+                const imgUrl = house.profileImgUrl || noimg;
                 const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
-
                 const $info = $("<div>").addClass("sh-info");
-                const title = house.name || "제목 없음";  // ✅ house.name으로 변경!
-                const city = house.city || "";
-                const price = (house.rent != null) ? (house.rent + "만원") : "";
-
+                const title = house.name || "제목 없음";
                 const $title = $("<p>").addClass("sh-title").text(title);
-                const $sub = $("<p>").addClass("sh-sub");
-                if (city) $sub.append(document.createTextNode(city));
-                if (price) $sub.append($("<span>").addClass("price-pill").text(price));
-
                 const $tagBox = $("<div>").addClass("tag-box");
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
-
-                $info.append($title, $sub, $tagBox);
+                $info.append($title, $tagBox);
                 $card.append($thumb, $info);
                 $grid.append($card);
             });
         }
 
-        /* ✅ 추가: 첫 페이지 다시 로드(외부에서 호출) */
         window.loadSharehouseFirstPage = function () {
-            page = 1;
+            offset = 0;
             lastPage = false;
             $grid.empty();
-            const loadFunc = isSearching ? loadFilteredPage : loadPage;
-            loadFunc(page);
+            loadInitialData();
         };
     });
 </script>

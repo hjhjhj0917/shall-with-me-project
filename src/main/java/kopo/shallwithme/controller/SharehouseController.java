@@ -218,29 +218,25 @@ public class SharehouseController {
         return rList;
     }
 
-    // ★ 무한 스크롤 목록 API (JSON) – 응답 포맷 { items, lastPage } 동일
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
-        int safePage = Math.max(page, 1);
-        int pageSize = 12;
-        int offset = (safePage - 1) * pageSize;
+    public Map<String, Object> list(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "15") int pageSize) {
 
         List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
 
         List<Map<String, Object>> items = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();
-            m.put("userId", c.getHouseId());   // 프론트 구조 재사용을 위해 키 이름 맞춤
+            m.put("userId", c.getHouseId());
             m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
-            m.put("age", null);
             m.put("tag1", (c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null);
             m.put("tag2", (c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null);
-            m.put("gender", null);
             return m;
         }).collect(Collectors.toList());
 
-        boolean lastPage = items.isEmpty();
+        boolean lastPage = items.size() < pageSize;
         return Map.of("items", items, "lastPage", lastPage);
     }
 
