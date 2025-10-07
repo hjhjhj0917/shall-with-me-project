@@ -1,12 +1,20 @@
 /* ============== Main: 검색바 + 목록 + 모달 프레임 ============== */
 
+:root{
+    --sh-primary:#1c407d;
+    --sh-border:#e5e7eb;
+    --sh-bg:#f5f7fb;
+    --radius:14px;
+    --shadow:0 6px 18px rgba(0,0,0,.06);
+}
+
 /* 검색바 */
 .sh-searchbar{
     display:flex; align-items:center;
     background:#fff; border:1px solid #e0e0e0; border-radius:50px;
     box-shadow:0 3px 12px rgba(0,0,0,.08);
     position:relative; height:66px; padding:0 10px;
-    width:100%; max-width:850px; margin:0 auto;
+    width:100%; max-width:850px; margin:0 auto 28px;
 }
 .search-section{ flex:1; padding:8px 24px; cursor:pointer; border-radius:30px; transition:background-color .2s; min-width:0; }
 .search-section:hover{ background:#f7f7f7; }
@@ -66,10 +74,6 @@
 
 @keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
 
-/* 카드 보조 */
-.price-pill{ display:inline-block; font-size:12px; background:#eef6ff; border-radius:999px; padding:2px 8px; }
-.sh-info .sh-sub{ display:flex; gap:8px; align-items:center; }
-
 /* ============== 등록 모달(iframe) 프레임 ============== */
 #sharehouseRegOverlay{ position:fixed; inset:0; overflow:hidden; }
 #sharehouseRegOverlay .modal-sheet{
@@ -84,3 +88,99 @@
 /* 모달 열릴 때 배경 스크롤 잠금 */
 html.modal-open, body.modal-open{ overflow:hidden !important; height:100%; }
 body.modal-open .sh-scroll-area{ overflow:hidden !important; }
+
+/* ============== 카드 레이아웃 (룸메이트와 동일) ============== */
+
+/* 전체 래퍼 */
+#sh-wrapper {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 110px 24px 0;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 110px);
+}
+
+/* 카드 그리드 (5열) */
+.sh-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:24px;
+}
+
+/* 카드 */
+.sh-card{
+    background:#fff;
+    border:1px solid var(--sh-border);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+
+.sh-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+
+/* 썸네일 */
+.sh-thumb {
+    height: 180px;
+    background: #e9eef7 no-repeat;
+    background-size: cover;
+    background-position: center 15%;
+}
+
+/* 텍스트 영역 */
+.sh-info{
+    padding:10px 12px 14px;
+}
+
+.sh-title{
+    margin:0 0 4px 0;
+    font-weight:600;
+    font-size:14px;
+}
+
+.sh-sub{
+    margin:0;
+    font-size:13px;
+    color:#4b5563;
+}
+
+/* 스크롤 영역 */
+.sh-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 8px 80px 0;
+    min-height: 830px;
+}
+
+/* 태그 */
+.tag-box {
+    margin-top: 6px;
+}
+
+.tag {
+    display: inline-block;
+    background: #f2f2f2;
+    padding: 4px 8px;
+    margin-right: 6px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* 가격 알약 */
+.price-pill{
+    display:inline-block;
+    font-size:12px;
+    background:#eef6ff;
+    border-radius:999px;
+    padding:2px 8px;
+}
+
+/* 무한 스크롤 */
+#sh-sentinel { height: 24px; display:block; }
+#sh-loader { text-align:center; padding:16px; color:#6b7280; font-size:14px; }

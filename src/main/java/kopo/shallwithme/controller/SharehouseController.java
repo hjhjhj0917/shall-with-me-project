@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import kopo.shallwithme.mapper.ISharehouseMapper;  // ✅ 추가!
+import kopo.shallwithme.dto.UserTagDTO;            // ✅ 추가!
 
 import java.io.IOException;
 import java.util.*;
@@ -86,7 +88,7 @@ public class SharehouseController {
             @RequestParam("thumbnail") MultipartFile thumbnail,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
             @RequestParam(value = "introduction", required = false) String introduction,
-            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage, // 프론트 호환(있으면 사용)
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
             HttpSession session
     ){
         String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
@@ -96,35 +98,56 @@ public class SharehouseController {
         }
 
         try {
-            // 1) 대표 이미지 업로드 (profileImage가 오면 우선 사용, 없으면 thumbnail 사용)
-            MultipartFile cover = (profileImage != null && !profileImage.isEmpty()) ? profileImage : thumbnail;
-            String coverUrl = (cover != null && !cover.isEmpty()) ? saveProfileImage(cover) : null;
+            log.info("=== 쉐어하우스 등록 요청 시작 ===");
+            log.info("userId: {}", userId);
+            log.info("introduction: {}", introduction);
+            log.info("thumbnail: {}", thumbnail != null ? thumbnail.getOriginalFilename() : "null");
+            log.info("추가 이미지 개수: {}", images != null ? images.size() : 0);
 
-            // 2) 추가 이미지 업로드 (선택)
+            // ★★★ 핵심 변경: 이미지 URL 배열 생성 ★★★
             List<String> imageUrls = new ArrayList<>();
+
+            // 1) 썸네일 (대표 이미지)
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                String thumbnailUrl = saveProfileImage(thumbnail);
+                imageUrls.add(thumbnailUrl);
+                log.info("썸네일 업로드: {}", thumbnailUrl);
+            }
+
+            // 2) 추가 이미지들
             if (images != null) {
                 for (MultipartFile f : images) {
                     if (f != null && !f.isEmpty()) {
-                        imageUrls.add(saveProfileImage(f));
+                        String url = saveProfileImage(f);
+                        imageUrls.add(url);
+                        log.info("추가 이미지 업로드: {}", url);
                     }
                 }
             }
 
-            sharehouseService.registerHouse(
+            log.info("총 업로드된 이미지: {}개", imageUrls.size());
+
+            // ★★★ 새로운 Service 메서드 호출 ★★★
+            Long houseId = sharehouseService.registerHouseWithImages(
                     userId,
-                    (introduction != null && !introduction.isBlank()) ? introduction : "제목 없음", // title
-                    "",     // subText (NOT NULL 대비: 빈 문자열)
-                    0,      // price   (NOT NULL 대비: 기본값 0)
-                    coverUrl
+                    (introduction != null && !introduction.isBlank()) ? introduction : "제목 없음",
+                    "",      // subText
+                    "",      // address
+                    imageUrls
             );
 
-            return ResponseEntity.ok(Map.of("result", 1));
+            log.info("✅ 등록 완료! houseId={}", houseId);
+
+            return ResponseEntity.ok(Map.of(
+                    "result", 1,
+                    "data", Map.of("shId", houseId)
+            ));
+
         } catch (Exception e) {
-            // 루트 원인 추출
             Throwable root = e;
             while (root.getCause() != null) root = root.getCause();
 
-            log.error("sharehouse/register failed", e);
+            log.error("sharehouse/register 실패", e);
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
@@ -134,7 +157,6 @@ public class SharehouseController {
                                     (root.getMessage() != null ? root.getMessage() : "")
                     ));
         }
-
     }
 
     // S3(NCP) 업로드 – 룸메이트와 동일한 방식/이름 유지
@@ -241,19 +263,31 @@ public class SharehouseController {
         return Map.of("tag1", tag1, "tag2", tag2, "gender", null);
     }
 
-    // 상세 페이지 – 룸메이트의 roommateDetail과 동일한 흐름/경로 이름만 변경
     @GetMapping("/sharehouseDetail")
-    public String roommateDetail(UserProfileDTO pDTO, org.springframework.ui.Model model) {
-        String userId = pDTO.getUserId();  // ?userId=xxx
-
+    public String sharehouseDetail(UserProfileDTO pDTO, org.springframework.ui.Model model) {
+        String userId = pDTO.getUserId();
         log.info("sharehouseDetail called with userId={}", userId);
 
         Long houseId;
-        try { houseId = Long.valueOf(userId); }
-        catch (Exception e) { houseId = 1L; }
+        try {
+            houseId = Long.valueOf(userId);
+        } catch (Exception e) {
+            houseId = 1L;
+        }
 
-        var detail = sharehouseService.getDetail(houseId);
-        model.addAttribute("user", detail); // 키 이름도 user 그대로(뷰 재사용을 위해)
+        // ✅ 모두 Service를 통해 조회
+        Map<String, Object> detail = sharehouseService.getDetail(houseId);
+        List<Map<String, Object>> images = sharehouseService.selectSharehouseImages(houseId);
+        List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(houseId);
+
+        // Model에 추가
+        detail.put("images", images);
+        detail.put("tags", tags);
+
+        log.info("이미지 개수: {}", images != null ? images.size() : 0);
+        log.info("태그 개수: {}", tags != null ? tags.size() : 0);
+
+        model.addAttribute("user", detail);
 
         return "sharehouse/sharehouseDetail";
     }

@@ -19,10 +19,10 @@
              ORDER BY shi.sort_order ASC, shi.img_id ASC
                               LIMIT 1)      AS coverUrl,
             (SELECT shi.url
-               FROM SHARE_HOUSE_IMAGE shi
-              WHERE shi.house_id = sh.house_id
-              ORDER BY shi.sort_order ASC, shi.img_id ASC
-              LIMIT 1)      AS thumbnailUrl
+             FROM SHARE_HOUSE_IMAGE shi
+             WHERE shi.house_id = sh.house_id
+             ORDER BY shi.sort_order ASC, shi.img_id ASC
+             LIMIT 1)      AS thumbnailUrl
         FROM SHARE_HOUSE sh
         ORDER BY sh.reg_dt DESC
             LIMIT #{limit} OFFSET #{offset}
@@ -42,10 +42,10 @@
              ORDER BY shi.sort_order ASC, shi.img_id ASC
                               LIMIT 1)      AS coverUrl,
             (SELECT shi.url
-               FROM SHARE_HOUSE_IMAGE shi
-              WHERE shi.house_id = sh.house_id
-              ORDER BY shi.sort_order ASC, shi.img_id ASC
-              LIMIT 1)      AS thumbnailUrl
+             FROM SHARE_HOUSE_IMAGE shi
+             WHERE shi.house_id = sh.house_id
+             ORDER BY shi.sort_order ASC, shi.img_id ASC
+             LIMIT 1)      AS thumbnailUrl
         FROM SHARE_HOUSE sh
         WHERE sh.house_id = #{value}
             LIMIT 1
@@ -72,18 +72,32 @@
             LIMIT 1
     </select>
 
-    <!-- 태그 -->
+    <!-- 쉐어하우스의 모든 이미지 조회 (★ 추가 ★) -->
+    <select id="selectSharehouseImages"
+            parameterType="long"
+            resultType="map">
+        SELECT
+            img_id     AS imgId,
+            house_id   AS houseId,
+            url,
+            sort_order AS sortOrder,
+            reg_dt     AS regDt
+        FROM SHARE_HOUSE_IMAGE
+        WHERE house_id = #{value}
+        ORDER BY sort_order ASC, img_id ASC
+    </select>
+
     <select id="selectSharehouseTags"
             parameterType="long"
             resultType="kopo.shallwithme.dto.UserTagDTO">
         SELECT
-            st.house_id AS houseId,
-            st.tag_id   AS tagId,
-            t.tag_name  AS tagName
+            st.house_id     AS houseId,
+            st.house_tag_id AS tagId,
+            t.tag_name      AS tagName
         FROM SHARE_HOUSE_TAG st
-                 JOIN TAG t ON t.tag_id = st.tag_id
+                 JOIN TAG t ON t.tag_id = st.house_tag_id
         WHERE st.house_id = #{value}
-        ORDER BY st.tag_id DESC
+        ORDER BY st.house_tag_id DESC
     </select>
 
     <!-- insert: PK 자동반환 -->
@@ -94,6 +108,16 @@
             (house_name, address, description, image_url, reg_id, reg_dt)
         VALUES
             (#{title}, COALESCE(#{address}, ''), #{subText}, #{coverUrl}, #{regId}, NOW())
+    </insert>
+
+    <!-- ★★★ 이미지 배치 저장 (핵심 추가!) ★★★ -->
+    <insert id="insertSharehouseImages" parameterType="list">
+        INSERT INTO SHARE_HOUSE_IMAGE
+        (house_id, url, sort_order, reg_dt)
+        VALUES
+        <foreach collection="list" item="img" separator=",">
+            (#{img.houseId}, #{img.url}, #{img.sortOrder}, NOW())
+        </foreach>
     </insert>
 
 </mapper>

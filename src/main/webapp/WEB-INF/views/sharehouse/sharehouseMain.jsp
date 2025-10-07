@@ -94,7 +94,7 @@
                 return;
             }
 
-            const url = ctx + '/sharehouse/detail?houseId=' + encodeURIComponent(id);
+            const url = ctx + '/sharehouse/sharehouseDetail?userId=' + encodeURIComponent(id);
             console.log("🔗 이동 URL:", url);
             window.open(url, "_blank");
         });
@@ -292,35 +292,28 @@
             }
         }
 
-        // 카드 렌더링 (쉐어하우스용)
         function renderHouseCards(items) {
             const $grid = $(".sh-grid");
             const noimg = ctx + "/images/noimg.png";
             items.forEach(house => {
-                console.log('sharehouse item keys:', Object.keys(house), house);
+                console.log('sharehouse item:', house);
 
-                const hid =
-                    house.houseId ?? house.HOUSE_ID ??
-                    house.id ?? house.ID ??
-                    house.house_id ??
-                    house.sharehouseId ?? house.SHAREHOUSE_ID ??
-                    house.shId ?? house.SH_ID ??
-                    house.seq ?? house.SEQ ?? house.idx ?? house.IDX ?? null;
+                const hid = house.userId;  // userId가 houseId
 
                 const $card = $("<article>").addClass("sh-card");
                 $card.attr("data-id", hid ?? "");
 
-                const imgUrl = house.thumbnailUrl || noimg;
+                const imgUrl = house.profileImgUrl || noimg;  // profileImgUrl이 이미지
                 const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
 
-                const $info  = $("<div>").addClass("sh-info");
-                const title  = house.title || "제목 없음";
-                const city   = house.city  || "";
-                const price  = (house.rent != null) ? (house.rent + "만원") : "";
+                const $info = $("<div>").addClass("sh-info");
+                const title = house.name || "제목 없음";  // ✅ house.name으로 변경!
+                const city = house.city || "";
+                const price = (house.rent != null) ? (house.rent + "만원") : "";
 
                 const $title = $("<p>").addClass("sh-title").text(title);
-                const $sub   = $("<p>").addClass("sh-sub");
-                if (city)  $sub.append(document.createTextNode(city));
+                const $sub = $("<p>").addClass("sh-sub");
+                if (city) $sub.append(document.createTextNode(city));
                 if (price) $sub.append($("<span>").addClass("price-pill").text(price));
 
                 const $tagBox = $("<div>").addClass("tag-box");
