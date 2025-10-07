@@ -225,4 +225,15 @@
 .btn-primary{ background:#3399ff; color:#fff; }
 .btn-primary:hover{ filter:brightness(1.03); }
 
+/* 액션바: 선 없이 버튼만 가운데 정렬 */
+.sh-reg-actions{
+    display: flex;
+    justify-content: center; /* 가운대로 */
+    gap: 10px;
+    padding: 8px 0 0;        /* 살짝 위 여백만 */
+    margin-top: 12px;        /* 위 요소와 간격 */
+    border: 0;               /* 선 제거 */
+}
+
+
 

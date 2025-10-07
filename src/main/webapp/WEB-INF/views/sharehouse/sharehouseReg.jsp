@@ -13,6 +13,10 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseReg.css?v=20251006"/>
+  <style>
+    /* UX: 업로더 전체가 버튼처럼 보이게 */
+    .uploader { cursor: pointer; }
+  </style>
 </head>
 
 <body>
@@ -149,7 +153,18 @@
       const span = wrap.querySelector('span');
       const img  = wrap.querySelector('.preview');
 
-      wrap.addEventListener('click', () => input.click());
+      // ✅ programmatic click 제거: 라벨 기본 클릭만 사용
+      // 라벨을 누르는 순간(파일창 열리기 직전) 값 초기화 → 같은 파일 재선택도 change 발생
+      wrap.addEventListener('mousedown', () => {
+        input.value = null;
+      });
+
+      // 보조: input 자체를 직접 눌러도 동일 동작
+      input.addEventListener('click', () => {
+        input.value = null;
+      });
+
+      // 파일 선택 후 미리보기
       input.addEventListener('change', () => {
         const f = input.files && input.files[0];
         if (!f){ img.hidden = true; span.hidden = false; return; }
