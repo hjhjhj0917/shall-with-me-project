@@ -541,14 +541,24 @@
             $.each(items, function (i, house) {
                 const houseId = house.userId || house.houseId;
                 if (houseId === loginUserId) return true;
+
                 const imgUrl = house.profileImgUrl || (ctx + "/images/noimg.png");
-                const title = house.name || "알 수 없음";
+                const houseName = house.name || "알 수 없음";
+
                 const $card = $("<article>").addClass("sh-card").attr("data-id", houseId);
                 const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
-                const $info = $("<div>").addClass("sh-info").append($("<p>").addClass("sh-title").text(title));
+                const $info = $("<div>").addClass("sh-info");
+
+                // 룸메이트와 동일한 형식: "이름 : 집이름"
+                const $sub = $("<p>").addClass("sh-sub").text("이름 : " + houseName);
+                $info.append($sub);
+
+                // 태그 박스
                 const $tagBox = $("<div>").addClass("tag-box");
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
+                if (house.tag3) $tagBox.append($("<span>").addClass("tag").text(house.tag3));
+
                 $info.append($tagBox);
                 $card.append($thumb, $info);
                 $grid.append($card);

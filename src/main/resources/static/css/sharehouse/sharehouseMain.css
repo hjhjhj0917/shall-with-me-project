@@ -89,7 +89,12 @@ html, body{
     font-weight:600;
     font-size:14px;
 }
-.sh-sub, .sh-price{
+.sh-sub{
+    margin:0;
+    font-size:13px;
+    color:#4b5563;
+}
+.sh-price{
     margin:0;
     font-size:13px;
     color:#4b5563;
