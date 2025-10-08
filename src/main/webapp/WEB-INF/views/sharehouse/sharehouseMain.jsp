@@ -572,7 +572,7 @@
                 const $info = $("<div>").addClass("sh-info");
 
                 // 룸메이트와 동일한 형식: "이름 : 집이름"
-                const $sub = $("<p>").addClass("sh-sub").text("이름 : " + houseName);
+                const $sub = $("<p>").addClass("sh-title").text("" + houseName);
                 $info.append($sub);
 
                 // 태그 박스

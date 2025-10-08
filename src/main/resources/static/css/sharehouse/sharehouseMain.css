@@ -283,3 +283,8 @@ body.modal-open .sh-scroll-area{ overflow:hidden !important; }
 .sh-fab-left:hover + .sh-tooltip {
     opacity: 1;
 }
+
+/* 태그 줄 간격만 살짝 늘리기 */
+.tag-box .tag{
+    margin: 0 6px 4px 0;  /* ← 아래쪽 4px 추가 */
+}
