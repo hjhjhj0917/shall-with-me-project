@@ -67,6 +67,11 @@
                     <c:forEach var="tag" items="${user.tags}">
                         <span class="chip"># ${tag.tagName}</span>
                     </c:forEach>
+
+                    <!-- ✅ 층수 추가 (6개 태그 + 층수 = 총 7개) -->
+                    <c:if test="${not empty user.floorNumber}">
+                        <span class="chip"># ${user.floorNumber}층</span>
+                    </c:if>
                 </div>
             </div>
 
