@@ -117,16 +117,14 @@
       <!-- 태그 선택 + 층수 입력 -->
       <div class="form-group">
         <div class="button-row">
-          <!-- 인라인 onclick 제거 -->
           <button type="button" id="btnTagSelect" class="tag-select-btn">
-            <i class="fa-solid fa-tags"></i> 태그 선택 (최대 3개)
+            <i class="fa-solid fa-tags"></i> 태그 6개 선택 (필수)
           </button>
-          <!-- 인라인 onclick 제거 -->
           <button type="button" id="btnFloorOpen" class="floor-input-btn">
-            <i class="fa-solid fa-building"></i> 층수 입력
+            <i class="fa-solid fa-building"></i> 층수 입력 (필수)
           </button>
         </div>
-        <div id="selectedTagsDisplay" style="margin-top:8px; color:#666; font-size:.9rem;">선택된 태그가 없습니다.</div>
+        <div id="selectedTagsDisplay" style="margin-top:8px; color:#666; font-size:.9rem;">태그 6개와 층수를 선택해주세요.</div>
         <input type="hidden" id="selectedTagIds" name="tagListJson" value="[]">
         <input type="hidden" id="floorNumber" name="floorNumber" value="">
       </div>
@@ -198,7 +196,6 @@
       <span>층</span>
     </div>
     <div class="floor-modal-actions">
-      <!-- 인라인 onclick 제거 -->
       <button type="button" class="floor-modal-btn cancel" id="btnFloorCancel">취소</button>
       <button type="button" class="floor-modal-btn confirm" id="btnFloorConfirm">확인</button>
     </div>
@@ -285,14 +282,21 @@
       const tagNames = tagIds.map(id => window.tagMap[id] || `태그${id}`);
       parts.push(...tagNames);
     }
-    if (floorNum && floorNum !== '' && floorNum !== 'undefined') parts.push(floorNum + '층');
+    if (floorNum && floorNum !== '' && floorNum !== 'undefined') {
+      parts.push(floorNum + '층');
+    }
 
-    if (parts.length > 0) { display.textContent = '선택됨: ' + parts.join(', '); display.style.color = '#3399ff'; }
-    else { display.textContent = '선택된 태그가 없습니다.'; display.style.color = '#666'; }
+    if (parts.length > 0) {
+      display.textContent = '선택됨: ' + parts.join(', ');
+      display.style.color = '#3399ff';
+    } else {
+      display.textContent = '태그 6개와 층수를 선택해주세요.';
+      display.style.color = '#666';
+    }
   }
 </script>
 
-<!-- 층수 입력 모달 스크립트: 함수는 유지, 호출은 이벤트 바인딩으로 -->
+<!-- 층수 입력 모달 스크립트 -->
 <script>
   function openFloorModal() {
     const modal = document.getElementById('floorModal');
@@ -326,12 +330,35 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const houseName = document.getElementById('houseName')?.value?.trim();
-      if (!houseName) { alert('쉐어하우스 이름을 입력해 주세요.'); document.getElementById('houseName')?.focus(); return; }
-      if (houseName.length > 20) { alert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.'); return; }
+      if (!houseName) {
+        alert('쉐어하우스 이름을 입력해 주세요.');
+        document.getElementById('houseName')?.focus();
+        return;
+      }
+      if (houseName.length > 20) {
+        alert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      // ✅ 태그 6개 필수 검증
+      const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
+      if (tagIds.length !== 6) {
+        alert('태그를 정확히 6개 선택해주세요.');
+        return;
+      }
+
+      // ✅ 층수 필수 검증
+      const floorNum = document.getElementById('floorNumber').value;
+      if (!floorNum || floorNum === '') {
+        alert('층수를 입력해주세요.');
+        return;
+      }
 
       const thumb = form.querySelector('input[name="thumbnail"]')?.files?.[0];
       if (!thumb) { alert('대표 이미지를 선택해 주세요.'); return; }
+
       const imgs = [...form.querySelectorAll('input[name="images"]')].map(i => i.files?.[0]).filter(Boolean);
       if (imgs.length < 1) { alert('추가 이미지를 최소 1장 선택해 주세요.'); return; }
 
@@ -345,10 +372,14 @@
         let json = null;
         try { json = await res.clone().json(); } catch (_) {}
 
-        if (res.status === 0 || res.type === 'opaqueredirect') { alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.'); return; }
+        if (res.status === 0 || res.type === 'opaqueredirect') {
+          alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.');
+          return;
+        }
         if (!res.ok) {
           const text = (json && json.msg) || (await res.text().catch(()=>'')) || '서버 오류';
-          alert(`저장 실패 (${res.status})\n${text}`); return;
+          alert(`저장 실패 (${res.status})\n${text}`);
+          return;
         }
 
         json = json || {};
@@ -365,9 +396,11 @@
           alert(json.msg || '저장에 실패했습니다.');
         }
       } catch (err) {
-        console.error(err); alert('서버 통신 중 오류가 발생했습니다.');
+        console.error(err);
+        alert('서버 통신 중 오류가 발생했습니다.');
       } finally {
-        btn.disabled = false; btn.textContent = '저장';
+        btn.disabled = false;
+        btn.textContent = '저장';
       }
     });
   });
@@ -376,22 +409,20 @@
 <!-- jQuery는 include보다 반드시 먼저 -->
 <script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
 
-<!-- 태그 선택 모달(HTML+JS) 포함: 여기서 openTagSelectModal 또는 openTagModal 전역 제공 -->
+<!-- 태그 선택 모달(HTML+JS) 포함 -->
 <jsp:include page="/WEB-INF/views/sharehouse/sharehouseTagSelect.jsp"/>
 
-<!-- 페이지 전용 바인딩: 인라인 onclick 없이 처리 -->
+<!-- 페이지 전용 바인딩 -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     // 태그 선택 버튼
     const tagBtn = document.getElementById('btnTagSelect');
     if (tagBtn) {
       tagBtn.addEventListener('click', function () {
-        // 1순위: 페이지 전역 브릿지가 있다면 사용
         if (typeof window.openTagSelectPopup === 'function') {
           window.openTagSelectPopup();
           return;
         }
-        // 2순위: include에서 제공하는 실제 모달 함수명 대응
         const openImpl = window.openTagSelectModal || window.openTagModal;
         if (typeof openImpl === 'function') {
           const hidden  = document.getElementById('selectedTagIds');
@@ -399,7 +430,6 @@
           openImpl(current, function (ids) {
             hidden.value = JSON.stringify(ids);
 
-            // 선택 태그 이름 맵 갱신(버튼 data-name 우선)
             window.tagMap = window.tagMap || {};
             ids.forEach(function (id) {
               const btn = document.querySelector('.tag-btn[data-id="' + id + '"]');
@@ -410,7 +440,6 @@
             renderInlineTags();
           });
         } else if (typeof $ !== 'undefined' && $('#tagSelectModalOverlay').length) {
-          // jQuery 기반 show/hide 대응
           $('#tagSelectModalOverlay').show();
         } else {
           alert('태그 선택 모달 스크립트를 찾지 못했습니다. sharehouseTagSelect.jsp를 확인하세요.');
@@ -429,16 +458,13 @@
   });
 </script>
 
-<!-- 전역 값 및 로드 확인 -->
 <script>
   window.userName = '<c:out value="${sessionScope.SS_USER_NAME}" default=""/>';
-  console.log('openTagSelectModal:', typeof window.openTagSelectModal, 'openTagModal:', typeof window.openTagModal);
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
-<!-- ▼▼▼ 태그 선택 모달 “디자인 그대로” 적용: 우선순위를 위해 맨 아래에 둠 ▼▼▼ -->
 <style id="tagModalStyles">
   :root{
     --sh-primary:#1c407d;
@@ -447,19 +473,16 @@
     --radius:14px;
     --shadow:0 6px 18px rgba(0,0,0,.06);
   }
-  /* 오버레이(가운데 정렬) */
   html body #tagSelectModalOverlay.modal-overlay{
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
     background:rgba(0,0,0,.4); backdrop-filter:blur(1px); z-index:10020;
   }
-  /* 시트 */
   html body #tagSelectModalOverlay .modal-sheet{
     width:100%; max-width:450px; max-height:80vh;
     background:#fff; border-radius:12px; overflow:hidden;
     box-shadow:var(--shadow); animation:fadeIn .3s;
     display:flex; flex-direction:column;
   }
-  /* 헤더 */
   html body #tagSelectModalOverlay .modal-header{
     position:relative; display:flex; align-items:center; justify-content:center;
     padding:16px 20px; border-bottom:1px solid #eee; background:#fff;
@@ -470,11 +493,7 @@
     background:#f6f7f8; display:grid; place-items:center; cursor:pointer;
   }
   html body #tagSelectModalOverlay .modal-close:hover{ background:#eceff3; }
-
-  /* 바디 */
   html body #tagSelectModalOverlay .modal-body{ padding:14px 16px; overflow:auto; flex:1; background:#fafbfc; }
-
-  /* 태그 리스트 그리드 + 버튼(필수) */
   html body #tagSelectModalOverlay .all-tag-list{
     display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px;
   }
@@ -488,11 +507,8 @@
   }
   html body #tagSelectModalOverlay .tag-btn:hover{ border-color:#cfd7e6; transform:translateY(-1px); }
   html body #tagSelectModalOverlay .tag-btn.selected{ background:#485fe7; border-color:#485fe7; color:#fff; }
-
-  /* 애니메이션 */
   @keyframes fadeIn{ 0%{opacity:0; transform:scale(.95)} 100%{opacity:1; transform:scale(1)} }
 </style>
-<!-- ▲▲▲ 끝 ▲▲▲ -->
 
 </body>
 </html>

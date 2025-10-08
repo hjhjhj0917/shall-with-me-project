@@ -107,7 +107,7 @@
 
 <script>
   (function(){
-    const MAX = 3;
+    const MAX = 6; // 6개 필수 선택으로 변경
     const $overlay = $('#tagSelectModalOverlay');
     const $list = $('#all-tag-list');
     const $count = $('#tagCount');
