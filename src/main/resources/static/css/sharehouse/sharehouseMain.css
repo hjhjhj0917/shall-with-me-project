@@ -1,4 +1,5 @@
-/* ============== Main: 검색바 + 목록 + 모달 프레임 ============== */
+#sh-sentinel{ height: 1px; }
+#sh-loader{ text-align:center; padding:16px; color:#6b7280; font-size:14px; }
 
 :root{
     --sh-primary:#1c407d;
@@ -8,74 +9,175 @@
     --shadow:0 6px 18px rgba(0,0,0,.06);
 }
 
+html, body{
+    background:var(--sh-bg);
+    color:#1f2a37;
+    font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    /*overflow:hidden; !* 외부 스크롤 완전히 제거 *!*/
+    height: 100%;      /* 뷰포트 높이 고정 */
+    -webkit-overflow-scrolling:touch;/* 모바일 드래그 스크롤 부드럽게 */
+}
+
+/* 헤더가 fixed라면 겹치지 않도록 여백 */
+#sh-wrapper {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 110px 24px 0;    /* 하단 padding 제거 */
+    display: flex;            /* flex 컨테이너 선언 */
+    flex-direction: column;   /* 세로 배치 */
+    height: calc(100vh - 110px); /* 헤더 높이만큼 뺀 전체 높이 */
+}
+
+
 /* 검색바 */
 .sh-searchbar{
-    display:flex; align-items:center;
-    background:#fff; border:1px solid #e0e0e0; border-radius:50px;
-    box-shadow:0 3px 12px rgba(0,0,0,.08);
-    position:relative; height:66px; padding:0 10px;
-    width:100%; max-width:850px; margin:0 auto 28px;
+    width:min(640px, 90%);
+    margin:0 auto 28px auto;
+    position:relative;
 }
-.search-section{ flex:1; padding:8px 24px; cursor:pointer; border-radius:30px; transition:background-color .2s; min-width:0; }
-.search-section:hover{ background:#f7f7f7; }
-.search-section + .search-section{ border-left:1px solid #eee; }
-.search-section-label{ font-size:12px; font-weight:700; letter-spacing:.5px; }
-.search-section-placeholder{ font-size:14px; color:#717171; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#sh-search-btn{
-    width:48px; height:48px; border-radius:50%;
-    background:linear-gradient(to right,#66B2FF,#3399ff);
-    color:#fff; border:0; font-size:16px; margin-left:10px;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .1s;
+.sh-searchbar input{
+    width:100%;
+    height:48px;
+    border-radius:999px;
+    border:2px solid #2b6cb026; /* 연한 테두리 */
+    background:#fff;
+    padding:0 56px 0 22px;
+    font-size:16px;
+    box-shadow:0 6px 12px rgba(28,64,125,.15); /* 스크린샷 느낌 */
+    outline:none;
+}
+.sh-searchbar button{
+    position:absolute;
+    right:8px; top:50%;
+    transform:translateY(-50%);
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none; background:#fff;
+    cursor:pointer;
 }
 
-/* 공통 모달 오버레이 */
-.modal-overlay{
-    position:fixed; inset:0; display:none;
-    align-items:center; justify-content:center;
-    background:rgba(0,0,0,.4); z-index:9998;
+/* 카드 그리드 (4열 고정) */
+.sh-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr); /* 요청: 4칸 */
+    gap:24px;
 }
 
-/* 지역/태그 선택 소모달 */
-#locationSelectModalOverlay .modal-sheet,
-#tagSelectModalOverlay .modal-sheet{
-    width:100%; max-width:500px; background:#fff; border-radius:12px; overflow:hidden;
-    animation:fadeIn .3s;
+/* 카드 */
+.sh-card{
+    background:#fff;
+    border:1px solid var(--sh-border);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
 }
-.modal-header{
-    display:flex; align-items:center; justify-content:center;
-    padding:16px; border-bottom:1px solid #eee; position:relative;
-}
-.modal-title-text{ font-weight:700; color:#222; }
-.modal-close{
-    position:absolute; right:16px; top:50%; transform:translateY(-50%);
-    width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:1rem; color:#222; background:#f7f7f7; border:0; cursor:pointer;
-}
-#locationSelectModalOverlay .modal-body,
-#tagSelectModalOverlay .modal-body{ max-height:450px; overflow:auto; padding:20px; }
-.location-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.location-item{
-    padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; cursor:pointer;
-    transition:border-color .2s, background-color .2s, font-weight .2s; font-size:14px;
-}
-.location-item:hover{ border-color:#222; }
-.location-item.selected{ background:#f7f7f7; border-color:#222; font-weight:600; }
 
-.search-tag-group{ display:flex; align-items:center; padding:16px 0; }
-.search-tag-group + .search-tag-group{ border-top:1px solid #f0f0f0; }
-.search-tag-group__icon-wrapper{ flex-shrink:0; width:80px; height:80px; border-radius:50%; background:#f8f9fa; border:1px solid #e9ecef; display:flex; align-items:center; justify-content:center; }
-.search-tag-group__icon-wrapper i{ font-size:30px; color:#495057; }
-.search-tag-group__content-wrapper{ flex-grow:1; padding-left:24px; }
-.search-tag-group__title{ font-weight:600; font-size:1rem; color:#343a40; margin-bottom:12px; }
-.search-tag-group__list{ display:flex; flex-wrap:wrap; gap:10px; }
-.tag-btn{ background:#fff; border:1px solid #dee2e6; border-radius:20px; padding:8px 16px; font-size:.9rem; color:#495057; cursor:pointer; transition:all .2s; }
-.tag-btn.selected{ background:#3399ff; border-color:#3399ff; color:#fff; font-weight:600; }
-.tag-btn:hover:not(.selected){ border-color:#495057; }
+/* 썸네일: 4:3 비율 */
+.sh-thumb {
+    height: 180px;
+    background: #e9eef7 no-repeat;
+    background-size: cover;
+    background-position: center 15%;  /* ← 세로 위치를 x% 정도 내려줌 */
+}
 
-@keyframes fadeIn{ from{opacity:0; transform:scale(.95);} to{opacity:1; transform:scale(1);} }
+/* 텍스트 영역 */
+.sh-info{
+    padding:10px 12px 14px;
+}
+.sh-title{
+    margin:0 0 4px 0;
+    font-weight:600;
+    font-size:14px;
+}
+.sh-sub, .sh-price{
+    margin:0;
+    font-size:13px;
+    color:#4b5563;
+}
+
+/* 좌하단 플로팅 버튼 (옵션) */
+.sh-fab{
+    position:fixed;
+    left:18px; bottom:18px;
+    width:44px; height:44px;
+    border-radius:50%;
+    border:none;
+    background:#67a5ff;
+    color:#fff;
+    font-size:18px;
+    box-shadow:0 10px 24px rgba(0,0,0,.18);
+    cursor:pointer;
+}
+
+.sh-card{ cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
+.sh-card:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
+
+/* 무한 스크롤 보조 요소 */
+#sh-sentinel { height: 24px; display:block; }  /* ← 관측 보장 (임시로 24px) */
+#sh-loader   { text-align:center; padding:16px; color:#6b7280; font-size:14px; }
+
+.tag-box {
+    margin-top: 6px;
+}
+.tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    margin-right: 4px;
+    border-radius: 12px;
+}
+
+.tag-box .tag {
+    display: inline-block;
+    margin-right: 6px;
+    background: #f2f2f2;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.tag-box .gender {
+    background: #dce6ff; /* 성별만 파스텔 톤 */
+    font-weight: 600;
+}
+
+.tag-box .gender.male {
+    background: #d0e2ff; /* 파란 느낌 */
+    color: #1c407d;      /* 글자 진파랑 */
+    font-weight: 600;
+}
+
+.tag-box .gender.female {
+    background: #ffe0ef; /* 핑크 느낌 */
+    color: #c2185b;      /* 글자 진핑크 */
+    font-weight: 600;
+}
+
+
+/*!* 카드 리스트 전용 스크롤 박스 *!*/
+/*.sh-scroll-area {*/
+/*    max-height: 700px;   !* 높이는 필요에 맞게 조정 (예: 화면 절반) *!*/
+/*    overflow-y: auto;    !* 세로 스크롤 *!*/
+/*    overflow-x: hidden;  !* 가로 스크롤 제거 *!*/
+/*    padding-right: 8px;  !* 스크롤바 공간 확보 *!*/
+/*}*/
+
+.sh-scroll-area {
+    flex: 1;                   /* wrapper에서 남은 공간 채움 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 8px 80px 0;     /* 하단 여백 80px 줘서 마지막 카드 안 잘림 */
+    min-height: 830px;
+}
+
+footer {
+    margin-top: 300px !important;
+}
 
 /* ============== 등록 모달(iframe) 프레임 ============== */
-#sharehouseRegOverlay{ position:fixed; inset:0; overflow:hidden; }
+#sharehouseRegOverlay{ position:fixed; inset:0; overflow:hidden; z-index:10000; }
 #sharehouseRegOverlay .modal-sheet{
     display:flex; flex-direction:column;
     width:min(1400px,96vw); height:min(92vh,100svh - 40px);
@@ -89,98 +191,90 @@
 html.modal-open, body.modal-open{ overflow:hidden !important; height:100%; }
 body.modal-open .sh-scroll-area{ overflow:hidden !important; }
 
-/* ============== 카드 레이아웃 (룸메이트와 동일) ============== */
-
-/* 전체 래퍼 */
-#sh-wrapper {
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 110px 24px 0;
+/* ============== 왼쪽 하단 + 버튼 ============== */
+.sh-fab-left {
+    position: fixed;
+    left: 80px;
+    bottom: 40px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
     display: flex;
-    flex-direction: column;
-    height: calc(100vh - 110px);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9000;
+    transition: transform .15s ease, background-color .15s ease;
 }
 
-/* 카드 그리드 (5열) */
-.sh-grid{
-    display:grid;
-    grid-template-columns:repeat(5, 1fr);
-    gap:24px;
+.sh-fab-left:hover {
+    transform: scale(1.06);
+    background-color: #f8fbff;
 }
 
-/* 카드 */
-.sh-card{
-    background:#fff;
-    border:1px solid var(--sh-border);
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:var(--shadow);
-    cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
+.sh-fab-left:active {
+    transform: scale(0.98);
 }
 
-.sh-card:hover{
-    transform:translateY(-2px);
-    box-shadow:0 10px 24px rgba(0,0,0,.08);
+/* + 아이콘 */
+.sh-fab-left .icon-plus {
+    font-size: 26px;
+    font-weight: 800;
+    color: #3399ff;
+    line-height: 1;
+    transform: translateY(-1px);
 }
 
-/* 썸네일 */
-.sh-thumb {
-    height: 180px;
-    background: #e9eef7 no-repeat;
-    background-size: cover;
-    background-position: center 15%;
+/* 버튼 라벨 */
+.sh-fab-label {
+    position: fixed;
+    left: 80px;
+    bottom: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c407d;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: rgba(255,255,255,0.85);
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    z-index: 9000;
 }
 
-/* 텍스트 영역 */
-.sh-info{
-    padding:10px 12px 14px;
-}
-
-.sh-title{
-    margin:0 0 4px 0;
-    font-weight:600;
-    font-size:14px;
-}
-
-.sh-sub{
-    margin:0;
-    font-size:13px;
-    color:#4b5563;
-}
-
-/* 스크롤 영역 */
-.sh-scroll-area {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 0 8px 80px 0;
-    min-height: 830px;
-}
-
-/* 태그 */
-.tag-box {
-    margin-top: 6px;
-}
-
-.tag {
-    display: inline-block;
-    background: #f2f2f2;
-    padding: 4px 8px;
-    margin-right: 6px;
-    border-radius: 8px;
+/* 툴팁 컨테이너 */
+.sh-tooltip {
+    position: fixed;
+    left: 60px;
+    bottom: 110px;
+    background: #1c407d;
+    color: #fff;
     font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 9000;
 }
 
-/* 가격 알약 */
-.price-pill{
-    display:inline-block;
-    font-size:12px;
-    background:#eef6ff;
-    border-radius:999px;
-    padding:2px 8px;
+/* 꼬리 */
+.sh-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #1c407d transparent transparent transparent;
 }
 
-/* 무한 스크롤 */
-#sh-sentinel { height: 24px; display:block; }
-#sh-loader { text-align:center; padding:16px; color:#6b7280; font-size:14px; }
+/* hover 시 툴팁 표시 */
+.sh-fab-left:hover + .sh-tooltip {
+    opacity: 1;
+}

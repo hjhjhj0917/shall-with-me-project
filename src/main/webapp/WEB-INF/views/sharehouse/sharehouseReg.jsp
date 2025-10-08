@@ -67,12 +67,12 @@
 
       <!-- ✅ 추가: 쉐어하우스 이름 입력 -->
       <div class="form-group">
-        <label>쉐어하우스 이름 <span style="color:#999; font-size:0.9em;">(최대 15자)</span></label>
+        <label>쉐어하우스 이름 <span style="color:#999; font-size:0.9em;">(최대 20자)</span></label>
         <input type="text"
                name="houseName"
                id="houseName"
-               maxlength="15"
-               placeholder="예: 강남 따뜻한 쉐어하우스"
+               maxlength="20"
+               placeholder="예: 강남 따뜻한 쉐어하우스 역세권"
                required
                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
       </div>
@@ -227,8 +227,8 @@
         document.getElementById('houseName')?.focus();
         return;
       }
-      if (houseName.length > 15) {
-        alert('쉐어하우스 이름은 최대 15자까지 입력 가능합니다.');
+      if (houseName.length > 20) {
+        alert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.');
         return;
       }
 

@@ -5,11 +5,251 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseAddBtn.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseMain.css?v=20251006"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-</head>
 
+    <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
+
+    <style>
+        /* (검색창 및 다른 부분 스타일은 이전과 동일) */
+        .sh-searchbar {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 50px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            height: 66px;
+            padding: 7px 10px;
+            width: 100%;
+            max-width: 850px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-section {
+            flex: 1;
+            padding: 8px 24px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: background-color 0.2s;
+            min-width: 0;
+        }
+
+        .search-section:hover {
+            background-color: #f7f7f7;
+        }
+
+        .search-section + .search-section {
+            border-left: 1px solid #eee;
+        }
+
+        .search-section-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .search-section-placeholder {
+            font-size: 14px;
+            color: #717171;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #sh-search-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #66B2FF, #3399ff);
+            color: white;
+            border: none;
+            font-size: 16px;
+            margin-left: 10px;
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+
+        #locationSelectModalOverlay .modal-sheet,
+        #tagSelectModalOverlay .modal-sheet {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 12px;
+            animation: fadeIn 0.3s;
+            overflow: hidden;
+        }
+
+        #locationSelectModalOverlay .modal-sheet {
+            max-width: 500px;
+        }
+
+        #locationSelectModalOverlay .modal-header,
+        #tagSelectModalOverlay .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        #locationSelectModalOverlay .modal-title-text,
+        #tagSelectModalOverlay .modal-title-text {
+            font-weight: 700;
+            color: #222;
+        }
+
+        #locationSelectModalOverlay .modal-close,
+        #tagSelectModalOverlay .modal-close {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #222;
+            background: #f7f7f7;
+            border: none;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #locationSelectModalOverlay .modal-body,
+        #tagSelectModalOverlay .modal-body {
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .location-item {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s, font-weight 0.2s;
+            font-size: 14px;
+        }
+
+        .location-item:hover {
+            border-color: #222;
+        }
+
+        .location-item.selected {
+            background-color: #f7f7f7;
+            border-color: #222;
+            font-weight: 600;
+        }
+
+        /* ✅ [수정] 태그 모달 그룹 UI 전체 변경 */
+        .search-tag-group {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .search-tag-group + .search-tag-group {
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .search-tag-group__icon-wrapper {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-tag-group__icon-wrapper i {
+            font-size: 30px;
+            color: #495057;
+        }
+
+        .search-tag-group__content-wrapper {
+            flex-grow: 1;
+            padding-left: 24px;
+        }
+
+        .search-tag-group__title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #343a40;
+            margin-bottom: 12px;
+        }
+
+        .search-tag-group__list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-btn {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag-btn.selected {
+            background-color: #3399ff;
+            border-color: #3399ff;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tag-btn:hover:not(.selected) {
+            border-color: #495057;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
 <body>
 <%@ include file="../includes/header.jsp" %>
 
@@ -33,7 +273,6 @@
     </div>
 </main>
 
-<!-- 지역 선택 모달 -->
 <div class="modal-overlay" id="locationSelectModalOverlay">
     <div class="modal-sheet">
         <div class="modal-header">
@@ -48,7 +287,6 @@
     </div>
 </div>
 
-<!-- 태그 선택 모달 -->
 <div class="modal-overlay" id="tagSelectModalOverlay">
     <div class="modal-sheet">
         <div class="modal-header">
@@ -64,6 +302,7 @@
 </div>
 
 <%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <%@ include file="../includes/customModal.jsp" %>
 
 <%
@@ -80,23 +319,12 @@
     (function () {
         const grid = document.querySelector('.sh-grid');
         if (!grid) return;
-
-        // 카드 클릭 시 상세 새창
         grid.addEventListener('click', (e) => {
             const card = e.target.closest('.sh-card');
-            if (!card) return;
-
-            const id = card.getAttribute('data-id');
-            console.log("🧩 클릭된 카드 ID:", id);
-
-            if (!id) {
-                alert("houseId 누락 - data-id 확인 필요");
-                return;
-            }
-
-            const url = ctx + '/sharehouse/sharehouseDetail?userId=' + encodeURIComponent(id);
-            console.log("🔗 이동 URL:", url);
-            window.open(url, "_blank");
+            if (!card || !grid.contains(card)) return;
+            const id = card.dataset.id;
+            if (!id) return;
+            window.open(ctx + '/sharehouse/sharehouseDetail?userId=' + encodeURIComponent(id), '_blank');
         });
     })();
 </script>
@@ -106,14 +334,36 @@
 
 <script>
     $(document).ready(function () {
-        // ✅ 룸메이트와 동일한 offset 기반 로직
+        // --- 전역 변수: page 대신 offset 사용 ---
         let offset = 0, loading = false, lastPage = false;
         let selectedLocation = "";
         const selectedTags = new Map();
         const $grid = $(".sh-grid");
         const $scrollArea = $(".sh-scroll-area");
 
-        loadInitialData(); // 첫 로드: 15개
+        const tagGroups = [
+            {key: "lifePattern", title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]},
+            {key: "activity", title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4]},
+            {key: "job", title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]},
+            {key: "workTime", title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10]},
+            {key: "guest", title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]},
+            {key: "share", title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14]},
+            {key: "personality", title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]},
+            {key: "prefer", title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18]},
+            {key: "conversation", title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]},
+            {key: "conflict", title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22]},
+            {key: "cook", title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]},
+            {key: "food", title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28]},
+            {key: "meal", title: "라니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]},
+            {key: "smell", title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33]},
+            {key: "clean", title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]},
+            {key: "cleanCircle", title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39]},
+            {key: "garbage", title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]},
+            {key: "dishWash", title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
+        ];
+
+        // --- 초기화 및 이벤트 핸들러 ---
+        loadInitialData(); // 1. 페이지 첫 로드 시 15개 요청
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
@@ -121,32 +371,35 @@
             let innerHeight = $scrollArea.innerHeight();
             let scrollHeight = $scrollArea[0].scrollHeight;
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
-                loadMoreData(); // 추가 로드: 5개
+                loadMoreData(); // 2. 스크롤 시 5개 요청
             }
         });
 
         $('#location-search-trigger').on('click', openLocationModal);
         $('#tag-search-trigger').on('click', openTagModal);
+
         $('#sh-search-btn').on('click', function () {
-            offset = 0;
+            offset = 0; // 오프셋 초기화
             lastPage = false;
             $grid.empty();
-            loadInitialData();
+            loadInitialData(); // 3. 검색 버튼 클릭 시에도 새로 15개 요청
         });
 
-        // ✅ 초기 데이터 로드 (15개)
+        // --- API 호출 함수 ---
+
         function loadInitialData() {
-            loadData(0, 15);
+            loadData(0, 15); // offset: 0, pageSize: 15
         }
 
-        // ✅ 추가 데이터 로드 (5개)
         function loadMoreData() {
-            loadData(offset, 5);
+            loadData(offset, 5); // 현재 offset에서 5개 추가
         }
 
-        // ✅ 통합 데이터 로드 함수
+        // 모든 API 호출을 처리하는 통합 함수
         function loadData(currentOffset, size) {
             loading = true;
+
+            const tagIds = Array.from(selectedTags.keys());
 
             $.ajax({
                 url: ctx + "/sharehouse/list",
@@ -155,30 +408,33 @@
                     offset: currentOffset,
                     pageSize: size,
                     location: selectedLocation || null,
-                    tagIds: Array.from(selectedTags.keys())
+                    tagIds: tagIds
                 },
                 dataType: "json",
                 success: function (data) {
                     const items = data.items || data.list || data || [];
                     if (items.length > 0) {
                         renderHouseCards(items);
-                        offset += items.length;
+                        offset += items.length; // 불러온 만큼 offset 증가
                     }
                     if (items.length < size || data.lastPage) {
                         lastPage = true;
                     }
                 },
-                error: (xhr, status, err) => console.error("쉐어하우스 목록 불러오기 실패:", err),
+                error: (err) => console.error('데이터 로드 실패', err),
                 complete: () => loading = false
             });
         }
 
-        // 지역 모달
+        // --- 지역 모달 ---
         function openLocationModal() {
             renderLocations();
             $('#locationSelectModalOverlay').css('display', 'flex');
         }
-        window.closeLocationModal = function () { $('#locationSelectModalOverlay').hide(); }
+
+        window.closeLocationModal = function () {
+            $('#locationSelectModalOverlay').hide();
+        }
 
         function renderLocations() {
             const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
@@ -201,18 +457,19 @@
             });
         }
 
-        // 태그 모달
+        // --- 태그 모달 ---
         function openTagModal() {
             loadAllTags();
             $('#tagSelectModalOverlay').css('display', 'flex');
         }
-        window.closeTagModal = function () { $('#tagSelectModalOverlay').hide(); };
+
+        window.closeTagModal = function () {
+            $('#tagSelectModalOverlay').hide();
+        };
 
         function loadAllTags() {
             $.ajax({
-                url: ctx + '/sharehouse/tagAll',
-                type: 'GET',
-                dataType: 'json',
+                url: ctx + '/sharehouse/tagAll', type: 'GET', dataType: 'json',
                 success: (tags) => renderAllTags(tags),
                 error: (err) => console.error('태그 불러오기 실패', err)
             });
@@ -221,26 +478,7 @@
         function renderAllTags(tagsFromServer) {
             const $container = $('#all-tag-list').empty();
             const tagMap = new Map(tagsFromServer.map(t => [t.tagId, t]));
-            const tagGroups = [
-                {title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]},
-                {title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4]},
-                {title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]},
-                {title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10]},
-                {title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]},
-                {title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14]},
-                {title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]},
-                {title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18]},
-                {title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]},
-                {title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22]},
-                {title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]},
-                {title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28]},
-                {title: "끼니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]},
-                {title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33]},
-                {title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]},
-                {title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39]},
-                {title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]},
-                {title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
-            ];
+
             tagGroups.forEach(group => {
                 const $groupDiv = $('<div>').addClass('search-tag-group');
                 const $iconWrapper = $('<div>').addClass('search-tag-group__icon-wrapper').append($('<i>').addClass(group.icon));
@@ -252,8 +490,14 @@
                     if (tagMap.has(tagId)) {
                         const tag = tagMap.get(tagId);
                         const $btn = $('<button>').addClass('tag-btn').text(tag.tagName).attr('data-id', tag.tagId);
-                        if (selectedTags.has(tag.tagId)) $btn.addClass('selected');
-                        $btn.on('click', () => toggleTagSelection(tag.tagId, tag.tagName));
+
+                        if (selectedTags.has(tag.tagId)) {
+                            $btn.addClass('selected');
+                        }
+
+                        $btn.on('click', function () {
+                            toggleTagSelection(tag.tagId, tag.tagName, $(this));
+                        });
                         $groupList.append($btn);
                     }
                 });
@@ -264,41 +508,48 @@
             });
         }
 
-        function toggleTagSelection(tagId, tagName) {
-            if (selectedTags.has(tagId)) selectedTags.delete(tagId);
-            else selectedTags.set(tagId, tagName);
-            updateTagDisplay();
+        function toggleTagSelection(tagId, tagName, $btn) {
+            if (selectedTags.has(tagId)) {
+                selectedTags.delete(tagId);
+            } else {
+                selectedTags.set(tagId, tagName);
+            }
+
+            $btn.toggleClass('selected');
+            updateSearchBarText();
         }
 
-        function updateTagDisplay() {
-            $('#all-tag-list .tag-btn').each(function () {
-                $(this).toggleClass('selected', selectedTags.has($(this).data('id')));
-            });
-            const tagCount = selectedTags.size;
+        function updateSearchBarText() {
+            let totalCount = selectedTags.size;
+            let firstTagName = "";
+            if (totalCount > 0) {
+                firstTagName = selectedTags.values().next().value;
+            }
+
             const $tagText = $('#tag-selection-text');
-            if (tagCount > 0) {
-                const firstTagName = selectedTags.values().next().value;
-                const displayText = tagCount > 1 ? firstTagName + " 외 " + (tagCount - 1) + "개" : firstTagName;
+            if (totalCount > 0) {
+                const displayText = totalCount > 1 ? firstTagName + " 외 " + (totalCount - 1) + "개" : firstTagName;
                 $tagText.text(displayText).css('color', '#222');
             } else {
                 $tagText.text('원하는 조건 추가').css('color', '');
             }
         }
 
+        // --- 카드 렌더링 ---
         function renderHouseCards(items) {
-            const noimg = ctx + "/images/noimg.png";
-            items.forEach(house => {
-                const hid = house.userId || house.houseId;
-                const $card = $("<article>").addClass("sh-card").attr("data-id", hid ?? "");
-                const imgUrl = house.profileImgUrl || noimg;
+            const loginUserId = "${sessionScope.SS_USER_ID}";
+            $.each(items, function (i, house) {
+                const houseId = house.userId || house.houseId;
+                if (houseId === loginUserId) return true;
+                const imgUrl = house.profileImgUrl || (ctx + "/images/noimg.png");
+                const title = house.name || "알 수 없음";
+                const $card = $("<article>").addClass("sh-card").attr("data-id", houseId);
                 const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
-                const $info = $("<div>").addClass("sh-info");
-                const title = house.name || "제목 없음";
-                const $title = $("<p>").addClass("sh-title").text(title);
+                const $info = $("<div>").addClass("sh-info").append($("<p>").addClass("sh-title").text(title));
                 const $tagBox = $("<div>").addClass("tag-box");
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
-                $info.append($title, $tagBox);
+                $info.append($tagBox);
                 $card.append($thumb, $info);
                 $grid.append($card);
             });

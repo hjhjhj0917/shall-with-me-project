@@ -53,9 +53,8 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
 }
 .see-all i{ margin-right:6px; }
 
-/* Body two columns */
+/* ✅ Body - 새 레이아웃 */
 .shd-body{
-    display:grid; grid-template-columns: 1.4fr .8fr; gap:26px;
     margin-top: 26px;
 }
 
@@ -64,45 +63,115 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     border-radius:16px; box-shadow:var(--shadow); padding:20px;
 }
 
-/* Summary */
-.shd-summary .meta{ color:var(--shd-muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-.shd-summary .meta .dot{ width:4px; height:4px; background:#c9cdd7; border-radius:50%; display:inline-block; }
-.tag-row{ margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+/* ✅ 전체 너비 요약 카드 */
+.shd-summary-full {
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.shd-summary-full .meta{
+    color:var(--shd-muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+.shd-summary-full .meta .dot{
+    width:4px;
+    height:4px;
+    background:#c9cdd7;
+    border-radius:50%;
+    display:inline-block;
+}
+.tag-row{
+    margin-top:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
 .chip{
-    background:#eff4ff; color:#1c3faa; border:1px solid #d6e3ff;
-    padding:5px 10px; border-radius:999px; font-size:13px;
+    background:#eff4ff;
+    color:#1c3faa;
+    border:1px solid #d6e3ff;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:13px;
 }
 
-/* Desc */
-.sec-title{ font-size:18px; margin:0 0 10px 0; }
-.sec-title.mt{ margin-top:14px; }
-
-/* Amenities */
-.amenity-list{ list-style:none; margin:10px 0 0; padding:0; columns:2; column-gap:16px; }
-.amenity-list li{ break-inside:avoid; margin:6px 0; color:#374151; }
-.amenity-list i{ margin-right:8px; color:#1c3faa; }
-
-/* Sticky card */
-.col-right{ position:relative; }
-.shd-sticky{ position:sticky; top:100px; }
-.price-line{ font-size:20px; display:flex; align-items:baseline; gap:6px; margin-bottom:10px; }
-.mini-form{ display:grid; gap:10px; }
-.mf-row{ display:flex; flex-direction:column; gap:6px; }
-.mf-row input, .mf-row select{
-    height:42px; border:1px solid var(--shd-border); border-radius:10px; padding:0 12px;
+/* ✅ 2단 레이아웃 */
+.shd-two-cols {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
 }
-.reserve-btn{
-    margin-top:6px; height:44px; border:0; border-radius:12px; background:#1c3faa; color:#fff; font-weight:700; cursor:pointer;
-}
-.notice{ margin:10px 0 0; color:var(--shd-muted); font-size:12px; }
 
-/* Responsive */
+/* ✅ 소개 카드 */
+.shd-desc {
+    min-height: 300px;
+}
+
+.shd-desc .sec-title{
+    font-size:18px;
+    margin:0 0 10px 0;
+}
+
+.shd-desc p {
+    color: #374151;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* ✅ 문의하기 카드 */
+.shd-contact {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.shd-contact .price-line{
+    font-size:20px;
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    margin-bottom:10px;
+}
+
+.shd-contact .reserve-btn{
+    margin-top:auto;
+    height:44px;
+    border:0;
+    border-radius:12px;
+    background:#1c3faa;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.shd-contact .reserve-btn:hover {
+    background:#15338a;
+}
+
+/* 반응형: 모바일에서는 1단 */
 @media (max-width: 980px){
-    .shd-body{ grid-template-columns: 1fr; }
-    .shd-gallery{ grid-template-columns: 1fr 1fr; grid-template-rows: 180px 130px 130px; }
+    .shd-two-cols {
+        grid-template-columns: 1fr;
+    }
+
+    .shd-gallery{
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 180px 130px 130px;
+    }
     #g0{ grid-column:1 / span 2; grid-row:1; }
     #g1{ grid-column:1; grid-row:2; }
     #g2{ grid-column:2; grid-row:2; }
     #g3{ grid-column:1; grid-row:3; }
     #g4{ grid-column:2; grid-row:3; }
+}
+
+@media (max-width: 768px) {
+    .shd-two-cols {
+        grid-template-columns: 1fr;
+    }
 }

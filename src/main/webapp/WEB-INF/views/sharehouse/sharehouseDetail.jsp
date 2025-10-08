@@ -17,10 +17,10 @@
 <main class="shd-wrapper">
     <section class="shd-titlebar">
         <h1 id="shd-title">${user.title}</h1>
-        <div class="shd-actions">
-            <button class="action-btn" type="button"><i class="fa-regular fa-share-from-square"></i> 공유하기</button>
-            <button class="action-btn" type="button"><i class="fa-regular fa-heart"></i> 저장</button>
-        </div>
+<%--        <div class="shd-actions">--%>
+<%--            <button class="action-btn" type="button"><i class="fa-regular fa-share-from-square"></i> 공유하기</button>--%>
+<%--            <button class="action-btn" type="button"><i class="fa-regular fa-heart"></i> 저장</button>--%>
+<%--        </div>--%>
     </section>
 
     <!-- 이미지 갤러리 -->
@@ -51,14 +51,13 @@
             </c:otherwise>
         </c:choose>
 
-        <button class="see-all" type="button">
-            <i class="fa-solid fa-grip"></i> 사진 모두 보기
-        </button>
+<%--        <button class="see-all" type="button">--%>
+<%--            <i class="fa-solid fa-grip"></i> 사진 모두 보기--%>
+<%--        </button>--%>
     </section>
 
     <section class="shd-body">
-        <div class="col-left">
-            <div class="shd-summary card">
+            <div class="shd-summary-full card">
                 <div class="meta">
                     <span id="meta-type">쉐어하우스</span>
                     <span class="dot"></span>
@@ -71,20 +70,22 @@
                 </div>
             </div>
 
+        <!-- 하단: 2단 레이아웃 -->
+        <div class="shd-two-cols">
+            <!-- 왼쪽: 소개 -->
             <div class="shd-desc card">
                 <h2 class="sec-title"><i class="fa-regular fa-file-lines"></i> 소개</h2>
                 <p>${user.subText}</p>
             </div>
-        </div>
 
-        <aside class="col-right">
-            <div class="shd-sticky card">
+            <!-- 오른쪽: 문의하기 -->
+            <div class="shd-contact card">
                 <div class="price-line">
                     <strong>문의하기</strong>
                 </div>
                 <button class="reserve-btn" type="button">문의하기</button>
             </div>
-        </aside>
+        </div>
     </section>
 </main>
 
