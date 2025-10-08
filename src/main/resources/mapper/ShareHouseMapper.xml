@@ -72,7 +72,7 @@
             LIMIT 1
     </select>
 
-    <!-- 쉐어하우스의 모든 이미지 조회 (★ 추가 ★) -->
+    <!-- 쉐어하우스의 모든 이미지 조회 -->
     <select id="selectSharehouseImages"
             parameterType="long"
             resultType="map">
@@ -87,6 +87,7 @@
         ORDER BY sort_order ASC, img_id ASC
     </select>
 
+    <!-- ✅ 쉐어하우스 태그 조회 - 룸메이트와 동일한 방식 -->
     <select id="selectSharehouseTags"
             parameterType="long"
             resultType="kopo.shallwithme.dto.UserTagDTO">
@@ -98,6 +99,13 @@
                  JOIN TAG t ON t.tag_id = st.house_tag_id
         WHERE st.house_id = #{value}
         ORDER BY st.house_tag_id DESC
+            LIMIT 3
+    </select>
+
+    <!-- ✅ 전체 태그 목록 조회 - 룸메이트와 완전 동일 -->
+    <select id="getAllTags" resultType="TagDTO">
+        SELECT TAG_ID, TAG_NAME
+        FROM TAG
     </select>
 
     <!-- insert: PK 자동반환 -->
@@ -110,7 +118,7 @@
             (#{title}, COALESCE(#{address}, ''), #{subText}, #{coverUrl}, #{regId}, NOW())
     </insert>
 
-    <!-- ★★★ 이미지 배치 저장 (핵심 추가!) ★★★ -->
+    <!-- ★★★ 이미지 배치 저장 ★★★ -->
     <insert id="insertSharehouseImages" parameterType="list">
         INSERT INTO SHARE_HOUSE_IMAGE
         (house_id, url, sort_order, reg_dt)
@@ -119,5 +127,20 @@
             (#{img.houseId}, #{img.url}, #{img.sortOrder}, NOW())
         </foreach>
     </insert>
+
+    <!-- ✅ 태그 저장 (룸메이트와 동일한 방식) -->
+    <insert id="insertSharehouseTags" parameterType="map">
+        INSERT INTO SHARE_HOUSE_TAG (house_id, house_tag_id)
+        VALUES
+        <foreach collection="tagList" item="tagId" separator=",">
+            (#{houseId}, #{tagId})
+        </foreach>
+    </insert>
+
+    <!-- ✅ 기존 태그 삭제 (수정 시 사용) -->
+    <delete id="deleteSharehouseTags" parameterType="long">
+        DELETE FROM SHARE_HOUSE_TAG
+        WHERE house_id = #{value}
+    </delete>
 
 </mapper>
