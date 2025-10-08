@@ -52,17 +52,18 @@ public class SharehouseService implements ISharehouseService {
     }
 
     /**
-     * ★★★ 새로운 메서드: 이미지 포함 등록 ★★★
+     * ★★★ 새로운 메서드: 이미지 + 층수 포함 등록 ★★★
      */
     @Override
     @Transactional
     public Long registerHouseWithImages(String ownerId, String title, String subText,
-                                        String address, List<String> imageUrls) {
+                                        String address, List<String> imageUrls, String floorNumber) {
 
         log.info("=== 쉐어하우스 등록 시작 ===");
         log.info("ownerId: {}", ownerId);
         log.info("title: {}", title);
         log.info("address: {}", address);
+        log.info("floorNumber: {}", floorNumber);  // ✅ 층수 로그 추가
         log.info("imageUrls 개수: {}", imageUrls != null ? imageUrls.size() : 0);
 
         // 1. 기본 정보 저장
@@ -71,6 +72,16 @@ public class SharehouseService implements ISharehouseService {
         dto.setSubText(subText);
         dto.setAddress(address);
         dto.setRegId(ownerId);
+
+        // ✅ 층수 설정 추가
+        if (floorNumber != null && !floorNumber.isBlank()) {
+            try {
+                dto.setFloorNumber(Integer.parseInt(floorNumber));
+                log.info("✅ 층수 설정: {}", floorNumber);
+            } catch (NumberFormatException e) {
+                log.warn("⚠️ 층수 파싱 실패: {}", floorNumber);
+            }
+        }
 
         // 첫 번째 이미지를 coverUrl로 설정
         if (imageUrls != null && !imageUrls.isEmpty()) {

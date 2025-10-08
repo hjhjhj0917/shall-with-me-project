@@ -14,10 +14,9 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseReg.css?v=20251006"/>
   <style>
-    /* UX: 업로더 전체가 버튼처럼 보이게 */
     .uploader { cursor: pointer; }
 
-    /* ✅ 태그 선택 버튼 스타일 (룸메이트와 동일) */
+    /* 태그 선택 버튼 스타일 */
     .tag-select-btn {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
@@ -27,7 +26,6 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 16px;
       transition: transform 0.2s ease;
     }
     .tag-select-btn:hover {
@@ -35,6 +33,111 @@
     }
     .tag-select-btn i {
       margin-right: 8px;
+    }
+
+    /* 층수 입력 버튼 스타일 */
+    .floor-input-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .floor-input-btn:hover {
+      transform: translateY(-2px);
+    }
+    .floor-input-btn i {
+      margin-right: 8px;
+    }
+
+    /* 태그/층수 버튼을 나란히 배치 */
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* 층수 입력 모달 */
+    .floor-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+    }
+    .floor-modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .floor-modal-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #1c407d;
+    }
+    .floor-input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .floor-input-group input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .floor-input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .floor-input-group span {
+      font-size: 1rem;
+      color: #666;
+      font-weight: 600;
+    }
+    .floor-modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .floor-modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .floor-modal-btn.cancel {
+      background: #f0f0f0;
+      color: #666;
+    }
+    .floor-modal-btn.cancel:hover {
+      background: #e0e0e0;
+    }
+    .floor-modal-btn.confirm {
+      background: #3399ff;
+      color: white;
+    }
+    .floor-modal-btn.confirm:hover {
+      background: #2288ee;
     }
   </style>
 </head>
@@ -84,7 +187,7 @@
         </label>
       </div>
 
-      <!-- ✅ 쉐어하우스 이름 입력 -->
+      <!-- 쉐어하우스 이름 입력 -->
       <div class="form-group">
         <label>쉐어하우스 이름 <span style="color:#999; font-size:0.9em;">(최대 20자)</span></label>
         <input type="text"
@@ -96,21 +199,26 @@
                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
       </div>
 
-      <!-- ✅ 태그 선택 버튼 추가 -->
+      <!-- 태그 선택 + 층수 입력 버튼 -->
       <div class="form-group">
-        <button type="button" class="tag-select-btn" onclick="openTagSelectPopup()">
-          <i class="fa-solid fa-tags"></i>
-          태그 선택 (최대 3개)
-        </button>
+        <div class="button-row">
+          <button type="button" class="tag-select-btn" onclick="openTagSelectPopup()">
+            <i class="fa-solid fa-tags"></i>
+            태그 선택 (최대 3개)
+          </button>
+          <button type="button" class="floor-input-btn" onclick="openFloorModal()">
+            <i class="fa-solid fa-building"></i>
+            층수 입력
+          </button>
+        </div>
         <div id="selectedTagsDisplay" style="margin-top: 8px; color: #666; font-size: 0.9rem;">
           선택된 태그가 없습니다.
         </div>
-        <!-- 숨겨진 필드에 태그 ID 저장 -->
         <input type="hidden" id="selectedTagIds" name="tagListJson" value="[]">
+        <input type="hidden" id="floorNumber" name="floorNumber" value="">
       </div>
 
       <div class="sh-modal-body sh-reg">
-        <!-- ▼ 업로더 왼쪽 + 태그패널 오른쪽 -->
         <div class="sh-top-row">
           <!-- 업로더 5장 -->
           <section class="sh-uploader-5">
@@ -141,7 +249,7 @@
             </label>
           </section>
 
-          <!-- ✅ 업로더 오른쪽: 보여질 태그 -->
+          <!-- 태그 패널 -->
           <aside class="inline-tag-panel inline-right">
             <div class="inline-tag-title">쉐어하우스 태그</div>
             <div class="inline-tag-list" id="inlineTagList"></div>
@@ -149,7 +257,7 @@
           </aside>
         </div>
 
-        <!-- 소개글은 아래 -->
+        <!-- 소개글 -->
         <section class="sh-reg-intro">
           <div class="form-group">
             <label>쉐어하우스 소개</label>
@@ -166,6 +274,24 @@
 
   </form>
 </main>
+
+<!-- 층수 입력 모달 -->
+<div class="floor-modal" id="floorModal">
+  <div class="floor-modal-content">
+    <div class="floor-modal-title">
+      <i class="fa-solid fa-building" style="color: #667eea; margin-right: 8px;"></i>
+      층수 입력
+    </div>
+    <div class="floor-input-group">
+      <input type="number" id="floorInput" min="1" max="99" placeholder="숫자 입력">
+      <span>층</span>
+    </div>
+    <div class="floor-modal-actions">
+      <button type="button" class="floor-modal-btn cancel" onclick="closeFloorModal()">취소</button>
+      <button type="button" class="floor-modal-btn confirm" onclick="saveFloorNumber()">확인</button>
+    </div>
+  </div>
+</div>
 
 <script>
   // 취소 버튼
@@ -189,7 +315,6 @@
 <!-- 업로더 미리보기 -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // 업로더 미리보기
     document.querySelectorAll('.sh-uploader-5 .uploader input[type="file"]').forEach(input => {
       const wrap = input.closest('.uploader');
       const span = wrap.querySelector('span');
@@ -219,11 +344,15 @@
     const list  = document.getElementById('inlineTagList');
     const empty = document.getElementById('inlineTagEmpty');
     const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
+    const floorNum = document.getElementById('floorNumber').value;
 
     list.innerHTML = '';
+
+    let hasContent = false;
+
+    // 태그 표시
     if (tagIds.length > 0){
-      empty.style.display = 'none';
-      // 실제 태그 이름은 전역 변수에서 가져오기
+      hasContent = true;
       tagIds.forEach(tagId => {
         const tagName = window.tagMap && window.tagMap[tagId] ? window.tagMap[tagId] : `태그${tagId}`;
         const pill = document.createElement('span');
@@ -231,15 +360,23 @@
         pill.textContent = tagName;
         list.appendChild(pill);
       });
-    } else {
-      empty.style.display = '';
     }
+
+    // 층수 표시
+    if (floorNum && floorNum !== '') {
+      hasContent = true;
+      const floorPill = document.createElement('span');
+      floorPill.className = 'tag-pill';
+      floorPill.textContent = floorNum + '층';
+      list.appendChild(floorPill);
+    }
+
+    empty.style.display = hasContent ? 'none' : '';
   }
 </script>
 
-<!-- ✅ 태그 선택 팝업 -->
+<!-- 태그 선택 팝업 -->
 <script>
-  // 태그 맵 (전역)
   window.tagMap = {};
 
   function openTagSelectPopup() {
@@ -256,31 +393,91 @@
     );
   }
 
-  // 태그 선택 완료 콜백
   window.receiveSelectedTags = function(tagList, tagNames) {
     console.log('선택된 태그:', tagList, tagNames);
-
-    // 태그 ID 저장
     document.getElementById('selectedTagIds').value = JSON.stringify(tagList);
 
-    // 태그 맵 업데이트
     tagList.forEach((id, idx) => {
       window.tagMap[id] = tagNames[idx];
     });
 
-    // 표시 업데이트
+    updateDisplayText();
+    renderInlineTags();
+  };
+
+  function updateDisplayText() {
     const display = document.getElementById('selectedTagsDisplay');
-    if (tagList.length > 0) {
-      display.textContent = `선택됨: ${tagNames.join(', ')}`;
+    const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
+    const floorNum = document.getElementById('floorNumber').value;
+
+    console.log('=== updateDisplayText 호출 ===');
+    console.log('tagIds:', tagIds);
+    console.log('floorNum:', floorNum);
+
+    let parts = [];
+
+    if (tagIds.length > 0) {
+      const tagNames = tagIds.map(id => window.tagMap[id] || `태그${id}`);
+      parts.push(...tagNames);
+    }
+
+    if (floorNum && floorNum !== '' && floorNum !== 'undefined') {
+      parts.push(floorNum + '층');
+    }
+
+    if (parts.length > 0) {
+      display.textContent = '선택됨: ' + parts.join(', ');
       display.style.color = '#3399ff';
     } else {
       display.textContent = '선택된 태그가 없습니다.';
       display.style.color = '#666';
     }
+  }
+</script>
 
-    // 오른쪽 패널 업데이트
+<!-- 층수 입력 모달 스크립트 -->
+<script>
+  function openFloorModal() {
+    const modal = document.getElementById('floorModal');
+    const input = document.getElementById('floorInput');
+    const currentFloor = document.getElementById('floorNumber').value;
+
+    input.value = currentFloor || '';
+    modal.style.display = 'flex';
+    input.focus();
+  }
+
+  function closeFloorModal() {
+    document.getElementById('floorModal').style.display = 'none';
+  }
+
+  function saveFloorNumber() {
+    const input = document.getElementById('floorInput');
+    const floorNum = parseInt(input.value);
+
+    if (isNaN(floorNum) || floorNum < 1 || floorNum > 99) {
+      alert('1층부터 99층까지 입력 가능합니다.');
+      return;
+    }
+
+    console.log('층수 저장:', floorNum); // 디버깅용
+    document.getElementById('floorNumber').value = floorNum;
+    updateDisplayText();
     renderInlineTags();
-  };
+    closeFloorModal();
+  }
+
+  // Enter 키로 저장
+  document.addEventListener('DOMContentLoaded', () => {
+    const floorInput = document.getElementById('floorInput');
+    if (floorInput) {
+      floorInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          saveFloorNumber();
+        }
+      });
+    }
+  });
 </script>
 
 <script>

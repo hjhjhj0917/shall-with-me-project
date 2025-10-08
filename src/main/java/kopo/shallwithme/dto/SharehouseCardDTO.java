@@ -20,6 +20,9 @@ public class SharehouseCardDTO {
 
     // 카드 표시용
     private Integer price;
+    
+    // 층 추가
+    private Integer floorNumber;
 
     // INSERT 시 바인딩 (XML에서 #{regId})
     private String regId;

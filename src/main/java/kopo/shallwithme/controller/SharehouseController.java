@@ -78,7 +78,9 @@ public class SharehouseController {
         return "sharehouse/sharehouseReg";
     }
 
-    // ✅ 저장 처리 (쉐어하우스 등록: 썸네일 + 추가 이미지들 수신)
+    // SharehouseController.java의 register 메서드만 수정하면 됩니다.
+// 다음과 같이 수정하세요:
+
     @PostMapping(
             value = "/register",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -91,7 +93,8 @@ public class SharehouseController {
             @RequestParam(value = "houseName", required = false) String houseName,
             @RequestParam(value = "introduction", required = false) String introduction,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-            @RequestParam(value = "tagList", required = false) String tagListJson,  // ✅ 태그 추가
+            @RequestParam(value = "tagListJson", required = false) String tagListJson,
+            @RequestParam(value = "floorNumber", required = false) String floorNumber,  // ✅ 층수 파라미터 추가
             HttpSession session
     ){
         String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
@@ -106,6 +109,7 @@ public class SharehouseController {
             log.info("houseName: {}", houseName);
             log.info("introduction: {}", introduction);
             log.info("tagListJson: {}", tagListJson);
+            log.info("floorNumber: {}", floorNumber);  // ✅ 로그 추가
             log.info("thumbnail: {}", thumbnail != null ? thumbnail.getOriginalFilename() : "null");
             log.info("추가 이미지 개수: {}", images != null ? images.size() : 0);
 
@@ -132,13 +136,14 @@ public class SharehouseController {
 
             log.info("총 업로드된 이미지: {}개", imageUrls.size());
 
-            // ✅ houseName을 title로, introduction을 subText로 저장
+            // ✅ houseName을 title로, introduction을 subText로, floorNumber 전달
             Long houseId = sharehouseService.registerHouseWithImages(
                     userId,
                     (houseName != null && !houseName.isBlank()) ? houseName : "제목 없음",
                     (introduction != null && !introduction.isBlank()) ? introduction : "",
                     "",
-                    imageUrls
+                    imageUrls,
+                    floorNumber  // ✅ 층수 전달
             );
 
             log.info("✅ 등록 완료! houseId={}", houseId);
@@ -223,20 +228,22 @@ public class SharehouseController {
 
         List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
 
-        // 룸메이트와 동일하게 Map으로 변환(tag1, tag2, tag3 포함)
         List<Map<String, Object>> rList = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();
-            m.put("userId",  c.getHouseId());
+            m.put("userId", c.getHouseId());
+            m.put("houseId", c.getHouseId());  // ✅ houseId도 추가
             m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
             m.put("age", null);
+            m.put("gender", null);
+            m.put("floorNumber", c.getFloorNumber());  // ✅ 층수 추가!
 
             // ✅ 태그 3개 표시
             List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(c.getHouseId());
             m.put("tag1", (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null);
             m.put("tag2", (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null);
             m.put("tag3", (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null);
-            m.put("gender", null);
+
             return m;
         }).collect(Collectors.toList());
 
@@ -250,23 +257,38 @@ public class SharehouseController {
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "15") int pageSize) {
 
+        log.info("=== 쉐어하우스 목록 조회 ===");
+        log.info("offset: {}, pageSize: {}", offset, pageSize);
+
         List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
 
         List<Map<String, Object>> items = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();
             m.put("userId", c.getHouseId());
+            m.put("houseId", c.getHouseId());  // ✅ houseId도 추가
             m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
+            m.put("floorNumber", c.getFloorNumber());  // ✅ 층수 추가!
 
             // ✅ 태그 3개 표시
             List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(c.getHouseId());
             m.put("tag1", (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null);
             m.put("tag2", (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null);
             m.put("tag3", (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null);
+
+            // ✅ 로깅 추가
+            log.info("카드 ID: {}, 층수: {}, 태그: {}, {}, {}",
+                    c.getHouseId(),
+                    c.getFloorNumber(),
+                    m.get("tag1"), m.get("tag2"), m.get("tag3"));
+
             return m;
         }).collect(Collectors.toList());
 
         boolean lastPage = items.size() < pageSize;
+
+        log.info("총 {}개 카드 반환", items.size());
+
         return Map.of("items", items, "lastPage", lastPage);
     }
 
