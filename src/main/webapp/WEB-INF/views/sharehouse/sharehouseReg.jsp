@@ -143,7 +143,7 @@
 
           <!-- ✅ 업로더 오른쪽: 보여질 태그 -->
           <aside class="inline-tag-panel inline-right">
-            <div class="inline-tag-title">보여질 태그</div>
+            <div class="inline-tag-title">쉐어하우스 태그</div>
             <div class="inline-tag-list" id="inlineTagList"></div>
             <p class="inline-tag-empty" id="inlineTagEmpty">등록된 태그가 없습니다.</p>
           </aside>

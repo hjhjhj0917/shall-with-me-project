@@ -684,7 +684,7 @@
 <div class="modal-overlay" id="sharehouseRegOverlay" style="display:none; z-index:10000;">
     <div class="modal-sheet">
         <div class="modal-header" style="justify-content:space-between;">
-            <div class="modal-title-text">쉐어하우스 등록</div>
+<%--            <div class="modal-title-text">쉐어하우스 등록</div>--%>
             <%--            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">--%>
             <%--                <i class="fa-solid fa-xmark"></i>--%>
             <%--            </button> 닫기버튼 임시삭제--%>
