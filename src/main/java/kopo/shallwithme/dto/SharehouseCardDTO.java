@@ -2,6 +2,8 @@ package kopo.shallwithme.dto;
 
 import lombok.Data;
 import java.util.List;
+import kopo.shallwithme.dto.UserTagDTO;
+import java.util.ArrayList;
 
 @Data
 public class SharehouseCardDTO {
@@ -18,8 +20,10 @@ public class SharehouseCardDTO {
 
     // 카드 표시용
     private Integer price;
-    private List<String> tags;
 
     // INSERT 시 바인딩 (XML에서 #{regId})
     private String regId;
+    // import java.util.*;
+    private List<UserTagDTO> tags = new ArrayList<>();
+
 }

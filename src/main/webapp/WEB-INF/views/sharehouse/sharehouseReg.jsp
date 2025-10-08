@@ -16,13 +16,32 @@
   <style>
     /* UX: 업로더 전체가 버튼처럼 보이게 */
     .uploader { cursor: pointer; }
+
+    /* ✅ 태그 선택 버튼 스타일 (룸메이트와 동일) */
+    .tag-select-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: transform 0.2s ease;
+    }
+    .tag-select-btn:hover {
+      transform: translateY(-2px);
+    }
+    .tag-select-btn i {
+      margin-right: 8px;
+    }
   </style>
 </head>
 
 <body>
 <% if (!inModal) { %>
 <header>
-  <!-- (기존 헤더) -->
   <div class="home-logo" onclick="location.href='/user/main'">
     <div class="header-icon-stack"><i class="fa-solid fa-people-roof fa-xs" style="color:#3399ff;"></i></div>
     <div class="header-logo">살며시</div>
@@ -65,7 +84,7 @@
         </label>
       </div>
 
-      <!-- ✅ 추가: 쉐어하우스 이름 입력 -->
+      <!-- ✅ 쉐어하우스 이름 입력 -->
       <div class="form-group">
         <label>쉐어하우스 이름 <span style="color:#999; font-size:0.9em;">(최대 20자)</span></label>
         <input type="text"
@@ -75,6 +94,19 @@
                placeholder="예: 강남 따뜻한 쉐어하우스 역세권"
                required
                style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
+      </div>
+
+      <!-- ✅ 태그 선택 버튼 추가 -->
+      <div class="form-group">
+        <button type="button" class="tag-select-btn" onclick="openTagSelectPopup()">
+          <i class="fa-solid fa-tags"></i>
+          태그 선택 (최대 3개)
+        </button>
+        <div id="selectedTagsDisplay" style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+          선택된 태그가 없습니다.
+        </div>
+        <!-- 숨겨진 필드에 태그 ID 저장 -->
+        <input type="hidden" id="selectedTagIds" name="tagListJson" value="[]">
       </div>
 
       <div class="sh-modal-body sh-reg">
@@ -116,7 +148,6 @@
             <p class="inline-tag-empty" id="inlineTagEmpty">등록된 태그가 없습니다.</p>
           </aside>
         </div>
-        <!-- ▲ 업로더 + 태그패널 -->
 
         <!-- 소개글은 아래 -->
         <section class="sh-reg-intro">
@@ -133,7 +164,6 @@
       </div>
     </section>
 
-    <!-- 오른쪽 외부 박스는 제거 -->
   </form>
 </main>
 
@@ -156,7 +186,7 @@
 
 <%@ include file="../includes/customModal.jsp" %>
 
-<!-- 업로더 미리보기 + 태그 복제 표시 -->
+<!-- 업로더 미리보기 -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // 업로더 미리보기
@@ -165,18 +195,14 @@
       const span = wrap.querySelector('span');
       const img  = wrap.querySelector('.preview');
 
-      // ✅ programmatic click 제거: 라벨 기본 클릭만 사용
-      // 라벨을 누르는 순간(파일창 열리기 직전) 값 초기화 → 같은 파일 재선택도 change 발생
       wrap.addEventListener('mousedown', () => {
         input.value = null;
       });
 
-      // 보조: input 자체를 직접 눌러도 동일 동작
       input.addEventListener('click', () => {
         input.value = null;
       });
 
-      // 파일 선택 후 미리보기
       input.addEventListener('change', () => {
         const f = input.files && input.files[0];
         if (!f){ img.hidden = true; span.hidden = false; return; }
@@ -186,31 +212,75 @@
       });
     });
 
-    // 좌측(혹은 서버)에서 선택된 태그를 오른쪽 패널에 복제
-    const SRC_SELECTOR = '#displayTags .tag-chip, .left-tags .tag-chip';
+    renderInlineTags();
+  });
 
-    function renderInlineTags(){
-      const src   = document.querySelectorAll(SRC_SELECTOR);
-      const list  = document.getElementById('inlineTagList');
-      const empty = document.getElementById('inlineTagEmpty');
-      list.innerHTML = '';
-      if (src.length){
-        empty.style.display = 'none';
-        src.forEach(el=>{
-          const pill = document.createElement('span');
-          pill.className = 'tag-pill';
-          const pure = (el.childNodes[0]?.textContent || el.textContent).trim().replace(/^#/, '');
-          pill.textContent = pure;
-          list.appendChild(pill);
-        });
-      } else {
-        empty.style.display = '';
-      }
+  function renderInlineTags(){
+    const list  = document.getElementById('inlineTagList');
+    const empty = document.getElementById('inlineTagEmpty');
+    const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
+
+    list.innerHTML = '';
+    if (tagIds.length > 0){
+      empty.style.display = 'none';
+      // 실제 태그 이름은 전역 변수에서 가져오기
+      tagIds.forEach(tagId => {
+        const tagName = window.tagMap && window.tagMap[tagId] ? window.tagMap[tagId] : `태그${tagId}`;
+        const pill = document.createElement('span');
+        pill.className = 'tag-pill';
+        pill.textContent = tagName;
+        list.appendChild(pill);
+      });
+    } else {
+      empty.style.display = '';
+    }
+  }
+</script>
+
+<!-- ✅ 태그 선택 팝업 -->
+<script>
+  // 태그 맵 (전역)
+  window.tagMap = {};
+
+  function openTagSelectPopup() {
+    const url = '${pageContext.request.contextPath}/sharehouse/tagSelect';
+    const width = 1000;
+    const height = 800;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+
+    window.tagSelectPopup = window.open(
+      url,
+      'tagSelect',
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+    );
+  }
+
+  // 태그 선택 완료 콜백
+  window.receiveSelectedTags = function(tagList, tagNames) {
+    console.log('선택된 태그:', tagList, tagNames);
+
+    // 태그 ID 저장
+    document.getElementById('selectedTagIds').value = JSON.stringify(tagList);
+
+    // 태그 맵 업데이트
+    tagList.forEach((id, idx) => {
+      window.tagMap[id] = tagNames[idx];
+    });
+
+    // 표시 업데이트
+    const display = document.getElementById('selectedTagsDisplay');
+    if (tagList.length > 0) {
+      display.textContent = `선택됨: ${tagNames.join(', ')}`;
+      display.style.color = '#3399ff';
+    } else {
+      display.textContent = '선택된 태그가 없습니다.';
+      display.style.color = '#666';
     }
 
+    // 오른쪽 패널 업데이트
     renderInlineTags();
-    document.addEventListener('tags:changed', renderInlineTags); // 태그 변경 시 호출
-  });
+  };
 </script>
 
 <script>
@@ -232,7 +302,6 @@
         return;
       }
 
-      // ✅ 이름 검증 추가
       const thumb = form.querySelector('input[name="thumbnail"]')?.files?.[0];
       if (!thumb) { alert('대표 이미지를 선택해 주세요.'); return; }
       const imgs = [...form.querySelectorAll('input[name="images"]')]
@@ -241,29 +310,25 @@
 
       btn.disabled = true; btn.textContent = '저장중...';
 
-      const fd = new FormData(form); // name="images" 여러개 자동 포함
-      // 룸메이트와 동일 구조: thumbnail을 profileImage로도 같이 전송
+      const fd = new FormData(form);
       fd.append('profileImage', form.querySelector('input[name="thumbnail"]').files[0]);
-
 
       try {
         const url = (typeof ctx !== 'undefined' ? ctx : '') + '/sharehouse/register';
         const res = await fetch(url, {
           method: 'POST',
           body: fd,
-          credentials: 'include', // 세션 쿠키 포함
+          credentials: 'include',
         });
 
         let json = null;
         try { json = await res.clone().json(); } catch (_) { /* ignore */ }
 
-// 리다이렉트/불투명 응답(상태코드 0) 대비
         if (res.status === 0 || res.type === 'opaqueredirect') {
           alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.');
           return;
         }
 
-// 일반 실패 처리
         if (!res.ok) {
           const text =
                   (json && json.msg) ||
@@ -276,20 +341,17 @@
         json = json || {};
 
         if (json.result === 1 || json.result === 'success') {
-          // 부모창에 목록 리로드 신호 (data 없을 수도 있으니 안전 처리)
           const savedId = json?.data?.shId ?? null;
           if (window.parent) {
             window.parent.postMessage({ type: 'SH_SAVED', shId: savedId }, '*');
           }
 
-          // 모달 닫기 (함수가 있으면)
           try {
             if (window.parent && typeof window.parent.closeSharehouseRegModal === 'function') {
               window.parent.closeSharehouseRegModal();
             }
           } catch(_) {}
 
-          // 단독 페이지로 연 경우엔 메인 이동
           if (window === window.parent) location.href = '/sharehouse/main';
         } else {
           alert(json.msg || '저장에 실패했습니다.');

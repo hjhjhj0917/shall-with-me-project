@@ -87,25 +87,26 @@
         ORDER BY sort_order ASC, img_id ASC
     </select>
 
-    <!-- ✅ 쉐어하우스 태그 조회 - 룸메이트와 동일한 방식 -->
+    <!-- ✅ 쉐어하우스 태그 조회 - SHARE_HOUSE_TAG_LIST 참조 -->
     <select id="selectSharehouseTags"
             parameterType="long"
             resultType="kopo.shallwithme.dto.UserTagDTO">
         SELECT
-            st.house_id     AS houseId,
-            st.house_tag_id AS tagId,
-            t.tag_name      AS tagName
+            st.house_id       AS houseId,
+            st.house_tag_id   AS tagId,
+            tl.house_tag_name AS tagName
         FROM SHARE_HOUSE_TAG st
-                 JOIN TAG t ON t.tag_id = st.house_tag_id
+                 INNER JOIN SHARE_HOUSE_TAG_LIST tl ON tl.house_tag_id = st.house_tag_id
         WHERE st.house_id = #{value}
-        ORDER BY st.house_tag_id DESC
+        ORDER BY st.house_tag_id
             LIMIT 3
     </select>
 
-    <!-- ✅ 전체 태그 목록 조회 - 룸메이트와 완전 동일 -->
+    <!-- ✅ 전체 태그 목록 조회 - SHARE_HOUSE_TAG_LIST에서 -->
     <select id="getAllTags" resultType="TagDTO">
-        SELECT TAG_ID, TAG_NAME
-        FROM TAG
+        SELECT house_tag_id AS tagId, house_tag_name AS tagName
+        FROM SHARE_HOUSE_TAG_LIST
+        ORDER BY house_tag_id
     </select>
 
     <!-- insert: PK 자동반환 -->

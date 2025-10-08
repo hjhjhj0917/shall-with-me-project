@@ -421,11 +421,22 @@
                     console.log("=== API 응답 ===");
                     console.log("전체 응답:", data);
 
-                    const items = data.items || data.list || data || [];
+                    // const items = data.items || data.list || data || []; 수정1 삭제
 
-                    if (items.length) {
-                        console.log("첫번째 카드 태그:", items[0].tag1, items[0].tag2, items[0].tag3);
-                    }
+                    //수정1 추가
+                    // 원본 응답을 src로 받음
+                    const src = data.items || data.list || data || [];
+// 서버에서 내려온 모든 필드를 보존하면서(특히 tags) items를 만듦
+                    const items = src.map(x => Object.assign({}, x, { tags: x.tags || [] }));
+
+
+                    // 쉐어하우스 전용: 배열 tags[] -> tag1/tag2/tag3로 맞춤 (룸메이트 템플릿 재사용)
+                    items.forEach(card => {
+                        const arr = (card.tags || []).map(t => t.tagName);
+                        card.tag1 = arr[0] || null;
+                        card.tag2 = arr[1] || null;
+                        card.tag3 = arr[2] || null;
+                    });
 
                     if (items.length > 0) {
                         console.log("첫 번째 아이템:", items[0]);

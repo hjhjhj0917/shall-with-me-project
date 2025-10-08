@@ -1,6 +1,7 @@
 package kopo.shallwithme.service;
 
 import kopo.shallwithme.dto.SharehouseCardDTO;
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,15 @@ public interface ISharehouseService {
 
     Map<String, Object> getDetail(Long houseId);
 
-    // ✅ 추가!
+    // ✅ 태그 조회
     List<UserTagDTO> selectSharehouseTags(Long houseId);
 
-    // ✅ 이미지 조회도 추가 (일관성을 위해)
+    // ✅ 이미지 조회
     List<Map<String, Object>> selectSharehouseImages(Long houseId);
+
+    // ✅ 전체 태그 목록 조회 (룸메이트와 동일)
+    List<TagDTO> getAllTags();
+
+    // ✅ 태그 저장 (룸메이트와 동일한 방식)
+    int saveSharehouseTags(Long houseId, List<Integer> tagList);
 }

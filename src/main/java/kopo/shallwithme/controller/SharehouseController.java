@@ -7,9 +7,12 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.SharehouseCardDTO;
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
+import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.ISharehouseService;
 import kopo.shallwithme.service.impl.UserInfoService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import kopo.shallwithme.mapper.ISharehouseMapper;  // ✅ 추가!
-import kopo.shallwithme.dto.UserTagDTO;            // ✅ 추가!
 
 import java.io.IOException;
 import java.util.*;
@@ -70,8 +71,8 @@ public class SharehouseController {
         String userName = (session != null) ? (String) session.getAttribute("SS_USER_NAME") : "";
 
         // 룸메이트와 동일 구조: JSP에서 사용할 값 셋업
-        req.setAttribute("userTags", List.of());      // 필요시 서비스에서 태그 가져와 채우면 됨
-        req.setAttribute("userTagNames", List.of());  // 화면 구조 맞추기용
+        req.setAttribute("userTags", List.of());
+        req.setAttribute("userTagNames", List.of());
         req.setAttribute("SS_USER_NAME", userName);
 
         return "sharehouse/sharehouseReg";
@@ -87,9 +88,10 @@ public class SharehouseController {
     public ResponseEntity<?> register(
             @RequestParam("thumbnail") MultipartFile thumbnail,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
-            @RequestParam(value = "houseName", required = false) String houseName,  // ✅ 추가
+            @RequestParam(value = "houseName", required = false) String houseName,
             @RequestParam(value = "introduction", required = false) String introduction,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestParam(value = "tagList", required = false) String tagListJson,  // ✅ 태그 추가
             HttpSession session
     ){
         String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
@@ -103,6 +105,7 @@ public class SharehouseController {
             log.info("userId: {}", userId);
             log.info("houseName: {}", houseName);
             log.info("introduction: {}", introduction);
+            log.info("tagListJson: {}", tagListJson);
             log.info("thumbnail: {}", thumbnail != null ? thumbnail.getOriginalFilename() : "null");
             log.info("추가 이미지 개수: {}", images != null ? images.size() : 0);
 
@@ -132,13 +135,30 @@ public class SharehouseController {
             // ✅ houseName을 title로, introduction을 subText로 저장
             Long houseId = sharehouseService.registerHouseWithImages(
                     userId,
-                    (houseName != null && !houseName.isBlank()) ? houseName : "제목 없음",  // title
-                    (introduction != null && !introduction.isBlank()) ? introduction : "",  // subText
-                    "",      // address
+                    (houseName != null && !houseName.isBlank()) ? houseName : "제목 없음",
+                    (introduction != null && !introduction.isBlank()) ? introduction : "",
+                    "",
                     imageUrls
             );
 
             log.info("✅ 등록 완료! houseId={}", houseId);
+
+            // ✅ 태그 저장 (룸메이트와 동일한 방식)
+            if (tagListJson != null && !tagListJson.isBlank()) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    List<Integer> tagList = mapper.readValue(
+                            tagListJson,
+                            mapper.getTypeFactory().constructCollectionType(List.class, Integer.class)
+                    );
+                    if (!tagList.isEmpty()) {
+                        sharehouseService.saveSharehouseTags(houseId, tagList);
+                        log.info("✅ 태그 {}개 저장 완료", tagList.size());
+                    }
+                } catch (Exception e) {
+                    log.error("태그 저장 중 오류", e);
+                }
+            }
 
             return ResponseEntity.ok(Map.of(
                     "result", 1,
@@ -203,15 +223,19 @@ public class SharehouseController {
 
         List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
 
-        // 룸메이트와 동일하게 Map으로 변환(tag1, tag2 포함)
+        // 룸메이트와 동일하게 Map으로 변환(tag1, tag2, tag3 포함)
         List<Map<String, Object>> rList = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();
-            m.put("userId",  c.getHouseId()); // 키 이름만 맞추기용(프론트 구조 동일)
+            m.put("userId",  c.getHouseId());
             m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
             m.put("age", null);
-            m.put("tag1", (c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null);
-            m.put("tag2", (c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null);
+
+            // ✅ 태그 3개 표시
+            List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(c.getHouseId());
+            m.put("tag1", (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null);
+            m.put("tag2", (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null);
+            m.put("tag3", (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null);
             m.put("gender", null);
             return m;
         }).collect(Collectors.toList());
@@ -233,8 +257,12 @@ public class SharehouseController {
             m.put("userId", c.getHouseId());
             m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
-            m.put("tag1", (c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null);
-            m.put("tag2", (c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null);
+
+            // ✅ 태그 3개 표시
+            List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(c.getHouseId());
+            m.put("tag1", (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null);
+            m.put("tag2", (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null);
+            m.put("tag3", (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null);
             return m;
         }).collect(Collectors.toList());
 
@@ -242,23 +270,22 @@ public class SharehouseController {
         return Map.of("items", items, "lastPage", lastPage);
     }
 
-    // ✅ 특정 항목의 태그 2개 + 기타정보 조회 API – 룸메이트 /{userId}/info와 동일
+    // ✅ 특정 항목의 태그 3개 + 기타정보 조회 API – 룸메이트 /{userId}/info와 동일
     @GetMapping("/{userId}/info")
     @ResponseBody
     public Map<String, Object> getRoommateInfo(@PathVariable String userId) {
         log.info("getRoommateInfo called for userId={}", userId);
 
-        // houseId로 변환
         Long houseId;
         try { houseId = Long.valueOf(userId); }
-        catch (Exception e) { return Map.of("tag1", null, "tag2", null, "gender", null); }
+        catch (Exception e) { return Map.of("tag1", null, "tag2", null, "tag3", null, "gender", null); }
 
-        SharehouseCardDTO c = sharehouseService.getCardById(houseId);
-        String tag1 = (c!=null && c.getTags()!=null && c.getTags().size()>0) ? c.getTags().get(0) : null;
-        String tag2 = (c!=null && c.getTags()!=null && c.getTags().size()>1) ? c.getTags().get(1) : null;
+        List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(houseId);
+        String tag1 = (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null;
+        String tag2 = (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null;
+        String tag3 = (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null;
 
-        // gender 키도 그대로 내려 프론트 구조를 유지
-        return Map.of("tag1", tag1, "tag2", tag2, "gender", null);
+        return Map.of("tag1", tag1, "tag2", tag2, "tag3", tag3, "gender", null);
     }
 
     @GetMapping("/sharehouseDetail")
@@ -278,7 +305,6 @@ public class SharehouseController {
         List<Map<String, Object>> images = sharehouseService.selectSharehouseImages(houseId);
         List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(houseId);
 
-        // Model에 추가
         detail.put("images", images);
         detail.put("tags", tags);
 
@@ -289,4 +315,63 @@ public class SharehouseController {
 
         return "sharehouse/sharehouseDetail";
     }
+
+    // ✅ 전체 태그 목록 조회 (룸메이트와 완전 동일)
+    @GetMapping("/tagAll")
+    @ResponseBody
+    public List<TagDTO> tagAll() throws Exception {
+        log.info("{}.tagAll Start!", this.getClass().getName());
+
+        List<TagDTO> rList = sharehouseService.getAllTags();
+
+        log.info("{}.tagAll End!", this.getClass().getName());
+
+        return rList;
+    }
+
+    // ✅ 태그 저장 API (룸메이트와 완전 동일)
+    @PostMapping("/saveSharehouseTags")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> saveSharehouseTags(
+            @RequestBody Map<String, Object> requestBody,
+            HttpSession session) {
+
+        log.info("{}.saveSharehouseTags Start!", this.getClass().getName());
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        if (userId == null || userId.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "로그인이 필요합니다."));
+        }
+
+        try {
+            Long houseId = Long.valueOf(requestBody.get("houseId").toString());
+            List<Integer> tagList = (List<Integer>) requestBody.get("tagList");
+
+            if (tagList == null || tagList.isEmpty()) {
+                return ResponseEntity.ok(Map.of("success", false, "message", "태그를 선택해주세요."));
+            }
+
+            int result = sharehouseService.saveSharehouseTags(houseId, tagList);
+
+            log.info("{}.saveSharehouseTags End!", this.getClass().getName());
+
+            if (result > 0) {
+                return ResponseEntity.ok(Map.of("success", true));
+            } else {
+                return ResponseEntity.ok(Map.of("success", false, "message", "태그 저장 실패"));
+            }
+
+        } catch (Exception e) {
+            log.error("태그 저장 중 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "서버 오류가 발생했습니다."));
+        }
+    }
+
+    @GetMapping("/tagSelect")
+    public String tagSelect() {
+        return "sharehouse/sharehouseTagSelect";
+    }
+
 }

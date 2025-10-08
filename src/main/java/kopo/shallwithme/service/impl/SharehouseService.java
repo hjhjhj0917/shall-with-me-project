@@ -2,6 +2,7 @@ package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.dto.SharehouseCardDTO;
 import kopo.shallwithme.dto.SharehouseImageDTO;
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.mapper.ISharehouseMapper;
 import kopo.shallwithme.mapper.ISharehouseImageMapper;
@@ -26,7 +27,12 @@ public class SharehouseService implements ISharehouseService {
         Map<String, Object> p = new HashMap<>();
         p.put("offset", Math.max(0, offset));
         p.put("limit", Math.max(1, limit));
-        return sharehouseMapper.listCards(p);
+        List<SharehouseCardDTO> cards = sharehouseMapper.listCards(p);
+        for (SharehouseCardDTO c : cards) {
+            List<UserTagDTO> tags = sharehouseMapper.selectSharehouseTags(c.getHouseId());
+            c.setTags(tags == null ? Collections.emptyList() : tags);
+        }
+        return cards;
     }
 
     @Override
@@ -145,7 +151,7 @@ public class SharehouseService implements ISharehouseService {
     }
 
     /**
-     * 쉐어하우스 태그 조회
+     * ✅ 쉐어하우스 태그 조회 (룸메이트와 동일)
      */
     @Override
     public List<UserTagDTO> selectSharehouseTags(Long houseId) {
@@ -157,7 +163,7 @@ public class SharehouseService implements ISharehouseService {
     }
 
     /**
-     * 쉐어하우스 이미지 목록 조회
+     * ✅ 쉐어하우스 이미지 목록 조회
      */
     @Override
     public List<Map<String, Object>> selectSharehouseImages(Long houseId) {
@@ -166,5 +172,41 @@ public class SharehouseService implements ISharehouseService {
             return Collections.emptyList();
         }
         return sharehouseMapper.selectSharehouseImages(houseId);
+    }
+
+    /**
+     * ✅ 전체 태그 목록 조회 (룸메이트와 동일)
+     */
+    @Override
+    public List<TagDTO> getAllTags() {
+        return sharehouseMapper.getAllTags();
+    }
+
+    /**
+     * ✅ 태그 저장 (룸메이트와 동일한 방식)
+     */
+    @Override
+    @Transactional
+    public int saveSharehouseTags(Long houseId, List<Integer> tagList) {
+        if (houseId == null || tagList == null || tagList.isEmpty()) {
+            log.warn("houseId 또는 tagList가 비어있음");
+            return 0;
+        }
+
+        log.info("태그 저장 시작: houseId={}, tagList={}", houseId, tagList);
+
+        // 1. 기존 태그 삭제
+        sharehouseMapper.deleteSharehouseTags(houseId);
+        log.info("기존 태그 삭제 완료");
+
+        // 2. 새 태그 저장
+        Map<String, Object> params = new HashMap<>();
+        params.put("houseId", houseId);
+        params.put("tagList", tagList);
+
+        int result = sharehouseMapper.insertSharehouseTags(params);
+        log.info("태그 {}개 저장 완료", result);
+
+        return result;
     }
 }
