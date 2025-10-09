@@ -13,7 +13,7 @@
             sh.house_id      AS houseId,
             sh.house_name    AS title,
             sh.description   AS subText,
-            sh.floor_number  AS floorNumber,  /* ✅ 층수 추가 */
+            sh.floor_number  AS floorNumber,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
@@ -37,7 +37,7 @@
             sh.house_id      AS houseId,
             sh.house_name    AS title,
             sh.description   AS subText,
-            sh.floor_number  AS floorNumber,  /* ✅ 층수 추가 */
+            sh.floor_number  AS floorNumber,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
@@ -63,7 +63,8 @@
             sh.description   AS subText,
             sh.address       AS address,
             sh.image_url     AS coverUrl,
-            sh.floor_number  AS floorNumber,  /* ✅ 층수 추가 */
+            sh.floor_number  AS floorNumber,
+            sh.reg_id        AS regId,
             sh.reg_dt        AS regDt,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
@@ -90,7 +91,7 @@
         ORDER BY sort_order ASC, img_id ASC
     </select>
 
-    <!-- ✅ 쉐어하우스 태그 조회 - SHARE_HOUSE_TAG_LIST 참조 -->
+    <!-- ✅✅✅ 쉐어하우스 태그 조회 - 3개 → 6개로 변경 ✅✅✅ -->
     <select id="selectSharehouseTags"
             parameterType="long"
             resultType="kopo.shallwithme.dto.UserTagDTO">
@@ -102,7 +103,7 @@
                  INNER JOIN SHARE_HOUSE_TAG_LIST tl ON tl.house_tag_id = st.house_tag_id
         WHERE st.house_id = #{value}
         ORDER BY st.house_tag_id
-            LIMIT 3
+            LIMIT 6
     </select>
 
     <!-- ✅ 전체 태그 목록 조회 - SHARE_HOUSE_TAG_LIST에서 -->

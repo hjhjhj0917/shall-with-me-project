@@ -161,4 +161,20 @@
                                  chg_dt            = NOW();
     </insert>
 
+    <!-- ✅ 사용자 프로필 조회 (수정됨) -->
+    <select id="findUserProfileByUserId"
+            parameterType="kopo.shallwithme.dto.UserProfileDTO"
+            resultType="kopo.shallwithme.dto.UserProfileDTO">
+        SELECT
+            ui.USER_ID AS userId,
+            ui.USER_NAME AS userName,
+            up.profile_image_url AS profileImageUrl,
+            up.introduction AS introduction,
+            up.reg_dt AS regDt,
+            up.chg_dt AS chgDt
+        FROM USER_INFO ui
+                 LEFT JOIN USER_PROFILE up ON ui.USER_ID = up.user_id
+        WHERE ui.USER_ID = #{userId}
+    </select>
+
 </mapper>
