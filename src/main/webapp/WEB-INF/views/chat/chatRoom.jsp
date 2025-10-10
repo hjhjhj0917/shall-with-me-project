@@ -67,21 +67,19 @@
         }
 
         .schedule-btn.accept {
-            background-color: #3399ff;
-            color: white;
-        }
-
-        .schedule-btn.accept:hover {
-            background-color: #2d8ae6;
+            background-color: white;
+            border-radius: 45px;
+            color: #3399ff;
+            border: 2px solid #E5F2FF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .schedule-btn.reject {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-
-        .schedule-btn.reject:hover {
-            background-color: #dee2e6;
+            background-color: white;
+            border-radius: 45px;
+            color: #dc3545;
+            border: 2px solid #E5F2FF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .action-completed-text {
@@ -184,14 +182,12 @@
         }
     });
 
-    // [최종] WebSocket 연결 함수
-    // [최종 수정] connect 함수를 이 코드로 전체 교체해주세요.
+    // [최종] connect 함수를 이 코드로 전체 교체해주세요.
     function connect() {
         if (!roomId) {
             showCustomAlert("채팅방 ID가 없습니다. 올바른 경로로 접속해 주세요.");
             return;
         }
-        // 서버 WebSocketConfig와 주소 일치 (필요시 '/ws-chat' -> '/ws' 등으로 변경)
         const socket = new SockJS("/ws");
         stompClient = Stomp.over(socket);
         stompClient.debug = null;
@@ -201,17 +197,21 @@
             fetch(`/chat/messages?roomId=${roomId}`)
                 .then(res => res.json())
                 .then(messages => {
-                    messages.forEach(msg => appendMessage(msg));
+                    messages.forEach(msg => {
+                        // [핵심] 메시지 종류에 따라 올바른 렌더링 함수 호출
+                        if (msg.messageType === 'SCHEDULE_REQUEST') {
+                            renderScheduleRequest(msg);
+                        } else if (msg.messageType === 'SCHEDULE_CONFIRMED' || msg.messageType === 'SCHEDULE_REJECTED') {
+                            renderSystemMessage(msg.message);
+                        } else {
+                            appendMessage(msg);
+                        }
+                    });
                     const chatBox = document.getElementById("chatBox");
                     chatBox.scrollTop = chatBox.scrollHeight;
 
-                    // [핵심] 페이지 로드가 완료된 후, "나 이제 입장해서 다 읽었어" 라는 신호를 보냅니다.
-                    // 이 코드가 상대방이 접속했을 때 '1'을 지워주는 역할을 합니다.
                     if (myUser.id && myUser.id !== 'null' && myUser.id !== '') {
-                        stompClient.send("/app/chat.readMessage", {}, JSON.stringify({
-                            roomId: roomId,
-                            readerId: myUser.id
-                        }));
+                        stompClient.send("/app/chat.readMessage", {}, JSON.stringify({ roomId: roomId, readerId: myUser.id }));
                     }
                 });
 
@@ -219,23 +219,26 @@
             stompClient.subscribe("/topic/chatroom/" + roomId, function (message) {
                 const msg = JSON.parse(message.body);
 
-                // 서버에서 온 메시지(내 것, 상대 것 모두)를 화면에 그림
-                appendMessage(msg);
+                // [핵심] 메시지 종류에 따라 올바른 렌더링 함수 호출
+                if (msg.messageType === 'SCHEDULE_REQUEST') {
+                    renderScheduleRequest(msg);
+                } else if (msg.messageType === 'SCHEDULE_CONFIRMED' || msg.messageType === 'SCHEDULE_REJECTED') {
+                    renderSystemMessage(msg.message);
+                } else {
+                    appendMessage(msg);
+                }
 
-                // [핵심] 상대방이 이미 접속해 있는 상태에서 새 메시지를 받았을 때,
-                // "방금 온 메시지도 바로 읽었어" 라는 신호를 보냅니다.
+                // 상대방이 보낸 메시지를 받았을 때만 '읽음' 신호를 보냄
                 if (msg.senderId === otherUser.id) {
                     if (myUser.id && myUser.id !== 'null' && myUser.id !== '') {
-                        stompClient.send("/app/chat.readMessage", {}, JSON.stringify({
-                            roomId: roomId,
-                            readerId: myUser.id
-                        }));
+                        stompClient.send("/app/chat.readMessage", {}, JSON.stringify({ roomId: roomId, readerId: myUser.id }));
                     }
                 }
             });
 
-            // 3. 상대방이 내 메시지를 읽었음을 감지하고 '1'을 지우는 구독 (기존과 동일)
+            // 3. 상대방이 내 메시지를 읽었음을 감지하는 구독
             stompClient.subscribe("/topic/read/" + roomId, function(readUpdate) {
+                // ... (기존 코드와 동일)
                 const updateInfo = JSON.parse(readUpdate.body);
                 if (updateInfo.readerId === otherUser.id) {
                     const unreadMarkers = document.querySelectorAll('.read-marker.is-unread');
@@ -272,8 +275,12 @@
         messageInput.value = '';
     }
 
-    // [최종] 일반 메시지를 화면에 추가하는 함수
+    // [최종] appendMessage 함수를 이 코드로 전체 교체해주세요.
     function appendMessage(msg) {
+        // [추가] 이미 화면에 그려진 메시지인지 확인 (중복 방지)
+        if (document.getElementById('message-' + msg.messageId)) {
+            return;
+        }
         if (!msg.message) {
             return;
         }
@@ -296,6 +303,7 @@
         const isMe = (senderId === myUser.id);
         const profileImageUrl = isMe ? myUser.imageUrl : otherUser.imageUrl;
         const wrapper = document.createElement("div");
+        wrapper.id = 'message-' + msg.messageId; // [추가] 메시지마다 고유 ID 부여
         wrapper.className = "message-wrapper " + (isMe ? "me" : "other");
         const profileImg = document.createElement("div");
         profileImg.className = "profile-img";
@@ -321,10 +329,7 @@
         if (isMe) {
             const readMarker = document.createElement("div");
             readMarker.className = "read-marker";
-
-            // [핵심 수정] 숫자 0, boolean false, null, undefined 모두 '안 읽음'으로 처리하는
-            // 더 안전한 방식으로 변경합니다.
-            if (!msg.read) {
+            if (msg.read === false) {
                 readMarker.textContent = "1";
                 readMarker.classList.add("is-unread");
             }
@@ -344,43 +349,39 @@
         }
     }
 
-    // 일정 '요청' UI를 렌더링하는 함수
     function renderScheduleRequest(msg) {
+        // [추가] 이미 화면에 그려진 메시지인지 확인 (중복 방지)
+        if (document.getElementById('message-' + msg.messageId)) {
+            return;
+        }
         const chatBox = document.getElementById("chatBox");
         const request = msg.scheduleRequest;
         if (!request) return;
-
         const isMe = msg.senderId === myUser.id;
         const profileImageUrl = isMe ? myUser.imageUrl : otherUser.imageUrl;
-
         const wrapper = document.createElement("div");
+        wrapper.id = 'message-' + msg.messageId; // [추가] 메시지마다 고유 ID 부여
         wrapper.className = "message-wrapper " + (isMe ? "me" : "other");
-
         const profileImg = document.createElement("div");
         profileImg.className = "profile-img";
         const img = document.createElement("img");
         img.src = profileImageUrl;
         profileImg.appendChild(img);
-
         const msgContent = document.createElement("div");
         msgContent.className = "message-content";
-
         if (!isMe) {
             const senderNameElem = document.createElement("div");
             senderNameElem.className = "sender-name";
             senderNameElem.textContent = otherUser.otherName;
             msgContent.appendChild(senderNameElem);
         }
-
         const bubble = document.createElement("div");
         bubble.className = "message-bubble schedule-request";
-
         const scheduleDate = new Date(request.scheduleDt.replace('T', ' ')).toLocaleString('ko-KR', {
             year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
-
         let actionButtonsHTML = '';
-        if (!isMe) { // 내가 요청을 받은 경우
+        if (!isMe) {
             if (request.status === 'PENDING') {
                 actionButtonsHTML =
                     '<button class="schedule-btn accept" onclick="handleScheduleAction(' + request.scheduleId + ', \'confirm\')">수락</button>' +
@@ -390,7 +391,7 @@
             } else if (request.status === 'REJECTED') {
                 actionButtonsHTML = '<span class="action-completed-text">❌ 거절됨</span>';
             }
-        } else { // 내가 요청을 보낸 경우
+        } else {
             if (request.status === 'PENDING') {
                 actionButtonsHTML = '<span class="action-completed-text">상대방의 응답을 기다리는 중...</span>';
             } else if (request.status === 'CONFIRMED') {
@@ -399,7 +400,6 @@
                 actionButtonsHTML = '<span class="action-completed-text">상대방이 거절했습니다.</span>';
             }
         }
-
         bubble.innerHTML =
             '<div class="schedule-request-title">일정 조율 요청</div>' +
             '<div class="schedule-request-info"><strong>' + request.title + '</strong></div>' +
@@ -410,7 +410,6 @@
             '<div class="schedule-request-actions" id="actions-' + request.scheduleId + '">' +
             actionButtonsHTML +
             '</div>';
-
         msgContent.appendChild(bubble);
         wrapper.appendChild(profileImg);
         wrapper.appendChild(msgContent);
@@ -426,7 +425,7 @@
             if (res.ok) {
                 const actionsDiv = document.getElementById('actions-' + scheduleId);
                 if (actionsDiv) {
-                    const actionText = action === 'confirm' ? '✅ 수락됨' : '❌ 거절됨';
+                    const actionText = action === 'confirm' ? '수락됨' : '거절됨';
                     actionsDiv.innerHTML = '<span class="action-completed-text">' + actionText + '</span>';
                 }
             } else {
