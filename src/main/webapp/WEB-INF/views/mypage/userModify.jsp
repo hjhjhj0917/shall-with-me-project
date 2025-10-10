@@ -215,7 +215,7 @@
             /*white-space: pre-wrap;*/
             word-break: keep-all;
             overflow-wrap: break-word;
-            min-height: 150px;
+            min-height: 258px;
             display: block; /* ← flex 제거 */
             text-align: left !important; /* ← 가운데 정렬 상속 차단 */
         }
@@ -246,7 +246,6 @@
             width: 100% !important; /* 가로 꽉 채우기 */
             margin: 0 !important;
             text-align: left !important; /* 텍스트 왼쪽 정렬 */
-            white-space: pre-wrap; /* 줄바꿈 유지 */
             word-break: keep-all; /* 한글 가독성 */
             overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
         }
@@ -270,7 +269,6 @@
             width: 100% !important;
             margin: 0 !important;
             text-align: left !important; /* 텍스트 왼쪽 정렬 */
-            white-space: pre-wrap !important; /* 줄바꿈 유지 */
             word-break: keep-all !important; /* 한글 가독성 */
             overflow-wrap: break-word !important;
         }
