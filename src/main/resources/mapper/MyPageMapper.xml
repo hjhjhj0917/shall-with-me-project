@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
 <mapper namespace="kopo.shallwithme.mapper.IMyPageMapper">
 
     <select id="pwCheck" parameterType="UserInfoDTO" resultType="UserInfoDTO">
@@ -19,56 +18,178 @@
     </select>
 
     <update id="softDeleteUser" parameterType="UserInfoDTO">
-        UPDATE
-        USER_INFO
+        UPDATE USER_INFO
         SET
         USER_NAME = '알수없음',
-        PASSWORD = UUID(), <!-- 임의의 값으로 변경하여 로그인 불가 처리 -->
-        EMAIL = CONCAT('deleted_', NOW(), '_', EMAIL), <!-- 이메일 중복 방지를 위해 기존 이메일 변경 -->
-        status = 'DEACTIVATED',
-        deleted_at = NOW() <!-- 현재 시간을 탈퇴 요청 시간으로 기록 -->
-        WHERE
-        USER_ID = #{userId}
+        PASSWORD  = UUID(),                         <!-- 로그인 불가 처리 -->
+        EMAIL     = CONCAT('deleted_', NOW(), '_', EMAIL),  <!-- 중복 방지 -->
+        status    = 'DEACTIVATED',
+        deleted_at= NOW()
+        WHERE USER_ID = #{userId}
     </update>
 
     <update id="deactivateProfile" parameterType="UserProfileDTO">
-        UPDATE
-            USER_PROFILE
-        SET
-            profile_image_url = '/images/withdraw-profile-img.png',
-            chg_dt = NOW()
-        WHERE
-            user_id = #{userId}
+        UPDATE USER_PROFILE
+        SET profile_image_url = '/images/withdraw-profile-img.png',
+            chg_dt            = NOW()
+        WHERE user_id = #{userId}
     </update>
 
-    <!-- 탈퇴한 지 30일 지난 회원 영구 삭제 (Hard Delete) 쿼리 -->
+    <!-- 탈퇴한 지 30일 지난 회원 영구 삭제 -->
     <delete id="deleteOldDeactivatedUsers">
         DELETE FROM USER_INFO
-        WHERE
-            status = 'DEACTIVATED'
-          AND
-        <![CDATA[
-            deleted_at <= DATE_SUB(NOW(), INTERVAL 15 DAY)
-        ]]>
+        WHERE status = 'DEACTIVATED'
+          AND <![CDATA[ deleted_at <= DATE_SUB(NOW(), INTERVAL 15 DAY) ]]>
     </delete>
 
     <select id="myPageUserInfo" parameterType="UserInfoDTO" resultType="UserInfoDTO">
-            SELECT U.EMAIL, U.ADDR1, U.ADDR2, U.AGE, U.GENDER, U.BIRTH_DATE, P.INTRODUCTION
-            FROM USER_INFO U
-            LEFT JOIN USER_PROFILE P ON U.user_id = P.user_id
-            WHERE U.user_id = #{userId}
-
+        SELECT U.EMAIL, U.ADDR1, U.ADDR2, U.AGE, U.GENDER, U.BIRTH_DATE, P.INTRODUCTION
+        FROM USER_INFO U
+                 LEFT JOIN USER_PROFILE P ON U.user_id = P.user_id
+        WHERE U.user_id = #{userId}
     </select>
 
     <select id="myPageUserTag" parameterType="UserInfoDTO" resultType="UserTagDTO">
         SELECT
-            ut.user_id  AS userId,
-            ut.tag_id   AS tagId,
-            t.tag_name  AS tagName
+            ut.user_id AS userId,
+            ut.tag_id  AS tagId,
+            t.tag_name AS tagName
         FROM USER_TAG ut
                  JOIN TAG t ON t.tag_id = ut.tag_id
         WHERE ut.user_id = #{userId}
         ORDER BY ut.tag_id DESC
+    </select>
+
+    <update id="updateIntroduction" parameterType="UserProfileDTO">
+        UPDATE USER_PROFILE
+        SET INTRODUCTION = #{introduction},
+            CHG_DT       = NOW()
+        WHERE USER_ID    = #{userId}
+    </update>
+
+    <update id="updateProfileImage" parameterType="UserProfileDTO">
+        UPDATE USER_PROFILE
+        SET PROFILE_IMAGE_URL = #{profileImageUrl},
+            CHG_DT            = NOW()
+        WHERE USER_ID         = #{userId}
+    </update>
+
+    <!-- ==========================================================
+         [ADD] tag_type 컬럼 없이 "그룹키"를 만드는 CASE 블록
+         - TAG 별칭이 t 인 쿼리에서 쓸 버전
+         - TAG 별칭이 t2 인 쿼리에서 쓸 버전
+         ※ tag_id 묶음은 실제 DB의 태그 id 구간에 맞게 조정 필요
+       ========================================================== -->
+    <sql id="case_tag_type_t">
+        CASE
+            WHEN t.tag_id IN (1,2) THEN 'lifePattern'
+            WHEN t.tag_id IN (3,4) THEN 'activity'
+            WHEN t.tag_id IN (5,6,7) THEN 'job'
+            WHEN t.tag_id IN (8,9,10) THEN 'workTime'
+            WHEN t.tag_id IN (11,12) THEN 'guest'
+            WHEN t.tag_id IN (13,14) THEN 'share'
+            WHEN t.tag_id IN (15,16) THEN 'personality'
+            WHEN t.tag_id IN (17,18) THEN 'prefer'
+            WHEN t.tag_id IN (19,20) THEN 'conversation'
+            WHEN t.tag_id IN (21,22) THEN 'conflict'
+            WHEN t.tag_id IN (23,24,25) THEN 'cook'
+            WHEN t.tag_id IN (26,27,28) THEN 'food'
+            WHEN t.tag_id IN (29,30,31) THEN 'meal'
+            WHEN t.tag_id IN (32,33) THEN 'smell'
+            WHEN t.tag_id IN (34,35,36) THEN 'clean'
+            WHEN t.tag_id IN (37,38,39) THEN 'cleanCircle'
+            WHEN t.tag_id IN (40,41) THEN 'garbage'
+            WHEN t.tag_id IN (42,43) THEN 'dishWash'
+            ELSE 'unknown'
+        END
+    </sql>
+
+    <sql id="case_tag_type_t2">
+        CASE
+            WHEN t2.tag_id IN (1,2) THEN 'lifePattern'
+            WHEN t2.tag_id IN (3,4) THEN 'activity'
+            WHEN t2.tag_id IN (5,6,7) THEN 'job'
+            WHEN t2.tag_id IN (8,9,10) THEN 'workTime'
+            WHEN t2.tag_id IN (11,12) THEN 'guest'
+            WHEN t2.tag_id IN (13,14) THEN 'share'
+            WHEN t2.tag_id IN (15,16) THEN 'personality'
+            WHEN t2.tag_id IN (17,18) THEN 'prefer'
+            WHEN t2.tag_id IN (19,20) THEN 'conversation'
+            WHEN t2.tag_id IN (21,22) THEN 'conflict'
+            WHEN t2.tag_id IN (23,24,25) THEN 'cook'
+            WHEN t2.tag_id IN (26,27,28) THEN 'food'
+            WHEN t2.tag_id IN (29,30,31) THEN 'meal'
+            WHEN t2.tag_id IN (32,33) THEN 'smell'
+            WHEN t2.tag_id IN (34,35,36) THEN 'clean'
+            WHEN t2.tag_id IN (37,38,39) THEN 'cleanCircle'
+            WHEN t2.tag_id IN (40,41) THEN 'garbage'
+            WHEN t2.tag_id IN (42,43) THEN 'dishWash'
+            ELSE 'unknown'
+        END
+    </sql>
+    <!-- ========================================================== -->
+
+    <!-- [FIX] 태그 목록은 tagType이 필요한데 TagDTO에 필드가 없으므로 UserTagDTO로 매핑 -->
+    <select id="selectAllTagsWithType" resultType="UserTagDTO">
+        SELECT
+        t.tag_id   AS tagId,
+        t.tag_name AS tagName,
+        <include refid="case_tag_type_t"/> AS tagType
+        FROM TAG t
+        ORDER BY tagType, t.tag_id
+    </select>
+
+    <!-- [FIX] (2) 내 태그 선택 조회: USER_TAG.tag_type 사용 금지 → TAG 조인 + CASE -->
+    <select id="selectMyTagSelectionsByUser" parameterType="UserInfoDTO"
+            resultType="kopo.shallwithme.dto.UserTagDTO">
+        SELECT
+        ut.tag_id AS tagId,
+        <include refid="case_tag_type_t"/> AS tagType
+        FROM USER_TAG ut
+        JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+    </select>
+
+    <!-- [FIX] (3) 그룹 단위 삭제: 전달된 tag_id 들이 속한 "그룹(CASE tagType)"에 있는 기존 선택 전체 삭제 -->
+    <delete id="deleteUserTagsByTagTypesOfTagIds" parameterType="kopo.shallwithme.dto.UserTagDTO">
+        DELETE FROM USER_TAG
+        WHERE user_id = #{userId}
+        AND tag_id IN (
+        SELECT t2.tag_id
+        FROM TAG t2
+        WHERE <include refid="case_tag_type_t2"/> IN (
+        SELECT DISTINCT <include refid="case_tag_type_t"/>
+        FROM TAG t
+        WHERE t.tag_id IN
+        <foreach collection="tagList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        )
+        )
+    </delete>
+
+    <!-- [FIX] (4) 삽입: USER_TAG(tag_type) 컬럼 없이 (user_id, tag_id)만 저장 -->
+    <insert id="insertUserTagsFromIds" parameterType="kopo.shallwithme.dto.UserTagDTO">
+        INSERT INTO USER_TAG (user_id, tag_id)
+        SELECT
+        #{userId} AS user_id,
+        t.tag_id
+        FROM TAG t
+        WHERE t.tag_id IN
+        <foreach collection="tagList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </insert>
+
+    <!-- [FIX] (5) 칩 표시용 정렬: t.tag_type 대신 CASE 결과로 정렬 -->
+    <select id="selectMyTagNames" parameterType="UserInfoDTO" resultType="TagDTO">
+        SELECT
+        t.tag_id   AS tagId,
+        t.tag_name AS tagName
+        FROM USER_TAG ut
+        JOIN TAG t ON t.tag_id = ut.tag_id
+        WHERE ut.user_id = #{userId}
+        ORDER BY <include refid="case_tag_type_t"/>, t.tag_id
     </select>
 
 </mapper>
