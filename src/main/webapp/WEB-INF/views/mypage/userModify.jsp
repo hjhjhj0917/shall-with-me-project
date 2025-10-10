@@ -438,7 +438,7 @@
                 <div class="mypage-card">
                     <div class="card-header">
                         <h3>정보 수정</h3>
-                        <a href="/mypage/profileEdit" class="card-action-btn active">비밀번호 변경</a>
+                        <a id="btnPwChange" class="card-action-btn active">비밀번호 변경</a>
                     </div>
                     <div class="card-body profile-section">
                         <div class="card-body profile-section">
@@ -509,6 +509,41 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- [모달] 비밀번호 변경 -->
+                    <div class="modal-overlay" id="pwChangeModal"
+                         style="display:none; align-items:center; justify-content:center; z-index:9998;">
+                        <div class="modal-sheet"
+                             style="width:100%; max-width:520px; background:#fff; border-radius:12px; overflow:hidden;">
+                            <div class="modal-header"
+                                 style="display:flex; align-items:center; justify-content:center; padding:16px; border-bottom:1px solid #eee; position:relative;">
+                                <button type="button" class="modal-close" id="pwChangeModalClose"
+                                        style="position:absolute; right:16px; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:50%; border:0; background:#f7f7f7; cursor:pointer;">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                                <div class="modal-title-text" style="font-weight:700; color:#222;">비밀번호 변경</div>
+                            </div>
+
+                            <div class="modal-body" style="padding:20px;">
+                                <!-- 에러 메시지 (ID는 pwUpdate에서 참조) -->
+                                <div id="findPwErrorMessage2" class="error-message" style="color:#e03131; font-size:13px; min-height:18px;"></div>
+
+                                <!-- 원본 구조 유지: form#f3 / name=userPw, pwCheck / .login-input -->
+                                <form id="f3">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    <div style="display:flex; flex-direction:column; gap:10px;">
+                                        <input type="password" name="userPw" id="userPw" class="login-input" placeholder="새 비밀번호"/>
+                                        <input type="password" name="pwCheck" id="pwCheck" class="login-input" placeholder="새 비밀번호 확인"/>
+
+                                        <button id="btnUpdatePw" type="button" class="card-action-btn active" style="justify-content:center;">
+                                            비밀번호 변경
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
 
 
                     <div class="card-body">
@@ -1042,6 +1077,98 @@
         }
     });
 </script>
+
+<script>
+    // 비밀번호 변경 처리 (네가 처음 준 로직 그대로, CSRF 헤더만 추가)
+    function pwUpdate(f3) {
+        let userPw = f3.userPw.value.trim();
+        let pwCheck = f3.pwCheck.value.trim();
+
+        $(".login-input").removeClass("input-error");
+        $("#findPwErrorMessage2").removeClass("visible").text("");
+
+        if (userPw === "") {
+            $("#userPw").addClass("input-error");
+            $("#findPwErrorMessage2").text("새로운 비밀번호를 입력하세요.").addClass("visible");
+            setTimeout(() => $("#findPwErrorMessage2").removeClass("visible"), 2000);
+            $("#userPw").focus();
+            return;
+        }
+
+        if (pwCheck === "") {
+            $("#pwCheck").addClass("input-error");
+            $("#findPwErrorMessage2").text("검증을 위한 새로운 비밀번호를 입력하세요.").addClass("visible");
+            setTimeout(() => $("#findPwErrorMessage2").removeClass("visible"), 2000);
+            $("#pwCheck").focus();
+            return;
+        }
+
+        if (userPw !== pwCheck) {
+            $("#pwCheck").addClass("input-error");
+            $("#findPwErrorMessage2").text("입력한 비밀번호가 일치하지 않습니다.").addClass("visible");
+            setTimeout(() => $("#findPwErrorMessage2").removeClass("visible"), 2000);
+            $("#pwCheck").focus();
+            return;
+        }
+
+        $.ajax({
+            url: "/user/newPasswordProc",    // ← 네가 처음 준 엔드포인트 유지
+            type: "post",
+            dataType: "JSON",
+            data: $("#f3").serialize(),
+            beforeSend: (xhr) => {
+                const {header, token} = getCsrf(); // 이 페이지 상단에 이미 있는 함수
+                if (header && token) xhr.setRequestHeader(header, token);
+            },
+            success: function (json) {
+                const goLogin = function(){ location.href = "/user/login"; };
+                if (json.result === "1") {
+                    window.showCustomAlert ? showCustomAlert(json.msg, goLogin) : (alert(json.msg), goLogin());
+                } else {
+                    window.showCustomAlert ? showCustomAlert(json.msg, goLogin) : (alert(json.msg), goLogin());
+                }
+            },
+            error: function (xhr) {
+                console.error('[pw] 변경 실패', xhr.status, xhr.responseText);
+                alert('변경 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
+            }
+        });
+    }
+
+    // 모달 열기/닫기 + 버튼 바인딩
+    $(function(){
+        const $modal = $('#pwChangeModal');
+        const $open  = $('#btnPwChange');
+        const $close = $('#pwChangeModalClose');
+
+        // 열기
+        $open.on('click', function(e){
+            e.preventDefault();
+            $('#f3')[0].reset(); // 초기화
+            $('#findPwErrorMessage2').removeClass('visible').text('');
+            $('.login-input').removeClass('input-error');
+
+            $modal.css('display','flex');
+            setTimeout(()=> $('#userPw').focus(), 0);
+        });
+
+        // 닫기(닫기 버튼/오버레이 클릭)
+        $close.on('click', ()=> $modal.hide());
+        $modal.on('click', (e)=> { if (e.target === e.currentTarget) $modal.hide(); });
+
+        // 제출 버튼 → pwUpdate
+        $('#btnUpdatePw').on('click', ()=> pwUpdate(document.getElementById('f3')));
+
+        // 엔터키 제출
+        $('#f3').on('keydown', function(e){
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                pwUpdate(document.getElementById('f3'));
+            }
+        });
+    });
+</script>
+
 
 
 </body>
