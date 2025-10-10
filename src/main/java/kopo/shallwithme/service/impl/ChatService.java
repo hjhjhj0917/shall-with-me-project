@@ -26,6 +26,14 @@ public class ChatService implements IChatService {
     public ChatMessageDTO saveMessage(ChatMessageDTO pDTO) throws Exception {
         log.info("{}.saveMessage Start!", this.getClass().getName());
 
+        if (pDTO.getMessage() == null) {
+            pDTO.setMessage("");
+        }
+
+        if (pDTO.getMessageType() == null || pDTO.getMessageType().isBlank()) {
+            pDTO.setMessageType("TEXT");
+        }
+
         pDTO.setRead(false);
         chatMapper.insertChatMessage(pDTO);
         chatMapper.incrementUnreadCount(pDTO);
