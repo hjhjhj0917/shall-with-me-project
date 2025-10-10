@@ -424,178 +424,183 @@
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
-<%@ include file="../includes/sideBar.jsp" %>
 
-<main class="sidebar-main-content">
-    <div class="mypage-wrapper">
-        <h1 class="mypage-title">마이페이지</h1>
+<div class="main-container">
+    <%@ include file="../includes/sideBar.jsp" %>
 
-        <div class="mypage-grid">
+    <main class="sidebar-main-content">
+        <div class="mypage-wrapper">
+            <h1 class="mypage-title">마이페이지</h1>
 
-            <!-- 정보 수정 카드 -->
-            <div class="mypage-card">
-                <div class="card-header">
-                    <h3>정보 수정</h3>
-                    <a href="/mypage/profileEdit" class="card-action-btn active">비밀번호 변경</a>
-                </div>
-                <div class="card-body profile-section">
+            <div class="mypage-grid">
+
+                <!-- 정보 수정 카드 -->
+                <div class="mypage-card">
+                    <div class="card-header">
+                        <h3>정보 수정</h3>
+                        <a href="/mypage/profileEdit" class="card-action-btn active">비밀번호 변경</a>
+                    </div>
                     <div class="card-body profile-section">
-                        <!-- 클릭 가능 영역: 래퍼 + 네온 오버레이 -->
-                        <div id="profilePhotoWrap" class="profile-photo-wrap" title="프로필 사진 변경하기">
-                            <img id="profilePhotoImg"
-                                 src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") %>"
-                                 alt="프로필 사진"
-                                 class="profile-pic-placeholder"/>
-                            <div class="photo-edit-glow" aria-hidden="true"></div>
-                        </div>
-                        <!-- [ADD] 여기 추가 -->
-                        <input type="file" id="profileFileInput" accept="image/*" style="display:none">
+                        <div class="card-body profile-section">
+                            <!-- 클릭 가능 영역: 래퍼 + 네온 오버레이 -->
+                            <div id="profilePhotoWrap" class="profile-photo-wrap" title="프로필 사진 변경하기">
+                                <img id="profilePhotoImg"
+                                     src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") %>"
+                                     alt="프로필 사진"
+                                     class="profile-pic-placeholder"/>
+                                <div class="photo-edit-glow" aria-hidden="true"></div>
+                            </div>
+                            <!-- [ADD] 여기 추가 -->
+                            <input type="file" id="profileFileInput" accept="image/*" style="display:none">
 
-                        <div class="profile-info">
-                            <span class="profile-name"><%= session.getAttribute("SS_USER_NAME") %>님</span>
-                            <div class="profile-meta">
-                                <div class="meta-item">
-                                    <i class="fa-solid fa-id-card-clip"></i>
-                                    <span><c:out
-                                            value="${not empty rDTO.userId ? rDTO.userId : sessionScope.SS_USER_ID}"/></span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fa-regular fa-envelope"></i>
-                                    <span><c:out
-                                            value="${not empty rDTO.email ? rDTO.email : sessionScope.SS_USER_EMAIL}"/></span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fa-regular fa-calendar-days"></i>
-                                    <span><c:out
-                                            value="${not empty rDTO.birthDate ? rDTO.birthDate : sessionScope.SS_USER_BIRTH}"/></span>
+                            <div class="profile-info">
+                                <span class="profile-name"><%= session.getAttribute("SS_USER_NAME") %>님</span>
+                                <div class="profile-meta">
+                                    <div class="meta-item">
+                                        <i class="fa-solid fa-id-card-clip"></i>
+                                        <span><c:out
+                                                value="${not empty rDTO.userId ? rDTO.userId : sessionScope.SS_USER_ID}"/></span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fa-regular fa-envelope"></i>
+                                        <span><c:out
+                                                value="${not empty rDTO.email ? rDTO.email : sessionScope.SS_USER_EMAIL}"/></span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fa-regular fa-calendar-days"></i>
+                                        <span><c:out
+                                                value="${not empty rDTO.birthDate ? rDTO.birthDate : sessionScope.SS_USER_BIRTH}"/></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="profile-info">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 태그 카드 -->
-            <div class="mypage-card">
-                <div class="card-header">
-                    <h3>태그</h3>
-                    <!-- [ADD] 태그 수정 버튼 -->
-                    <%--<a href="/mypage/tagEdit" class="card-action-btn active" title="태그 수정">태그 수정</a>--%>
-                    <a id="btnTagEdit" class="card-action-btn active" title="태그 수정">태그 수정</a>
-                </div>
-                <!-- [모달] 마이페이지 태그 수정 -->
-                <div class="modal-overlay" id="mypageTagModal"
-                     style="display:none; align-items:center; justify-content:center; z-index:9998;">
-                    <div class="modal-sheet"
-                         style="width:100%; max-width:560px; background:#fff; border-radius:12px; overflow:hidden;">
-                        <div class="modal-header"
-                             style="display:flex; align-items:center; justify-content:center; padding:16px; border-bottom:1px solid #eee; position:relative;">
-                            <button type="button" class="modal-close" id="mypageTagModalClose"
-                                    style="position:absolute; right:16px; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:50%; border:0; background:#f7f7f7; cursor:pointer;">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                            <div class="modal-title-text" style="font-weight:700; color:#222;">태그 수정</div>
-                        </div>
-                        <div class="modal-body" style="max-height:560px; overflow:auto; padding:20px;">
-                            <div id="mypageTagGroupContainer"><!-- JS로 렌더링 --></div>
-                        </div>
-                        <div class="modal-footer"
-                             style="display:flex; gap:10px; justify-content:flex-end; padding:12px 16px; border-top:1px solid #eee;">
-                            <button type="button" id="btnTagSave" class="card-action-btn active">저장</button>
+                            <div class="profile-info">
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- 태그 카드 -->
+                <div class="mypage-card">
+                    <div class="card-header">
+                        <h3>태그</h3>
+                        <!-- [ADD] 태그 수정 버튼 -->
+                        <%--<a href="/mypage/tagEdit" class="card-action-btn active" title="태그 수정">태그 수정</a>--%>
+                        <a id="btnTagEdit" class="card-action-btn active" title="태그 수정">태그 수정</a>
+                    </div>
+                    <!-- [모달] 마이페이지 태그 수정 -->
+                    <div class="modal-overlay" id="mypageTagModal"
+                         style="display:none; align-items:center; justify-content:center; z-index:9998;">
+                        <div class="modal-sheet"
+                             style="width:100%; max-width:560px; background:#fff; border-radius:12px; overflow:hidden;">
+                            <div class="modal-header"
+                                 style="display:flex; align-items:center; justify-content:center; padding:16px; border-bottom:1px solid #eee; position:relative;">
+                                <button type="button" class="modal-close" id="mypageTagModalClose"
+                                        style="position:absolute; right:16px; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:50%; border:0; background:#f7f7f7; cursor:pointer;">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                                <div class="modal-title-text" style="font-weight:700; color:#222;">태그 수정</div>
+                            </div>
+                            <div class="modal-body" style="max-height:560px; overflow:auto; padding:20px;">
+                                <div id="mypageTagGroupContainer"><!-- JS로 렌더링 --></div>
+                            </div>
+                            <div class="modal-footer"
+                                 style="display:flex; gap:10px; justify-content:flex-end; padding:12px 16px; border-top:1px solid #eee;">
+                                <button type="button" id="btnTagSave" class="card-action-btn active">저장</button>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="card-body">
-                    <c:choose>
-                        <c:when test="${not empty tList}">
-                            <div class="tag-chip-wrap">
-                                <c:forEach var="tag" items="${tList}">
+
+                    <div class="card-body">
+                        <c:choose>
+                            <c:when test="${not empty tList}">
+                                <div class="tag-chip-wrap">
+                                    <c:forEach var="tag" items="${tList}">
                         <span class="tag-chip">
                             <i class="fa-solid fa-tag"></i>
                             <c:out value="${empty tag.tagName ? tag.tag_name : tag.tagName}"/>
                         </span>
-                                </c:forEach>
-                            </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <span style="color:#6e7b8b">등록된 태그가 없습니다.</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+
+
+                <!-- 자기소개 카드 -->
+                <div class="mypage-card">
+                    <div class="card-header">
+                        <h3>자기소개</h3>
+                        <!-- [MOD] 페이지 이동 막고 id만 부여 -->
+                        <a id="introSaveBtn" class="card-action-btn active" title="수정하기">수정하기</a>
+                    </div>
+
+                    <div class="card-body intro-body">
+                        <!-- [VIEW] 이 박스 자체를 클릭하면 contenteditable로 전환 -->
+                        <div class="intro-area" id="introArea">
+                            <c:choose>
+                                <c:when test="${not empty rDTO.introduction}">
+                                    <c:out value="${rDTO.introduction}"/>
+                                </c:when>
+                                <c:otherwise>아직 소개글이 없습니다.</c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <!-- [ADD] 숨김 폼: AJAX serialize()용 (CSRF 포함) -->
+                        <form id="introForm" style="display:none;">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                            <input type="hidden" name="introduction" id="introHiddenInput"/>
+                        </form>
+                    </div>
+                </div>
+
+
+                <!-- 주소 카드 -->
+                <div class="mypage-card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <h3>주소</h3>
+                            <!-- [ADD] 상세 주소: 헤더 안 한 줄 표기 + 말줄임 -->
+                            <span class="header-inline-value">
+                <c:out value="${not empty rDTO.addr1 ? rDTO.addr1 : '등록된 주소가 없습니다.'}"/>
+            </span>
+                        </div>
+                        <a href="${pageContext.request.contextPath}/mypage/addressEdit"
+                           class="card-action-btn active" title="주소 수정">주소 수정</a>
+                    </div>
+
+                    <div class="card-body">
+                        <%-- 페이지 스코프로 주소 보존 (지오코딩용) --%>
+                        <c:set var="addr1" value="${not empty rDTO.addr1 ? rDTO.addr1 : ''}"/>
+
+                        <!-- 지도: 헤더 바로 아래 -->
+                        <div id="kakaoMap" class="addr-map"></div>
+                    </div>
+                </div>
+
+
+                <!-- 본문은 그대로 두되, 중복이 싫으면 이 부분은 지워도 됨 -->
+                <%--<div class="card-body">
+                    <c:choose>
+                        <c:when test="${not empty rDTO.addr1}">
+                            <div class="addr-box"><c:out value="${rDTO.addr1}"/></div>
                         </c:when>
                         <c:otherwise>
-                            <span style="color:#6e7b8b">등록된 태그가 없습니다.</span>
+                            <span style="color:#6e7b8b">등록된 주소가 없습니다.</span>
                         </c:otherwise>
                     </c:choose>
                 </div>
-            </div>
+            </div>--%>
 
+    </main>
+</div>
 
-            <!-- 자기소개 카드 -->
-            <div class="mypage-card">
-                <div class="card-header">
-                    <h3>자기소개</h3>
-                    <!-- [MOD] 페이지 이동 막고 id만 부여 -->
-                    <a id="introSaveBtn" class="card-action-btn active" title="수정하기">수정하기</a>
-                </div>
-
-                <div class="card-body intro-body">
-                    <!-- [VIEW] 이 박스 자체를 클릭하면 contenteditable로 전환 -->
-                    <div class="intro-area" id="introArea">
-                        <c:choose>
-                            <c:when test="${not empty rDTO.introduction}">
-                                <c:out value="${rDTO.introduction}"/>
-                            </c:when>
-                            <c:otherwise>아직 소개글이 없습니다.</c:otherwise>
-                        </c:choose>
-                    </div>
-
-                    <!-- [ADD] 숨김 폼: AJAX serialize()용 (CSRF 포함) -->
-                    <form id="introForm" style="display:none;">
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                        <input type="hidden" name="introduction" id="introHiddenInput"/>
-                    </form>
-                </div>
-            </div>
-
-
-            <!-- 주소 카드 -->
-            <div class="mypage-card">
-                <div class="card-header">
-                    <div class="card-header-left">
-                        <h3>주소</h3>
-                        <!-- [ADD] 상세 주소: 헤더 안 한 줄 표기 + 말줄임 -->
-                        <span class="header-inline-value">
-                <c:out value="${not empty rDTO.addr1 ? rDTO.addr1 : '등록된 주소가 없습니다.'}"/>
-            </span>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/mypage/addressEdit"
-                       class="card-action-btn active" title="주소 수정">주소 수정</a>
-                </div>
-
-                <div class="card-body">
-                    <%-- 페이지 스코프로 주소 보존 (지오코딩용) --%>
-                    <c:set var="addr1" value="${not empty rDTO.addr1 ? rDTO.addr1 : ''}"/>
-
-                    <!-- 지도: 헤더 바로 아래 -->
-                    <div id="kakaoMap" class="addr-map"></div>
-                </div>
-            </div>
-
-
-            <!-- 본문은 그대로 두되, 중복이 싫으면 이 부분은 지워도 됨 -->
-            <%--<div class="card-body">
-                <c:choose>
-                    <c:when test="${not empty rDTO.addr1}">
-                        <div class="addr-box"><c:out value="${rDTO.addr1}"/></div>
-                    </c:when>
-                    <c:otherwise>
-                        <span style="color:#6e7b8b">등록된 주소가 없습니다.</span>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-        </div>--%>
-
-</main>
-
+<%@ include file="../includes/chatbot.jsp" %>
+<%@ include file="../includes/footer.jsp" %>
 <!-- 업로드 엔드포인트 & CSRF 상수 -->
 <%--<script>
     // 절대경로 안전
@@ -613,8 +618,8 @@
     // ★추가: CSRF 안전 추출 + fallback
     function getCsrf() {
         // JSP가 내려준 값 우선
-        let header = ('${_csrf.headerName}'||'').trim();
-        let token  = ('${_csrf.token}'||'').trim();
+        let header = ('${_csrf.headerName}' || '').trim();
+        let token = ('${_csrf.token}' || '').trim();
 
         // 비어있으면 숨은 input에서 대체 추출 (introForm에 이미 존재)
         if (!token) {
@@ -623,7 +628,7 @@
         }
         // 최종 안전망: Spring Security 기본 헤더명
         if (!header) header = 'X-CSRF-TOKEN';
-        return { header, token };
+        return {header, token};
     }
 </script>
 
@@ -834,7 +839,7 @@
                 contentType: false,
                 dataType: 'json',
                 beforeSend: (xhr) => {                               // ★변경
-                    const { header, token } = getCsrf();
+                    const {header, token} = getCsrf();
                     if (header && token) xhr.setRequestHeader(header, token);
                     else console.warn('[profile] CSRF header/token이 없어 헤더 설정 생략');
                 },
@@ -958,7 +963,7 @@
                     data: JSON.stringify(payload),
                     dataType: 'json',
                     beforeSend: (xhr) => {
-                        const { header, token } = getCsrf();          // ★변경
+                        const {header, token} = getCsrf();          // ★변경
                         if (header && token) xhr.setRequestHeader(header, token);
                         else console.warn('[tags] CSRF header/token이 없어 헤더 설정 생략');
                     }
