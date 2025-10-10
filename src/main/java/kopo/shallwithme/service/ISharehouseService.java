@@ -18,9 +18,9 @@ public interface ISharehouseService {
 
     void registerHouse(String ownerId, String title, String subText, Integer price, String coverUrl);
 
-    // ★★★ 추가: 이미지 포함 등록 ★★★
+    // ★★★ 추가: 이미지 포함 등록 (✅ floorNumber 파라미터 추가) ★★★
     Long registerHouseWithImages(String ownerId, String title, String subText,
-                                 String address, List<String> imageUrls);
+                                 String address, List<String> imageUrls, String floorNumber);
 
     SharehouseCardDTO getCardById(Long houseId);
 

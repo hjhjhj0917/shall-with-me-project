@@ -5,68 +5,71 @@
 
 <mapper namespace="kopo.shallwithme.mapper.ISharehouseMapper">
 
-    <!-- 목록: 대표 썸네일 1장, 최신 등록순 -->
+    <!-- 목록: 대표 썸네일 1장, 최신 등록순 + ✅ floor_number 추가 -->
     <select id="listCards"
             parameterType="map"
             resultType="kopo.shallwithme.dto.SharehouseCardDTO">
         SELECT
-            sh.house_id    AS houseId,
-            sh.house_name  AS title,
-            sh.description AS subText,
+            sh.house_id      AS houseId,
+            sh.house_name    AS title,
+            sh.description   AS subText,
+            sh.floor_number  AS floorNumber,  /* ✅ 층수 추가 */
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
              ORDER BY shi.sort_order ASC, shi.img_id ASC
-                              LIMIT 1)      AS coverUrl,
+                                LIMIT 1)        AS coverUrl,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
              ORDER BY shi.sort_order ASC, shi.img_id ASC
-             LIMIT 1)      AS thumbnailUrl
+             LIMIT 1)        AS thumbnailUrl
         FROM SHARE_HOUSE sh
         ORDER BY sh.reg_dt DESC
             LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- 단건 카드 -->
+    <!-- 단건 카드 + ✅ floor_number 추가 -->
     <select id="getCardById"
             parameterType="long"
             resultType="kopo.shallwithme.dto.SharehouseCardDTO">
         SELECT
-            sh.house_id    AS houseId,
-            sh.house_name  AS title,
-            sh.description AS subText,
+            sh.house_id      AS houseId,
+            sh.house_name    AS title,
+            sh.description   AS subText,
+            sh.floor_number  AS floorNumber,  /* ✅ 층수 추가 */
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
              ORDER BY shi.sort_order ASC, shi.img_id ASC
-                              LIMIT 1)      AS coverUrl,
+                                LIMIT 1)        AS coverUrl,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
              ORDER BY shi.sort_order ASC, shi.img_id ASC
-             LIMIT 1)      AS thumbnailUrl
+             LIMIT 1)        AS thumbnailUrl
         FROM SHARE_HOUSE sh
         WHERE sh.house_id = #{value}
             LIMIT 1
     </select>
 
-    <!-- 상세 (DB에 있는 컬럼만) -->
+    <!-- 상세 (DB에 있는 컬럼만) + ✅ floor_number 추가 -->
     <select id="getDetail"
             parameterType="long"
             resultType="map">
         SELECT
-            sh.house_id    AS houseId,
-            sh.house_name  AS title,
-            sh.description AS subText,
-            sh.address     AS address,
-            sh.image_url   AS coverUrl,
-            sh.reg_dt      AS regDt,
+            sh.house_id      AS houseId,
+            sh.house_name    AS title,
+            sh.description   AS subText,
+            sh.address       AS address,
+            sh.image_url     AS coverUrl,
+            sh.floor_number  AS floorNumber,  /* ✅ 층수 추가 */
+            sh.reg_dt        AS regDt,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
              ORDER BY shi.sort_order ASC, shi.img_id ASC
-                              LIMIT 1)      AS thumbnailUrl
+                                LIMIT 1)        AS thumbnailUrl
         FROM SHARE_HOUSE sh
         WHERE sh.house_id = #{value}
             LIMIT 1
@@ -109,14 +112,14 @@
         ORDER BY house_tag_id
     </select>
 
-    <!-- insert: PK 자동반환 -->
+    <!-- ✅✅✅ insert: PK 자동반환 + floor_number 추가 ✅✅✅ -->
     <insert id="insertSharehouse"
             parameterType="kopo.shallwithme.dto.SharehouseCardDTO"
             useGeneratedKeys="true" keyProperty="houseId">
         INSERT INTO SHARE_HOUSE
-            (house_name, address, description, image_url, reg_id, reg_dt)
+        (house_name, address, description, image_url, floor_number, reg_id, reg_dt)
         VALUES
-            (#{title}, COALESCE(#{address}, ''), #{subText}, #{coverUrl}, #{regId}, NOW())
+            (#{title}, COALESCE(#{address}, ''), #{subText}, #{coverUrl}, #{floorNumber}, #{regId}, NOW())
     </insert>
 
     <!-- ★★★ 이미지 배치 저장 ★★★ -->

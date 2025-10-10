@@ -557,11 +557,19 @@
             }
         }
 
-        // --- 카드 렌더링 ---
         function renderHouseCards(items) {
             const loginUserId = "${sessionScope.SS_USER_ID}";
+
             $.each(items, function (i, house) {
-                const houseId = house.userId || house.houseId;
+                console.log("=== 카드 렌더링 ===");
+                console.log("house 객체:", house);
+                console.log("houseId:", house.houseId || house.userId);
+                console.log("floorNumber:", house.floorNumber);
+                console.log("tag1:", house.tag1);
+                console.log("tag2:", house.tag2);
+                console.log("tag3:", house.tag3);
+
+                const houseId = house.houseId || house.userId;
                 if (houseId === loginUserId) return true;
 
                 const imgUrl = house.profileImgUrl || (ctx + "/images/noimg.png");
@@ -571,15 +579,24 @@
                 const $thumb = $("<div>").addClass("sh-thumb").css("background-image", "url('" + imgUrl + "')");
                 const $info = $("<div>").addClass("sh-info");
 
-                // 룸메이트와 동일한 형식: "이름 : 집이름"
-                const $sub = $("<p>").addClass("sh-title").text("" + houseName);
-                $info.append($sub);
+                const $title = $("<p>").addClass("sh-title").text(houseName);
+                $info.append($title);
 
-                // 태그 박스
                 const $tagBox = $("<div>").addClass("tag-box");
+
+                // ✅ 태그 3개 표시
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
                 if (house.tag3) $tagBox.append($("<span>").addClass("tag").text(house.tag3));
+
+                // ✅ 층수 표시 (null 체크 강화)
+                if (house.floorNumber != null && house.floorNumber !== '' && house.floorNumber !== 'null') {
+                    const floorTag = $("<span>").addClass("tag floor-tag").text(house.floorNumber + "층");
+                    $tagBox.append(floorTag);
+                    console.log("✅ 층수 태그 추가:", house.floorNumber + "층");
+                } else {
+                    console.log("⚠️ 층수 없음:", house.floorNumber);
+                }
 
                 $info.append($tagBox);
                 $card.append($thumb, $info);
@@ -684,7 +701,7 @@
 <div class="modal-overlay" id="sharehouseRegOverlay" style="display:none; z-index:10000;">
     <div class="modal-sheet">
         <div class="modal-header" style="justify-content:space-between;">
-            <div class="modal-title-text">쉐어하우스 등록</div>
+<%--            <div class="modal-title-text">쉐어하우스 등록</div>--%>
             <%--            <button type="button" class="modal-close" id="sharehouseRegClose" aria-label="닫기">--%>
             <%--                <i class="fa-solid fa-xmark"></i>--%>
             <%--            </button> 닫기버튼 임시삭제--%>
