@@ -170,24 +170,46 @@
         function linkify(text) {
             const urlRegex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
             return text.replace(urlRegex, function (rawUrl) {
-                // URL 끝에 붙은 문장부호 체크
                 let url = rawUrl;
                 let trailingChar = '';
-
-                // URL 끝에 ) , . ! ? 등이 붙어있으면 떼어내기
                 const lastChar = url.charAt(url.length - 1);
                 if (/[)\],.!?]/.test(lastChar)) {
                     trailingChar = lastChar;
                     url = url.slice(0, -1);
                 }
-
                 return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>' + trailingChar;
             });
         }
 
-        // \n 줄바꿈을 <br>로 바꾸는 함수
-        function formatNewlines(text) {
-            return text.replace(/\n/g, "<br>");
+        // --- 🎨 변경된 부분: HTML 태그를 인식하는 타이핑 함수 ---
+        function typeWriter(element, text) {
+            // 서버 응답에 포함된 \n을 <br>로, URL을 <a> 태그로 먼저 변환합니다.
+            // <strong> 같은 태그도 이 단계에서 그대로 유지됩니다.
+            const processedHtml = linkify(text).replace(/\n/g, '<br>');
+
+            let i = 0;
+            $(element).html(''); // '입력 중...' 메시지를 비웁니다.
+
+            function typing() {
+                if (i < processedHtml.length) {
+                    // 현재 문자가 '<' 이면 태그의 시작으로 간주합니다.
+                    if (processedHtml[i] === '<') {
+                        // '>' 문자를 찾아 태그 전체를 한 번에 추가합니다.
+                        const closingTagIndex = processedHtml.indexOf('>', i);
+                        const tag = processedHtml.substring(i, closingTagIndex + 1);
+                        $(element).append(tag);
+                        i = closingTagIndex; // 인덱스를 태그 끝으로 이동
+                    } else {
+                        // 일반 텍스트는 한 글자씩 추가합니다.
+                        $(element).append(processedHtml[i]);
+                    }
+
+                    i++;
+                    scrollToBottom();
+                    setTimeout(typing, 30); // 타이핑 속도 (ms)
+                }
+            }
+            typing();
         }
 
         // 메시지 전송
@@ -195,26 +217,19 @@
             const question = inputEl.val().trim();
             if (!question) return;
 
-            // 사용자 메시지는 그냥 텍스트
             appendMessage(question, 'user-message', false);
-
-            // 입력창 비우기
             inputEl.val('');
 
-            // '입력 중...' 메시지 추가 (초기값은 텍스트)
             const typingIndicator = appendMessage('...', 'bot-message', false);
 
-            // 서버에 질문 전송 (AJAX)
             $.ajax({
                 url: "/api/chatbot/ask",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({question: question}),
                 success: function (response) {
-                    // ✅ 줄바꿈 처리 추가!
-                    const formatted = formatNewlines(linkify(response.answer));
-                    $(typingIndicator).html(formatted);
-                    scrollToBottom();
+                    // 수정된 typeWriter 함수를 호출합니다.
+                    typeWriter(typingIndicator, response.answer);
                 },
                 error: function () {
                     $(typingIndicator).text('죄송합니다. 오류가 발생했어요.');
@@ -237,7 +252,7 @@
             }
             messagesEl.append(msgDiv);
             scrollToBottom();
-            return msgDiv[0]; // '입력 중...' 메시지를 수정하기 위해 요소 반환
+            return msgDiv[0];
         }
 
         // 항상 맨 아래로 스크롤
