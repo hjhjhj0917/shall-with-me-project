@@ -59,7 +59,58 @@
     .floor-modal-btn.cancel:hover { background: #e0e0e0; }
     .floor-modal-btn.confirm { background: #3399ff; color: #fff; }
     .floor-modal-btn.confirm:hover { background: #2288ee; }
+
+    /* 모달 여백 제거 */
+    #sharehouseRegOverlay .modal-sheet {
+      max-height: 95vh !important;
+      margin: 0 !important;
+    }
+    #sharehouseRegOverlay .modal-body {
+      padding: 0 !important;
+      overflow-y: auto;
+    }
+
+    /* 우편번호 입력 필드 스타일 */
+    .address-group {
+      margin-bottom: 20px;
+    }
+    .address-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .address-row input[readonly] {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+    .address-row button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .2s;
+      white-space: nowrap;
+    }
+    .address-row button:hover {
+      transform: translateY(-2px);
+    }
+    .address-input-full {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .address-input-full:focus {
+      outline: none;
+      border-color: #667eea;
+    }
   </style>
+  <!-- 다음 우편번호 서비스 -->
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <body>
@@ -99,7 +150,9 @@
         <label>
           <span>
             <c:choose>
-              <c:when test="${not empty loginName}"><c:out value="${loginName}"/>의 쉐어하우스</c:when>
+              <c:when test="${not empty loginName}">
+                <c:out value="${loginName}"/>의 쉐어하우스
+              </c:when>
               <c:otherwise>내 쉐어하우스</c:otherwise>
             </c:choose>
           </span>
@@ -127,6 +180,18 @@
         <div id="selectedTagsDisplay" style="margin-top:8px; color:#666; font-size:.9rem;">태그 6개와 층수를 선택해주세요.</div>
         <input type="hidden" id="selectedTagIds" name="tagListJson" value="[]">
         <input type="hidden" id="floorNumber" name="floorNumber" value="">
+      </div>
+
+      <!-- 우편번호 및 주소 입력 -->
+      <div class="form-group address-group">
+        <label>주소 <span style="color:#999; font-size:.9em;">(필수)</span></label>
+        <div class="address-row">
+          <input type="text" id="addr1" name="addr1" placeholder="주소" readonly required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
+          <button type="button" id="btnAddr">
+            <i class="fa-solid fa-magnifying-glass"></i> 우편번호 찾기
+          </button>
+        </div>
+        <input type="text" id="addr2" name="addr2" placeholder="상세주소를 입력하세요" required class="address-input-full">
       </div>
 
       <div class="sh-modal-body sh-reg">
@@ -202,8 +267,42 @@
   </div>
 </div>
 
+<!-- ✅ 1. jQuery (가장 먼저!) -->
+<script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
+
+<!-- ✅ 2. customModal 포함 (jQuery 다음) -->
+<%@ include file="../includes/customModal.jsp" %>
+
+<!-- ✅ 3. 다음 우편번호 서비스 스크립트 -->
 <script>
-  // 취소 버튼
+function execDaumPostcode() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      let addr = '';
+      if (data.userSelectedType === 'R') {
+        addr = data.roadAddress;
+      } else {
+        addr = data.jibunAddress;
+      }
+      document.getElementById('addr1').value = addr;
+      document.getElementById('addr2').focus();
+    }
+  }).open();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const btnAddr = document.getElementById('btnAddr');
+  if (btnAddr) {
+    btnAddr.addEventListener('click', function(e) {
+      e.preventDefault();
+      execDaumPostcode();
+    });
+  }
+});
+</script>
+
+<!-- ✅ 4. 취소 버튼 -->
+<script>
   document.addEventListener('DOMContentLoaded', function () {
     const cancelBtn = document.getElementById('shRegCancelBtn');
     if (cancelBtn) {
@@ -219,9 +318,7 @@
   });
 </script>
 
-<%@ include file="../includes/customModal.jsp" %>
-
-<!-- 업로더 미리보기 및 태그/층수 표시 -->
+<!-- ✅ 5. 업로더 미리보기 및 태그/층수 표시 -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.sh-uploader-5 .uploader input[type="file"]').forEach(input => {
@@ -236,7 +333,7 @@
         const f = input.files && input.files[0];
         if (!f){ img.hidden = true; span.hidden = false; return; }
         if (!f.type.startsWith('image/')){ alert('이미지 파일만 업로드 가능합니다.'); input.value=''; return; }
-        if (f.size > 5 * 1024 * 1024){ alert('최대 5MB까지만 업로드 가능합니다.'); input.value=''; return; }
+        if (f.size > 10 * 1024 * 1024){ alert('최대 10MB까지만 업로드 가능합니다.'); input.value=''; return; }
         img.src = URL.createObjectURL(f); img.hidden = false; span.hidden = true;
       });
     });
@@ -296,7 +393,7 @@
   }
 </script>
 
-<!-- 층수 입력 모달 스크립트 -->
+<!-- ✅ 6. 층수 입력 모달 스크립트 -->
 <script>
   function openFloorModal() {
     const modal = document.getElementById('floorModal');
@@ -322,8 +419,8 @@
   });
 </script>
 
+<!-- ✅ 7. 저장 제출 -->
 <script>
-  // 저장 제출
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('roommateForm');
     const btn  = document.getElementById('btnSave');
@@ -342,17 +439,29 @@
         return;
       }
 
-      // ✅ 태그 6개 필수 검증
       const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
       if (tagIds.length !== 6) {
         alert('태그를 정확히 6개 선택해주세요.');
         return;
       }
 
-      // ✅ 층수 필수 검증
       const floorNum = document.getElementById('floorNumber').value;
       if (!floorNum || floorNum === '') {
         alert('층수를 입력해주세요.');
+        return;
+      }
+
+      const addr1 = document.getElementById('addr1').value.trim();
+      const addr2 = document.getElementById('addr2').value.trim();
+
+      if (!addr1) {
+        alert('주소를 입력해주세요. "우편번호 찾기" 버튼을 클릭하세요.');
+        return;
+      }
+
+      if (!addr2) {
+        alert('상세주소를 입력해주세요.');
+        document.getElementById('addr2').focus();
         return;
       }
 
@@ -363,8 +472,28 @@
       if (imgs.length < 1) { alert('추가 이미지를 최소 1장 선택해 주세요.'); return; }
 
       btn.disabled = true; btn.textContent = '저장중...';
-      const fd = new FormData(form);
-      fd.append('profileImage', form.querySelector('input[name="thumbnail"]').files[0]);
+      const fd = new FormData();
+
+      const thumbnailFile = form.querySelector('input[name="thumbnail"]').files[0];
+      if (thumbnailFile) {
+        fd.append('thumbnail', thumbnailFile);
+      }
+
+      // ✅ 추가 이미지 (파일이 있을 때만!)
+      const imageInputs = form.querySelectorAll('input[name="images"]');
+      imageInputs.forEach(input => {
+        if (input.files && input.files[0]) {  // ✅ 파일 있을 때만!
+          fd.append('images', input.files[0]);
+        }
+      });
+
+      // ✅ 나머지 필드들
+      fd.append('houseName', document.getElementById('houseName').value);
+      fd.append('introduction', document.getElementById('introTextarea').value || '');
+      fd.append('tagListJson', document.getElementById('selectedTagIds').value);
+      fd.append('floorNumber', document.getElementById('floorNumber').value);
+      fd.append('addr1', document.getElementById('addr1').value);
+      fd.append('addr2', document.getElementById('addr2').value);
 
       try {
         const url = (typeof ctx !== 'undefined' ? ctx : '') + '/sharehouse/register';
@@ -406,16 +535,12 @@
   });
 </script>
 
-<!-- jQuery는 include보다 반드시 먼저 -->
-<script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
-
-<!-- 태그 선택 모달(HTML+JS) 포함 -->
+<!-- ✅ 8. 태그 선택 모달 포함 -->
 <jsp:include page="/WEB-INF/views/sharehouse/sharehouseTagSelect.jsp"/>
 
-<!-- 페이지 전용 바인딩 -->
+<!-- ✅ 9. 페이지 전용 바인딩 -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // 태그 선택 버튼
     const tagBtn = document.getElementById('btnTagSelect');
     if (tagBtn) {
       tagBtn.addEventListener('click', function () {
@@ -447,7 +572,6 @@
       });
     }
 
-    // 층수 입력 모달 버튼들
     const btnFloorOpen    = document.getElementById('btnFloorOpen');
     const btnFloorCancel  = document.getElementById('btnFloorCancel');
     const btnFloorConfirm = document.getElementById('btnFloorConfirm');
