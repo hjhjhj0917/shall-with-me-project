@@ -37,5 +37,6 @@ public interface IMyPageService {
     int updateMyTagsByGroup(UserTagDTO p);                 // 저장 (DTO: userId, tagList)
     List<TagDTO> getMyTagChips(UserInfoDTO p);             // 칩 표시용 (DTO)
 
+    boolean verifyPassword(UserInfoDTO pDTO) throws Exception;
 
 }

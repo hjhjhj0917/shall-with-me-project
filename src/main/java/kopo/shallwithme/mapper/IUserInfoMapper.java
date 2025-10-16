@@ -73,4 +73,6 @@ public interface IUserInfoMapper {
 
     // ✅ 프로필 조회: DTO로 받고 DTO로 반환 (void 금지, @Param 금지)
     UserProfileDTO findUserProfileByUserId(UserProfileDTO pDTO);
+
+
 }
