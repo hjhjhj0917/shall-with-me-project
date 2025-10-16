@@ -212,6 +212,17 @@ public class MyPageService implements IMyPageService {
         return list;
     }
 
+    @Override
+    public boolean verifyPassword(UserInfoDTO pDTO) throws Exception {
+        // DB의 해시값을 가져와 비교
+        UserInfoDTO rDTO = myPageMapper.getPasswordHashByUserId(pDTO); // PASSWORD 컬럼만 세팅해서 리턴
+        if (rDTO == null || rDTO.getPassword() == null) {
+            return false;
+        }
+        // pDTO.password 는 이미 EncryptUtil로 해시된 값
+        return rDTO.getPassword().equals(pDTO.getPassword());
+    }
+
 
 
 
