@@ -1,25 +1,41 @@
 package kopo.shallwithme.controller;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import kopo.shallwithme.dto.MsgDTO;
-import kopo.shallwithme.dto.UserInfoDTO;
-import kopo.shallwithme.dto.UserProfileDTO;
-import kopo.shallwithme.dto.UserTagDTO;
+import kopo.shallwithme.dto.*;
 import kopo.shallwithme.service.IMyPageService;
 import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import kopo.shallwithme.dto.TagDTO;
+import kopo.shallwithme.dto.UserTagDTO;
+import kopo.shallwithme.dto.UserInfoDTO;
+
 
 @Slf4j
 @RequestMapping(value = "/mypage")
@@ -28,6 +44,63 @@ import java.util.Optional;
 public class MyPageController {
 
     private final IMyPageService myPageService;
+
+    @Value("${ncp.object-storage.endpoint}")
+    private String endpoint;
+
+    @Value("${ncp.object-storage.region}")
+    private String region;
+
+    @Value("${ncp.object-storage.access-key}")
+    private String accessKey;
+
+    @Value("${ncp.object-storage.secret-key}")
+    private String secretKey;
+
+    @Value("${ncp.object-storage.bucket-name}")
+    private String bucketName;
+
+    @Value("${ncp.object-storage.folder}")
+    private String folder;
+
+    // ===== (추가) content-type 화이트리스트 =====
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
+            "image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"
+    );
+
+    // ===== (추가) NCP 업로드 헬퍼: 업로드 후 퍼블릭 URL 반환 =====
+    private String uploadToNcpObjectStorage(MultipartFile file) throws IOException {
+        String original = file.getOriginalFilename();
+        String ext = StringUtils.getFilenameExtension(original);
+        if (ext == null || ext.isBlank()) {
+            // content type으로부터 확장자 추정 (jfif 같은 케이스 대비)
+            String ct = String.valueOf(file.getContentType());
+            if (ct.equals("image/jpeg")) ext = "jpg";
+            else if (ct.equals("image/png")) ext = "png";
+            else if (ct.equals("image/webp")) ext = "webp";
+            else if (ct.equals("image/gif")) ext = "gif";
+            else ext = "img";
+        }
+        String key = folder.replaceFirst("/+$","") + "/" + UUID.randomUUID().toString().replace("-", "") + "." + ext;
+
+        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withPathStyleAccessEnabled(true) // ★ NCP 필수
+                .build();
+
+        ObjectMetadata meta = new ObjectMetadata();
+        meta.setContentLength(file.getSize());
+        if (file.getContentType() != null) meta.setContentType(file.getContentType());
+
+        s3Client.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), meta)
+                .withCannedAcl(CannedAccessControlList.PublicRead)); // 퍼블릭 읽기
+
+        // 퍼블릭 URL 구성
+        return endpoint + "/" + bucketName + "/" + key;
+    }
+
 
     @GetMapping("userModify")
     public String userModify(HttpSession session, ModelMap model) throws Exception {
@@ -246,5 +319,102 @@ public class MyPageController {
 
         return dto;
     }
+
+    @PostMapping("/introductionUpdate")
+    @ResponseBody
+    public String introductionUpdate(HttpServletRequest request, HttpSession session) throws Exception {
+        log.info("{}.introductionUpdate Start!", this.getClass().getName());
+
+        String introduction = request.getParameter("introduction");
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        log.info("userId : {}, introduction : {}", userId, introduction);
+
+        UserProfileDTO pDTO = new UserProfileDTO();
+
+        pDTO.setUserId(userId);
+        pDTO.setIntroduction(introduction);
+
+        int res = myPageService.updateIntroduction(pDTO);
+        String msg;
+
+        if (res > 0) {
+            msg = "자기소개가 수정되었습니다.";
+        } else {
+            msg = "자기소개 수정을 실패했습니다.";
+        }
+
+        log.info("{}.introductionUpdate End!", this.getClass().getName());
+        return msg;
+    }
+
+    // ===== (변경) 프로필 업로드: 로컬 저장 → NCP 업로드로 교체 =====
+    @PostMapping("/profileImageUpdate")
+    @ResponseBody
+    public ResponseEntity<?> profileImageUpdate(MultipartFile file, HttpSession session) throws IOException {
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        if (userId == null || userId.isBlank()) {
+            return ResponseEntity.badRequest().body("{\"error\":\"로그인이 필요합니다.\"}");
+        }
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("{\"error\":\"파일이 비어있습니다.\"}");
+        }
+        String ct = file.getContentType();
+        if (ct == null || !ALLOWED_IMAGE_TYPES.contains(ct.toLowerCase())) {
+            return ResponseEntity.badRequest().body("{\"error\":\"이미지(JPEG/PNG/WEBP/GIF)만 업로드 가능합니다.\"}");
+        }
+        if (file.getSize() > 5 * 1024 * 1024) {
+            return ResponseEntity.badRequest().body("{\"error\":\"최대 5MB까지 업로드 가능합니다.\"}");
+        }
+
+        // ★ 외부(NCP) 업로드 후 퍼블릭 URL 반환
+        String urlPath = uploadToNcpObjectStorage(file);
+
+        // DB 업데이트
+        UserProfileDTO p = new UserProfileDTO();
+        p.setUserId(userId);
+        p.setProfileImageUrl(urlPath);
+        myPageService.updateProfileImage(p);
+
+        // 세션 갱신 (화면 즉시 반영)
+        session.setAttribute("SS_USER_PROFILE_IMG_URL", urlPath);
+
+        // 프론트에 URL 반환
+        return ResponseEntity.ok("{\"url\":\"" + urlPath + "\"}");
+    }
+
+
+    // 전체 태그: [ { tagId, tagName, tagType } ]
+    @GetMapping("tags/all")
+    @ResponseBody
+    public ResponseEntity<List<UserTagDTO>> tagsAll(){
+        List<UserTagDTO> list = myPageService.getAllTagsWithType();
+        return ResponseEntity.ok(list);
+    }
+
+    // 내 태그(그룹별 1개): [ { tagId, tagType } ]
+    @GetMapping("tags/my")
+    @ResponseBody
+    public ResponseEntity<List<UserTagDTO>> tagsMy(HttpSession session){
+        UserInfoDTO p = new UserInfoDTO();
+        p.setUserId((String) session.getAttribute("SS_USER_ID"));
+        List<UserTagDTO> list = myPageService.getMyTagSelections(p); // DTO만
+        return ResponseEntity.ok(list);
+    }
+
+    // 저장: 본문 = UserTagDTO { tagList: [...] }  (DTO 단일만 받음)
+    @PostMapping("tags/update")
+    @ResponseBody
+    public ResponseEntity<?> tagsUpdate(@RequestBody UserTagDTO p, HttpSession session){
+        p.setUserId((String) session.getAttribute("SS_USER_ID"));
+        int res = myPageService.updateMyTagsByGroup(p); // DTO만
+        UserInfoDTO q = new UserInfoDTO(); q.setUserId(p.getUserId());
+        List<TagDTO> chips = myPageService.getMyTagChips(q); // 칩 표시용
+        return ResponseEntity.ok(java.util.Map.of("res", res, "tags", chips));
+    }
+
+
+
+
 
 }

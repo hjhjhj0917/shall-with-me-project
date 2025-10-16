@@ -1,5 +1,6 @@
 package kopo.shallwithme.service;
 
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
@@ -26,5 +27,15 @@ public interface IMyPageService {
     UserInfoDTO myPageUserInfo(UserInfoDTO pDTO) throws Exception;
 
     List<UserTagDTO> myPageUserTag(UserInfoDTO pDTO) throws Exception;
+
+    int updateIntroduction(UserProfileDTO pDTO) throws Exception; // ← 추가
+
+    int updateProfileImage(UserProfileDTO pDTO);
+
+    List<UserTagDTO> getAllTagsWithType();                 // 전체 태그
+    List<UserTagDTO> getMyTagSelections(UserInfoDTO p);    // 내 태그 조회 (DTO)
+    int updateMyTagsByGroup(UserTagDTO p);                 // 저장 (DTO: userId, tagList)
+    List<TagDTO> getMyTagChips(UserInfoDTO p);             // 칩 표시용 (DTO)
+
 
 }

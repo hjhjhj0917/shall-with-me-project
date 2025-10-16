@@ -27,8 +27,29 @@
                 <%= session.getAttribute("SS_USER_NAME") %>님
             </span>
             <button class="header-dropdown-toggle" id="userIconToggle">
-                <img src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL")  %>" alt="프로필 사진"
-                     class="user-profile-img">
+                <%
+                    // 1. 세션에서 프로필 이미지 URL 값을 가져옵니다.
+                    Object profileImgUrlObj = session.getAttribute("SS_USER_PROFILE_IMG_URL");
+                    String profileImgUrl = null;
+
+                    // 2. 값이 null이 아닌지 확인하고 문자열로 변환합니다.
+                    if (profileImgUrlObj != null) {
+                        profileImgUrl = profileImgUrlObj.toString();
+                    }
+
+                    // 3. URL이 유효한지(null이나 빈 문자열이 아닌지) 확인합니다.
+                    if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
+                %>
+                <%-- 조건이 참일 경우: 세션에 있는 이미지 URL로 img 태그 생성 --%>
+                <img src="<%= profileImgUrl %>" alt="프로필 사진" class="user-profile-img">
+                <%
+                } else {
+                %>
+                <%-- 조건이 거짓일 경우: 기본 이미지로 img 태그 생성 --%>
+                <img src="/images/withdraw-profile-img.png" alt="기본 프로필 사진" class="user-profile-img">
+                <%
+                    }
+                %>
             </button>
         </div>
 
@@ -68,6 +89,9 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 
 <script>
     // 뱃지 UI를 업데이트하는 함수

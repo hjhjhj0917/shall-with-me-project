@@ -1,9 +1,6 @@
 package kopo.shallwithme.service.impl;
 
-import kopo.shallwithme.dto.MailDTO;
-import kopo.shallwithme.dto.UserInfoDTO;
-import kopo.shallwithme.dto.UserProfileDTO;
-import kopo.shallwithme.dto.UserTagDTO;
+import kopo.shallwithme.dto.*;
 import kopo.shallwithme.mapper.IMyPageMapper;
 import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.service.IMyPageService;
@@ -16,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import kopo.shallwithme.dto.TagDTO;
+import kopo.shallwithme.dto.UserTagDTO;
+import kopo.shallwithme.dto.UserInfoDTO;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -126,5 +128,91 @@ public class MyPageService implements IMyPageService {
         log.info("{}.myPageUserTag End!", this.getClass().getName());
         return rList;
     }
+
+    @Override
+    public int updateIntroduction(UserProfileDTO pDTO) throws Exception {
+        log.info("{}.updateIntroduction Start!", this.getClass().getName());
+
+        if (pDTO == null || CmmUtil.nvl(pDTO.getUserId()).isEmpty()) {
+            log.warn("updateIntroduction: userId가 비어있음");
+            return 0;
+        }
+
+        int res = myPageMapper.updateIntroduction(pDTO);
+
+        log.info("{}.updateIntroduction End! res={}", this.getClass().getName(), res);
+        return res;
+    }
+
+    @Override
+    public int updateProfileImage(UserProfileDTO pDTO) {
+        log.info("{}.updateProfileImage Start!", this.getClass().getName());
+
+        if (pDTO == null) {
+            log.warn("updateProfileImage: pDTO is null");
+            log.info("{}.updateProfileImage End! res=0 (pDTO null)", this.getClass().getName());
+            return 0;
+        }
+        if (pDTO.getUserId() == null || pDTO.getUserId().isBlank()) {
+            log.warn("updateProfileImage: userId is blank");
+            log.info("{}.updateProfileImage End! res=0 (userId blank)", this.getClass().getName());
+            return 0;
+        }
+        // URL은 로그에 직접 노출해도 되는 퍼블릭 경로지만, 길면 줄여 찍자
+        String shortUrl = Optional.ofNullable(pDTO.getProfileImageUrl())
+                .map(u -> u.length() > 120 ? u.substring(0,120) + "..." : u)
+                .orElse(null);
+
+        log.info("updateProfileImage param => userId={}, url={}", pDTO.getUserId(), shortUrl);
+
+        int res = myPageMapper.updateProfileImage(pDTO);
+
+        log.info("updateProfileImage DB result => res={}", res);
+        log.info("{}.updateProfileImage End!", this.getClass().getName());
+        return res;
+    }
+
+    @Override
+    public List<UserTagDTO> getAllTagsWithType() {
+        log.info("{}.getAllTagsWithType Start!", this.getClass().getName());
+        List<UserTagDTO> list = myPageMapper.selectAllTagsWithType();
+        log.info("{}.getAllTagsWithType End! size={}", this.getClass().getName(), list.size());
+        return list;
+    }
+
+    @Override
+    public List<UserTagDTO> getMyTagSelections(UserInfoDTO p) {
+        log.info("{}.getMyTagSelections Start! userId={}", this.getClass().getName(), p.getUserId());
+        List<UserTagDTO> list = myPageMapper.selectMyTagSelectionsByUser(p);
+        log.info("{}.getMyTagSelections End! size={}", this.getClass().getName(), list.size());
+        return list;
+    }
+
+    @Override
+    public int updateMyTagsByGroup(UserTagDTO p) {
+        log.info("{}.updateMyTagsByGroup Start! userId={}, tagList={}", this.getClass().getName(), p.getUserId(), p.getTagList());
+        if (p == null || p.getUserId() == null || p.getTagList() == null || p.getTagList().isEmpty()) {
+            log.warn("updateMyTagsByGroup invalid param");
+            return 0;
+        }
+        // 1) 전달된 tag_id들의 소속 tag_type만 추출해 해당 그룹만 삭제
+        myPageMapper.deleteUserTagsByTagTypesOfTagIds(p); // DTO만 사용
+
+        // 2) INSERT ... SELECT 로 태그타입까지 조인해 일괄 삽입
+        int inserted = myPageMapper.insertUserTagsFromIds(p); // DTO만 사용
+        log.info("{}.updateMyTagsByGroup End! inserted={}", this.getClass().getName(), inserted);
+        return inserted;
+    }
+
+    @Override
+    public List<TagDTO> getMyTagChips(UserInfoDTO p) {
+        log.info("{}.getMyTagChips Start! userId={}", this.getClass().getName(), p.getUserId());
+        List<TagDTO> list = myPageMapper.selectMyTagNames(p);
+        log.info("{}.getMyTagChips End! size={}", this.getClass().getName(), list.size());
+        return list;
+    }
+
+
+
 
 }

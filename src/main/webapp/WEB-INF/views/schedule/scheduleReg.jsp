@@ -584,7 +584,7 @@
 
     // ✅ WebSocket 연결 함수
     function connectWebSocket() {
-        const socket = new SockJS('/ws-chat'); // 💡 서버의 WebSocket 엔드포인트 확인 필요
+        const socket = new SockJS('/ws'); //
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function (frame) {
@@ -791,10 +791,10 @@
                                 scheduleRequest: savedEvent,
                                 sentAt: new Date().toISOString()
                             };
-                            stompClient.send("/app/chat/send", {}, JSON.stringify(scheduleMessage));
+                            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(scheduleMessage));
                         }
                         showCustomAlert("상대방에게 일정 요청을 보냈습니다.", function (){
-                            location.href = '/chat/chatRoom?roomId=' + roomId;
+                            history.back();
                         });
                     },
                     error: function(err) {

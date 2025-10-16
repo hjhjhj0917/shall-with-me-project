@@ -1,5 +1,6 @@
 package kopo.shallwithme.mapper;
 
+import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserInfoDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
@@ -29,4 +30,16 @@ public interface IMyPageMapper {
     UserInfoDTO myPageUserInfo (UserInfoDTO pDTO) throws Exception;
 
     List<UserTagDTO> myPageUserTag(UserInfoDTO pDTO) throws Exception;
+
+    int updateIntroduction(UserProfileDTO pDTO); // ← 추가
+
+    int updateProfileImage(UserProfileDTO pDTO);
+
+    List<UserTagDTO> selectAllTagsWithType();               // all: tagId, tagName, tagType
+    List<UserTagDTO> selectMyTagSelectionsByUser(UserInfoDTO p); // my: tagId, tagType
+    int deleteUserTagsByTagTypesOfTagIds(UserTagDTO p);     // p.userId, p.tagList
+    int insertUserTagsFromIds(UserTagDTO p);                // p.userId, p.tagList (INSERT ... SELECT)
+    List<TagDTO> selectMyTagNames(UserInfoDTO p);           // 칩 표시용: tagId, tagName
+
+
 }
