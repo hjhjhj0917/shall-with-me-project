@@ -5,9 +5,38 @@
 
 <mapper namespace="kopo.shallwithme.mapper.IChatMapper">
 
+    <resultMap id="chatMessageResultMap" type="kopo.shallwithme.dto.ChatMessageDTO">
+        <id property="messageId" column="message_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="senderId" column="sender_id"/>
+        <result property="message" column="message"/>
+        <result property="sentAt" column="sent_at"/>
+        <result property="read" column="is_read"/>
+        <result property="messageType" column="message_type"/>
+
+        <association property="scheduleRequest"
+                     column="schedule_id"
+                     javaType="kopo.shallwithme.dto.ScheduleDTO"
+                     select="kopo.shallwithme.mapper.IScheduleMapper.getScheduleById"/>
+    </resultMap>
+
     <insert id="insertChatMessage" parameterType="ChatMessageDTO">
-        INSERT INTO CHAT_MESSAGE (room_id, sender_id, message, sent_at)
-        VALUES (#{roomId}, #{senderId}, #{message}, #{sentAt})
+        INSERT INTO CHAT_MESSAGE (
+            room_id,
+            sender_id,
+            message,
+            sent_at,
+            message_type,
+            schedule_id
+        )
+        VALUES (
+                   #{roomId},
+                   #{senderId},
+                   #{message},
+                   #{sentAt},
+                   #{messageType},
+                   #{scheduleRequest.scheduleId}
+               )
     </insert>
 
     <select id="getOtherUserId" parameterType="ChatRoomDTO" resultType="ChatRoomDTO">
@@ -81,15 +110,16 @@
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
-    <!-- int 타입 수정-->
-    <select id="selectMessagesByRoomId" parameterType="int" resultType="ChatMessageDTO">
+    <select id="selectMessagesByRoomId" parameterType="int" resultMap="chatMessageResultMap">
         SELECT
             message_id,
-            room_id AS roomId,
-            sender_id AS senderId,
+            room_id,
+            sender_id,
             message,
-            sent_at AS sentAt,
-            is_read AS "read"
+            sent_at,
+            is_read,
+            message_type,
+            schedule_id  -- [핵심] schedule_id 컬럼을 반드시 포함해야 ResultMap이 동작합니다.
         FROM
             CHAT_MESSAGE
         WHERE

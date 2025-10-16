@@ -59,7 +59,58 @@
     .floor-modal-btn.cancel:hover { background: #e0e0e0; }
     .floor-modal-btn.confirm { background: #3399ff; color: #fff; }
     .floor-modal-btn.confirm:hover { background: #2288ee; }
+
+    /* 모달 여백 제거 */
+    #sharehouseRegOverlay .modal-sheet {
+      max-height: 95vh !important;
+      margin: 0 !important;
+    }
+    #sharehouseRegOverlay .modal-body {
+      padding: 0 !important;
+      overflow-y: auto;
+    }
+
+    /* 우편번호 입력 필드 스타일 */
+    .address-group {
+      margin-bottom: 20px;
+    }
+    .address-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .address-row input[readonly] {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+    .address-row button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .2s;
+      white-space: nowrap;
+    }
+    .address-row button:hover {
+      transform: translateY(-2px);
+    }
+    .address-input-full {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .address-input-full:focus {
+      outline: none;
+      border-color: #667eea;
+    }
   </style>
+  <!-- 다음 우편번호 서비스 -->
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <body>
@@ -99,7 +150,9 @@
         <label>
           <span>
             <c:choose>
-              <c:when test="${not empty loginName}"><c:out value="${loginName}"/>의 쉐어하우스</c:when>
+              <c:when test="${not empty loginName}">
+                <c:out value="${loginName}"/>의 쉐어하우스
+              </c:when>
               <c:otherwise>내 쉐어하우스</c:otherwise>
             </c:choose>
           </span>
@@ -117,18 +170,28 @@
       <!-- 태그 선택 + 층수 입력 -->
       <div class="form-group">
         <div class="button-row">
-          <!-- 인라인 onclick 제거 -->
           <button type="button" id="btnTagSelect" class="tag-select-btn">
-            <i class="fa-solid fa-tags"></i> 태그 선택 (최대 3개)
+            <i class="fa-solid fa-tags"></i> 태그 6개 선택 (필수)
           </button>
-          <!-- 인라인 onclick 제거 -->
           <button type="button" id="btnFloorOpen" class="floor-input-btn">
-            <i class="fa-solid fa-building"></i> 층수 입력
+            <i class="fa-solid fa-building"></i> 층수 입력 (필수)
           </button>
         </div>
-        <div id="selectedTagsDisplay" style="margin-top:8px; color:#666; font-size:.9rem;">선택된 태그가 없습니다.</div>
+        <div id="selectedTagsDisplay" style="margin-top:8px; color:#666; font-size:.9rem;">태그 6개와 층수를 선택해주세요.</div>
         <input type="hidden" id="selectedTagIds" name="tagListJson" value="[]">
         <input type="hidden" id="floorNumber" name="floorNumber" value="">
+      </div>
+
+      <!-- 우편번호 및 주소 입력 -->
+      <div class="form-group address-group">
+        <label>주소 <span style="color:#999; font-size:.9em;">(필수)</span></label>
+        <div class="address-row">
+          <input type="text" id="addr1" name="addr1" placeholder="주소" readonly required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:1rem;">
+          <button type="button" id="btnAddr">
+            <i class="fa-solid fa-magnifying-glass"></i> 우편번호 찾기
+          </button>
+        </div>
+        <input type="text" id="addr2" name="addr2" placeholder="상세주소를 입력하세요" required class="address-input-full">
       </div>
 
       <div class="sh-modal-body sh-reg">
@@ -198,15 +261,48 @@
       <span>층</span>
     </div>
     <div class="floor-modal-actions">
-      <!-- 인라인 onclick 제거 -->
       <button type="button" class="floor-modal-btn cancel" id="btnFloorCancel">취소</button>
       <button type="button" class="floor-modal-btn confirm" id="btnFloorConfirm">확인</button>
     </div>
   </div>
 </div>
 
+<!-- ✅ 1. jQuery (가장 먼저!) -->
+<script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
+
+<!-- ✅ 2. customModal 포함 (jQuery 다음) -->
+<%@ include file="../includes/customModal.jsp" %>
+
+<!-- ✅ 3. 다음 우편번호 서비스 스크립트 -->
 <script>
-  // 취소 버튼
+function execDaumPostcode() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      let addr = '';
+      if (data.userSelectedType === 'R') {
+        addr = data.roadAddress;
+      } else {
+        addr = data.jibunAddress;
+      }
+      document.getElementById('addr1').value = addr;
+      document.getElementById('addr2').focus();
+    }
+  }).open();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const btnAddr = document.getElementById('btnAddr');
+  if (btnAddr) {
+    btnAddr.addEventListener('click', function(e) {
+      e.preventDefault();
+      execDaumPostcode();
+    });
+  }
+});
+</script>
+
+<!-- ✅ 4. 취소 버튼 -->
+<script>
   document.addEventListener('DOMContentLoaded', function () {
     const cancelBtn = document.getElementById('shRegCancelBtn');
     if (cancelBtn) {
@@ -222,9 +318,7 @@
   });
 </script>
 
-<%@ include file="../includes/customModal.jsp" %>
-
-<!-- 업로더 미리보기 및 태그/층수 표시 -->
+<!-- ✅ 5. 업로더 미리보기 및 태그/층수 표시 -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.sh-uploader-5 .uploader input[type="file"]').forEach(input => {
@@ -239,7 +333,7 @@
         const f = input.files && input.files[0];
         if (!f){ img.hidden = true; span.hidden = false; return; }
         if (!f.type.startsWith('image/')){ alert('이미지 파일만 업로드 가능합니다.'); input.value=''; return; }
-        if (f.size > 5 * 1024 * 1024){ alert('최대 5MB까지만 업로드 가능합니다.'); input.value=''; return; }
+        if (f.size > 10 * 1024 * 1024){ alert('최대 10MB까지만 업로드 가능합니다.'); input.value=''; return; }
         img.src = URL.createObjectURL(f); img.hidden = false; span.hidden = true;
       });
     });
@@ -285,14 +379,21 @@
       const tagNames = tagIds.map(id => window.tagMap[id] || `태그${id}`);
       parts.push(...tagNames);
     }
-    if (floorNum && floorNum !== '' && floorNum !== 'undefined') parts.push(floorNum + '층');
+    if (floorNum && floorNum !== '' && floorNum !== 'undefined') {
+      parts.push(floorNum + '층');
+    }
 
-    if (parts.length > 0) { display.textContent = '선택됨: ' + parts.join(', '); display.style.color = '#3399ff'; }
-    else { display.textContent = '선택된 태그가 없습니다.'; display.style.color = '#666'; }
+    if (parts.length > 0) {
+      display.textContent = '선택됨: ' + parts.join(', ');
+      display.style.color = '#3399ff';
+    } else {
+      display.textContent = '태그 6개와 층수를 선택해주세요.';
+      display.style.color = '#666';
+    }
   }
 </script>
 
-<!-- 층수 입력 모달 스크립트: 함수는 유지, 호출은 이벤트 바인딩으로 -->
+<!-- ✅ 6. 층수 입력 모달 스크립트 -->
 <script>
   function openFloorModal() {
     const modal = document.getElementById('floorModal');
@@ -318,26 +419,81 @@
   });
 </script>
 
+<!-- ✅ 7. 저장 제출 -->
 <script>
-  // 저장 제출
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('roommateForm');
     const btn  = document.getElementById('btnSave');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const houseName = document.getElementById('houseName')?.value?.trim();
-      if (!houseName) { alert('쉐어하우스 이름을 입력해 주세요.'); document.getElementById('houseName')?.focus(); return; }
-      if (houseName.length > 20) { alert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.'); return; }
+      if (!houseName) {
+        alert('쉐어하우스 이름을 입력해 주세요.');
+        document.getElementById('houseName')?.focus();
+        return;
+      }
+      if (houseName.length > 20) {
+        alert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
+      if (tagIds.length !== 6) {
+        alert('태그를 정확히 6개 선택해주세요.');
+        return;
+      }
+
+      const floorNum = document.getElementById('floorNumber').value;
+      if (!floorNum || floorNum === '') {
+        alert('층수를 입력해주세요.');
+        return;
+      }
+
+      const addr1 = document.getElementById('addr1').value.trim();
+      const addr2 = document.getElementById('addr2').value.trim();
+
+      if (!addr1) {
+        alert('주소를 입력해주세요. "우편번호 찾기" 버튼을 클릭하세요.');
+        return;
+      }
+
+      if (!addr2) {
+        alert('상세주소를 입력해주세요.');
+        document.getElementById('addr2').focus();
+        return;
+      }
 
       const thumb = form.querySelector('input[name="thumbnail"]')?.files?.[0];
       if (!thumb) { alert('대표 이미지를 선택해 주세요.'); return; }
+
       const imgs = [...form.querySelectorAll('input[name="images"]')].map(i => i.files?.[0]).filter(Boolean);
       if (imgs.length < 1) { alert('추가 이미지를 최소 1장 선택해 주세요.'); return; }
 
       btn.disabled = true; btn.textContent = '저장중...';
-      const fd = new FormData(form);
-      fd.append('profileImage', form.querySelector('input[name="thumbnail"]').files[0]);
+      const fd = new FormData();
+
+      const thumbnailFile = form.querySelector('input[name="thumbnail"]').files[0];
+      if (thumbnailFile) {
+        fd.append('thumbnail', thumbnailFile);
+      }
+
+      // ✅ 추가 이미지 (파일이 있을 때만!)
+      const imageInputs = form.querySelectorAll('input[name="images"]');
+      imageInputs.forEach(input => {
+        if (input.files && input.files[0]) {  // ✅ 파일 있을 때만!
+          fd.append('images', input.files[0]);
+        }
+      });
+
+      // ✅ 나머지 필드들
+      fd.append('houseName', document.getElementById('houseName').value);
+      fd.append('introduction', document.getElementById('introTextarea').value || '');
+      fd.append('tagListJson', document.getElementById('selectedTagIds').value);
+      fd.append('floorNumber', document.getElementById('floorNumber').value);
+      fd.append('addr1', document.getElementById('addr1').value);
+      fd.append('addr2', document.getElementById('addr2').value);
 
       try {
         const url = (typeof ctx !== 'undefined' ? ctx : '') + '/sharehouse/register';
@@ -345,10 +501,14 @@
         let json = null;
         try { json = await res.clone().json(); } catch (_) {}
 
-        if (res.status === 0 || res.type === 'opaqueredirect') { alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.'); return; }
+        if (res.status === 0 || res.type === 'opaqueredirect') {
+          alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.');
+          return;
+        }
         if (!res.ok) {
           const text = (json && json.msg) || (await res.text().catch(()=>'')) || '서버 오류';
-          alert(`저장 실패 (${res.status})\n${text}`); return;
+          alert(`저장 실패 (${res.status})\n${text}`);
+          return;
         }
 
         json = json || {};
@@ -365,33 +525,29 @@
           alert(json.msg || '저장에 실패했습니다.');
         }
       } catch (err) {
-        console.error(err); alert('서버 통신 중 오류가 발생했습니다.');
+        console.error(err);
+        alert('서버 통신 중 오류가 발생했습니다.');
       } finally {
-        btn.disabled = false; btn.textContent = '저장';
+        btn.disabled = false;
+        btn.textContent = '저장';
       }
     });
   });
 </script>
 
-<!-- jQuery는 include보다 반드시 먼저 -->
-<script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
-
-<!-- 태그 선택 모달(HTML+JS) 포함: 여기서 openTagSelectModal 또는 openTagModal 전역 제공 -->
+<!-- ✅ 8. 태그 선택 모달 포함 -->
 <jsp:include page="/WEB-INF/views/sharehouse/sharehouseTagSelect.jsp"/>
 
-<!-- 페이지 전용 바인딩: 인라인 onclick 없이 처리 -->
+<!-- ✅ 9. 페이지 전용 바인딩 -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // 태그 선택 버튼
     const tagBtn = document.getElementById('btnTagSelect');
     if (tagBtn) {
       tagBtn.addEventListener('click', function () {
-        // 1순위: 페이지 전역 브릿지가 있다면 사용
         if (typeof window.openTagSelectPopup === 'function') {
           window.openTagSelectPopup();
           return;
         }
-        // 2순위: include에서 제공하는 실제 모달 함수명 대응
         const openImpl = window.openTagSelectModal || window.openTagModal;
         if (typeof openImpl === 'function') {
           const hidden  = document.getElementById('selectedTagIds');
@@ -399,7 +555,6 @@
           openImpl(current, function (ids) {
             hidden.value = JSON.stringify(ids);
 
-            // 선택 태그 이름 맵 갱신(버튼 data-name 우선)
             window.tagMap = window.tagMap || {};
             ids.forEach(function (id) {
               const btn = document.querySelector('.tag-btn[data-id="' + id + '"]');
@@ -410,7 +565,6 @@
             renderInlineTags();
           });
         } else if (typeof $ !== 'undefined' && $('#tagSelectModalOverlay').length) {
-          // jQuery 기반 show/hide 대응
           $('#tagSelectModalOverlay').show();
         } else {
           alert('태그 선택 모달 스크립트를 찾지 못했습니다. sharehouseTagSelect.jsp를 확인하세요.');
@@ -418,7 +572,6 @@
       });
     }
 
-    // 층수 입력 모달 버튼들
     const btnFloorOpen    = document.getElementById('btnFloorOpen');
     const btnFloorCancel  = document.getElementById('btnFloorCancel');
     const btnFloorConfirm = document.getElementById('btnFloorConfirm');
@@ -429,16 +582,13 @@
   });
 </script>
 
-<!-- 전역 값 및 로드 확인 -->
 <script>
   window.userName = '<c:out value="${sessionScope.SS_USER_NAME}" default=""/>';
-  console.log('openTagSelectModal:', typeof window.openTagSelectModal, 'openTagModal:', typeof window.openTagModal);
 </script>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
-<!-- ▼▼▼ 태그 선택 모달 “디자인 그대로” 적용: 우선순위를 위해 맨 아래에 둠 ▼▼▼ -->
 <style id="tagModalStyles">
   :root{
     --sh-primary:#1c407d;
@@ -447,19 +597,16 @@
     --radius:14px;
     --shadow:0 6px 18px rgba(0,0,0,.06);
   }
-  /* 오버레이(가운데 정렬) */
   html body #tagSelectModalOverlay.modal-overlay{
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
     background:rgba(0,0,0,.4); backdrop-filter:blur(1px); z-index:10020;
   }
-  /* 시트 */
   html body #tagSelectModalOverlay .modal-sheet{
     width:100%; max-width:450px; max-height:80vh;
     background:#fff; border-radius:12px; overflow:hidden;
     box-shadow:var(--shadow); animation:fadeIn .3s;
     display:flex; flex-direction:column;
   }
-  /* 헤더 */
   html body #tagSelectModalOverlay .modal-header{
     position:relative; display:flex; align-items:center; justify-content:center;
     padding:16px 20px; border-bottom:1px solid #eee; background:#fff;
@@ -470,11 +617,7 @@
     background:#f6f7f8; display:grid; place-items:center; cursor:pointer;
   }
   html body #tagSelectModalOverlay .modal-close:hover{ background:#eceff3; }
-
-  /* 바디 */
   html body #tagSelectModalOverlay .modal-body{ padding:14px 16px; overflow:auto; flex:1; background:#fafbfc; }
-
-  /* 태그 리스트 그리드 + 버튼(필수) */
   html body #tagSelectModalOverlay .all-tag-list{
     display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px;
   }
@@ -488,11 +631,8 @@
   }
   html body #tagSelectModalOverlay .tag-btn:hover{ border-color:#cfd7e6; transform:translateY(-1px); }
   html body #tagSelectModalOverlay .tag-btn.selected{ background:#485fe7; border-color:#485fe7; color:#fff; }
-
-  /* 애니메이션 */
   @keyframes fadeIn{ 0%{opacity:0; transform:scale(.95)} 100%{opacity:1; transform:scale(1)} }
 </style>
-<!-- ▲▲▲ 끝 ▲▲▲ -->
 
 </body>
 </html>

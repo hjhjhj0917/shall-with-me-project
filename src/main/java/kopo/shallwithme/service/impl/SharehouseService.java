@@ -54,26 +54,31 @@ public class SharehouseService implements ISharehouseService {
     /**
      * ★★★ 새로운 메서드: 이미지 + 층수 포함 등록 ★★★
      */
+    /**
+     * ✅ 수정: address 1개 → addr1, addr2 2개로 변경
+     */
     @Override
     @Transactional
     public Long registerHouseWithImages(String ownerId, String title, String subText,
-                                        String address, List<String> imageUrls, String floorNumber) {
+                                        String addr1, String addr2, List<String> imageUrls, String floorNumber) {
 
         log.info("=== 쉐어하우스 등록 시작 ===");
         log.info("ownerId: {}", ownerId);
         log.info("title: {}", title);
-        log.info("address: {}", address);
-        log.info("floorNumber: {}", floorNumber);  // ✅ 층수 로그 추가
+        log.info("addr1 (기본주소): {}", addr1);     // ✅ 수정
+        log.info("addr2 (상세주소): {}", addr2);     // ✅ 추가
+        log.info("floorNumber: {}", floorNumber);
         log.info("imageUrls 개수: {}", imageUrls != null ? imageUrls.size() : 0);
 
         // 1. 기본 정보 저장
         SharehouseCardDTO dto = new SharehouseCardDTO();
         dto.setTitle(title);
         dto.setSubText(subText);
-        dto.setAddress(address);
+        dto.setAddress(addr1);           // ✅ addr1 설정
+        dto.setDetailAddress(addr2);     // ✅ addr2 설정
         dto.setRegId(ownerId);
 
-        // ✅ 층수 설정 추가
+        // 층수 설정
         if (floorNumber != null && !floorNumber.isBlank()) {
             try {
                 dto.setFloorNumber(Integer.parseInt(floorNumber));

@@ -10,6 +10,134 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseDetail.css"/>
+    <!-- ✅ 카카오맵 API 추가 (여기에 팀원의 실제 API 키를 입력하세요) -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=218d70914021664c1d8e3dc194489251&libraries=services"></script>
+    <style>
+        /* 작성자 프로필 스타일 */
+        .host-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 0;
+            gap: 16px;
+        }
+
+        .host-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #3399ff;
+            box-shadow: 0 6px 16px rgba(51, 153, 255, 0.3);
+        }
+
+        .host-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .host-info {
+            text-align: center;
+        }
+
+        .host-info .host-label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .host-info strong {
+            font-size: 1.3rem;
+            color: #222;
+            display: block;
+        }
+
+        .reserve-btn {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+
+        .reserve-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* ✅ 카카오맵 스타일 */
+        .map-section {
+            margin-top: 30px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .address-info {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3399ff;
+        }
+
+        .address-info i {
+            color: #3399ff;
+            margin-right: 8px;
+        }
+
+        .address-info p {
+            margin: 8px 0;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .address-info .postcode {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 2단 레이아웃 높이 맞추기 */
+        .shd-two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start; /* 상단 정렬 */
+        }
+
+        .shd-two-cols > .card {
+            height: 100%; /* 양쪽 높이 동일 */
+        }
+
+        /* 소개 섹션 */
+        .shd-desc {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shd-desc p {
+            flex: 1; /* 남은 공간 채우기 */
+        }
+
+        /* 위치 섹션과 지도 사이 간격 */
+        .map-section {
+            margin-top: 40px; /* 간격 추가 */
+        }
+
+        .address-info {
+            margin-bottom: 24px; /* 주소와 지도 사이 간격 */
+        }
+    </style>
 </head>
 <body>
 <%@ include file="../includes/header.jsp" %>
@@ -17,10 +145,6 @@
 <main class="shd-wrapper">
     <section class="shd-titlebar">
         <h1 id="shd-title">${user.title}</h1>
-<%--        <div class="shd-actions">--%>
-<%--            <button class="action-btn" type="button"><i class="fa-regular fa-share-from-square"></i> 공유하기</button>--%>
-<%--            <button class="action-btn" type="button"><i class="fa-regular fa-heart"></i> 저장</button>--%>
-<%--        </div>--%>
     </section>
 
     <!-- 이미지 갤러리 -->
@@ -50,25 +174,28 @@
                 </c:forEach>
             </c:otherwise>
         </c:choose>
-
-<%--        <button class="see-all" type="button">--%>
-<%--            <i class="fa-solid fa-grip"></i> 사진 모두 보기--%>
-<%--        </button>--%>
     </section>
 
     <section class="shd-body">
-            <div class="shd-summary-full card">
-                <div class="meta">
-                    <span id="meta-type">쉐어하우스</span>
-                    <span class="dot"></span>
-                    <span id="meta-guest">공동 주택</span>
-                </div>
-                <div class="tag-row" id="tagRow">
-                    <c:forEach var="tag" items="${user.tags}">
-                        <span class="chip"># ${tag.tagName}</span>
-                    </c:forEach>
-                </div>
+        <div class="shd-summary-full card">
+            <div class="meta">
+                <span id="meta-type">쉐어하우스</span>
+                <span class="dot"></span>
+                <span id="meta-guest">설명 태그</span>
             </div>
+
+            <!-- 태그 6개 + 층수 = 이 7개 표시 -->
+            <div class="tag-row" id="tagRow">
+                <c:forEach var="tag" items="${user.tags}">
+                    <span class="chip"># ${tag.tagName}</span>
+                </c:forEach>
+
+                <!-- 층수 추가 (일반 태그와 동일한 스타일) -->
+                <c:if test="${not empty user.floorNumber}">
+                    <span class="chip"># ${user.floorNumber}층</span>
+                </c:if>
+            </div>
+        </div>
 
         <!-- 하단: 2단 레이아웃 -->
         <div class="shd-two-cols">
@@ -78,17 +205,165 @@
                 <p>${user.subText}</p>
             </div>
 
-            <!-- 오른쪽: 문의하기 -->
+            <!-- 오른쪽: 작성자 프로필 + 문의하기 -->
             <div class="shd-contact card">
-                <div class="price-line">
-                    <strong>문의하기</strong>
+                <!-- 작성자 프로필 이미지 추가 -->
+                <div class="host-profile">
+                    <div class="host-avatar">
+                        <c:choose>
+                            <c:when test="${not empty user.hostProfileUrl}">
+                                <img src="${user.hostProfileUrl}"
+                                     alt="작성자 프로필"
+                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${fn:escapeXml(not empty user.hostName ? user.hostName : 'User')}&background=3399ff&color=fff&size=140'">
+                            </c:when>
+                            <c:otherwise>
+                                <img src="https://ui-avatars.com/api/?name=${fn:escapeXml(not empty user.hostName ? user.hostName : 'User')}&background=3399ff&color=fff&size=140"
+                                     alt="기본 프로필">
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="host-info">
+                        <span class="host-label">작성자</span>
+                        <strong>${not empty user.hostName ? user.hostName : '알 수 없음'}</strong>
+                    </div>
                 </div>
-                <button class="reserve-btn" type="button">문의하기</button>
+
+                <!-- 문의하기 버튼 (채팅으로 연결) -->
+                <button class="reserve-btn" type="button" onclick="openChatWithHost()">
+                    <i class="fa-regular fa-comment-dots"></i> 문의하기
+                </button>
             </div>
+        </div>
+
+        <!-- ✅ 카카오맵 섹션 추가 -->
+        <div class="shd-desc card map-section">
+            <h2 class="sec-title"><i class="fa-solid fa-map-location-dot"></i> 위치</h2>
+
+            <!-- 주소 정보 표시 -->
+            <div class="address-info">
+                <p>
+                    <i class="fa-solid fa-location-dot"></i>
+                    <strong>${not empty user.address ? user.address : '주소 정보 없음'}</strong>
+                </p>
+                <c:if test="${not empty user.detailAddress}">
+                    <p style="color:#666; font-size:0.9rem; margin-left:24px;">
+                        ${user.detailAddress}
+                    </p>
+                </c:if>
+            </div>
+
+            <!-- 카카오맵 컨테이너 -->
+            <div id="map" class="map-container"></div>
         </div>
     </section>
 </main>
 
 <%@ include file="../includes/footer.jsp" %>
+
+<script>
+    // 채팅 열기 함수 (기존 시스템 활용)
+    function openChatWithHost() {
+        const hostId = '${user.regId}';
+        const hostName = '${user.hostName}';
+
+        // null 체크 강화
+        if (!hostId || hostId === 'null' || hostId === '' || hostId === 'undefined') {
+            alert('작성자 정보를 찾을 수 없습니다.');
+            return;
+        }
+
+        console.log('채팅 열기:', hostId, hostName);
+
+        // 기존 채팅 시스템 활용: createOrGetRoom API 사용
+        fetch('/chat/createOrGetRoom?user2Id=' + encodeURIComponent(hostId))
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP error! status: ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                if (data.roomId) {
+                    window.location.href = '/chat/chatRoom?roomId=' + Number(data.roomId);
+                } else {
+                    alert('채팅방 생성에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('채팅방 생성 중 오류:', error);
+                alert('채팅 연결에 실패했습니다.');
+            });
+    }
+
+    // ✅ 카카오맵 초기화 (addr1만 사용)
+    document.addEventListener('DOMContentLoaded', function() {
+        const address = '${user.address}';
+
+        if (!address || address === '' || address === 'null') {
+            console.warn('주소 정보가 없습니다.');
+            document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;"><p>주소 정보가 없어 지도를 표시할 수 없습니다.</p></div>';
+            return;
+        }
+
+        // 카카오맵 API 로드 확인
+        if (typeof kakao === 'undefined' || !kakao.maps) {
+            console.error('카카오맵 API가 로드되지 않았습니다.');
+            return;
+        }
+
+        const mapContainer = document.getElementById('map');
+        const mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 기본 중심좌표 (서울)
+            level: 3
+        };
+
+        const map = new kakao.maps.Map(mapContainer, mapOption);
+        const geocoder = new kakao.maps.services.Geocoder();
+
+        // ✅ addr1(기본 주소)만 사용하여 좌표 검색 - 상세주소 제외로 검색 성공률 향상
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                // 마커 생성
+                const marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
+
+                // 인포윈도우 생성
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: '<div style="padding:5px 10px;font-size:12px;font-weight:600;">${user.title}</div>'
+                });
+                infowindow.open(map, marker);
+
+                // 지도 중심을 마커 위치로 이동
+                map.setCenter(coords);
+            } else {
+                console.error('주소 검색 실패:', status, 'address:', address);
+                mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;"><p>주소를 찾을 수 없습니다.</p></div>';
+            }
+        });
+    });
+
+    // 이미지 로드 오류 방지 - 한 번만 실행되도록 개선
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileImg = document.querySelector('.host-avatar img');
+        if (profileImg) {
+            // 이미 에러 핸들러가 설정되어 있으면 중복 방지
+            if (!profileImg.dataset.errorHandled) {
+                profileImg.dataset.errorHandled = 'true';
+                profileImg.addEventListener('error', function(e) {
+                    // 한 번만 실행되도록 이벤트 리스너 제거
+                    e.target.removeEventListener('error', arguments.callee);
+                    console.log('프로필 이미지 로드 실패, 기본 이미지로 대체');
+
+                    // 사용자 이름을 포함한 기본 이미지로 대체 (크기 140)
+                    const hostName = '${fn:escapeXml(not empty user.hostName ? user.hostName : "User")}';
+                    this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(hostName) + '&background=3399ff&color=fff&size=140';
+                }, {once: true}); // once 옵션으로 한 번만 실행
+            }
+        }
+    });
+</script>
+
 </body>
 </html>
