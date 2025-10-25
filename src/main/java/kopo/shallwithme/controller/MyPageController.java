@@ -413,6 +413,50 @@ public class MyPageController {
         return ResponseEntity.ok(java.util.Map.of("res", res, "tags", chips));
     }
 
+    @PostMapping(value = "/passwordVerify")
+    @ResponseBody
+    public MsgDTO passwordVerify(HttpServletRequest request, HttpSession session) throws Exception {
+        log.info("{}.mypage/passwordVerify Start!", this.getClass().getName());
+
+        MsgDTO dto = new MsgDTO();
+
+        // 로그인 세션에서 사용자 ID 확보 (프로젝트 세션 키에 맞춰 사용)
+        String ssUserId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+        String currentPw = CmmUtil.nvl(request.getParameter("currentPw"));
+
+        if (ssUserId.isEmpty() || currentPw.isEmpty()) {
+            dto.setResult(0);
+            dto.setMsg("요청 정보가 부족합니다. 다시 시도해주세요.");
+            log.info("세션 또는 파라미터 누락");
+            return dto;
+        }
+
+        // 입력 비번 해시
+        String encPw = EncryptUtil.encHashSHA256(currentPw);
+
+        // DTO 규칙 준수
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserId(ssUserId);
+        pDTO.setPassword(encPw);
+
+        boolean ok = myPageService.verifyPassword(pDTO); // 서비스에서 DB와 비교
+
+        if (ok) {
+            // ★★ 핵심: /user/newPasswordProc가 요구하는 세션값 세팅
+            // 기존 newPasswordProc은 NEW_PASSWORD 세션에 "userId"를 담아 사용 중
+            session.setAttribute("NEW_PASSWORD", ssUserId);
+
+            dto.setResult(1);
+            dto.setMsg("현재 비밀번호가 확인되었습니다.");
+        } else {
+            dto.setResult(0);
+            dto.setMsg("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        log.info("{}.mypage/passwordVerify End!", this.getClass().getName());
+        return dto;
+    }
+
 
 
 

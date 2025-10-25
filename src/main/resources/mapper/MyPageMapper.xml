@@ -192,4 +192,16 @@
         ORDER BY <include refid="case_tag_type_t"/>, t.tag_id
     </select>
 
+    <!-- 로그인 사용자의 PASSWORD 해시만 반환 -->
+    <select id="getPasswordHashByUserId" parameterType="UserInfoDTO"
+            resultType="UserInfoDTO">
+        SELECT
+            PASSWORD
+        FROM
+            USER_INFO
+        WHERE
+            USER_ID = #{userId}
+            LIMIT 1
+    </select>
+
 </mapper>

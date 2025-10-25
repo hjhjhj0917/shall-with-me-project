@@ -39,7 +39,9 @@ public interface IMyPageMapper {
     List<UserTagDTO> selectMyTagSelectionsByUser(UserInfoDTO p); // my: tagId, tagType
     int deleteUserTagsByTagTypesOfTagIds(UserTagDTO p);     // p.userId, p.tagList
     int insertUserTagsFromIds(UserTagDTO p);                // p.userId, p.tagList (INSERT ... SELECT)
-    List<TagDTO> selectMyTagNames(UserInfoDTO p);           // 칩 표시용: tagId, tagName
+    List<TagDTO> selectMyTagNames(UserInfoDTO p);// 칩 표시용: tagId, tagName
+
+    UserInfoDTO getPasswordHashByUserId(UserInfoDTO pDTO) throws Exception;
 
 
 }

@@ -42,4 +42,6 @@ public interface IUserInfoService {
 
     //✅ 프로필 단건 조회: DTO in/out, void 금지
     UserProfileDTO findUserProfileByUserId(UserProfileDTO pDTO);
+
+
 }
