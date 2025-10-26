@@ -151,29 +151,39 @@
     <section class="shd-gallery">
         <c:choose>
             <c:when test="${not empty user.images}">
-                <c:forEach var="img" items="${user.images}" varStatus="status" end="4">
+                <!-- ✅ 4장만 표시 (인덱스 0~3) -->
+                <c:forEach var="img" items="${user.images}" varStatus="status" end="3">
                     <img id="g${status.index}"
                          src="${img.url}"
                          alt="쉐어하우스 이미지 ${status.index + 1}"
                          onerror="this.src='${pageContext.request.contextPath}/images/noimg.png'">
                 </c:forEach>
 
-                <!-- 5개 미만일 경우 noimg로 채우기 -->
-                <c:forEach begin="${fn:length(user.images)}" end="4" var="i">
+                <!-- 4개 미만일 경우 noimg로 채우기 -->
+                <c:forEach begin="${fn:length(user.images)}" end="3" var="i">
                     <img id="g${i}"
                          src="${pageContext.request.contextPath}/images/noimg.png"
                          alt="이미지 없음">
                 </c:forEach>
             </c:when>
             <c:otherwise>
-                <!-- 이미지가 없을 경우 -->
-                <c:forEach begin="0" end="4" var="i">
+                <!-- 이미지가 없을 경우 (4장만) -->
+                <c:forEach begin="0" end="3" var="i">
                     <img id="g${i}"
                          src="${pageContext.request.contextPath}/images/noimg.png"
                          alt="이미지 없음">
                 </c:forEach>
             </c:otherwise>
         </c:choose>
+
+        <!-- ✅ 5번째 칸: 실제 거주 사진 안내 박스 -->
+        <div class="photo-notice-box">
+            <div class="notice-icon">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="notice-title">실제 거주<br/>사진입니다</div>
+            <div class="notice-subtitle">Real Photos<br/>Verified</div>
+        </div>
     </section>
 
     <section class="shd-body">
