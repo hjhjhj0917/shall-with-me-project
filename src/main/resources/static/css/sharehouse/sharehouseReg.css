@@ -104,8 +104,8 @@
     border-radius: 999px;
 }
 
-/* ============== Airbnb 5장 모자이크 ============== */
-/* 4×2 + 2:1 (셀 정사각), grid-areas로 고정 */
+/* ============== ✅ 4장 업로드 + 안내 영역 ============== */
+/* 4×2 그리드: A(대표 2칸 높이) + B,C,D(업로드) + E(안내) */
 .roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5{
     display: grid;
     grid-template-columns: repeat(4,1fr);
@@ -145,7 +145,7 @@
     border-radius: inherit;
 }
 
-/* 위치(직계 5자식) */
+/* ✅ 위치 지정 (A~D만 업로드, E는 안내 영역) */
 .sh-uploader-5 > .uploader:nth-of-type(1){
     grid-area: A;
     border-radius: 16px 0 0 16px;
@@ -155,10 +155,81 @@
     grid-area: C;
     border-top-right-radius: 16px;
 }
-.sh-uploader-5 > .uploader:nth-of-type(4){ grid-area: D; }
-.sh-uploader-5 > .uploader:nth-of-type(5){
+.sh-uploader-5 > .uploader:nth-of-type(4){
+    grid-area: D;
+    border-bottom-left-radius: 0;
+}
+
+/* ✅ 5번째 칸: 안내 영역 (업로드 불가) */
+.sh-uploader-5 > .upload-notice-box{
     grid-area: E;
-    border-bottom-right-radius: 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 12px;
+
+    /* 테두리 스타일 */
+    border: 2px solid #b3d9ff;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #e6f2ff 0%, #cce5ff 100%);
+    box-shadow: 0 4px 12px rgba(51, 153, 255, 0.15);
+
+    cursor: default;
+    overflow: hidden;
+}
+
+.sh-uploader-5 > .upload-notice-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(51, 153, 255, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* 아이콘 */
+.upload-notice-box .notice-icon {
+    font-size: 2.5rem;
+    color: #3399ff;
+    margin-bottom: 8px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* 텍스트 */
+.upload-notice-box .notice-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0066cc;
+    margin-bottom: 4px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.upload-notice-box .notice-subtitle {
+    font-size: 0.75rem;
+    color: #3399ff;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* 작은 장식 요소 */
+.upload-notice-box::after {
+    content: '📸';
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+    opacity: 0.3;
 }
 
 /* 모바일(≤1200px) : 대표 16:9 + 아래 2×2 */
@@ -176,8 +247,26 @@
         aspect-ratio: 16/9;
         border-radius: 16px;
     }
-    .sh-uploader-5 > .uploader:nth-of-type(n+2):nth-of-type(-n+5){
+    .sh-uploader-5 > .uploader:nth-of-type(n+2):nth-of-type(-n+4){
         aspect-ratio: 1/1;
+    }
+
+    /* 모바일에서 안내 박스 크기 조정 */
+    .sh-uploader-5 > .upload-notice-box{
+        aspect-ratio: 1/1;
+        border-bottom-right-radius: 16px;
+    }
+
+    .upload-notice-box .notice-icon {
+        font-size: 2rem;
+    }
+
+    .upload-notice-box .notice-title {
+        font-size: 0.85rem;
+    }
+
+    .upload-notice-box .notice-subtitle {
+        font-size: 0.7rem;
     }
 }
 
@@ -234,6 +323,3 @@
     margin-top: 12px;        /* 위 요소와 간격 */
     border: 0;               /* 선 제거 */
 }
-
-
-

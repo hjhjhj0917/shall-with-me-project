@@ -15,7 +15,7 @@
 
     <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid #eee;background:#fff;">
       <div style="font-size:0.95rem;color:#495057;">
-        <span id="tagCount" style="font-weight:600;color:#3399ff;">0</span>/3 선택
+        <span id="tagCount" style="font-weight:600;color:#3399ff;">0</span>/6 선택
       </div>
       <div style="display:flex;gap:8px;">
         <button type="button" class="btn ghost" id="tagSelectCancelBtn"

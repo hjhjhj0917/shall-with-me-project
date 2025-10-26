@@ -17,7 +17,7 @@
 
     /* 태그 선택 버튼 */
     .tag-select-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #3399ff 0%, #0066cc 100%);
       color: #fff; border: none; padding: 12px 24px; border-radius: 8px;
       font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform .2s;
     }
@@ -26,7 +26,7 @@
 
     /* 층수 입력 버튼 */
     .floor-input-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #3399ff 0%, #0066cc 100%);
       color: #fff; border: none; padding: 12px 24px; border-radius: 8px;
       font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform .2s;
     }
@@ -49,7 +49,7 @@
     .floor-input-group input {
       flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; text-align: center;
     }
-    .floor-input-group input:focus { outline: none; border-color: #667eea; }
+    .floor-input-group input:focus { outline: none; border-color: #3399ff; }
     .floor-input-group span { font-size: 1rem; color: #666; font-weight: 600; }
     .floor-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
     .floor-modal-btn {
@@ -85,7 +85,7 @@
     }
     .address-row button {
       padding: 10px 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #3399ff 0%, #0066cc 100%);
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -106,7 +106,7 @@
     }
     .address-input-full:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #3399ff;
     }
   </style>
   <!-- 다음 우편번호 서비스 -->
@@ -218,12 +218,16 @@
               <span>이미지 업로드</span>
               <img class="preview" alt="" hidden>
             </label>
-            <label class="uploader small">
-              <input type="file" name="images" accept="image/*" hidden>
-              <span>이미지 업로드</span>
-              <img class="preview" alt="" hidden>
-            </label>
+            <!-- ✅ 안내 영역 (업로드 불가) -->
+            <div class="upload-notice-box">
+              <div class="notice-icon">
+                <i class="fa-solid fa-images"></i>
+              </div>
+              <div class="notice-title">최대 4장까지<br>업로드 가능</div>
+              <div class="notice-subtitle">대표 이미지 1장 +<br>추가 이미지 3장</div>
+            </div>
           </section>
+
 
           <!-- 태그 패널 -->
           <aside class="inline-tag-panel inline-right">
