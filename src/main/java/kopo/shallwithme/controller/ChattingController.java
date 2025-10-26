@@ -30,6 +30,25 @@ public class ChattingController {
     private final SimpMessagingTemplate messagingTemplate;
     private final IChatService chatService;
 
+    @MessageMapping("/chat.sendMessage")
+    public void sendMessage(ChatMessageDTO chatMessage) {
+        log.info("{}.sendMessage Start!", this.getClass().getName());
+
+        try {
+            chatMessage.setSentAt(LocalDateTime.now());
+
+            ChatMessageDTO savedMessage = chatService.saveMessage(chatMessage);
+
+            messagingTemplate.convertAndSend("/topic/chatroom/" + savedMessage.getRoomId(), savedMessage);
+
+        } catch (Exception e) {
+            log.error("메시지 전송 및 저장 중 오류 발생: {}", chatMessage.toString(), e);
+        }
+
+        log.info("{}.sendMessage End!", this.getClass().getName());
+    }
+
+
     // 회원 메시지 보관 페이지
     @GetMapping("userListPage")
     public String userListPage() {
@@ -38,26 +57,6 @@ public class ChattingController {
         log.info("{}.userListPage End!", this.getClass().getName());
 
         return "chat/userList";
-    }
-
-    @MessageMapping("/chat.sendMessage")
-    public void sendMessage(ChatMessageDTO chatMessage) {
-        log.info("{}.sendMessage Start!", this.getClass().getName());
-
-        try {
-            chatMessage.setSentAt(LocalDateTime.now());
-
-            // [핵심 수정] 서비스로부터 isRead가 설정된 새로운 DTO를 반환받음
-            ChatMessageDTO savedMessage = chatService.saveMessage(chatMessage);
-
-            // 반환받은 'savedMessage' 객체를 브로드캐스팅
-            messagingTemplate.convertAndSend("/topic/chatroom/" + savedMessage.getRoomId(), savedMessage);
-
-        } catch (Exception e) {
-            log.error("메시지 전송 및 저장 중 오류 발생: {}", chatMessage.toString(), e);
-        }
-
-        log.info("{}.sendMessage End!", this.getClass().getName());
     }
 
 
@@ -236,12 +235,10 @@ public class ChattingController {
     public void readMessage(ChatMessageDTO readMessage) {
         log.info("{}.readMessage Start!", this.getClass().getName());
 
-        // --- [핵심 수정] readerId가 유효한지 반드시 확인 ---
         if (readMessage.getReaderId() == null || readMessage.getReaderId().isBlank() || readMessage.getReaderId().equals("null")) {
             log.warn("비정상적인 readerId를 수신하여 읽음 처리를 중단합니다. DTO: {}", readMessage.toString());
             return; // readerId가 없으면 아무 작업도 하지 않고 종료
         }
-        // --------------------------------------------------
 
         try {
             // 1. DB 업데이트: 서비스 로직을 호출
@@ -256,6 +253,7 @@ public class ChattingController {
 
         log.info("{}.readMessage End!", this.getClass().getName());
     }
+
 
     @GetMapping("/totalUnreadCount")
     @ResponseBody
