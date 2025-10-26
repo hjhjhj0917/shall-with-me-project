@@ -198,7 +198,7 @@
              LIMIT 1)         AS thumbnailUrl
         FROM SHARE_HOUSE sh
         WHERE sh.reg_id = #{value}
-            LIMIT 1
+        ORDER BY sh.reg_dt DESC
     </select>
 
     <!-- ✅ 쉐어하우스 삭제 (house_id 기준) -->

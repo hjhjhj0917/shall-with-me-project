@@ -246,28 +246,31 @@ public class SharehouseService implements ISharehouseService {
     }
 
     /**
-     * ✅ 본인의 쉐어하우스 조회 (userId 기준)
+     * ✅ 본인의 쉐어하우스 조회 (userId 기준) - 여러 개 조회
      */
     @Override
-    public SharehouseCardDTO getSharehouseByUserId(String userId) {
+    public List<SharehouseCardDTO> getSharehouseByUserId(String userId) {
         if (userId == null || userId.isBlank()) {
             log.warn("userId가 비어있습니다");
-            return null;
+            return Collections.emptyList();
         }
 
         log.info("본인 쉐어하우스 조회: userId={}", userId);
-        SharehouseCardDTO house = sharehouseMapper.getSharehouseByUserId(userId);
+        List<SharehouseCardDTO> houses = sharehouseMapper.getSharehouseByUserId(userId);
 
-        if (house != null) {
-            // 태그 정보도 함께 조회
-            List<UserTagDTO> tags = sharehouseMapper.selectSharehouseTags(house.getHouseId());
-            house.setTags(tags == null ? Collections.emptyList() : tags);
-            log.info("쉐어하우스 조회 성공: houseId={}", house.getHouseId());
+        if (houses != null && !houses.isEmpty()) {
+            // 각 쉐어하우스의 태그 정보도 함께 조회
+            for (SharehouseCardDTO house : houses) {
+                List<UserTagDTO> tags = sharehouseMapper.selectSharehouseTags(house.getHouseId());
+                house.setTags(tags == null ? Collections.emptyList() : tags);
+            }
+            log.info("쉐어하우스 {}개 조회 성공", houses.size());
         } else {
             log.info("등록된 쉐어하우스가 없습니다");
+            return Collections.emptyList();
         }
 
-        return house;
+        return houses;
     }
 
     /**

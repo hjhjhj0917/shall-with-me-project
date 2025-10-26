@@ -613,7 +613,7 @@ public class SharehouseController {
     }
 
     /**
-     * ✅ 본인의 쉐어하우스 정보 조회 API
+     * ✅ 본인의 쉐어하우스 정보 조회 API - 여러 개 조회
      */
     @GetMapping("/getMySharehouse")
     @ResponseBody
@@ -628,26 +628,32 @@ public class SharehouseController {
 
         try {
             log.info("본인 쉐어하우스 조회: userId={}", userId);
-            SharehouseCardDTO house = sharehouseService.getSharehouseByUserId(userId);
+            List<SharehouseCardDTO> houses = sharehouseService.getSharehouseByUserId(userId);
 
-            if (house != null) {
-                Map<String, Object> result = new HashMap<>();
-                result.put("houseId", house.getHouseId());
-                result.put("userId", house.getRegId());
-                result.put("name", house.getTitle());
-                result.put("profileImgUrl", house.getCoverUrl());
-                result.put("floorNumber", house.getFloorNumber());
+            if (houses != null && !houses.isEmpty()) {
+                List<Map<String, Object>> result = new ArrayList<>();
 
-                // 태그 정보 추가 (최대 3개)
-                List<UserTagDTO> tags = house.getTags();
-                if (tags != null && !tags.isEmpty()) {
-                    result.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
-                    result.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
-                    result.put("tag3", tags.size() > 2 ? tags.get(2).getTagName() : null);
+                for (SharehouseCardDTO house : houses) {
+                    Map<String, Object> houseMap = new HashMap<>();
+                    houseMap.put("houseId", house.getHouseId());
+                    houseMap.put("userId", house.getRegId());
+                    houseMap.put("name", house.getTitle());
+                    houseMap.put("profileImgUrl", house.getCoverUrl());
+                    houseMap.put("floorNumber", house.getFloorNumber());
+
+                    // 태그 정보 추가 (최대 3개)
+                    List<UserTagDTO> tags = house.getTags();
+                    if (tags != null && !tags.isEmpty()) {
+                        houseMap.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
+                        houseMap.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+                        houseMap.put("tag3", tags.size() > 2 ? tags.get(2).getTagName() : null);
+                    }
+
+                    result.add(houseMap);
                 }
 
-                log.info("쉐어하우스 조회 성공: houseId={}", house.getHouseId());
-                return ResponseEntity.ok(result);
+                log.info("쉐어하우스 {}개 조회 성공", houses.size());
+                return ResponseEntity.ok(Map.of("houses", result));
             } else {
                 log.info("등록된 쉐어하우스가 없음");
                 return ResponseEntity.ok(Map.of("message", "등록된 쉐어하우스가 없습니다."));
