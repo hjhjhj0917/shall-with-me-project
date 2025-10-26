@@ -596,4 +596,129 @@ public class SharehouseController {
         return "SharehouseController is working!";
     }
 
+    /**
+     * ✅ 쉐어하우스 정보 수정 페이지 이동
+     */
+    @GetMapping("/mypage/sharehouseModify")
+    public String sharehouseModifyPage(HttpSession session, org.springframework.ui.Model model) {
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        if (userId == null || userId.isBlank()) {
+            log.warn("로그인되지 않은 사용자");
+            return "redirect:/user/login";
+        }
+
+        log.info("쉐어하우스 수정 페이지 접근: userId={}", userId);
+        return "mypage/sharehouseModify";
+    }
+
+    /**
+     * ✅ 본인의 쉐어하우스 정보 조회 API
+     */
+    @GetMapping("/getMySharehouse")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getMySharehouse(HttpSession session) {
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        if (userId == null || userId.isBlank()) {
+            log.warn("로그인되지 않은 사용자");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "로그인이 필요합니다."));
+        }
+
+        try {
+            log.info("본인 쉐어하우스 조회: userId={}", userId);
+            SharehouseCardDTO house = sharehouseService.getSharehouseByUserId(userId);
+
+            if (house != null) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("houseId", house.getHouseId());
+                result.put("userId", house.getRegId());
+                result.put("name", house.getTitle());
+                result.put("profileImgUrl", house.getCoverUrl());
+                result.put("floorNumber", house.getFloorNumber());
+
+                // 태그 정보 추가 (최대 3개)
+                List<UserTagDTO> tags = house.getTags();
+                if (tags != null && !tags.isEmpty()) {
+                    result.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
+                    result.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+                    result.put("tag3", tags.size() > 2 ? tags.get(2).getTagName() : null);
+                }
+
+                log.info("쉐어하우스 조회 성공: houseId={}", house.getHouseId());
+                return ResponseEntity.ok(result);
+            } else {
+                log.info("등록된 쉐어하우스가 없음");
+                return ResponseEntity.ok(Map.of("message", "등록된 쉐어하우스가 없습니다."));
+            }
+
+        } catch (Exception e) {
+            log.error("쉐어하우스 조회 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "조회 실패"));
+        }
+    }
+
+    /**
+     * ✅ 쉐어하우스 삭제 API
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteSharehouse(
+            @RequestParam("houseId") Long houseId,
+            HttpSession session) {
+
+        Map<String, Object> result = new HashMap<>();
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        if (userId == null || userId.isBlank()) {
+            log.warn("로그인되지 않은 사용자");
+            result.put("success", false);
+            result.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+
+        try {
+            log.info("쉐어하우스 삭제 요청: houseId={}, userId={}", houseId, userId);
+
+            // 본인의 쉐어하우스인지 확인
+            SharehouseCardDTO house = sharehouseService.getCardById(houseId);
+
+            if (house == null) {
+                log.warn("존재하지 않는 쉐어하우스: houseId={}", houseId);
+                result.put("success", false);
+                result.put("message", "존재하지 않는 쉐어하우스입니다.");
+                return ResponseEntity.ok(result);
+            }
+
+            if (!house.getRegId().equals(userId)) {
+                log.warn("권한 없음: houseId={}, regId={}, userId={}", houseId, house.getRegId(), userId);
+                result.put("success", false);
+                result.put("message", "본인의 쉐어하우스만 삭제할 수 있습니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(result);
+            }
+
+            // 삭제 실행
+            boolean deleted = sharehouseService.deleteSharehouse(houseId);
+
+            if (deleted) {
+                log.info("✅ 쉐어하우스 삭제 성공: houseId={}", houseId);
+                result.put("success", true);
+                result.put("message", "삭제되었습니다.");
+            } else {
+                log.warn("⚠️ 쉐어하우스 삭제 실패: houseId={}", houseId);
+                result.put("success", false);
+                result.put("message", "삭제에 실패했습니다.");
+            }
+
+        } catch (Exception e) {
+            log.error("❌ 쉐어하우스 삭제 중 오류 발생", e);
+            result.put("success", false);
+            result.put("message", "삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+
+        return ResponseEntity.ok(result);
+    }
 }

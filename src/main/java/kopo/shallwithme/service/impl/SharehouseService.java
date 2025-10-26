@@ -244,4 +244,69 @@ public class SharehouseService implements ISharehouseService {
 
         return result;
     }
+
+    /**
+     * ✅ 본인의 쉐어하우스 조회 (userId 기준)
+     */
+    @Override
+    public SharehouseCardDTO getSharehouseByUserId(String userId) {
+        if (userId == null || userId.isBlank()) {
+            log.warn("userId가 비어있습니다");
+            return null;
+        }
+
+        log.info("본인 쉐어하우스 조회: userId={}", userId);
+        SharehouseCardDTO house = sharehouseMapper.getSharehouseByUserId(userId);
+
+        if (house != null) {
+            // 태그 정보도 함께 조회
+            List<UserTagDTO> tags = sharehouseMapper.selectSharehouseTags(house.getHouseId());
+            house.setTags(tags == null ? Collections.emptyList() : tags);
+            log.info("쉐어하우스 조회 성공: houseId={}", house.getHouseId());
+        } else {
+            log.info("등록된 쉐어하우스가 없습니다");
+        }
+
+        return house;
+    }
+
+    /**
+     * ✅ 쉐어하우스 삭제 (태그, 이미지 포함 - 트랜잭션 처리)
+     */
+    @Override
+    @Transactional
+    public boolean deleteSharehouse(Long houseId) {
+        if (houseId == null) {
+            log.warn("houseId가 null입니다");
+            return false;
+        }
+
+        try {
+            log.info("=== 쉐어하우스 삭제 시작: houseId={} ===", houseId);
+
+            // 1. 태그 삭제
+            int deletedTags = sharehouseMapper.deleteSharehouseTags(houseId);
+            log.info("태그 {}개 삭제됨", deletedTags);
+
+            // 2. 이미지 삭제
+            int deletedImages = sharehouseMapper.deleteSharehouseImages(houseId);
+            log.info("이미지 {}개 삭제됨", deletedImages);
+
+            // 3. 쉐어하우스 메인 정보 삭제
+            int deletedHouse = sharehouseMapper.deleteSharehouse(houseId);
+            log.info("쉐어하우스 삭제 결과: {}", deletedHouse);
+
+            if (deletedHouse > 0) {
+                log.info("✅ 쉐어하우스 삭제 완료: houseId={}", houseId);
+                return true;
+            } else {
+                log.warn("⚠️ 쉐어하우스 삭제 실패 (대상 없음): houseId={}", houseId);
+                return false;
+            }
+
+        } catch (Exception e) {
+            log.error("❌ 쉐어하우스 삭제 중 오류 발생: houseId={}", houseId, e);
+            throw new RuntimeException("쉐어하우스 삭제 실패", e);
+        }
+    }
 }

@@ -37,4 +37,13 @@ public interface ISharehouseMapper {
 
     // ✅ 태그 삭제 (수정 시 사용)
     int deleteSharehouseTags(Long houseId);
+
+    // ✅ 본인의 쉐어하우스 조회 (regId 기준)
+    SharehouseCardDTO getSharehouseByUserId(String userId);
+
+    // ✅ 쉐어하우스 삭제
+    int deleteSharehouse(Long houseId);
+
+    // ✅ 쉐어하우스 이미지 삭제
+    int deleteSharehouseImages(Long houseId);
 }

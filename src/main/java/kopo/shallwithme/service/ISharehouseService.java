@@ -37,4 +37,10 @@ public interface ISharehouseService {
 
     // ✅ 태그 저장 (룸메이트와 동일한 방식)
     int saveSharehouseTags(Long houseId, List<Integer> tagList);
+
+    // ✅ 본인의 쉐어하우스 조회 (userId 기준)
+    SharehouseCardDTO getSharehouseByUserId(String userId);
+
+    // ✅ 쉐어하우스 삭제 (태그, 이미지 포함)
+    boolean deleteSharehouse(Long houseId);
 }

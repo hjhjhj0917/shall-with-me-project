@@ -51,7 +51,7 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- 단건 카드 + ✅ floor_number + ADDRESS, DETAIL_ADDRESS 추가 -->
+    <!-- 단건 카드 + ✅ floor_number + ADDRESS, DETAIL_ADDRESS + reg_id 추가 -->
     <select id="getCardById"
             parameterType="long"
             resultType="kopo.shallwithme.dto.SharehouseCardDTO">
@@ -62,6 +62,7 @@
             sh.ADDRESS       AS address,
             sh.DETAIL_ADDRESS AS detailAddress,
             sh.floor_number  AS floorNumber,
+            sh.reg_id        AS regId,
             (SELECT shi.url
              FROM SHARE_HOUSE_IMAGE shi
              WHERE shi.house_id = sh.house_id
@@ -170,6 +171,45 @@
     <!-- ✅ 기존 태그 삭제 -->
     <delete id="deleteSharehouseTags" parameterType="long">
         DELETE FROM SHARE_HOUSE_TAG
+        WHERE house_id = #{value}
+    </delete>
+
+    <!-- ✅ 본인의 쉐어하우스 조회 (regId 기준) -->
+    <select id="getSharehouseByUserId"
+            parameterType="string"
+            resultType="kopo.shallwithme.dto.SharehouseCardDTO">
+        SELECT
+            sh.house_id       AS houseId,
+            sh.house_name     AS title,
+            sh.description    AS subText,
+            sh.ADDRESS        AS address,
+            sh.DETAIL_ADDRESS AS detailAddress,
+            sh.floor_number   AS floorNumber,
+            sh.reg_id         AS regId,
+            (SELECT shi.url
+             FROM SHARE_HOUSE_IMAGE shi
+             WHERE shi.house_id = sh.house_id
+             ORDER BY shi.sort_order ASC, shi.img_id ASC
+                                 LIMIT 1)         AS coverUrl,
+            (SELECT shi.url
+             FROM SHARE_HOUSE_IMAGE shi
+             WHERE shi.house_id = sh.house_id
+             ORDER BY shi.sort_order ASC, shi.img_id ASC
+             LIMIT 1)         AS thumbnailUrl
+        FROM SHARE_HOUSE sh
+        WHERE sh.reg_id = #{value}
+            LIMIT 1
+    </select>
+
+    <!-- ✅ 쉐어하우스 삭제 (house_id 기준) -->
+    <delete id="deleteSharehouse" parameterType="long">
+        DELETE FROM SHARE_HOUSE
+        WHERE house_id = #{value}
+    </delete>
+
+    <!-- ✅ 쉐어하우스 이미지 삭제 (house_id 기준) -->
+    <delete id="deleteSharehouseImages" parameterType="long">
+        DELETE FROM SHARE_HOUSE_IMAGE
         WHERE house_id = #{value}
     </delete>
 
