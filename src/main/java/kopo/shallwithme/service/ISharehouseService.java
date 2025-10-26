@@ -11,8 +11,8 @@ public interface ISharehouseService {
     List<SharehouseCardDTO> listCards(
             int offset,
             int limit,
-            String city,
-            Integer minRent,
+            String location,
+            List<Integer> tagIds,
             Integer maxRent
     );
 

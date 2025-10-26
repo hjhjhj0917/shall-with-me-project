@@ -1,7 +1,7 @@
 /* ============== 등록 페이지(iframe 내부) ============== */
 
 /* 컨테이너 */
-.roommate-container{
+.roommate-container {
     width: 100%;
     max-width: none;
     padding: 16px 12px;
@@ -9,12 +9,13 @@
 }
 
 /* 폼 레이아웃 */
-#roommateForm{
+#roommateForm {
     display: flex;
     gap: 20px;
     width: 100%;
 }
-.roommate-left{
+
+.roommate-left {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -25,37 +26,53 @@
     flex: 1 1 100%;
     max-width: 100%;
 }
-@media (max-width:1100px){
-    #roommateForm{ flex-direction: column; }
-    .roommate-left{ min-height: 520px; }
+
+@media (max-width: 1100px) {
+    #roommateForm {
+        flex-direction: column;
+    }
+
+    .roommate-left {
+        min-height: 520px;
+    }
 }
 
 /* 폼 공통 */
-.form-group{ margin-bottom: 32px; }
-.form-group label{
+.form-group {
+    margin-bottom: 32px;
+}
+
+.form-group label {
     display: block;
     font-weight: 600;
     margin-bottom: 12px;
 }
 
 /* 업로더(좌) + 태그패널(우) */
-.sh-top-row{
+.sh-top-row {
     display: grid;
-    grid-template-columns: minmax(0,1fr) 280px;
+    grid-template-columns: minmax(0, 1fr) 280px;
     align-items: stretch;
     gap: 16px;
     margin-bottom: 20px;
 }
-.sh-top-row > *{ min-width: 0; }
+
+.sh-top-row > * {
+    min-width: 0;
+}
 
 /* Safari 대비(선택): 왼쪽 그리드도 줄어들 수 있게 */
-.sh-top-row > .sh-uploader-5{ min-height: 0; }
+.sh-top-row > .sh-uploader-5 {
+    min-height: 0;
+}
 
-@media (max-width:1200px){
-    .sh-top-row{ grid-template-columns: 1fr; }
+@media (max-width: 1200px) {
+    .sh-top-row {
+        grid-template-columns: 1fr;
+    }
 
     /* 모바일에선 패널을 자연 높이로 */
-    .inline-tag-panel.inline-right{
+    .inline-tag-panel.inline-right {
         position: static;
         align-self: auto;
         height: auto;
@@ -65,36 +82,40 @@
 }
 
 /* 태그 패널(우) */
-.inline-tag-panel.inline-right{
+.inline-tag-panel.inline-right {
     background: #fff;
     border: 1px solid #e9eef7;
     border-radius: 14px;
     padding: 14px;
-    box-shadow: 0 4px 14px rgba(17,24,39,.06);
-    position: relative;        /* sticky 해제 */
+    box-shadow: 0 4px 14px rgba(17, 24, 39, .06);
+    position: relative; /* sticky 해제 */
     align-self: stretch;
-    height: 100%;              /* 그리드 셀 높이를 꽉 채움 */
+    height: 100%; /* 그리드 셀 높이를 꽉 채움 */
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: auto;            /* 내용 많으면 내부 스크롤 */
+    overflow: auto; /* 내용 많으면 내부 스크롤 */
 }
-.inline-tag-title{
+
+.inline-tag-title {
     font-weight: 800;
     font-size: 15px;
     margin-bottom: 10px;
 }
-.inline-tag-list{
+
+.inline-tag-list {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     min-height: 36px;
 }
-.inline-tag-empty{
+
+.inline-tag-empty {
     color: #9aa1ac;
     font-size: 13px;
 }
-.tag-pill{
+
+.tag-pill {
     font-size: 12px;
     line-height: 1;
     padding: 6px 10px;
@@ -106,10 +127,10 @@
 
 /* ============== ✅ 4장 업로드 + 안내 영역 ============== */
 /* 4×2 그리드: A(대표 2칸 높이) + B,C,D(업로드) + E(안내) */
-.roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5{
+.roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5 {
     display: grid;
-    grid-template-columns: repeat(4,1fr);
-    grid-template-rows: repeat(2,1fr);
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     grid-template-areas:
     "A A B C"
     "A A D E";
@@ -120,7 +141,7 @@
 }
 
 /* 카드 공통 */
-.sh-uploader-5 > .uploader{
+.sh-uploader-5 > .uploader {
     position: relative;
     display: grid;
     place-items: center;
@@ -130,12 +151,13 @@
     height: auto;
     border: 1.5px dashed #d7deea;
     border-radius: 16px;
-    background: linear-gradient(180deg,#fafcff 0%,#f7fbff 100%);
-    box-shadow: 0 4px 16px rgba(17,24,39,.04);
+    background: linear-gradient(180deg, #fafcff 0%, #f7fbff 100%);
+    box-shadow: 0 4px 16px rgba(17, 24, 39, .04);
     overflow: hidden;
     cursor: pointer;
 }
-.sh-uploader-5 > .uploader .preview{
+
+.sh-uploader-5 > .uploader .preview {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -146,22 +168,27 @@
 }
 
 /* ✅ 위치 지정 (A~D만 업로드, E는 안내 영역) */
-.sh-uploader-5 > .uploader:nth-of-type(1){
+.sh-uploader-5 > .uploader:nth-of-type(1) {
     grid-area: A;
     border-radius: 16px 0 0 16px;
 }
-.sh-uploader-5 > .uploader:nth-of-type(2){ grid-area: B; }
-.sh-uploader-5 > .uploader:nth-of-type(3){
+
+.sh-uploader-5 > .uploader:nth-of-type(2) {
+    grid-area: B;
+}
+
+.sh-uploader-5 > .uploader:nth-of-type(3) {
     grid-area: C;
     border-top-right-radius: 16px;
 }
-.sh-uploader-5 > .uploader:nth-of-type(4){
+
+.sh-uploader-5 > .uploader:nth-of-type(4) {
     grid-area: D;
     border-bottom-left-radius: 0;
 }
 
 /* ✅ 5번째 칸: 안내 영역 (업로드 불가) */
-.sh-uploader-5 > .upload-notice-box{
+.sh-uploader-5 > .upload-notice-box {
     grid-area: E;
     position: relative;
     display: flex;
@@ -200,8 +227,14 @@
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
 }
 
 /* 텍스트 */
@@ -233,9 +266,9 @@
 }
 
 /* 모바일(≤1200px) : 대표 16:9 + 아래 2×2 */
-@media (max-width:1200px){
-    .roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5{
-        grid-template-columns: repeat(2,1fr);
+@media (max-width: 1200px) {
+    .roommate-container .sh-modal-body.sh-reg .sh-top-row > .sh-uploader-5 {
+        grid-template-columns: repeat(2, 1fr);
         grid-template-rows: auto;
         grid-template-areas:
       "A A"
@@ -243,16 +276,18 @@
       "D E";
         aspect-ratio: auto;
     }
-    .sh-uploader-5 > .uploader:nth-of-type(1){
+
+    .sh-uploader-5 > .uploader:nth-of-type(1) {
         aspect-ratio: 16/9;
         border-radius: 16px;
     }
-    .sh-uploader-5 > .uploader:nth-of-type(n+2):nth-of-type(-n+4){
+
+    .sh-uploader-5 > .uploader:nth-of-type(n+2):nth-of-type(-n+4) {
         aspect-ratio: 1/1;
     }
 
     /* 모바일에서 안내 박스 크기 조정 */
-    .sh-uploader-5 > .upload-notice-box{
+    .sh-uploader-5 > .upload-notice-box {
         aspect-ratio: 1/1;
         border-bottom-right-radius: 16px;
     }
@@ -271,55 +306,78 @@
 }
 
 /* 소개글 */
-.sh-reg-intro{
+.sh-reg-intro {
     grid-column: 1 / -1;
     margin-top: 18px;
 }
 
 /* 소개 textarea — 태그패널과 동일 룩 */
-#introTextarea{
+#introTextarea {
     display: block;
     width: 100%;
     max-width: 100%;
     min-height: 180px;
     padding: 14px 16px;
-    border: 1px solid #e9eef7;            /* 태그패널과 동일 */
-    border-radius: 14px;                   /* 태그패널과 동일 */
+    border: 1px solid #e9eef7; /* 태그패널과 동일 */
+    border-radius: 14px; /* 태그패널과 동일 */
     background: #fff;
-    box-shadow: 0 4px 14px rgba(17,24,39,.06); /* 태그패널과 동일 */
-    resize: vertical;                      /* 세로로만 리사이즈 */
+    box-shadow: 0 4px 14px rgba(17, 24, 39, .06); /* 태그패널과 동일 */
+    resize: vertical; /* 세로로만 리사이즈 */
 }
-#introTextarea:focus{
+
+#introTextarea:focus {
     outline: 2px solid #98b7ff;
     outline-offset: 0;
     border-color: #a9c4ff;
-    box-shadow: 0 6px 18px rgba(17,24,39,.08);
+    box-shadow: 0 6px 18px rgba(17, 24, 39, .08);
 }
-#introTextarea::placeholder{ color:#9aa1ac; }
+
+#introTextarea::placeholder {
+    color: #9aa1ac;
+}
 
 /* 공통 버튼 */
-.btn{
-    appearance:none;
-    border:0;
-    cursor:pointer;
-    padding:10px 18px;
-    border-radius:10px;
-    font-weight:600;
-    box-shadow:0 2px 8px rgba(17,24,39,.08);
-    transition:transform .08s ease, filter .15s ease;
+.btn {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(17, 24, 39, .08);
+    transition: transform .08s ease, filter .15s ease;
 }
-.btn:active{ transform:translateY(1px); }
 
-.btn-cancel{ background:#f3f5f9; color:#475569; }
-.btn-primary{ background:#3399ff; color:#fff; }
-.btn-primary:hover{ filter:brightness(1.03); }
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-cancel {
+    background-color: white;
+    color: #9aa1ac;
+    border-radius: 40px;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: white;
+    color: #3399ff;
+    border-radius: 40px;
+    border: 2px solid #E5F2FF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.03);
+}
 
 /* 액션바: 선 없이 버튼만 가운데 정렬 */
-.sh-reg-actions{
+.sh-reg-actions {
     display: flex;
     justify-content: center; /* 가운대로 */
     gap: 10px;
-    padding: 8px 0 0;        /* 살짝 위 여백만 */
-    margin-top: 12px;        /* 위 요소와 간격 */
-    border: 0;               /* 선 제거 */
+    padding: 8px 0 0; /* 살짝 위 여백만 */
+    margin-top: 12px; /* 위 요소와 간격 */
+    border: 0; /* 선 제거 */
 }

@@ -354,12 +354,17 @@ public class SharehouseController {
     @ResponseBody
     public Map<String, Object> list(
             @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "15") int pageSize) {
+            @RequestParam(defaultValue = "15") int pageSize,
+            @RequestParam(required = false) String location,
+            @RequestParam(value = "tagIds", required = false) List<Integer> tagIds
+    ) {
 
         log.info("=== 쉐어하우스 목록 조회 ===");
         log.info("offset: {}, pageSize: {}", offset, pageSize);
+        log.info("location: {}", location);
+        log.info("tagIds: {}", tagIds);
 
-        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
+        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, location, tagIds, null);
 
         List<Map<String, Object>> items = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();

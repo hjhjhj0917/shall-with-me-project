@@ -342,24 +342,12 @@
         const $scrollArea = $(".sh-scroll-area");
 
         const tagGroups = [
-            {key: "lifePattern", title: "생활패턴", icon: "fa-solid fa-sun", tags: [1, 2]},
-            {key: "activity", title: "활동범위", icon: "fa-solid fa-map-location-dot", tags: [3, 4]},
-            {key: "job", title: "직업", icon: "fa-solid fa-briefcase", tags: [5, 6, 7]},
-            {key: "workTime", title: "퇴근 시간", icon: "fa-solid fa-business-time", tags: [8, 9, 10]},
-            {key: "guest", title: "손님초대", icon: "fa-solid fa-door-open", tags: [11, 12]},
-            {key: "share", title: "물건공유", icon: "fa-solid fa-handshake", tags: [13, 14]},
-            {key: "personality", title: "성격", icon: "fa-solid fa-face-smile", tags: [15, 16]},
-            {key: "prefer", title: "선호하는 성격", icon: "fa-solid fa-heart", tags: [17, 18]},
-            {key: "conversation", title: "대화", icon: "fa-solid fa-comments", tags: [19, 20]},
-            {key: "conflict", title: "갈등", icon: "fa-solid fa-people-arrows", tags: [21, 22]},
-            {key: "cook", title: "요리", icon: "fa-solid fa-utensils", tags: [23, 24, 25]},
-            {key: "food", title: "주식", icon: "fa-solid fa-bowl-food", tags: [26, 27, 28]},
-            {key: "meal", title: "라니", icon: "fa-solid fa-calendar-day", tags: [29, 30, 31]},
-            {key: "smell", title: "음식 냄새", icon: "fa-solid fa-wind", tags: [32, 33]},
-            {key: "clean", title: "청결", icon: "fa-solid fa-broom", tags: [34, 35, 36]},
-            {key: "cleanCircle", title: "청소 주기", icon: "fa-solid fa-broom", tags: [37, 38, 39]},
-            {key: "garbage", title: "쓰레기 배출", icon: "fa-solid fa-trash-can", tags: [40, 41]},
-            {key: "dishWash", title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
+            {key: "toilet", title: "화장실", icon: "fa-solid fa-toilet", tags: [1, 2]},
+            {key: "refrigerator", title: "냉장고", icon: "fa-solid fa-door-closed", tags: [3, 4]},
+            {key: "washing", title: "세탁기", icon: "fa-solid fa-water", tags: [5, 6]},
+            {key: "elevator", title: "엘리베이터", icon: "fa-solid fa-elevator", tags: [7, 8]},
+            {key: "convenience", title: "편의 시설", icon: "fa-solid fa-hospital", tags: [9, 10, 11]},
+            {key: "parking", title: "주차공간", icon: "fa-solid fa-square-parking", tags: [12, 13]}
         ];
 
         // --- 초기화 및 이벤트 핸들러 ---

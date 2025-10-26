@@ -10,25 +10,45 @@
             parameterType="map"
             resultType="kopo.shallwithme.dto.SharehouseCardDTO">
         SELECT
-            sh.house_id      AS houseId,
-            sh.house_name    AS title,
-            sh.description   AS subText,
-            sh.ADDRESS       AS address,
-            sh.DETAIL_ADDRESS AS detailAddress,
-            sh.floor_number  AS floorNumber,
-            (SELECT shi.url
-             FROM SHARE_HOUSE_IMAGE shi
-             WHERE shi.house_id = sh.house_id
-             ORDER BY shi.sort_order ASC, shi.img_id ASC
-                LIMIT 1)        AS coverUrl,
-            (SELECT shi.url
-             FROM SHARE_HOUSE_IMAGE shi
-             WHERE shi.house_id = sh.house_id
-             ORDER BY shi.sort_order ASC, shi.img_id ASC
-             LIMIT 1)        AS thumbnailUrl
+        sh.house_id      AS houseId,
+        sh.house_name    AS title,
+        sh.description   AS subText,
+        sh.ADDRESS       AS address,
+        sh.DETAIL_ADDRESS AS detailAddress,
+        sh.floor_number  AS floorNumber,
+        (SELECT shi.url
+        FROM SHARE_HOUSE_IMAGE shi
+        WHERE shi.house_id = sh.house_id
+        ORDER BY shi.sort_order ASC, shi.img_id ASC
+        LIMIT 1)        AS coverUrl,
+        (SELECT shi.url
+        FROM SHARE_HOUSE_IMAGE shi
+        WHERE shi.house_id = sh.house_id
+        ORDER BY shi.sort_order ASC, shi.img_id ASC
+        LIMIT 1)        AS thumbnailUrl
         FROM SHARE_HOUSE sh
+
+        <where>
+            <if test="location != null and location != ''">
+                sh.ADDRESS LIKE CONCAT('%', SUBSTRING(#{location}, 1, 2), '%')
+            </if>
+
+            <if test="tagIds != null and tagIds.size() > 0">
+                AND sh.house_id IN (
+                SELECT sht.house_id
+                FROM SHARE_HOUSE_TAG sht
+                WHERE sht.house_tag_id IN
+                <foreach collection="tagIds" item="tagId" open="(" separator="," close=")">
+                    #{tagId}
+                </foreach>
+                GROUP BY sht.house_id
+                HAVING COUNT(DISTINCT sht.house_tag_id) = #{tagIdsSize}
+                )
+            </if>
+        </where>
+
         ORDER BY sh.reg_dt DESC
-            LIMIT #{limit} OFFSET #{offset}
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <!-- 단건 카드 + ✅ floor_number + ADDRESS, DETAIL_ADDRESS 추가 -->
