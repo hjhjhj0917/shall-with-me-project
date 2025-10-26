@@ -23,15 +23,34 @@ public class SharehouseService implements ISharehouseService {
     private final ISharehouseImageMapper imageMapper;
 
     @Override
-    public List<SharehouseCardDTO> listCards(int offset, int limit, String city, Integer minRent, Integer maxRent) {
+    public List<SharehouseCardDTO> listCards(int offset, int limit, String location, List<Integer> tagIds, Integer maxRent) {
+        log.info("{}.listCards Start!", this.getClass().getName());
+
         Map<String, Object> p = new HashMap<>();
         p.put("offset", Math.max(0, offset));
         p.put("limit", Math.max(1, limit));
+
+        if (location != null && !location.isBlank()) {
+            p.put("location", location);
+        }
+        if (tagIds != null && !tagIds.isEmpty()) {
+            p.put("tagIds", tagIds);
+        }
+        if (tagIds != null && !tagIds.isEmpty()) {
+            p.put("tagIds", tagIds);
+            p.put("tagIdsSize", tagIds.size());
+        }
+
+        log.info("SharehouseService.listCards 쿼리 파라미터: {}", p);
+
         List<SharehouseCardDTO> cards = sharehouseMapper.listCards(p);
         for (SharehouseCardDTO c : cards) {
             List<UserTagDTO> tags = sharehouseMapper.selectSharehouseTags(c.getHouseId());
             c.setTags(tags == null ? Collections.emptyList() : tags);
         }
+
+        log.info("{}.listCards End!", this.getClass().getName());
+
         return cards;
     }
 
