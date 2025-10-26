@@ -251,7 +251,6 @@
         });
     }
 
-    // [최종] 메시지 전송 함수
     function sendMessage() {
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
@@ -274,6 +273,7 @@
 
         messageInput.value = '';
     }
+
 
     // [최종] appendMessage 함수를 이 코드로 전체 교체해주세요.
     function appendMessage(msg) {
