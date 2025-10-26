@@ -212,7 +212,7 @@
             typing();
         }
 
-        // 메시지 전송
+
         function sendMessage() {
             const question = inputEl.val().trim();
             if (!question) return;
@@ -228,7 +228,6 @@
                 contentType: "application/json",
                 data: JSON.stringify({question: question}),
                 success: function (response) {
-                    // 수정된 typeWriter 함수를 호출합니다.
                     typeWriter(typingIndicator, response.answer);
                 },
                 error: function () {
@@ -236,6 +235,7 @@
                 }
             });
         }
+
 
         sendBtn.on("click", sendMessage);
         inputEl.on("keypress", (e) => {
