@@ -457,12 +457,12 @@
                     return;
                 }
                 if (!f.type.startsWith('image/')) {
-                    alert('이미지 파일만 업로드 가능합니다.');
+                    showCustomAlert('이미지 파일만 업로드 가능합니다.');
                     input.value = '';
                     return;
                 }
                 if (f.size > 10 * 1024 * 1024) {
-                    alert('최대 10MB까지만 업로드 가능합니다.');
+                    showCustomAlert('최대 10MB까지만 업로드 가능합니다.');
                     input.value = '';
                     return;
                 }
@@ -547,7 +547,7 @@
         const input = document.getElementById('floorInput');
         const floorNum = parseInt(input.value);
         if (isNaN(floorNum) || floorNum < 1 || floorNum > 99) {
-            alert('1층부터 99층까지 입력 가능합니다.');
+            showCustomAlert('1층부터 99층까지 입력 가능합니다.');
             return;
         }
         document.getElementById('floorNumber').value = floorNum;
@@ -575,24 +575,24 @@
 
             const houseName = document.getElementById('houseName')?.value?.trim();
             if (!houseName) {
-                alert('쉐어하우스 이름을 입력해 주세요.');
+                showCustomAlert('쉐어하우스 이름을 입력해 주세요.');
                 document.getElementById('houseName')?.focus();
                 return;
             }
             if (houseName.length > 20) {
-                alert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.');
+                showCustomAlert('쉐어하우스 이름은 최대 20자까지 입력 가능합니다.');
                 return;
             }
 
             const tagIds = JSON.parse(document.getElementById('selectedTagIds').value || '[]');
             if (tagIds.length !== 6) {
-                alert('태그를 정확히 6개 선택해주세요.');
+                showCustomAlert('태그를 정확히 6개 선택해주세요.');
                 return;
             }
 
             const floorNum = document.getElementById('floorNumber').value;
             if (!floorNum || floorNum === '') {
-                alert('층수를 입력해주세요.');
+                showCustomAlert('층수를 입력해주세요.');
                 return;
             }
 
@@ -600,25 +600,25 @@
             const addr2 = document.getElementById('addr2').value.trim();
 
             if (!addr1) {
-                alert('주소를 입력해주세요. "우편번호 찾기" 버튼을 클릭하세요.');
+                showCustomAlert('주소를 입력해주세요. "우편번호 찾기" 버튼을 클릭하세요.');
                 return;
             }
 
             if (!addr2) {
-                alert('상세주소를 입력해주세요.');
+                showCustomAlert('상세주소를 입력해주세요.');
                 document.getElementById('addr2').focus();
                 return;
             }
 
             const thumb = form.querySelector('input[name="thumbnail"]')?.files?.[0];
             if (!thumb) {
-                alert('대표 이미지를 선택해 주세요.');
+                showCustomAlert('대표 이미지를 선택해 주세요.');
                 return;
             }
 
             const imgs = [...form.querySelectorAll('input[name="images"]')].map(i => i.files?.[0]).filter(Boolean);
             if (imgs.length < 1) {
-                alert('추가 이미지를 최소 1장 선택해 주세요.');
+                showCustomAlert('추가 이미지를 최소 1장 선택해 주세요.');
                 return;
             }
 
@@ -657,12 +657,12 @@
                 }
 
                 if (res.status === 0 || res.type === 'opaqueredirect') {
-                    alert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.');
+                    showCustomAlert('저장 실패 (redirect/CORS 가능성)\n로그인 리다이렉트 또는 CORS 설정을 확인해 주세요.');
                     return;
                 }
                 if (!res.ok) {
                     const text = (json && json.msg) || (await res.text().catch(() => '')) || '서버 오류';
-                    alert(`저장 실패 (${res.status})\n${text}`);
+                    showCustomAlert(`저장 실패 (${res.status})\n${text}`);
                     return;
                 }
 
@@ -678,11 +678,11 @@
                     }
                     if (window === window.parent) location.href = '/sharehouse/main';
                 } else {
-                    alert(json.msg || '저장에 실패했습니다.');
+                    showCustomAlert(json.msg || '저장에 실패했습니다.');
                 }
             } catch (err) {
                 console.error(err);
-                alert('서버 통신 중 오류가 발생했습니다.');
+                showCustomAlert('서버 통신 중 오류가 발생했습니다.');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '저장';
@@ -723,7 +723,7 @@
                 } else if (typeof $ !== 'undefined' && $('#tagSelectModalOverlay').length) {
                     $('#tagSelectModalOverlay').show();
                 } else {
-                    alert('태그 선택 모달 스크립트를 찾지 못했습니다. sharehouseTagSelect.jsp를 확인하세요.');
+                    showCustomAlert('태그 선택 모달 스크립트를 찾지 못했습니다. sharehouseTagSelect.jsp를 확인하세요.');
                 }
             });
         }

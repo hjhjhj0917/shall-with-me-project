@@ -798,7 +798,7 @@
                         });
                     },
                     error: function(err) {
-                        alert("일정 저장에 실패했습니다.");
+                        showCustomAlert("일정 저장에 실패했습니다.");
                     }
                 });
             });

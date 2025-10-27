@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseDetail.css"/>
     <!-- ✅ 카카오맵 API 추가 (여기에 팀원의 실제 API 키를 입력하세요) -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=218d70914021664c1d8e3dc194489251&libraries=services"></script>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <style>
         /* 작성자 프로필 스타일 */
         .host-profile {
@@ -268,6 +269,7 @@
     </section>
 </main>
 
+<%@ include file="../includes/customModal.jsp" %>
 <%@ include file="../includes/footer.jsp" %>
 
 <script>
@@ -278,7 +280,7 @@
 
         // null 체크 강화
         if (!hostId || hostId === 'null' || hostId === '' || hostId === 'undefined') {
-            alert('작성자 정보를 찾을 수 없습니다.');
+            showCustomAlert('작성자 정보를 찾을 수 없습니다.');
             return;
         }
 
@@ -294,12 +296,12 @@
                 if (data.roomId) {
                     window.location.href = '/chat/chatRoom?roomId=' + Number(data.roomId);
                 } else {
-                    alert('채팅방 생성에 실패했습니다.');
+                    showCustomAlert('채팅방 생성에 실패했습니다.');
                 }
             })
             .catch(error => {
                 console.error('채팅방 생성 중 오류:', error);
-                alert('채팅 연결에 실패했습니다.');
+                showCustomAlert('채팅 연결에 실패했습니다.');
             });
     }
 
@@ -374,6 +376,18 @@
         }
     });
 </script>
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
+    }
+%>
+<script>
+    const userName = "<%= ssUserName %>";
+</script>
+
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
+<script src="${pageContext.request.contextPath}/js/navbar.js"></script>
 
 </body>
 </html>

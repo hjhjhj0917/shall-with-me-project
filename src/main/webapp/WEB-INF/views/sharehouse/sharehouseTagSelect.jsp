@@ -208,7 +208,7 @@
                 selectedTags.delete(id);
               } else {
                 if (selectedTags.size >= MAX) {
-                  alert('최대 3개까지만 선택할 수 있습니다.');
+                  showCustomAlert('최대 3개까지만 선택할 수 있습니다.');
                   return;
                 }
                 $(this).addClass('selected');

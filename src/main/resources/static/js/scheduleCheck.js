@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#step2').show();
 
         const selectedEvent = window.lastClickedEvent;
-        if (!selectedEvent) return alert("수정할 이벤트가 없습니다.");
+        if (!selectedEvent) return showCustomAlert("수정할 이벤트가 없습니다.");
 
         const original = selectedEvent.extendedProps.originalEvent;
 
