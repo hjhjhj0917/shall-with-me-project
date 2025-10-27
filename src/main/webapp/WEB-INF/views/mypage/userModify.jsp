@@ -385,6 +385,13 @@
             color: #fff;
             border-color: #3399ff;
         }
+
+        /* 헤더 버튼 클릭 보장 */
+        .card-header { position: relative; }               /* 쌓임 맥락 생성 */
+        .card-action-btn { position: relative; z-index: 2; }/* 버튼을 항상 위에 */
+        .header-inline-value { pointer-events: none; }     /* 긴 주소 텍스트가 클릭 못 가로채게 */
+
+
     </style>
 
 </head>
@@ -568,8 +575,7 @@
                                 <c:out value="${not empty rDTO.addr1 ? rDTO.addr1 : '등록된 주소가 없습니다.'}"/>
                             </span>
                         </div>
-                        <a href="${pageContext.request.contextPath}/mypage/addressEdit"
-                           class="card-action-btn active" title="주소 수정">주소 수정</a>
+                        <button id="btnAddrEdit" class="card-action-btn active" title="주소 수정">주소 수정</button>
                     </div>
 
                     <div class="card-body">
@@ -580,6 +586,40 @@
 
             </div>
         </div>
+        <!-- ★추가: [모달] 주소 수정 -->
+        <div class="modal-overlay" id="addrEditModal"
+             style="display:none; align-items:center; justify-content:center; z-index:9998;">
+            <div class="modal-sheet"
+                 style="width:100%; max-width:560px; background:#fff; border-radius:12px; overflow:hidden;">
+                <div class="modal-header"
+                     style="display:flex; align-items:center; justify-content:center; padding:16px; border-bottom:1px solid #eee; position:relative;">
+                    <button type="button" class="modal-close" id="addrEditModalClose"
+                            style="position:absolute; right:16px; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:50%; border:0; background:#f7f7f7; cursor:pointer;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="modal-title-text" style="font-weight:700; color:#222;">주소 수정</div>
+                </div>
+                <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:10px;">
+                    <form id="addrForm">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+                        <!-- 한 줄 주소 -->
+                        <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center;">
+                            <input type="text" id="addr1" name="addr1" class="login-input" placeholder="(우편번호) 도로명 주소" readonly>
+                            <button type="button" id="btnFindPost" class="card-action-btn active">주소 찾기</button>
+                        </div>
+
+                        <!-- 상세주소 -->
+                        <input type="text" id="addr2" name="addr2" class="login-input" placeholder="상세주소(동/호)">
+                    </form>
+                </div>
+                <div class="modal-footer"
+                     style="display:flex; gap:10px; justify-content:flex-end; padding:12px 16px; border-top:1px solid #eee;">
+                    <button type="button" id="btnAddrSave" class="card-action-btn active">저장</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
 </div>
@@ -980,11 +1020,22 @@
                 if (header && token) xhr.setRequestHeader(header, token);
             },
             success: function (json) {
+                const $pwModal = $('#pwChangeModal'); // 모달 선택자
                 const goLogin = function(){ location.href = "<c:url value='/user/login'/>"; };
+
                 if (json.result === "1" || json.result === 1) {
-                    window.showCustomAlert ? showCustomAlert(json.msg, goLogin) : (alert(json.msg), goLogin());
+                    // ✅ 1) 성공 시 모달 닫기
+                    $pwModal.hide();
+
+                    // ✅ 2) 커스텀 알림 띄우기 (확인 누르면 로그인 이동)
+                    window.showCustomAlert
+                        ? showCustomAlert(json.msg || '비밀번호가 변경되었어요!', goLogin)
+                        : (alert(json.msg || '비밀번호가 변경되었어요!'), goLogin());
                 } else {
-                    window.showCustomAlert ? showCustomAlert(json.msg, goLogin) : (alert(json.msg), goLogin());
+                    // 실패 시 모달은 유지하고 메시지만 출력
+                    window.showCustomAlert
+                        ? showCustomAlert(json.msg || '비밀번호 변경에 실패했어요.')
+                        : alert(json.msg || '비밀번호 변경에 실패했어요.');
                 }
             },
             error: function (xhr) {
@@ -1067,6 +1118,145 @@
         $('#f3').on('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('#btnUpdatePw').click(); }});
     });
 </script>
+<!-- ★추가: 카카오 우편번호 API -->
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<script>
+    // ★추가: 카카오 우편번호 → 분리 필드 채우기
+    function kakaoPost(f) {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                const address = data.address;
+                const zonecode = data.zonecode;
+                f.addr1.value = "(" + zonecode + ") " + address;
+            }
+        }).open();
+    }
+
+    // ★추가: 주소 저장 전 검증
+    function validateAddressForm() {
+        const addr1 = ($('#addr1').val() || '').trim(); // 한 줄 주소
+        const addr2 = ($('#addr2').val() || '').trim(); // 상세주소
+
+        if (!addr1) {
+            (window.showCustomAlert || alert)('주소 찾기 버튼으로 주소를 선택해주세요.');
+            return false;
+        }
+        if (!addr2) {
+            (window.showCustomAlert || alert)('상세주소(동/호)를 입력해주세요.');
+            $('#addr2').focus();
+            return false;
+        }
+        return true;
+    }
+
+
+
+    // ★추가: 헤더의 인라인 표시 및 지도 재배치 갱신
+    function refreshAddressUI(fullLineAddress) {
+        // 1) 카드 헤더의 인라인 텍스트 갱신
+        const $inline = $('.card-header-left .header-inline-value').first();
+        if ($inline.length) $inline.text(fullLineAddress || '등록된 주소가 없습니다.');
+
+        // 2) 지도 리로케이션 (기존 코드 재활용)
+        const container = document.getElementById('kakaoMap');
+        if (!container || !window.kakao || !kakao.maps) return;
+
+        const geocoder = new kakao.maps.services.Geocoder();
+        geocoder.addressSearch(fullLineAddress, function (result, status) {
+            if (status === kakao.maps.services.Status.OK && result.length) {
+                const item = result[0];
+                const pos = new kakao.maps.LatLng(item.y, item.x);
+
+                // 기존 맵/마커 재사용이 어렵다면 새로 그려도 됨
+                const map = new kakao.maps.Map(container, {center: pos, level: 3});
+                const marker = new kakao.maps.Marker({position: pos});
+                marker.setMap(map);
+            } else {
+                console.warn('지오코딩 실패:', status, result);
+            }
+        });
+    }
+
+    // ★추가: 모달 오픈/저장 이벤트 바인딩
+    $(function () {
+        const $modal = $('#addrEditModal');
+        const $close = $('#addrEditModalClose'); // $open 제거
+
+// 위임 바인딩: 레이아웃 변동/겹침에도 안정적으로 동작
+        $(document).on('click', '#btnAddrEdit', function (e) {
+            e.preventDefault();
+            const currentLine = $('.card-header-left .header-inline-value').first().text().trim();
+            $('#addrForm')[0].reset();
+            if (currentLine && currentLine !== '등록된 주소가 없습니다.') {
+                $('#addr1').val(currentLine);
+            }
+            $modal.css('display', 'flex');
+        });
+
+
+        $close.on('click', () => $modal.hide());
+        $modal.on('click', (e) => { if (e.target === e.currentTarget) $modal.hide(); });
+
+        // 주소 찾기
+        $('#btnFindPost').on('click', function() {
+            kakaoPost(document.getElementById('addrForm'));
+        });
+        // 저장
+        $('#btnAddrSave').on('click', function () {
+            if (!validateAddressForm()) return;
+
+            // addr2(detail) 동기화(선택)
+            $('#addr2').val($('#detailAddress').val());
+
+            const payload = $('#addrForm').serialize();
+
+            $.ajax({
+                // ★중요: 프로젝트 규칙에 맞춘 경로
+                url: '/mypage/addressUpdate',
+                type: 'post',
+                dataType: 'json',
+                data: payload,
+                beforeSend: (xhr) => {
+                    const {header, token} = getCsrf();
+                    if (header && token) xhr.setRequestHeader(header, token);
+                },
+                success: function (res) {
+                    const success = (res && (res.result === 1 || res.result === "1"));
+                    const msg = (res && res.msg) ? res.msg : (success ? '주소가 저장되었어요!' : '저장에 실패했어요.');
+
+                    // 한 줄 주소를 서버에서 다시 만들어 내려줄 수도 있으나,
+                    // 여기서는 클라이언트 조합값 사용
+                    const line = $('#addr1').val();
+
+                    if (success) {
+                        // ✅ 1) 먼저 모달 닫기
+                        $modal.hide();
+
+                        showCustomAlert(msg, function () {
+                            setTimeout(() => {
+                                location.reload();
+                            }, 500);
+                        }); // 저장 성공 시 커스텀 알림 띄우기
+
+                        // ✅ 확인 버튼 누르고 모달 닫힌 // 1초 후 새로고침 (커스텀 모달 닫히는 타이밍 고려)
+                    } else {
+                        showCustomAlert('저장에 실패했어요.');
+                    }
+                },
+                error: function (xhr) {
+                    console.error('[addr] 저장 실패', xhr.status, xhr.responseText);
+                    alert('저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
+                }
+            });
+        });
+    });
+</script>
+
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
+<script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+
+
 
 </body>
 </html>

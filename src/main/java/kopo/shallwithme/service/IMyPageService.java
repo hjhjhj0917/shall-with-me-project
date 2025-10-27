@@ -39,4 +39,7 @@ public interface IMyPageService {
 
     boolean verifyPassword(UserInfoDTO pDTO) throws Exception;
 
+    int updateAddress(UserProfileDTO pDTO);
+
+
 }

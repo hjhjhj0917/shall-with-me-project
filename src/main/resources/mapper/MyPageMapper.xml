@@ -204,4 +204,14 @@
             LIMIT 1
     </select>
 
+    <!-- 필요 컬럼만 최소 업데이트 (스키마에 맞춰 필드명 조정) -->
+    <update id="updateAddress" parameterType="UserProfileDTO">
+        UPDATE USER_INFO
+        SET
+        ADDR1 = #{addr1},  <!-- 표시용 한 줄 주소 -->
+        ADDR2 = #{addr2},  <!-- 상세주소(동/호) -->
+        CHG_DT = NOW()
+        WHERE USER_ID = #{userId}
+    </update>
+
 </mapper>
