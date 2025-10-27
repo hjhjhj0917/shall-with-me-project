@@ -84,12 +84,12 @@
                     console.log("이동할 URL:", targetUrl);
                     window.location.href = targetUrl;
                 } else {
-                    alert("채팅방 생성 실패");
+                    showCustomAlert("채팅방 생성 실패");
                 }
             })
             .catch(err => {
                 console.error("채팅방 생성 중 오류:", err);
-                alert("오류가 발생했습니다.");
+                showCustomAlert("오류가 발생했습니다.");
             });
     }
 
