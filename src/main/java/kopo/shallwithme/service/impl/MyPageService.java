@@ -224,6 +224,13 @@ public class MyPageService implements IMyPageService {
     }
 
 
+    @Override
+    @Transactional
+    public int updateAddress(UserProfileDTO pDTO) {
+        return myPageMapper.updateAddress(pDTO);
+    }
+
+
 
 
 }

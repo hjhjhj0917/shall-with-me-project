@@ -27,10 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserTagDTO;
@@ -455,6 +452,29 @@ public class MyPageController {
 
         log.info("{}.mypage/passwordVerify End!", this.getClass().getName());
         return dto;
+    }
+
+    @PostMapping("/addressUpdate") // 클래스 레벨 @RequestMapping이 없다면 "/mypage/addressUpdate"로 작성
+    @ResponseBody
+    public ResponseEntity<Map<String,Object>> addressUpdate(UserProfileDTO pDTO, HttpSession session) {
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        Map<String,Object> res = new HashMap<>();
+
+        if (userId == null) {
+            res.put("result", 0);
+            res.put("msg", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(res);
+        }
+
+        // JSP의 name과 DTO 필드명이 매칭되어 자동 바인딩됨
+        pDTO.setUserId(userId);
+        // addr1: 표시용 한 줄 주소, addr2: 상세주소(동/호)
+        int r = myPageService.updateAddress(pDTO);
+
+        res.put("result", r > 0 ? 1 : 0);
+        res.put("msg", r > 0 ? "주소가 저장되었어요!" : "주소 저장에 실패했어요.");
+        return ResponseEntity.ok(res);
     }
 
 

@@ -43,5 +43,7 @@ public interface IMyPageMapper {
 
     UserInfoDTO getPasswordHashByUserId(UserInfoDTO pDTO) throws Exception;
 
+    int updateAddress(UserProfileDTO pDTO);
+
 
 }
