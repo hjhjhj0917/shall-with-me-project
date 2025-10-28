@@ -121,17 +121,20 @@
         }
 
         .card-action-btn.active {
-            background: #3399ff; /* 파란 배경 */
-            color: #fff; /* 흰 글씨 */
-            border-color: #3399ff; /* 테두리 파랑 */
+            background: transparent;      /* 배경 제거 */
+            color: #3399ff;          /* 텍스트 색상 */
+            border-color: transparent;  /* 테두리 제거 */
+            text-decoration: underline !important; /* 밑줄 추가 */
+            box-shadow: none;             /* 그림자 제거 */
         }
 
         .card-action-btn.active:hover,
         .card-action-btn.active:focus-visible {
-            background: #1c407d; /* 딥블루 */
-            border-color: #1c407d;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(28, 64, 125, 0.25);
+            background: transparent;      /* 배경 없음 */
+            border-color: transparent;  /* 테두리 없음 */
+            color: #1c407d;          /* 텍스트 색상 (진하게) */
+            box-shadow: none;             /* 그림자 제거 */
+            text-decoration: underline !important; /* 밑줄 유지 */
         }
 
         .profile-section {
@@ -343,48 +346,133 @@
             }
         }
 
-        .mytag-group {
+        /* --- [START] NEW TAG MODAL STYLE (Applied to #mypageTagModal) --- */
+        #mypageTagModal .search-tag-group {
             display: flex;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f3f5
+            align-items: center;
+            padding: 16px 0;
         }
 
-        .mytag-ico {
-            width: 28px;
+        #mypageTagModal .search-tag-group + .search-tag-group {
+            border-top: 1px solid #f0f0f0;
+        }
+
+        #mypageTagModal .search-tag-group__icon-wrapper {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
             display: flex;
-            align-items: flex-start;
-            justify-content: center
+            align-items: center;
+            justify-content: center;
         }
 
-        .mytag-body {
-            flex: 1
+        #mypageTagModal .search-tag-group__icon-wrapper i {
+            font-size: 30px;
+            color: #495057;
         }
 
-        .mytag-title {
-            font-weight: 700;
-            margin-bottom: 8px
+        #mypageTagModal .search-tag-group__content-wrapper {
+            flex-grow: 1;
+            padding-left: 24px;
+            min-width: 0; /* 텍스트 오버플로우 방지 */
         }
 
-        .mytag-list {
+        #mypageTagModal .search-tag-group__title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #343a40;
+            margin-bottom: 12px;
+        }
+
+        #mypageTagModal .search-tag-group__list {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px
+            gap: 10px;
+            width: 100%;
         }
 
-        .mytag-btn, .tag-btn {
-            border: 1px solid #d0d7e2;
-            background: #fff;
-            border-radius: 999px;
-            padding: 6px 10px;
+        #mypageTagModal .tag-btn {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            color: #495057;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .mytag-btn.selected, .tag-btn.selected {
-            background: #3399ff;
-            color: #fff;
+        #mypageTagModal .tag-btn.selected {
+            background-color: #3399ff;
             border-color: #3399ff;
+            color: white;
+            font-weight: 600;
         }
+
+        #mypageTagModal .tag-btn:hover:not(.selected) {
+            border-color: #495057;
+        }
+
+        #mypageTagModal .modal-body {
+            max-height: 560px; /* profile.jsp의 기존 높이 유지 */
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        #mypageTagModal .modal-footer {
+            display: flex;
+            justify-content: space-between; /* 이미지와 동일하게 양쪽 정렬 */
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
+
+        #mypageTagModal .modal-footer > div:first-child { /* 0/6 선택 텍스트 */
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
+        #mypageTagModal #tagCount { /* 0/6 선택의 '0' 부분 */
+            font-weight: 600;
+            color: #3399ff;
+        }
+
+        #mypageTagModal .modal-footer > div:last-child { /* 버튼 그룹 */
+            display: flex;
+            gap: 8px;
+        }
+
+        #mypageTagModal .modal-footer #btnTagCancel { /* 취소 버튼 */
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            background-color: white;
+            color: #9aa1ac;
+            border-radius: 40px;
+            border: 2px solid #E5F2FF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #mypageTagModal .modal-footer #btnTagSave { /* 선택 완료 버튼 (저장 버튼) */
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            /* 기존 card-action-btn.active 스타일 오버라이드 */
+            text-decoration: none !important;
+            background-color: white;
+            color: #3399ff;
+            border-radius: 40px;
+            border: 2px solid #E5F2FF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* --- [END] NEW TAG MODAL STYLE --- */
+
 
         /* 헤더 버튼 클릭 보장 */
         .card-header { position: relative; }               /* 쌓임 맥락 생성 */
@@ -407,7 +495,6 @@
 
             <div class="mypage-grid">
 
-                <!-- 정보 수정 카드 -->
                 <div class="mypage-card">
                     <div class="card-header">
                         <h3>정보 수정</h3>
@@ -415,7 +502,6 @@
                     </div>
                     <div class="card-body profile-section">
                         <div class="card-body profile-section">
-                            <!-- 클릭 가능 영역: 래퍼 + 네온 오버레이 -->
                             <div id="profilePhotoWrap" class="profile-photo-wrap" title="프로필 사진 변경하기">
                                 <img id="profilePhotoImg"
                                      src="<%= session.getAttribute("SS_USER_PROFILE_IMG_URL") %>"
@@ -451,13 +537,11 @@
                     </div>
                 </div>
 
-                <!-- 태그 카드 -->
                 <div class="mypage-card">
                     <div class="card-header">
                         <h3>태그</h3>
                         <a id="btnTagEdit" class="card-action-btn active" title="태그 수정">태그 수정</a>
                     </div>
-                    <!-- [모달] 마이페이지 태그 수정 -->
                     <div class="modal-overlay" id="mypageTagModal"
                          style="display:none; align-items:center; justify-content:center; z-index:9998;">
                         <div class="modal-sheet"
@@ -471,16 +555,22 @@
                                 <div class="modal-title-text" style="font-weight:700; color:#222;">태그 수정</div>
                             </div>
                             <div class="modal-body" style="max-height:560px; overflow:auto; padding:20px;">
-                                <div id="mypageTagGroupContainer"><!-- JS로 렌더링 --></div>
+                                <div id="mypageTagGroupContainer"></div>
                             </div>
-                            <div class="modal-footer"
-                                 style="display:flex; gap:10px; justify-content:flex-end; padding:12px 16px; border-top:1px solid #eee;">
-                                <button type="button" id="btnTagSave" class="card-action-btn active">저장</button>
+                            <div class="modal-footer">
+                                <div style="font-size:0.95rem;color:#495057;">
+                                    <span style="font-weight:600;color:#3399ff;"></span>
+                                </div>
+                                <div style="display:flex;gap:8px;">
+                                    <button type="button" id="btnTagCancel"
+                                            style="padding:8px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">취소</button>
+                                    <button type="button" id="btnTagSave"
+                                            style="padding:8px 16px;border:none;border-radius:8px;background:#3399ff;color:#fff;font-weight:600;cursor:pointer;font-size:0.9rem;">선택 완료</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- [모달] 비밀번호 변경 -->
                     <div class="modal-overlay" id="pwChangeModal"
                          style="display:none; align-items:center; justify-content:center; z-index:9998;">
                         <div class="modal-sheet"
@@ -497,7 +587,6 @@
                             <div class="modal-body" style="padding:20px;">
                                 <div id="findPwErrorMessage2" class="error-message" style="color:#e03131; font-size:13px; min-height:18px;"></div>
 
-                                <!-- ★★ STEP1: 현재 비밀번호 확인 -->
                                 <form id="pwVerifyForm" style="margin-bottom:12px;">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <div style="display:flex; flex-direction:column; gap:10px;">
@@ -508,7 +597,6 @@
                                     </div>
                                 </form>
 
-                                <!-- STEP2: 새 비밀번호 (처음엔 숨김) -->
                                 <form id="f3" style="display:none;">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <div style="display:flex; flex-direction:column; gap:10px;">
@@ -542,7 +630,6 @@
                     </div>
                 </div>
 
-                <!-- 자기소개 카드 -->
                 <div class="mypage-card">
                     <div class="card-header">
                         <h3>자기소개</h3>
@@ -566,7 +653,6 @@
                     </div>
                 </div>
 
-                <!-- 주소 카드 -->
                 <div class="mypage-card">
                     <div class="card-header">
                         <div class="card-header-left">
@@ -586,7 +672,6 @@
 
             </div>
         </div>
-        <!-- ★추가: [모달] 주소 수정 -->
         <div class="modal-overlay" id="addrEditModal"
              style="display:none; align-items:center; justify-content:center; z-index:9998;">
             <div class="modal-sheet"
@@ -603,13 +688,11 @@
                     <form id="addrForm">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-                        <!-- 한 줄 주소 -->
                         <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center;">
                             <input type="text" id="addr1" name="addr1" class="login-input" placeholder="(우편번호) 도로명 주소" readonly>
                             <button type="button" id="btnFindPost" class="card-action-btn active">주소 찾기</button>
                         </div>
 
-                        <!-- 상세주소 -->
                         <input type="text" id="addr2" name="addr2" class="login-input" placeholder="상세주소(동/호)">
                     </form>
                 </div>
@@ -866,8 +949,10 @@
         const $modal = $('#mypageTagModal');
         const $modalClose = $('#mypageTagModalClose');
         const $btnEdit = $('#btnTagEdit');
-        const $btnSave = $('#btnTagSave');
+        const $btnSave = $('#btnTagSave'); // 기존 '저장' 버튼
+        const $btnCancel = $('#btnTagCancel'); // 추가: '취소' 버튼
         const $wrap = $('#mypageTagGroupContainer');
+        const $tagCount = $('#tagCount'); // 태그 개수 표시
 
         const selectedByGroup = new Map();
 
@@ -882,6 +967,7 @@
                 const myMap = {};
                 (myTags || []).forEach(s => { myMap[s.tagType] = s.tagId; });
                 renderGroups(allTags, myMap);
+                updateTagCountDisplay(); // 모달 열 때 카운트 초기화
                 $modal.css('display', 'flex');
             } catch (e) {
                 console.error('태그 로드 실패', e);
@@ -891,6 +977,10 @@
 
         $modalClose.on('click', () => $modal.hide());
         $modal.on('click', (e) => { if (e.target === e.currentTarget) $modal.hide(); });
+
+        $btnCancel.on('click', () => { // 취소 버튼 클릭 시 모달 닫기
+            $modal.hide();
+        });
 
         $btnSave.on('click', async function () {
             const payload = {tagList: []};
@@ -942,17 +1032,23 @@
 
             tagGroups.forEach(g => {
                 const list = byGroup.get(g.key) || [];
-                const $g = $('<div class="mytag-group">');
-                const $ico = $('<div class="mytag-ico">').append($('<i>').addClass(g.icon));
-                const $body = $('<div class="mytag-body">');
-                const $title = $('<div class="mytag-title">').text(g.title);
-                const $list = $('<div class="mytag-list">');
+                if (list.length === 0) return;
+
+                const $groupDiv = $('<div>').addClass('search-tag-group');
+
+                const $iconWrapper = $('<div>')
+                        .addClass('search-tag-group__icon-wrapper')
+                        .append($('<i>').addClass(g.icon));
+
+                const $contentWrapper = $('<div>').addClass('search-tag-group__content-wrapper');
+                const $groupTitle = $('<div>').addClass('search-tag-group__title').text(g.title);
+                const $groupList = $('<div>').addClass('search-tag-group__list');
 
                 list.forEach(tag => {
-                    const $btn = $('<button type="button" class="mytag-btn">')
-                        .text(tag.tagName)
-                        .attr('data-id', tag.tagId)
-                        .attr('data-group', g.key);
+                    const $btn = $('<button type="button" class="tag-btn">')
+                            .text(tag.tagName)
+                            .attr('data-id', tag.tagId)
+                            .attr('data-group', g.key);
 
                     if (myMap[g.key] && Number(myMap[g.key]) === Number(tag.tagId)) {
                         $btn.addClass('selected');
@@ -960,23 +1056,27 @@
                     }
 
                     $btn.on('click', function () {
-                        $list.find('.mytag-btn').removeClass('selected');
+                        $groupList.find('.tag-btn').removeClass('selected');
                         $(this).addClass('selected');
                         selectedByGroup.set(g.key, {tagId: tag.tagId, tagName: tag.tagName});
+                        updateTagCountDisplay(); // 클릭 시 카운트 업데이트
                     });
 
-                    $list.append($btn);
+                    $groupList.append($btn);
                 });
 
-                $body.append($title, $list);
-                $g.append($ico, $body);
-                $wrap.append($g);
+                $contentWrapper.append($groupTitle, $groupList);
+                $groupDiv.append($iconWrapper, $contentWrapper);
+                $wrap.append($groupDiv);
             });
+        }
+
+        function updateTagCountDisplay() { // 태그 개수 업데이트 함수
+            $tagCount.text(selectedByGroup.size);
         }
     });
 </script>
 
-<!-- ★★★ 비밀번호 변경 2단계 로직 (추가된 부분 포함) ★★★ -->
 <script>
     // 기존 pwUpdate 로직 유지 (NEW_PASSWORD 세션이 있는 상태에서 동작)
     function pwUpdate(f3) {
@@ -1114,7 +1214,6 @@
         $('#f3').on('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('#btnUpdatePw').click(); }});
     });
 </script>
-<!-- ★추가: 카카오 우편번호 API -->
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script>
