@@ -195,10 +195,10 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     padding: 16px 12px;
 
     /* 배경 스타일 - REG와 동일한 세련된 그라데이션 */
-    background: linear-gradient(135deg, #e6f2ff 0%, #cce5ff 100%);
     border: 2px solid #b3d9ff;
     border-radius: 0; /* 갤러리와 동일한 각진 모서리 */
     box-shadow: 0 4px 12px rgba(51, 153, 255, 0.15);
+
 
     /* 효과 */
     position: relative;
@@ -262,7 +262,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
 
 /* 장식 요소 - REG와 동일 */
 .photo-notice-box::after {
-    content: '📸';
     position: absolute;
     bottom: 8px;
     right: 8px;
