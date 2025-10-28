@@ -3,12 +3,12 @@ package kopo.shallwithme.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.shallwithme.dto.YouthPolicyDTO;
-import kopo.shallwithme.mapper.IYouthPolicyMapper; // 새로 만든 매퍼 주입
-import lombok.RequiredArgsConstructor; // RequiredArgsConstructor로 변경
+import kopo.shallwithme.mapper.IYouthPolicyMapper;
+import kopo.shallwithme.service.IYouthPolicyService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,11 +18,14 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor // 생성자 주입을 위해 변경
-public class YouthPolicyService {
+@RequiredArgsConstructor
+public class YouthPolicyService implements IYouthPolicyService {
 
-    private final IYouthPolicyMapper youthPolicyMapper; // DB와 통신할 매퍼
+    private final IYouthPolicyMapper youthPolicyMapper;
     private final RestTemplate restTemplate;
+
+    // ✅ [추가] 새로 추가된 정책을 임베딩하기 위해 주입
+    private final PolicyEmbeddingService policyEmbeddingService;
 
     @Value("${secure.api.url}")
     private String apiUrl;
@@ -31,101 +34,107 @@ public class YouthPolicyService {
     private String apiKey;
 
     /**
-     * [수정] 이제 이 메소드는 외부 API가 아닌, 우리 DB에서 정책 목록을 조회합니다.
+     * (인터페이스 구현)
+     * 페이징 처리를 위한 정책 목록 조회
      */
+    @Override
+    public List<YouthPolicyDTO> getPolicies(int page, int size) throws Exception {
+        log.info(this.getClass().getName() + ".getPolicies (paginated) from DB Start!");
+        int offset = (page - 1) * size;
+        return youthPolicyMapper.getPolicyListPaginated(offset, size);
+    }
+
+    /**
+     * (인터페이스 구현)
+     * 전체 정책 개수 조회
+     */
+    @Override
+    public int getTotalPolicyCount() throws Exception {
+        log.info(this.getClass().getName() + ".getTotalPolicyCount from DB Start!");
+        return youthPolicyMapper.getTotalPolicyCount();
+    }
+
+    /**
+     * (인터페이스 구현)
+     * 모든 정책 목록 조회 (PolicyEmbeddingService용)
+     */
+    @Override
     public List<YouthPolicyDTO> getPolicies() throws Exception {
-        log.info(this.getClass().getName() + ".getPolicies from DB Start!");
+        log.info(this.getClass().getName() + ".getPolicies (all) from DB Start!");
         return youthPolicyMapper.getPolicyList();
     }
 
     /**
-     * [추가] 스케줄러가 호출할 메소드.
-     * 외부 API에서 데이터를 가져와 DB에 저장(갱신)합니다.
+     * (인터페이스 구현)
+     * 스케줄러가 호출할 증분 업데이트 메서드
      */
+    @Override
     @Transactional
     public void fetchAndSavePolicies() throws Exception {
-        log.info("fetchAndSavePolicies Start!");
+        log.info("fetchAndSavePolicies (Incremental Update) Start!");
 
-        // 1. API 호출 URL 구성 및 데이터 받아오기
-        String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
-                .queryParam("apiKeyNm", apiKey)
-                .queryParam("pageNum", 1)
-                .queryParam("pageSize", 100) // 100개씩 한번에 가져오기 (페이지네이션 처리 필요)
-                .queryParam("rtnType", "json")
-                .build().toUriString();
-
-        // 전체 정책을 담을 리스트
-        List<YouthPolicyDTO> allPolicies = new ArrayList<>();
-
+        // 1. API에서 모든 정책을 조회 (페이지네이션 처리)
+        List<YouthPolicyDTO> allPoliciesFromApi = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
 
-        // 총 데이터 건수, 페이지 처리용 변수
         int totalCount = 0;
         int pageNum = 1;
         int pageSize = 100;
-        int totalPages;
 
         do {
-            // API 호출할 때 페이지 번호 바꿔가며 요청
             String pagedUrl = UriComponentsBuilder.fromHttpUrl(apiUrl)
-                    .queryParam("apiKeyNm", apiKey)
-                    .queryParam("pageNum", pageNum)
-                    .queryParam("pageSize", pageSize)
-                    .queryParam("rtnType", "json")
+                    .queryParam("apiKeyNm", apiKey).queryParam("pageNum", pageNum)
+                    .queryParam("pageSize", pageSize).queryParam("rtnType", "json")
                     .build().toUriString();
 
             String response = restTemplate.getForObject(pagedUrl, String.class);
-            log.info("API response page {}: {}", pageNum, response);
-
             JsonNode rootNode = mapper.readTree(response);
             JsonNode resultNode = rootNode.path("result");
             JsonNode paggingNode = resultNode.path("pagging");
             JsonNode itemsNode = resultNode.path("youthPolicyList");
 
-            // 총 데이터 건수 구하기 (첫 호출 때만 세팅)
             if (totalCount == 0) {
                 totalCount = paggingNode.path("totCount").asInt();
-                totalPages = (totalCount + pageSize - 1) / pageSize;
-                log.info("Total policy count: {}, total pages: {}", totalCount, totalPages);
+                log.info("Total policy count from API: {}", totalCount);
             }
 
             if (itemsNode.isArray()) {
                 for (JsonNode item : itemsNode) {
-                    YouthPolicyDTO dto = mapper.treeToValue(item, YouthPolicyDTO.class);
-                    allPolicies.add(dto);
+                    allPoliciesFromApi.add(mapper.treeToValue(item, YouthPolicyDTO.class));
                 }
             }
-
             pageNum++;
+        } while (pageNum <= (totalCount + pageSize - 1) / pageSize); // 페이지네이션 끝까지
 
-        } while (pageNum <= (totalCount + pageSize - 1) / pageSize);
+        log.info("API에서 총 {}건의 정책 조회 완료. DB와 비교 시작...", allPoliciesFromApi.size());
 
-        // DB 저장
-        log.info("DB 저장 전 기존 정책 모두 삭제");
-        youthPolicyMapper.deleteAllPolicies();
+        // 2. [변경] DB와 비교하여 *새로운 정책*만 저장
+        List<YouthPolicyDTO> newPoliciesToEmbed = new ArrayList<>();
+        int newPolicyCount = 0;
 
-        log.info("DB 저장 시작, 총 {}건 저장", allPolicies.size());
+        for (YouthPolicyDTO apiDto : allPoliciesFromApi) {
+            // API에서 가져온 정책의 ID(plcyNo)로 DB 조회
+            YouthPolicyDTO existingPolicy = youthPolicyMapper.getPolicyById(apiDto.getPlcyNo());
 
-        int batchSize = 100;
-        for (int i = 0; i < allPolicies.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, allPolicies.size());
-            List<YouthPolicyDTO> batchList = allPolicies.subList(i, end);
-
-            insertBatch(batchList);
-        }
-
-        log.info("fetchAndSavePolicies End!");
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void insertBatch(List<YouthPolicyDTO> batchList) {
-        for (YouthPolicyDTO dto : batchList) {
-            try {
-                youthPolicyMapper.insertPolicy(dto);
-            } catch (Exception e) {
-                log.error("정책 삽입 실패: {}, 이유: {}", dto.getPlcyNo(), e.getMessage());
+            // DB에 해당 정책이 없으면 (새로운 정책이면)
+            if (existingPolicy == null) {
+                try {
+                    // DB에 삽입
+                    youthPolicyMapper.insertPolicy(apiDto);
+                    // 임베딩 목록에 추가
+                    newPoliciesToEmbed.add(apiDto);
+                    newPolicyCount++;
+                } catch (Exception e) {
+                    log.error("새 정책 삽입 실패: {}, 이유: {}", apiDto.getPlcyNo(), e.getMessage());
+                }
             }
         }
-    }
 
+        log.info("DB 저장 완료. 신규 정책 {}건 추가됨.", newPolicyCount);
+
+        // 3. [추가] 새로 추가된 정책들만 임베딩 서비스로 전달
+        policyEmbeddingService.embedNewPolicies(newPoliciesToEmbed);
+
+        log.info("fetchAndSavePolicies (Incremental Update) End!");
+    }
 }

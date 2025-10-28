@@ -2,17 +2,27 @@ package kopo.shallwithme.mapper;
 
 import kopo.shallwithme.dto.YouthPolicyDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
 public interface IYouthPolicyMapper {
 
-    // DB에 저장된 모든 정책 목록 조회 (공지사항/챗봇용)
+    // 1. 임베딩용 전체 목록 조회
     List<YouthPolicyDTO> getPolicyList();
 
-    // 새로운 정책 데이터를 DB에 삽입
+    // 2. 증분 업데이트 시 중복 확인용
+    YouthPolicyDTO getPolicyById(String plcyNo);
+
+    // 3. 증분 업데이트 시 신규 삽입용
     void insertPolicy(YouthPolicyDTO pDTO);
 
-    // 데이터 갱신 전, 기존의 모든 정책 데이터를 삭제
+    // 4. (예비용)
     void deleteAllPolicies();
+
+    // 5. 컨트롤러 페이징용
+    List<YouthPolicyDTO> getPolicyListPaginated(@Param("offset") int offset, @Param("limit") int limit);
+
+    // 6. 컨트롤러 페이징용
+    int getTotalPolicyCount();
 }
