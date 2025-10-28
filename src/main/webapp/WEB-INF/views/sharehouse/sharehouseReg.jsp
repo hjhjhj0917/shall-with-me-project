@@ -17,9 +17,41 @@
             cursor: pointer;
         }
 
+        #tagSelectOkBtn{
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #tagSelectCancelBtn{
+            background-color: white !important;
+            color: #9aa1ac !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #btnFloorConfirm{
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #btnFloorCancel{
+            background-color: white !important;
+            color: #9aa1ac !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+        }
+
         /* 태그 선택 버튼 */
         .tag-select-btn {
-            background: linear-gradient(135deg, #3399ff 0%, #0066cc 100%);
+            background: linear-gradient(to right, #66B2FF, #3399ff);
             color: #fff;
             border: none;
             padding: 12px 24px;
@@ -40,7 +72,7 @@
 
         /* 층수 입력 버튼 */
         .floor-input-btn {
-            background: linear-gradient(135deg, #3399ff 0%, #0066cc 100%);
+            background: linear-gradient(to right, #66B2FF, #3399ff);
             color: #fff;
             border: none;
             padding: 12px 24px;
@@ -184,7 +216,7 @@
 
         .address-row button {
             padding: 10px 20px;
-            background: linear-gradient(135deg, #3399ff 0%, #0066cc 100%);
+            background: linear-gradient(to right, #66B2FF, #3399ff);
             color: #fff;
             border: none;
             border-radius: 8px;

@@ -120,7 +120,7 @@
       {key: "washer", title: "세탁기 공유", icon: "fa-solid fa-soap", tags: [5, 6]},
       {key: "elevator", title: "엘리베이터", icon: "fa-solid fa-elevator", tags: [7, 8]},
       {key: "nearby", title: "근처", icon: "fa-solid fa-location-dot", tags: [9, 10, 11]},
-      {key: "parking", title: "주차", icon: "fa-solid fa-car", tags: [12, 13]},
+      {key: "parking", title: "주차", icon: "fa-solid fa-square-parking", tags: [12, 13]},
     ];
 
     window.openTagSelectModal = function(initialSelectedIds = [], onDone){
