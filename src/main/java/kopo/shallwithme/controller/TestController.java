@@ -1,27 +1,23 @@
 package kopo.shallwithme.controller;
 
-import kopo.shallwithme.service.impl.YouthPolicyService;
+import kopo.shallwithme.dto.SpamDTO;
+import kopo.shallwithme.service.ITestService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@RestController
 @RequiredArgsConstructor
-@Slf4j
-@RequestMapping("/admin")
+@RestController
 public class TestController {
 
-    private final YouthPolicyService youthPolicyService;
+    private final ITestService testService;
 
-    // 수동 실행용 정책 저장 API
-    @GetMapping("/fetch-policies")
-    public String fetchPoliciesGet() {
-        try {
-            youthPolicyService.fetchAndSavePolicies();
-            return "정책 데이터를 성공적으로 갱신했습니다.";
-        } catch (Exception e) {
-            log.error("정책 갱신 중 오류 발생", e);
-            return "정책 갱신 중 오류: " + e.getMessage();
-        }
+    @GetMapping(value = "/test/analyze")
+    public SpamDTO analyze() {
+
+        SpamDTO dto = new SpamDTO();
+        dto.setText("완전 감동이에요 다시 봐도 좋네요");
+
+        return testService.test(dto);
     }
 }
