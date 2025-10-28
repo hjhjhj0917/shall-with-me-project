@@ -726,7 +726,7 @@
 
             const newText = ($area.text() || '').trim();
             if (newText.length > 1000) {
-                (window.showCustomAlert || alert)('자기소개는 1000자 이하로 작성해주세요.');
+                showCustomAlert('자기소개는 1000자 이하로 작성해주세요.');
                 return;
             }
 
@@ -742,11 +742,11 @@
                         .removeAttr('contenteditable')
                         .removeClass('is-editing');
                     editing = false;
-                    (window.showCustomAlert || alert)(msg || '자기소개가 저장되었어요!');
+                    showCustomAlert(msg || '자기소개가 저장되었어요!');
                 },
                 error: function (xhr) {
                     console.error('[intro] 저장 실패', xhr.status, xhr.responseText);
-                    (window.showCustomAlert || alert)('저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
+                    showCustomAlert('저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
                 }
             });
         });
@@ -781,12 +781,12 @@
                 return;
             }
             if (!/^image\//.test(f.type)) {
-                alert('이미지 파일만 업로드할 수 있어요.');
+                showCustomAlert('이미지 파일만 업로드할 수 있어요.');
                 $wrap.removeClass('active');
                 return;
             }
             if (f.size > 5 * 1024 * 1024) {
-                alert('최대 5MB까지 업로드 가능합니다.');
+                showCustomAlert('최대 5MB까지 업로드 가능합니다.');
                 $wrap.removeClass('active');
                 return;
             }
@@ -822,7 +822,7 @@
                 },
                 error: function (xhr) {
                     console.error('[profile] 업로드 실패', xhr.status, xhr.responseText);
-                    alert('업로드 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
+                    showCustomAlert('업로드 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
                 },
                 complete: function () {
                     $wrap.removeClass('active loading');
@@ -885,7 +885,7 @@
                 $modal.css('display', 'flex');
             } catch (e) {
                 console.error('태그 로드 실패', e);
-                alert('태그를 불러오는 중 오류가 발생했어요.');
+                showCustomAlert('태그를 불러오는 중 오류가 발생했어요.');
             }
         });
 
@@ -925,10 +925,10 @@
                     }
                 }
                 $modal.hide();
-                alert('태그가 저장되었어요!');
+                showCustomAlert('태그가 저장되었어요!');
             } catch (e) {
                 console.error('태그 저장 실패', e);
-                alert('저장 중 오류가 발생했어요.');
+                showCustomAlert('저장 중 오류가 발생했어요.');
             }
         });
 
@@ -1028,19 +1028,15 @@
                     $pwModal.hide();
 
                     // ✅ 2) 커스텀 알림 띄우기 (확인 누르면 로그인 이동)
-                    window.showCustomAlert
-                        ? showCustomAlert(json.msg || '비밀번호가 변경되었어요!', goLogin)
-                        : (alert(json.msg || '비밀번호가 변경되었어요!'), goLogin());
+                    showCustomAlert(json.msg || '비밀번호가 변경되었어요!', goLogin);
                 } else {
                     // 실패 시 모달은 유지하고 메시지만 출력
-                    window.showCustomAlert
-                        ? showCustomAlert(json.msg || '비밀번호 변경에 실패했어요.')
-                        : alert(json.msg || '비밀번호 변경에 실패했어요.');
+                    showCustomAlert(json.msg || '비밀번호 변경에 실패했어요.');
                 }
             },
             error: function (xhr) {
                 console.error('[pw] 변경 실패', xhr.status, xhr.responseText);
-                alert('변경 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
+                showCustomAlert('변경 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
             }
         });
     }
@@ -1105,7 +1101,7 @@
                 },
                 error: function(xhr){
                     console.error('[pw] verify 실패', xhr.status, xhr.responseText);
-                    alert('확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
+                    showCustomAlert('확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
                 }
             });
         });
@@ -1139,11 +1135,11 @@
         const addr2 = ($('#addr2').val() || '').trim(); // 상세주소
 
         if (!addr1) {
-            (window.showCustomAlert || alert)('주소 찾기 버튼으로 주소를 선택해주세요.');
+            showCustomAlert('주소 찾기 버튼으로 주소를 선택해주세요.');
             return false;
         }
         if (!addr2) {
-            (window.showCustomAlert || alert)('상세주소(동/호)를 입력해주세요.');
+            showCustomAlert('상세주소(동/호)를 입력해주세요.');
             $('#addr2').focus();
             return false;
         }
@@ -1246,7 +1242,7 @@
                 },
                 error: function (xhr) {
                     console.error('[addr] 저장 실패', xhr.status, xhr.responseText);
-                    alert('저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
+                    showCustomAlert('저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
                 }
             });
         });

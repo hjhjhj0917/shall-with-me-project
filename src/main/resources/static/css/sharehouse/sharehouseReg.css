@@ -319,6 +319,9 @@
     background: #fff;
     box-shadow: 0 4px 14px rgba(17, 24, 39, .06); /* 태그패널과 동일 */
     resize: vertical; /* 세로로만 리사이즈 */
+    font-family: 'Noto Sans KR', 'Pretendard', 'Nanum Gothic', sans-serif; /* 페이지 기본 폰트와 동일하게 */
+    font-size: 1rem;
+
 }
 
 #introTextarea:focus {
