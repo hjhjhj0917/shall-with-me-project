@@ -342,11 +342,11 @@
         const $scrollArea = $(".sh-scroll-area");
 
         const tagGroups = [
-            {key: "toilet", title: "화장실", icon: "fa-solid fa-toilet", tags: [1, 2]},
-            {key: "refrigerator", title: "냉장고", icon: "fa-solid fa-door-closed", tags: [3, 4]},
-            {key: "washing", title: "세탁기", icon: "fa-solid fa-water", tags: [5, 6]},
+            {key: "toilet", title: "화장실", icon: "fa-solid fa-bath", tags: [1, 2]},
+            {key: "refrigerator", title: "냉장고", icon: "fa-solid fa-temperature-low", tags: [3, 4]},
+            {key: "washing", title: "세탁기", icon: "fa-solid fa-soap", tags: [5, 6]},
             {key: "elevator", title: "엘리베이터", icon: "fa-solid fa-elevator", tags: [7, 8]},
-            {key: "convenience", title: "편의 시설", icon: "fa-solid fa-hospital", tags: [9, 10, 11]},
+            {key: "convenience", title: "편의 시설", icon: "fa-solid fa-location-dot", tags: [9, 10, 11]},
             {key: "parking", title: "주차공간", icon: "fa-solid fa-square-parking", tags: [12, 13]}
         ];
 

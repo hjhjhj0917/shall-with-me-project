@@ -30,7 +30,7 @@
         background: #fff;
         border-radius: 35px;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-        display: flex;
+        display: none;
         flex-direction: column;
         overflow: hidden;
         transform: scale(0.5);
@@ -41,6 +41,7 @@
     }
 
     .chatbot-container.active {
+        display: flex;
         transform: scale(1);
         opacity: 1;
         pointer-events: auto;
