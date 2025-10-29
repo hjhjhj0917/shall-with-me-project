@@ -108,7 +108,7 @@ public class YouthPolicyService implements IYouthPolicyService {
 
         log.info("API에서 총 {}건의 정책 조회 완료. DB와 비교 시작...", allPoliciesFromApi.size());
 
-        // 2. [변경] DB와 비교하여 *새로운 정책*만 저장
+        // 2. DB와 비교하여 *새로운 정책*만 저장
         List<YouthPolicyDTO> newPoliciesToEmbed = new ArrayList<>();
         int newPolicyCount = 0;
 
@@ -132,7 +132,7 @@ public class YouthPolicyService implements IYouthPolicyService {
 
         log.info("DB 저장 완료. 신규 정책 {}건 추가됨.", newPolicyCount);
 
-        // 3. [추가] 새로 추가된 정책들만 임베딩 서비스로 전달
+        // 3. 새로 추가된 정책들만 임베딩 서비스로 전달
         policyEmbeddingService.embedNewPolicies(newPoliciesToEmbed);
 
         log.info("fetchAndSavePolicies (Incremental Update) End!");

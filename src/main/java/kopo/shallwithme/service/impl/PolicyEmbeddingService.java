@@ -1,14 +1,12 @@
 package kopo.shallwithme.service.impl;
 
-// (imports...)
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.Metadata;
-import dev.langchain4j.data.document.DocumentSplitter; // [추가]
+import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-// import dev.langchain4j.store.embedding.EmbeddingStoreIngestor; // [삭제] Ingestor 사용 안 함
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import kopo.shallwithme.dto.YouthPolicyDTO;
@@ -25,7 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList; // [추가]
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -152,7 +150,7 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
         // --- [디버깅 로그] ---
         log.info("Sending {} text segments to OpenAI embedding API...", validSegments.size());
 
-// --- 배치 단위로 나누어 임베딩 ---
+        // --- 배치 단위로 나누어 임베딩 ---
         int BATCH_SIZE = 500; // 한 번에 보낼 세그먼트 수 (조정 가능)
         List<Embedding> allEmbeddings = new ArrayList<>();
         List<TextSegment> allValidSegments = new ArrayList<>();
@@ -169,7 +167,7 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
             allValidSegments.addAll(batch);
         }
 
-// --- 임베딩 저장 ---
+        // --- 임베딩 저장 ---
         try {
             embeddingStore.addAll(allEmbeddings, allValidSegments);
             log.info("Successfully added {} embeddings to the store.", allEmbeddings.size());
