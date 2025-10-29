@@ -40,7 +40,7 @@ public class Langchain4jConfig {
                 .build();
     }
 
-    // 2. Embedding Model (변경 없음)
+    // 2. Embedding Model
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()
@@ -50,8 +50,7 @@ public class Langchain4jConfig {
                 .build();
     }
 
-    // 3. Embedding Store (✅ [핵심 수정])
-    // Bean의 반환 타입을 'InMemoryEmbeddingStore' (구현 클래스)로 명시
+    // 3. Embedding Store
     @Bean
     public InMemoryEmbeddingStore<TextSegment> embeddingStore() {
 
