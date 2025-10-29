@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <title>살며시</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css"/>
+    <style>
+        /* 오른쪽 영역 클릭 가능하도록 cursor 추가 */
+        .right-panel {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
@@ -22,8 +28,8 @@
         </svg>
     </div>
 
-    <!-- 오른쪽 비스듬한 영역 -->
-    <div class="right-panel">
+    <!-- 오른쪽 비스듬한 영역 (클릭 시 이동) -->
+    <div class="right-panel" id="rightPanel">
         <div class="wave-left">
             <svg viewBox="0 0 800 800" preserveAspectRatio="none">
                 <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#ffffff"/>
@@ -32,9 +38,6 @@
         <div class="right-inner">
             <div class="logo">살며시</div>
             <div class="logo-2">Shall With Me</div>
-            <form action="/user/main" method="get">
-                <button type="submit" class="start-button">시작하기</button>
-            </form>
         </div>
     </div>
 
@@ -61,10 +64,21 @@
     }
 
     showText(idx);
-    setInterval(() => {
+    const interval = setInterval(() => {
         idx = (idx + 1) % texts.length;
         showText(idx);
     }, 4000);
+
+    // 오른쪽 영역 클릭 시 메인으로 이동
+    const rightPanel = document.getElementById("rightPanel");
+    rightPanel.addEventListener("click", () => {
+        window.location.href = "/user/main";
+    });
+
+    // 특정 시간 후(예: 12초) 자동 이동
+    setTimeout(() => {
+        window.location.href = "/user/main";
+    }, 12000);
 </script>
 
 </body>
