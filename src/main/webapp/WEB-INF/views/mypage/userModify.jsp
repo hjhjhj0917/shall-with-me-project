@@ -448,14 +448,14 @@
         }
 
         #mypageTagModal .modal-footer #btnTagCancel { /* 취소 버튼 */
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            background-color: white;
-            color: #9aa1ac;
-            border-radius: 40px;
-            border: 2px solid #E5F2FF;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 8px 16px !important;
+            cursor: pointer !important;
+            font-size: 0.9rem !important;
+            background-color: white !important;
+            color: #9aa1ac !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
         }
 
         #mypageTagModal .modal-footer #btnTagSave { /* 선택 완료 버튼 (저장 버튼) */
@@ -465,13 +465,111 @@
             font-size: 0.9rem;
             /* 기존 card-action-btn.active 스타일 오버라이드 */
             text-decoration: none !important;
-            background-color: white;
-            color: #3399ff;
-            border-radius: 40px;
-            border: 2px solid #E5F2FF;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
         }
         /* --- [END] NEW TAG MODAL STYLE --- */
+
+        #btnVerifyPw{
+            text-decoration: none !important;
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer;
+        }
+
+        #btnUpdatePw{
+            text-decoration: none !important;
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer;
+        }
+
+        #btnFindPost{
+            text-decoration: none !important;
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer;
+        }
+
+        #btnAddrSave{
+            text-decoration: none !important;
+            background-color: white !important;
+            color: #3399ff !important;
+            border-radius: 40px !important;
+            border: 2px solid #E5F2FF !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer;
+        }
+
+        /* ===== [비밀번호 수정 입력창 리디자인] ===== */
+        #pwChangeModal .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #pwChangeModal .login-input:focus {
+            border-color: #3399ff;
+            box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
+        }
+
+        /* 오류 시 강조 표시 유지 */
+        #pwChangeModal .login-input.input-error {
+            border-color: #e03131;
+            box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
+        }
+
+
+        /* ===== [주소 수정 모달 입력창 리디자인] ===== */
+        #addrEditModal .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background: #fff;
+        }
+
+        #addrEditModal .login-input:focus {
+            border-color: #3399ff;
+            box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
+        }
+
+        /* 오류나 강조 표시용 (선택적으로 사용 가능) */
+        #addrEditModal .login-input.input-error {
+            border-color: #e03131;
+            box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
+        }
+
+        #pwVerifyForm #btnVerifyPw,
+        #f3 #btnUpdatePw {
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+
 
 
         /* 헤더 버튼 클릭 보장 */
@@ -570,8 +668,6 @@
                             </div>
                         </div>
                     </div>
-
-
 
                     <div class="modal-overlay" id="pwChangeModal"
                          style="display:none; align-items:center; justify-content:center; z-index:9998;">
