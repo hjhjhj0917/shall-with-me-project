@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,29 +49,30 @@ public class Langchain4jConfig {
                 .apiKey(openAiApiKey)
                 .modelName("text-embedding-3-small")
                 .timeout(Duration.ofSeconds(60))
+
                 .build();
     }
 
     // 3. Embedding Store
+
     @Bean
     public InMemoryEmbeddingStore<TextSegment> embeddingStore() {
+        try {
+            Resource resource = new ClassPathResource("shallwithme-embedding-store.json");
 
-        Path storePath = Paths.get(embeddingStorePath);
+            if (resource.exists()) {
+                log.info("기존 임베딩 파일(shallwithme-embedding)을 classpath에서 로드합니다.");
 
-        // 앱 시작 시 JSON 파일이 있으면, 파일을 읽어서 복원
-        if (Files.exists(storePath)) {
-            try {
-                log.info("기존 임베딩 파일({})을 로드합니다.", embeddingStorePath);
-                String json = Files.readString(storePath);
-                // ✅ Codec이 아닌 'InMemoryEmbeddingStore.fromJson' (static 메서드) 사용
+                String json = new String(resource.getInputStream().readAllBytes());
                 return InMemoryEmbeddingStore.fromJson(json);
-            } catch (IOException e) {
-                log.error("임베딩 파일 로드 실패. 새 저장소를 생성합니다.", e);
+            } else {
+                log.warn("임베딩 파일이 classpath에 없습니다. 새 InMemoryEmbeddingStore를 생성합니다.");
+                return new InMemoryEmbeddingStore<>();
             }
+        } catch (IOException e) {
+            log.error("임베딩 파일 로드 중 오류 발생. 새 저장소를 생성합니다.", e);
+            return new InMemoryEmbeddingStore<>();
         }
-
-        // 파일이 없으면, 비어있는 새 저장소를 생성
-        log.info("기존 임베딩 파일이 없습니다. 새 InMemoryEmbeddingStore를 생성합니다.");
-        return new InMemoryEmbeddingStore<>();
     }
+
 }
