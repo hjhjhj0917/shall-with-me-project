@@ -1,5 +1,7 @@
 package kopo.shallwithme.service.impl;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.document.DocumentSplitter;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,27 +54,47 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        // (onApplicationEvent 메서드 내용은 이전과 동일)
         log.info("Application context refreshed. Checking embedding store status...");
-        Path storePath = Paths.get(embeddingStorePath);
-        if (!Files.exists(storePath)) {
-            log.info("Embedding store file ({}) not found. Embedding all policies from DB...", embeddingStorePath);
-            try {
-                List<YouthPolicyDTO> allPolicies = youthPolicyService.getPolicies();
-                if (allPolicies == null || allPolicies.isEmpty()) {
-                    log.warn("No policy data found in the database. Skipping initial embedding.");
-                    return;
-                }
-                int embeddedCount = this.embedAndStorePolicies(allPolicies); // 메서드 이름 변경
-                log.info("Successfully embedded and stored {} segments from {} initial policies.", embeddedCount, allPolicies.size());
-                if (embeddedCount > 0) {
-                    saveStoreToFile();
-                }
-            } catch (Exception e) {
-                log.error("Failed during initial embedding of all policies.", e);
+
+        try {
+            Path storePath;
+            Resource classpathResource = null;
+
+            if (embeddingStorePath.startsWith("classpath:")) {
+                String resourcePath = embeddingStorePath.replace("classpath:", "");
+                classpathResource = new ClassPathResource(resourcePath);
+            } else {
+                storePath = Paths.get(embeddingStorePath);
             }
-        } else {
-            log.info("Embedding store file ({}) exists. Assuming it was loaded successfully.", embeddingStorePath);
+
+            // 🔹 1) 외부 경로 우선
+            if (!embeddingStorePath.startsWith("classpath:") && Files.exists(Paths.get(embeddingStorePath))) {
+                log.info("Embedding store file ({}) found in filesystem.", embeddingStorePath);
+                return;
+            }
+
+            // 🔹 2) classpath 리소스 확인
+            if (classpathResource != null && classpathResource.exists()) {
+                log.info("Embedding store found in classpath: {}", classpathResource.getFilename());
+                return;
+            }
+
+            // 🔹 3) 파일이 없을 경우 초기화
+            log.info("Embedding store not found. Generating from database...");
+            List<YouthPolicyDTO> allPolicies = youthPolicyService.getPolicies();
+            if (allPolicies == null || allPolicies.isEmpty()) {
+                log.warn("No policy data found in the database. Skipping initial embedding.");
+                return;
+            }
+
+            int embeddedCount = this.embedAndStorePolicies(allPolicies);
+            log.info("Successfully embedded and stored {} segments from {} initial policies.", embeddedCount, allPolicies.size());
+            if (embeddedCount > 0) {
+                saveStoreToFile();
+            }
+
+        } catch (Exception e) {
+            log.error("Error initializing embedding store", e);
         }
     }
 
@@ -191,7 +214,6 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
 
     }
 
-
     private Document dtoToDocument(YouthPolicyDTO dto) {
         // (dtoToDocument 메서드 내용은 이전과 동일)
         String content = dto.getPlcyExplnCn();
@@ -210,26 +232,24 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
     }
 
     private synchronized void saveStoreToFile() {
-        Path storePath = Paths.get(embeddingStorePath);
         try {
             log.info("Saving embedding store state to file ({}) ...", embeddingStorePath);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // entries에 접근할 수 없으면, store 자체를 fromJson/serializeToJson 메서드를 활용
-            // InMemoryEmbeddingStore는 serializeToJson() 메서드 제공
             String json = embeddingStore.serializeToJson();
 
-            // 만약 serializeToJson()으로 바로 저장하면, 모든 Embedding+TextSegment가 JSON으로 직렬화됨
+            if (embeddingStorePath.startsWith("classpath:")) {
+                // ⚠️ classpath 안의 리소스는 수정 불가능 (read-only)
+                log.warn("Cannot save to classpath resource ({}). Skipping save.", embeddingStorePath);
+                return;
+            }
+
+            Path storePath = Paths.get(embeddingStorePath);
             Files.writeString(storePath, json);
 
             log.info("Embedding store saved successfully.");
         } catch (IOException e) {
             log.error("Failed to save embedding store file ({}).", embeddingStorePath, e);
         } catch (Exception e) {
-            log.error("An unexpected error occurred while saving embedding data to JSON.", e);
+            log.error("Unexpected error while saving embedding store JSON.", e);
         }
     }
-
 }
-
