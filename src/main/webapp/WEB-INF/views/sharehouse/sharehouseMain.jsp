@@ -447,20 +447,49 @@
         }
 
         function renderLocations() {
-            const locations = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시', '세종특별자치시', '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도'];
+            // ✅ [수정] locations를 객체 배열로 변경 (display: 표시용, value: 전송용)
+            const locations = [
+                { display: '서울특별시', value: '서울특별시' },
+                { display: '부산광역시', value: '부산광역시' },
+                { display: '대구광역시', value: '대구광역시' },
+                { display: '인천광역시', value: '인천광역시' },
+                { display: '광주광역시', value: '광주광역시' },
+                { display: '대전광역시', value: '대전광역시' },
+                { display: '울산광역시', value: '울산광역시' },
+                { display: '세종특별자치시', value: '세종특별자치시' },
+                { display: '경기도', value: '경기도' },
+                { display: '강원특별자치도', value: '강원특별자치도' },
+                { display: '충청북도', value: '충북' }, // ✅ 요청 사항
+                { display: '충청남도', value: '충남' }, // ✅ 요청 사항
+                { display: '전북특별자치도', value: '전북특별자치도' },
+                { display: '전라남도', value: '전남' }, // ✅ 요청 사항
+                { display: '경상북도', value: '경북' }, // ✅ 요청 사항
+                { display: '경상남도', value: '경남' }, // ✅ 요청 사항
+                { display: '제주특별자치도', value: '제주특별자치도' }
+            ];
+
             const $container = $('#location-grid-container').empty();
+
             locations.forEach(loc => {
-                const $item = $('<div>').addClass('location-item').text(loc);
-                if (loc === selectedLocation) $item.addClass('selected');
+                // ✅ [수정] loc.display로 텍스트 설정
+                const $item = $('<div>').addClass('location-item').text(loc.display);
+
+                // ✅ [수정] selectedLocation (value)와 loc.value 비교
+                if (loc.value === selectedLocation) {
+                    $item.addClass('selected');
+                }
+
                 $item.on('click', function () {
-                    if (selectedLocation === loc) {
-                        selectedLocation = "";
+                    // ✅ [수정] loc.value와 비교
+                    if (selectedLocation === loc.value) {
+                        selectedLocation = ""; // 선택 해제
                         $('#location-selection-text').text('지역 선택').css('color', '');
                     } else {
-                        selectedLocation = loc;
-                        $('#location-selection-text').text(loc).css('color', '#222');
+                        // ✅ [수정] selectedLocation에는 value, 텍스트에는 display 저장
+                        selectedLocation = loc.value;
+                        $('#location-selection-text').text(loc.display).css('color', '#222');
                     }
-                    renderLocations();
+                    renderLocations(); // 'selected' 클래스 업데이트를 위해 다시 렌더링
                     closeLocationModal();
                 });
                 $container.append($item);
