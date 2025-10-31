@@ -882,12 +882,6 @@
         transform: translateY(-1px);
     }
 
-    html body #tagSelectModalOverlay .tag-btn.selected {
-        background: #485fe7;
-        border-color: #485fe7;
-        color: #fff;
-    }
-
     @keyframes fadeIn {
         0% {
             opacity: 0;

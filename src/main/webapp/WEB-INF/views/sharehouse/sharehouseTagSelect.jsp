@@ -203,19 +203,35 @@
               const id = Number($(this).data('id'));
               const name = $(this).data('name');
 
+              // 클릭한 그룹 가져오기
+              const $groupList = $(this).closest('.search-tag-group__list');
+
               if ($(this).hasClass('selected')) {
+                // 선택 해제
                 $(this).removeClass('selected');
                 selectedTags.delete(id);
               } else {
+                // 같은 그룹 내 다른 선택 해제
+                $groupList.find('.tag-btn.selected').each(function(){
+                  const otherId = Number($(this).data('id'));
+                  $(this).removeClass('selected');
+                  selectedTags.delete(otherId);
+                });
+
+                // 최대 선택 수 체크
                 if (selectedTags.size >= MAX) {
-                  showCustomAlert('최대 3개까지만 선택할 수 있습니다.');
+                  showCustomAlert(`최대 ${MAX}개까지만 선택할 수 있습니다.`);
                   return;
                 }
+
+                // 선택 추가
                 $(this).addClass('selected');
                 selectedTags.set(id, name);
               }
+
               updateCount();
             });
+
 
             $groupList.append($btn);
           }
