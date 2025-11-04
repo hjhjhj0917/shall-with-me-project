@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,10 @@ public class ChattingController {
         log.info("{}.sendMessage Start!", this.getClass().getName());
 
         try {
-            chatMessage.setSentAt(LocalDateTime.now());
+            // 서울(Asia/Seoul) 시간 기준으로 설정
+            ZoneId seoulZone = ZoneId.of("Asia/Seoul");
+            LocalDateTime seoulTime = LocalDateTime.now(seoulZone);
+            chatMessage.setSentAt(seoulTime);
 
             ChatMessageDTO savedMessage = chatService.saveMessage(chatMessage);
 
