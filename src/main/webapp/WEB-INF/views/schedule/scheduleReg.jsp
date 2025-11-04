@@ -562,8 +562,8 @@
                 <textarea placeholder="메모" id="eventMemoInput"></textarea>
             </div>
             <div class="shcedule-modal-buttons">
-<%--                <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>--%>
-<%--                <button type="button" onclick="cancelRegister()">취소</button>--%>
+                <%--                <button type="button" id="deleteEventBtn" style="display:none;">삭제</button>--%>
+                <%--                <button type="button" onclick="cancelRegister()">취소</button>--%>
                 <button type="submit" class="schedule-save-btn">저장</button>
             </div>
         </form>
@@ -759,6 +759,11 @@
 
             let startDate = $('#eventStartDate').val();
             if (startDate && time) {
+                // ⭐ 시간 형식 정규화: "5:00" → "05:00"
+                const timeParts = time.split(':');
+                if (timeParts[0].length === 1) {
+                    time = '0' + time; // 한자리 시간 앞에 0 추가
+                }
                 startDate += 'T' + time + ':00';
             }
 
@@ -778,21 +783,35 @@
                     contentType: 'application/json',
                     data: JSON.stringify(eventData),
                     success: function(savedEvent) {
-                        console.log("요청 응답:", savedEvent);   // 여기에 schedule 객체 확인
+                        console.log("✅ 서버 응답:", savedEvent);
                         $('#step2').hide();
                         $('#step1').show();
                         calendar.refetchEvents();
 
-                        if (stompClient && stompClient.connected) {
-                            const scheduleMessage = {
-                                roomId: roomId,
-                                senderId: myUserId,
-                                messageType: 'SCHEDULE_REQUEST',
-                                scheduleRequest: savedEvent,
-                                sentAt: new Date().toISOString()
-                            };
-                            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(scheduleMessage));
+                        // ⭐ 수정: 일정 보낸 사람도 자신의 채팅방에 메시지 표시
+                        // 서버는 WebSocket으로 상대방에게 전송 (브로드캐스트)
+                        // 클라이언트는 자신의 채팅방에만 로컬로 추가 (WebSocket 사용 안 함)
+
+                        // 방법 1: localStorage에 임시 저장 (채팅방 돌아갈 때 표시)
+                        const tempScheduleMessage = {
+                            messageId: 'local-schedule-' + savedEvent.scheduleId,
+                            roomId: roomId,
+                            senderId: myUserId,
+                            messageType: 'SCHEDULE_REQUEST',
+                            scheduleRequest: savedEvent,
+                            sentAt: new Date().toISOString()
+                        };
+
+                        // localStorage에 저장 (채팅방으로 돌아갈 때 표시하기 위함)
+                        try {
+                            const pendingMessages = JSON.parse(localStorage.getItem('pendingScheduleMessages') || '[]');
+                            pendingMessages.push(tempScheduleMessage);
+                            localStorage.setItem('pendingScheduleMessages', JSON.stringify(pendingMessages));
+                            console.log("📝 일정 메시지 임시 저장:", tempScheduleMessage);
+                        } catch (e) {
+                            console.error("localStorage 저장 실패:", e);
                         }
+
                         showCustomAlert("상대방에게 일정 요청을 보냈습니다.", function (){
                             history.back();
                         });
@@ -823,8 +842,8 @@
     flatpickr("#timePicker", {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "h:i", // 12시간제 (오전/오후)
-        time_24hr: false,    // true면 24시간제
+        dateFormat: "H:i",   // ⭐ 24시간제 (HH:MM 형식)
+        time_24hr: true,     // ⭐ true로 변경 (24시간제)
         minuteIncrement: 5   // 분 단위 간격
     });
 
