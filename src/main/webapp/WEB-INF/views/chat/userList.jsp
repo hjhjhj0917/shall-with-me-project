@@ -152,21 +152,44 @@
 
 <script>
 
-    function formatTimeAgo(dateString) {
-        // 1. 날짜 데이터가 없으면 빈 문자열 반환
-        if (!dateString) return "";
+    /**
+     * [수정] chat.jsp의 parseDate와 동일한 로직을 사용합니다.
+     * .ready()의 정렬 로직과 formatTimeAgo가 이 함수를 공유합니다.
+     */
+    function parseListDate(dateString) {
+        if (!dateString) return new Date(0); // 1970년 (정렬 시 맨 뒤)
 
-        // 2. 'T'를 포함한 표준 형식이므로 바로 Date 객체로 변환
-        const messageDate = new Date(dateString);
-        const now = new Date();
+        // [수정] 서버가 UTC 시간("...T04:39:00")을 'Z' 없이 보내는 문제 해결
+        // 'Z'를 강제로 붙여 UTC임을 명시해야 브라우저가 KST로 올바르게 변환합니다.
+        let isoDateString = dateString;
 
-        // 3. 혹시라도 날짜 변환에 실패하면 빈 문자열 반환
-        if (isNaN(messageDate.getTime())) {
-            console.error("잘못된 날짜 형식으로 변환에 실패했습니다:", dateString);
-            return "";
+        // "YYYY-MM-DD HH:MM:SS" 형식을 "YYYY-MM-DDTHH:MM:SSZ"로 변경
+        if (isoDateString.includes(' ') && !isoDateString.includes('T')) {
+            isoDateString = isoDateString.replace(' ', 'T') + 'Z';
+        }
+        // "YYYY-MM-DDTHH:MM:SS" (Z가 없는) 형식을 "YYYY-MM-DDTHH:MM:SSZ"로 변경
+        else if (isoDateString.includes('T') && !isoDateString.endsWith('Z')) {
+            isoDateString += 'Z';
         }
 
-        // 4. 시간 차이를 '초' 단위로 계산
+        const messageDate = new Date(isoDateString);
+
+        if (isNaN(messageDate.getTime())) {
+            console.error("잘못된 날짜 형식으로 변환에 실패했습니다:", dateString);
+            return new Date(0); // 1970년
+        }
+        return messageDate; // KST로 변환된 Date 객체
+    }
+
+    // [수정] formatTimeAgo는 이제 parseListDate를 사용
+    function formatTimeAgo(dateString) {
+        // [수정] parseListDate를 호출하여 KST Date 객체를 받음
+        const messageDate = parseListDate(dateString);
+
+        // [수정] 시간이 유효하지 않으면(1970년) 빈 문자열 반환
+        if (messageDate.getTime() === 0) return "";
+
+        const now = new Date(); // 브라우저의 현재 시간 (KST)
         const secondsAgo = Math.round((now.getTime() - messageDate.getTime()) / 1000);
 
         // 5. 조건에 따라 정확한 상대 시간으로 변환
@@ -183,7 +206,7 @@
             return Math.floor(secondsAgo / 86400) + '일 전';
         }
 
-        // 7일 이상은 '월 일' 형식으로 표시
+        // 7일 이상은 '월 일' 형식으로 표시 (messageDate는 이미 KST입니다)
         return messageDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
     }
 
@@ -227,6 +250,7 @@
         clone.querySelector('.subtitle').textContent = user.lastMessage || '대화 내용이 없습니다.';
 
         if (user.lastMessageTimestamp) {
+            // [수정] 수정된 formatTimeAgo 함수가 호출됨
             clone.querySelector('.timestamp').textContent = formatTimeAgo(user.lastMessageTimestamp);
         }
 
@@ -262,7 +286,20 @@
                     container.addClass('is-empty');
                     container.append('<p>대화 상대가 없습니다.</p>');
                 } else {
-                    $.each(userList, function (index, user) {
+                    // [수정] 정렬 문제 해결:
+
+                    // 1. userList를 KST Date 객체와 함께 변환
+                    const sortedUserList = userList.map(user => {
+                        // [수정] parseListDate 함수를 사용하여 KST Date 객체 생성
+                        const kstDate = parseListDate(user.lastMessageTimestamp);
+                        return { ...user, kstDate: kstDate };
+                    });
+
+                    // 2. KST Date 기준으로 내림차순 정렬 (최신순)
+                    sortedUserList.sort((a, b) => b.kstDate.getTime() - a.kstDate.getTime());
+
+                    // 3. 정렬된 목록을 화면에 .append()
+                    $.each(sortedUserList, function (index, user) {
                         var chatItem = createChatItem(user);
                         container.append(chatItem);
                     });
@@ -299,11 +336,20 @@
     // 실시간으로 채팅 목록을 업데이트하는 함수
     function updateChatList(user) {
         var container = $("#chatList");
+
+        // [수정] 정렬 문제 해결:
+        // 실시간 갱신은 .prepend() (무조건 맨 위로) 방식을 유지합니다.
+        // (실시간 갱신 시 전체 목록을 다시 정렬하는 것은 복잡도가 높습니다)
+        // 새로고침 시에는 .ready()의 정렬 로직이 정확한 순서를 보장합니다.
+
+        // 1. 기존 항목 제거
         container.find('.chat-partner-item[data-userid="' + user.userId + '"]').remove();
+
+        // 2. 새 항목을 맨 위에 추가
         var newChatItem = createChatItem(user);
         container.prepend(newChatItem);
 
-        // 목록이 비어있다가 첫 대화가 생기는 경우 "대화 상대가 없습니다" 메시지 제거
+        // 3. 목록이 비어있다가 첫 대화가 생기는 경우 "대화 상대가 없습니다" 메시지 제거
         if(container.hasClass('is-empty')) {
             container.removeClass('is-empty');
             container.find('p').remove();
@@ -313,3 +359,4 @@
 
 </body>
 </html>
+
