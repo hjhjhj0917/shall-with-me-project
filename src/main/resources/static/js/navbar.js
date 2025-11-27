@@ -25,9 +25,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 숨겨야 할 페이지들 처리
     const path = window.location.pathname;
-    const pageName = path.split('/').pop();
+    let pageName = path.split('/').pop();
+
+    if (pageName === "") {
+        pageName = "index";
+    }
 
     const hideBoxByPage = {
+        index: ['switchBox'],
         main: ['switchBox'],
         userProfile: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],
         userTagSelect: ['switchBox', 'menuBox', 'userNameBox', 'messageBox'],

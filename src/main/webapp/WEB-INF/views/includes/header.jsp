@@ -107,8 +107,10 @@
         }
     }
 
-    // 로그인한 사용자 ID가 있을 때만 실행
+    // 전역 변수로 클라이언트 선언 (연결 해제를 위해)
+    let headerStompClient = null;
     const loggedInHeaderUserId = "<%= session.getAttribute("SS_USER_ID") %>";
+
     if (loggedInHeaderUserId && loggedInHeaderUserId !== 'null') {
 
         // 1. 페이지 로드 시 전체 안 읽은 개수 가져오기 (AJAX)
@@ -122,19 +124,74 @@
             .catch(err => console.error('Total unread count fetch error:', err));
 
         // 2. 실시간 업데이트를 위한 WebSocket 연결
-        const headerSocket = new SockJS("/ws"); // WebSocketConfig와 주소 일치
-        const headerStompClient = Stomp.over(headerSocket);
+        const headerSocket = new SockJS("/ws");
+        headerStompClient = Stomp.over(headerSocket);
+
+        // 디버그 로그 끄기 (성능 및 콘솔 깔끔하게 유지)
         headerStompClient.debug = null;
 
         headerStompClient.connect({}, function () {
-            // 안 읽은 개수 변경 알림을 받을 개인 채널 구독
             headerStompClient.subscribe('/topic/user/' + loggedInHeaderUserId, function (message) {
                 const updateInfo = JSON.parse(message.body);
-                // 서버에서 totalUnreadCount를 보내준다고 가정
                 if (updateInfo.totalUnreadCount !== undefined) {
                     updateTotalUnreadBadge(updateInfo.totalUnreadCount);
                 }
             });
         });
+
+        // [중요] 페이지를 벗어나거나 새로고침 할 때 명시적으로 연결 해제
+        window.addEventListener('beforeunload', function() {
+            if (headerStompClient !== null) {
+                headerStompClient.disconnect(function() {
+                    console.log("Header WebSocket disconnected gracefully.");
+                });
+            }
+        });
     }
 </script>
+
+<%--<script>--%>
+<%--    // 뱃지 UI를 업데이트하는 함수--%>
+<%--    function updateTotalUnreadBadge(count) {--%>
+<%--        const badge = document.getElementById('totalUnreadBadge');--%>
+<%--        if (!badge) return;--%>
+
+<%--        if (count > 0) {--%>
+<%--            badge.textContent = count > 99 ? '99+' : count;--%>
+<%--            badge.style.display = 'flex';--%>
+<%--        } else {--%>
+<%--            badge.style.display = 'none';--%>
+<%--        }--%>
+<%--    }--%>
+
+<%--    // 로그인한 사용자 ID가 있을 때만 실행--%>
+<%--    const loggedInHeaderUserId = "<%= session.getAttribute("SS_USER_ID") %>";--%>
+<%--    if (loggedInHeaderUserId && loggedInHeaderUserId !== 'null') {--%>
+
+<%--        // 1. 페이지 로드 시 전체 안 읽은 개수 가져오기 (AJAX)--%>
+<%--        fetch('/chat/totalUnreadCount')--%>
+<%--            .then(res => res.json())--%>
+<%--            .then(data => {--%>
+<%--                if (data.totalCount !== undefined) {--%>
+<%--                    updateTotalUnreadBadge(data.totalCount);--%>
+<%--                }--%>
+<%--            })--%>
+<%--            .catch(err => console.error('Total unread count fetch error:', err));--%>
+
+<%--        // 2. 실시간 업데이트를 위한 WebSocket 연결--%>
+<%--        const headerSocket = new SockJS("/ws"); // WebSocketConfig와 주소 일치--%>
+<%--        const headerStompClient = Stomp.over(headerSocket);--%>
+<%--        headerStompClient.debug = null;--%>
+
+<%--        headerStompClient.connect({}, function () {--%>
+<%--            // 안 읽은 개수 변경 알림을 받을 개인 채널 구독--%>
+<%--            headerStompClient.subscribe('/topic/user/' + loggedInHeaderUserId, function (message) {--%>
+<%--                const updateInfo = JSON.parse(message.body);--%>
+<%--                // 서버에서 totalUnreadCount를 보내준다고 가정--%>
+<%--                if (updateInfo.totalUnreadCount !== undefined) {--%>
+<%--                    updateTotalUnreadBadge(updateInfo.totalUnreadCount);--%>
+<%--                }--%>
+<%--            });--%>
+<%--        });--%>
+<%--    }--%>
+<%--</script>--%>
