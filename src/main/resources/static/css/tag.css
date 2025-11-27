@@ -2,7 +2,7 @@ body {
     font-family: 'Noto Sans KR', sans-serif;
     overflow-x: hidden;
     background-color: #f8faff;
-    background-image: url("../images/kpaas-background.png");
+    background-image: url("../images/background.png");
     z-index: 1;
 }
 
