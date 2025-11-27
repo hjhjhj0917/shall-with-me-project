@@ -86,7 +86,7 @@
     </script>
     <style>
         body {
-            background-image: url("../images/kpaas-background.png");
+            background-image: url("../images/background.png");
         }
 
         /* ✅ 등록 폼 컨테이너 */

@@ -1,38 +1,22 @@
 package kopo.shallwithme.controller;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.*;
 import kopo.shallwithme.service.IMyPageService;
+import kopo.shallwithme.service.impl.AwsS3Service; // ✅ AWS 서비스 import 추가
 import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-
-import kopo.shallwithme.dto.TagDTO;
-import kopo.shallwithme.dto.UserTagDTO;
-import kopo.shallwithme.dto.UserInfoDTO;
-
 
 @Slf4j
 @RequestMapping(value = "/mypage")
@@ -41,63 +25,23 @@ import kopo.shallwithme.dto.UserInfoDTO;
 public class MyPageController {
 
     private final IMyPageService myPageService;
+    private final AwsS3Service awsS3Service; // ✅ AWS 서비스 주입 추가
 
-    @Value("${ncp.object-storage.endpoint}")
-    private String endpoint;
+    // ❌ [삭제됨] NCP 관련 @Value 설정들 모두 제거
+    // @Value("${ncp.object-storage.endpoint}") private String endpoint;
+    // @Value("${ncp.object-storage.region}") private String region;
+    // @Value("${ncp.object-storage.access-key}") private String accessKey;
+    // @Value("${ncp.object-storage.secret-key}") private String secretKey;
+    // @Value("${ncp.object-storage.bucket-name}") private String bucketName;
+    // @Value("${ncp.object-storage.folder}") private String folder;
 
-    @Value("${ncp.object-storage.region}")
-    private String region;
-
-    @Value("${ncp.object-storage.access-key}")
-    private String accessKey;
-
-    @Value("${ncp.object-storage.secret-key}")
-    private String secretKey;
-
-    @Value("${ncp.object-storage.bucket-name}")
-    private String bucketName;
-
-    @Value("${ncp.object-storage.folder}")
-    private String folder;
-
-    // ===== (추가) content-type 화이트리스트 =====
+    // content-type 화이트리스트 (보안 검증용)
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"
     );
 
-    // ===== (추가) NCP 업로드 헬퍼: 업로드 후 퍼블릭 URL 반환 =====
-    private String uploadToNcpObjectStorage(MultipartFile file) throws IOException {
-        String original = file.getOriginalFilename();
-        String ext = StringUtils.getFilenameExtension(original);
-        if (ext == null || ext.isBlank()) {
-            // content type으로부터 확장자 추정 (jfif 같은 케이스 대비)
-            String ct = String.valueOf(file.getContentType());
-            if (ct.equals("image/jpeg")) ext = "jpg";
-            else if (ct.equals("image/png")) ext = "png";
-            else if (ct.equals("image/webp")) ext = "webp";
-            else if (ct.equals("image/gif")) ext = "gif";
-            else ext = "img";
-        }
-        String key = folder.replaceFirst("/+$","") + "/" + UUID.randomUUID().toString().replace("-", "") + "." + ext;
-
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withPathStyleAccessEnabled(true) // ★ NCP 필수
-                .build();
-
-        ObjectMetadata meta = new ObjectMetadata();
-        meta.setContentLength(file.getSize());
-        if (file.getContentType() != null) meta.setContentType(file.getContentType());
-
-        s3Client.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), meta)
-                .withCannedAcl(CannedAccessControlList.PublicRead)); // 퍼블릭 읽기
-
-        // 퍼블릭 URL 구성
-        return endpoint + "/" + bucketName + "/" + key;
-    }
-
+    // ❌ [삭제됨] private String uploadToNcpObjectStorage(MultipartFile file) throws IOException { ... }
+    // AWS S3 서비스가 이 역할을 대신합니다.
 
     @GetMapping("userModify")
     public String userModify(HttpSession session, ModelMap model) throws Exception {
@@ -123,8 +67,6 @@ public class MyPageController {
         model.addAttribute("tList", rList);
 
         log.info("{}.userModify End!", this.getClass().getName());
-
-
 
         return "mypage/userModify";
     }
@@ -226,24 +168,18 @@ public class MyPageController {
         log.info("{}.withdrawEmailChk Start!", this.getClass().getName());
 
         String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
-        String email = CmmUtil.nvl(request.getParameter("email"));
 
-        log.info("userId : {}", userId);
-        log.info("email : {}", email);
+        log.info("userId={}", userId);
 
         UserInfoDTO pDTO = new UserInfoDTO();
         pDTO.setUserId(userId);
-        pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
 
-        log.info("암호화 email : {}", pDTO.getEmail());
+        UserInfoDTO rDTO = myPageService.myPageUserInfo(pDTO);
 
-        UserInfoDTO rDTO = Optional.ofNullable(myPageService.emailCheck(pDTO)).orElseGet(UserInfoDTO::new);
+        String mail = rDTO.getEmail();
+        rDTO.setEmail(EncryptUtil.decAES128BCBC(mail));
 
-        if(CmmUtil.nvl(rDTO.getExistsYn()).equals("Y")) {
-
-            session.setAttribute("SS_USER_EMAIL", pDTO.getEmail());
-        }
-
+        log.info("rDTO: {}", rDTO);
         log.info("{}.withdrawEmailChk End!", this.getClass().getName());
 
         return rDTO;
@@ -345,7 +281,7 @@ public class MyPageController {
         return msg;
     }
 
-    // ===== (변경) 프로필 업로드: 로컬 저장 → NCP 업로드로 교체 =====
+    // ✅ [변경] 프로필 이미지 업로드: AWS S3 사용
     @PostMapping("/profileImageUpdate")
     @ResponseBody
     public ResponseEntity<?> profileImageUpdate(MultipartFile file, HttpSession session) throws IOException {
@@ -364,8 +300,8 @@ public class MyPageController {
             return ResponseEntity.badRequest().body("{\"error\":\"최대 5MB까지 업로드 가능합니다.\"}");
         }
 
-        // ★ 외부(NCP) 업로드 후 퍼블릭 URL 반환
-        String urlPath = uploadToNcpObjectStorage(file);
+        // ✅ [변경] AWS S3 서비스 사용
+        String urlPath = awsS3Service.uploadFile(file);
 
         // DB 업데이트
         UserProfileDTO p = new UserProfileDTO();
@@ -454,7 +390,7 @@ public class MyPageController {
         return dto;
     }
 
-    @PostMapping("/addressUpdate") // 클래스 레벨 @RequestMapping이 없다면 "/mypage/addressUpdate"로 작성
+    @PostMapping("/addressUpdate")
     @ResponseBody
     public ResponseEntity<Map<String,Object>> addressUpdate(UserProfileDTO pDTO, HttpSession session) {
 
@@ -476,9 +412,5 @@ public class MyPageController {
         res.put("msg", r > 0 ? "주소가 저장되었어요!" : "주소 저장에 실패했어요.");
         return ResponseEntity.ok(res);
     }
-
-
-
-
 
 }

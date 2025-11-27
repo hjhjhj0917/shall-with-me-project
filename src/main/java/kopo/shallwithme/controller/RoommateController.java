@@ -1,12 +1,5 @@
 package kopo.shallwithme.controller;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -16,20 +9,18 @@ import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.impl.RoommateService;
 import kopo.shallwithme.service.impl.UserInfoService;
+import kopo.shallwithme.service.impl.AwsS3Service; // ✅ AWS 서비스 import 추가
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,24 +33,15 @@ public class RoommateController {
 
     private final RoommateService roommateService;
     private final UserInfoService userInfoService;
+    private final AwsS3Service awsS3Service; // ✅ AWS 서비스 주입 추가
 
-    @Value("${ncp.object-storage.endpoint}")
-    private String endpoint;
-
-    @Value("${ncp.object-storage.region}")
-    private String region;
-
-    @Value("${ncp.object-storage.access-key}")
-    private String accessKey;
-
-    @Value("${ncp.object-storage.secret-key}")
-    private String secretKey;
-
-    @Value("${ncp.object-storage.bucket-name}")
-    private String bucketName;
-
-    @Value("${ncp.object-storage.folder}")
-    private String folder;
+    // ❌ [삭제됨] NCP 관련 @Value 설정들 모두 제거
+    // @Value("${ncp.object-storage.endpoint}") ...
+    // @Value("${ncp.object-storage.region}") ...
+    // @Value("${ncp.object-storage.access-key}") ...
+    // @Value("${ncp.object-storage.secret-key}") ...
+    // @Value("${ncp.object-storage.bucket-name}") ...
+    // @Value("${ncp.object-storage.folder}") ...
 
     @GetMapping("/roommateReg")
     public String roommateReg() {
@@ -77,7 +59,7 @@ public class RoommateController {
 
         // ✅ tag_name만 추출 (중복 제거 원하면 .distinct() 추가)
         List<String> userTagNames = userTags.stream()
-                .map(UserTagDTO::getTagName)   // <-- 여기 수정!
+                .map(UserTagDTO::getTagName)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
@@ -91,7 +73,7 @@ public class RoommateController {
 
     // ✅ 저장 처리
     @PostMapping("/register")
-    @ResponseBody // JSON 데이터를 반환하기 위해 이 어노테이션을 추가합니다.
+    @ResponseBody
     public ResponseEntity<?> registerProfile(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
                                              @RequestParam(value = "introduction", required = false) String introduction,
                                              HttpSession session) {
@@ -100,7 +82,6 @@ public class RoommateController {
 
         String userId = (session != null) ? (String) session.getAttribute("SS_USER_ID") : null;
         if (userId == null || userId.isBlank()) {
-            // 로그인되지 않은 경우 401 Unauthorized 에러와 함께 JSON 응답
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("result", "fail", "msg", "로그인이 필요합니다."));
         }
@@ -108,56 +89,27 @@ public class RoommateController {
         try {
             String imageUrl = null;
             if (profileImage != null && !profileImage.isEmpty()) {
-                imageUrl = saveProfileImage(profileImage); // 이미지 저장 로직
+                // ✅ [변경] AWS S3 서비스 사용
+                imageUrl = awsS3Service.uploadFile(profileImage);
             }
 
-            roommateService.saveUserProfile(userId, introduction, imageUrl); // 프로필 저장 로직
+            roommateService.saveUserProfile(userId, introduction, imageUrl);
             session.setAttribute("SS_USER_PROFILE_IMG_URL", imageUrl);
 
-            // 성공 시 "result":"success" 라는 JSON 응답을 보냅니다.
             return ResponseEntity.ok(Map.of("result", "success"));
 
         } catch (Exception e) {
-            // log.error("프로필 저장 실패", e);
-            // 서버 처리 중 에러 발생 시 500 Internal Server Error와 함께 JSON 응답
+            log.error("프로필 저장 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("result", "fail", "msg", "서버 오류로 저장에 실패했습니다."));
         }
     }
 
-    // 로컬 폴더에 저장하고 /uploads/profile/.. URL 반환
-    private String saveProfileImage(MultipartFile file) throws IOException {
-        String originalFilename = file.getOriginalFilename();
-        String ext = StringUtils.getFilenameExtension(originalFilename);
-        String uuidFileName = UUID.randomUUID().toString().replace("-", "") + (ext != null ? "." + ext : "");
-
-        // NCP Object Storage 클라이언트 생성
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withPathStyleAccessEnabled(true) // NCP는 이게 꼭 필요함
-                .build();
-
-        // 파일 메타데이터 설정
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(file.getSize());
-        metadata.setContentType(file.getContentType());
-
-        String key = folder + "/" + uuidFileName;
-
-        // S3 업로드
-        s3Client.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), metadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead)); // 공개 읽기 권한
-
-        // URL 반환
-        return endpoint + "/" + bucketName + "/" + key;
-    }
+    // ❌ [삭제됨] private String saveProfileImage(MultipartFile file) throws IOException { ... }
+    // AWS S3 서비스가 이 역할을 대신합니다.
 
     @GetMapping("/roommateMain")
     public String roommateMain() {
-        // 템플릿/뷰 파일: templates/roommate/roommateMain.html (Thymeleaf)
-        // 또는 /WEB-INF/views/roommate/roommateMain.jsp (JSP)
         return "roommate/roommateMain";
     }
 
@@ -175,7 +127,7 @@ public class RoommateController {
     }
 
 
-    // ★ 무한 스크롤 목록 API (JSON)
+    // ☆ 무한 스크롤 목록 API (JSON)
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
@@ -202,18 +154,7 @@ public class RoommateController {
         return roommateService.getDisplayInfo(userId);
     }
 
-//    // ✅ 25-09-15 추가 //
-//    @GetMapping("roommateDetail")
-//    public String roommateDetail() {
-//
-//        log.info("{}.roommateDetail Start!", this.getClass().getName());
-//        log.info("{}.roommateDetail End!", this.getClass().getName());
-//
-//        return "roommate/roommateDetail";
-//    }
-
-    //    // ✅ 25-09-17 추가 //
-// UserProfileDTO 안에 userId 필드가 있다고 가정
+    // ✅ 25-09-17 추가
     @GetMapping("/roommateDetail")
     public String roommateDetail(UserProfileDTO pDTO, org.springframework.ui.Model model) {
         String userId = pDTO.getUserId();  // ?userId=xxx 로 전달됨
@@ -228,7 +169,7 @@ public class RoommateController {
 
     @PostMapping("/searchByTags")
     @ResponseBody
-    public TagDTO searchByTags(@RequestBody TagDTO tagDTO) { // ✅ [수정] @RequestBody로 자동 변환
+    public TagDTO searchByTags(@RequestBody TagDTO tagDTO) {
         log.info("{}.searchByTags Start!", this.getClass().getName());
 
         log.info("searchByTags called with location={}, tagGroupMap={}, page={}, pageSize={}",
