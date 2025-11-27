@@ -1,12 +1,5 @@
 package kopo.shallwithme.controller;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.SharehouseCardDTO;
@@ -15,14 +8,13 @@ import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.ISharehouseService;
 import kopo.shallwithme.service.impl.UserInfoService;
+import kopo.shallwithme.service.impl.AwsS3Service; // ✅ AWS 서비스 import 추가
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -40,24 +32,15 @@ public class SharehouseController {
 
     private final ISharehouseService sharehouseService;
     private final UserInfoService userInfoService;
+    private final AwsS3Service awsS3Service; // ✅ AWS 서비스 주입 추가
 
-    @Value("${ncp.object-storage.endpoint}")
-    private String endpoint;
-
-    @Value("${ncp.object-storage.region}")
-    private String region;
-
-    @Value("${ncp.object-storage.access-key}")
-    private String accessKey;
-
-    @Value("${ncp.object-storage.secret-key}")
-    private String secretKey;
-
-    @Value("${ncp.object-storage.bucket-name}")
-    private String bucketName;
-
-    @Value("${ncp.object-storage.folder}")
-    private String folder;
+    // ❌ [삭제됨] NCP 관련 @Value 설정들 모두 제거
+    // @Value("${ncp.object-storage.endpoint}") private String endpoint;
+    // @Value("${ncp.object-storage.region}") private String region;
+    // @Value("${ncp.object-storage.access-key}") private String accessKey;
+    // @Value("${ncp.object-storage.secret-key}") private String secretKey;
+    // @Value("${ncp.object-storage.bucket-name}") private String bucketName;
+    // @Value("${ncp.object-storage.folder}") private String folder;
 
     // 등록 페이지
     @GetMapping("/sharehouseReg")
@@ -184,7 +167,7 @@ public class SharehouseController {
             log.info("✅ 파일 크기 검증 통과");
 
             // ========================================
-            // ✅ 3. 이미지 업로드 시작
+            // ✅ 3. 이미지 업로드 시작 (AWS S3 사용)
             // ========================================
             log.info("=== 이미지 업로드 시작 ===");
             List<String> imageUrls = new ArrayList<>();
@@ -192,7 +175,7 @@ public class SharehouseController {
             // 썸네일 업로드
             if (thumbnail != null && !thumbnail.isEmpty()) {
                 log.info("썸네일 업로드 중...");
-                String thumbnailUrl = saveProfileImage(thumbnail);
+                String thumbnailUrl = awsS3Service.uploadFile(thumbnail); // ✅ 변경
                 imageUrls.add(thumbnailUrl);
                 log.info("✅ 썸네일 업로드 완료: {}", thumbnailUrl);
             }
@@ -200,17 +183,17 @@ public class SharehouseController {
             // 추가 이미지 업로드
             if (images != null) {
                 for (int i = 0; i < images.size(); i++) {
-                    MultipartFile f = images.get(i);
-                    if (f != null && !f.isEmpty()) {
-                        log.info("추가 이미지 {}번 업로드 중...", i + 1);
-                        String url = saveProfileImage(f);
-                        imageUrls.add(url);
-                        log.info("✅ 추가 이미지 {}번 업로드 완료: {}", i + 1, url);
+                    MultipartFile image = images.get(i);
+                    if (image != null && !image.isEmpty()) {
+                        log.info("이미지 {}번 업로드 중...", i + 1);
+                        String imageUrl = awsS3Service.uploadFile(image); // ✅ 변경
+                        imageUrls.add(imageUrl);
+                        log.info("✅ 이미지 {}번 업로드 완료: {}", i + 1, imageUrl);
                     }
                 }
             }
 
-            log.info("✅ 총 {}개 이미지 업로드 완료", imageUrls.size());
+            log.info("✅ 이미지 업로드 완료! 총 {}개", imageUrls.size());
 
             // ========================================
             // ✅ 4. DB 저장
@@ -259,14 +242,15 @@ public class SharehouseController {
 
         } catch (Exception e) {
             log.error("========================================");
-            log.error("❌ /sharehouse/register 실패!");
+            log.error("❌ 쉐어하우스 등록 중 오류 발생!");
             log.error("에러 타입: {}", e.getClass().getName());
             log.error("에러 메시지: {}", e.getMessage());
 
             Throwable root = e;
-            while (root.getCause() != null) root = root.getCause();
-
-            log.error("근본 원인: {} - {}",
+            while (root.getCause() != null && root.getCause() != root) {
+                root = root.getCause();
+            }
+            log.error("Root cause: {} - {}",
                     root.getClass().getSimpleName(),
                     root.getMessage() != null ? root.getMessage() : "메시지 없음");
             log.error("전체 스택 트레이스:", e);
@@ -282,30 +266,8 @@ public class SharehouseController {
         }
     }
 
-    // S3(NCP) 업로드 – 룸메이트와 동일한 방식/이름 유지
-    private String saveProfileImage(MultipartFile file) throws IOException {
-        String originalFilename = file.getOriginalFilename();
-        String ext = StringUtils.getFilenameExtension(originalFilename);
-        String uuidFileName = UUID.randomUUID().toString().replace("-", "") + (ext != null ? "." + ext : "");
-
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withPathStyleAccessEnabled(true)
-                .build();
-
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(file.getSize());
-        metadata.setContentType(file.getContentType());
-
-        String key = folder + "/" + uuidFileName;
-
-        s3Client.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), metadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
-
-        return endpoint + "/" + bucketName + "/" + key;
-    }
+    // ❌ [삭제됨] private String saveProfileImage(MultipartFile file) throws IOException { ... }
+    // AWS S3 서비스가 이 역할을 대신합니다.
 
     @GetMapping("/sharehouseMain")
     public String sharehouseMain() {
@@ -328,93 +290,127 @@ public class SharehouseController {
             Map<String, Object> m = new HashMap<>();
             m.put("userId", c.getHouseId());
             m.put("houseId", c.getHouseId());
-            m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
-            m.put("age", null);
-            m.put("gender", null);
-            m.put("floorNumber", c.getFloorNumber());
+            m.put("profileImgUrl", c.getCoverUrl());
 
-            // ✅ 태그 6개로 확장
-            List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(c.getHouseId());
-            m.put("tag1", (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null);
-            m.put("tag2", (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null);
-            m.put("tag3", (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null);
-            m.put("tag4", (tags != null && tags.size() > 3) ? tags.get(3).getTagName() : null);
-            m.put("tag5", (tags != null && tags.size() > 4) ? tags.get(4).getTagName() : null);
-            m.put("tag6", (tags != null && tags.size() > 5) ? tags.get(5).getTagName() : null);
+            List<UserTagDTO> tags = c.getTags();
+            if (tags != null && !tags.isEmpty()) {
+                m.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
+                m.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+            } else {
+                m.put("tag1", null);
+                m.put("tag2", null);
+            }
+            m.put("gender", "");
 
             return m;
         }).collect(Collectors.toList());
 
         log.info("{}.getUserList End!", this.getClass().getName());
+
         return rList;
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> list(
-            @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "15") int pageSize,
-            @RequestParam(required = false) String location,
-            @RequestParam(value = "tagIds", required = false) List<Integer> tagIds
-    ) {
+    public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
+        int safePage = Math.max(page, 1);
+        int pageSize = 12;
+        int offset = (safePage - 1) * pageSize;
 
-        log.info("=== 쉐어하우스 목록 조회 ===");
-        log.info("offset: {}, pageSize: {}", offset, pageSize);
-        log.info("location: {}", location);
-        log.info("tagIds: {}", tagIds);
-
-        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, location, tagIds, null);
+        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
 
         List<Map<String, Object>> items = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();
             m.put("userId", c.getHouseId());
             m.put("houseId", c.getHouseId());
-            m.put("profileImgUrl", c.getCoverUrl());
             m.put("name", c.getTitle());
-            m.put("floorNumber", c.getFloorNumber());
+            m.put("profileImgUrl", c.getCoverUrl());
 
-            // ✅ 태그 6개로 확장
-            List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(c.getHouseId());
-            m.put("tag1", (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null);
-            m.put("tag2", (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null);
-            m.put("tag3", (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null);
-            m.put("tag4", (tags != null && tags.size() > 3) ? tags.get(3).getTagName() : null);
-            m.put("tag5", (tags != null && tags.size() > 4) ? tags.get(4).getTagName() : null);
-            m.put("tag6", (tags != null && tags.size() > 5) ? tags.get(5).getTagName() : null);
-
-            log.info("카드 ID: {}, 층수: {}, 태그 6개: {}, {}, {}, {}, {}, {}",
-                    c.getHouseId(),
-                    c.getFloorNumber(),
-                    m.get("tag1"), m.get("tag2"), m.get("tag3"),
-                    m.get("tag4"), m.get("tag5"), m.get("tag6"));
-
+            List<UserTagDTO> tags = c.getTags();
+            if (tags != null && !tags.isEmpty()) {
+                m.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
+                m.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+            }
+            m.put("gender", "");
             return m;
         }).collect(Collectors.toList());
 
-        boolean lastPage = items.size() < pageSize;
-
-        log.info("총 {}개 카드 반환", items.size());
-
+        boolean lastPage = items.isEmpty();
         return Map.of("items", items, "lastPage", lastPage);
     }
 
-    // ✅ 특정 항목의 태그 3개 + 기타정보 조회 API – 룸메이트 /{userId}/info와 동일
-    @GetMapping("/{userId}/info")
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> getRoommateInfo(@PathVariable String userId) {
-        log.info("getRoommateInfo called for userId={}", userId);
+    public Map<String, Object> search(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
+            @RequestParam(value = "maxRent", required = false) Integer maxRent
+    ) {
+        log.info("Sharehouse search - page={}, pageSize={}, location={}, tagIds={}, maxRent={}",
+                page, pageSize, location, tagIds, maxRent);
 
-        Long houseId;
-        try { houseId = Long.valueOf(userId); }
-        catch (Exception e) { return Map.of("tag1", null, "tag2", null, "tag3", null, "gender", null); }
+        int safePage = Math.max(page, 1);
+        int safePageSize = (pageSize <= 0) ? 12 : pageSize;
+        int offset = (safePage - 1) * safePageSize;
 
-        List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(houseId);
-        String tag1 = (tags != null && tags.size() > 0) ? tags.get(0).getTagName() : null;
-        String tag2 = (tags != null && tags.size() > 1) ? tags.get(1).getTagName() : null;
-        String tag3 = (tags != null && tags.size() > 2) ? tags.get(2).getTagName() : null;
+        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, safePageSize, location, tagIds, maxRent);
 
-        return Map.of("tag1", tag1, "tag2", tag2, "tag3", tag3, "gender", null);
+        List<Map<String, Object>> items = cards.stream().map(c -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("userId", c.getHouseId());
+            m.put("houseId", c.getHouseId());
+            m.put("name", c.getTitle());
+            m.put("profileImgUrl", c.getCoverUrl());
+            m.put("address", c.getAddress());
+            m.put("detailAddress", c.getDetailAddress());
+            m.put("floorNumber", c.getFloorNumber());
+
+            List<UserTagDTO> tags = c.getTags();
+            if (tags != null && !tags.isEmpty()) {
+                m.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
+                m.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+            }
+            return m;
+        }).collect(Collectors.toList());
+
+        boolean lastPage = items.size() < safePageSize;
+        return Map.of(
+                "items", items,
+                "lastPage", lastPage,
+                "page", safePage,
+                "pageSize", safePageSize
+        );
+    }
+
+    @GetMapping("/{houseId}/info")
+    @ResponseBody
+    public Map<String, Object> getSharehouseInfo(@PathVariable("houseId") Long houseId) {
+        log.info("getSharehouseInfo called for houseId={}", houseId);
+
+        SharehouseCardDTO card = sharehouseService.getCardById(houseId);
+        if (card == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("houseId", card.getHouseId());
+        result.put("title", card.getTitle());
+        result.put("subText", card.getSubText());
+        result.put("coverUrl", card.getCoverUrl());
+        result.put("address", card.getAddress());
+        result.put("detailAddress", card.getDetailAddress());
+        result.put("floorNumber", card.getFloorNumber());
+
+        List<UserTagDTO> tags = card.getTags();
+        if (tags != null && !tags.isEmpty()) {
+            result.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
+            result.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+        }
+
+        return result;
     }
 
     @GetMapping("/sharehouseDetail")
@@ -428,7 +424,7 @@ public class SharehouseController {
             houseId = Long.valueOf(userId);
         } catch (Exception e) {
             log.error("userId 파싱 실패: {}", userId);
-            houseId = 1L;
+            return "error/notFound";
         }
 
         // 1단계: 기본 정보 조회
@@ -446,14 +442,11 @@ public class SharehouseController {
         Object regIdObj = detail.get("regId");
         log.info("=== regId 처리 ===");
         log.info("DB에서 가져온 regIdObj: {}", regIdObj);
-        log.info("regIdObj 타입: {}", regIdObj != null ? regIdObj.getClass().getName() : "null");
 
         String regId = null;
-
         if (regIdObj != null) {
-            regId = String.valueOf(regIdObj).trim(); // ✅ trim() 추가
+            regId = String.valueOf(regIdObj).trim();
             log.info("String 변환 후 regId: '{}'", regId);
-            log.info("regId 길이: {}", regId.length());
 
             if (regId.equals("null") || regId.isBlank()) {
                 log.warn("regId가 'null' 문자열이거나 비어있음");
@@ -461,7 +454,6 @@ public class SharehouseController {
             }
         }
 
-        // 명시적으로 regId 설정
         detail.put("regId", regId);
         log.info("detail에 설정된 최종 regId: '{}'", regId);
 
@@ -479,25 +471,9 @@ public class SharehouseController {
                 log.info("UserInfoService 호출 후");
 
                 if (hostProfile != null) {
-                    log.info("조회된 프로필 전체: {}", hostProfile);
-                    log.info("userId: {}", hostProfile.getUserId());
-                    log.info("userName: {}", hostProfile.getUserName());
+                    log.info("조회된 프로필: userName={}", hostProfile.getUserName());
 
-                    // ✅ 다양한 필드명 시도
-                    String profileUrl = null;
-
-                    // 방법 1: getter 메서드 이용
-                    try {
-                        profileUrl = hostProfile.getProfileImageUrl();
-                        log.info("getProfileImageUrl(): {}", profileUrl);
-                    } catch (Exception e) {
-                        log.warn("getProfileImageUrl() 실패");
-                    }
-
-                    // 방법 2: 다른 필드명 시도 (필요시)
-                    // profileUrl = hostProfile.getProfileImgUrl();
-                    // profileUrl = hostProfile.getProfile_image_url();
-
+                    String profileUrl = hostProfile.getProfileImageUrl();
                     if (profileUrl != null && !profileUrl.isBlank()) {
                         detail.put("hostProfileUrl", profileUrl);
                         log.info("✅ 프로필 URL 설정 성공: {}", profileUrl);
@@ -523,7 +499,6 @@ public class SharehouseController {
         log.info("=== 최종 detail 내용 ===");
         log.info("regId: '{}'", detail.get("regId"));
         log.info("hostName: '{}'", detail.get("hostName"));
-        log.info("hostProfileUrl: '{}'", detail.get("hostProfileUrl"));
         log.info("이미지 개수: {}", images != null ? images.size() : 0);
         log.info("태그 개수: {}", tags != null ? tags.size() : 0);
 
