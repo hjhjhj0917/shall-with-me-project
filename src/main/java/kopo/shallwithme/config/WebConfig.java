@@ -56,7 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
                     AbstractHttp11Protocol<?> protocol = (AbstractHttp11Protocol<?>) handler;
                     protocol.setMaxSavePostSize(104857600);
 
-                    log.info("✅ Tomcat Connector 설정 완료");
+                    log.info("Tomcat Connector 설정 완료");
                     log.info("  - maxParameterCount: 10000");
                     log.info("  - maxPostSize: 100MB");
                     log.info("  - maxSavePostSize: 100MB");

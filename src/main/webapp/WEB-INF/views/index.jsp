@@ -4,82 +4,96 @@
 <head>
     <meta charset="UTF-8">
     <title>살며시</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css"/>
-    <style>
-        /* 오른쪽 영역 클릭 가능하도록 cursor 추가 */
-        .right-panel {
-            cursor: pointer;
-        }
-    </style>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            function checkLoginAndRedirect(url) {
+                $.ajax({
+                    url: "/user/loginCheck",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (res) {
+                        if (res === 1) {
+                            location.href = url;
+                        } else {
+                            showCustomAlert("로그인이 필요한 서비스입니다.", function () {
+                                location.href = "/user/login";
+                            });
+                        }
+                    },
+                    error: function () {
+                        showCustomAlert("서버 통신 오류가 발생했습니다.");
+                    }
+                });
+            }
+
+            $("#roommateBtn").on("click", function () {
+                checkLoginAndRedirect("/roommate/roommateMain");
+            });
+
+            $("#sharehouseBtn").on("click", function () {
+                checkLoginAndRedirect("/sharehouse/sharehouseMain");
+            });
+        });
+    </script>
+
 </head>
 <body>
+<%@ include file="includes/header.jsp" %>
 
 <div class="main-container">
-    <!-- 왼쪽 텍스트 -->
-    <div class="left-panel">
-        <div class="text-box">
-            <div id="textContainer" class="slide-text"></div>
+
+    <div class="left-panel" id="roommateBtn">
+        <div class="left-text">
+            자신과 비슷한 성향의 룸메이트를 찾아보세요
+        </div>
+        <div class="roommate-start">
+            룸메이트 찾기
+        </div>
+        <div class="left">
+            <img src="/images/roommate.png" class="left-image" alt="왼쪽 이미지"/>
         </div>
     </div>
 
-    <div class="wave-left">
-        <svg viewBox="0 0 800 800" preserveAspectRatio="none">
-            <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#f4f9fe"/>
-        </svg>
-    </div>
-
-    <!-- 오른쪽 비스듬한 영역 (클릭 시 이동) -->
-    <div class="right-panel" id="rightPanel">
-        <div class="wave-left">
-            <svg viewBox="0 0 800 800" preserveAspectRatio="none">
-                <path d="M0,0 C150,200 150,600 0,800 L0,0 Z" fill="#ffffff"/>
-            </svg>
+    <div class="right-panel" id="sharehouseBtn">
+        <div class="right-text">
+            자신의 새로운 보금자리를 찾아보세요
         </div>
-        <div class="right-inner">
-            <div class="logo">살며시</div>
-            <div class="logo-2">Shall With Me</div>
+        <div class="right-start">
+            쉐어하우스 찾기
+        </div>
+        <div class="right">
+            <img src="/images/sharehouse.png" class="right-image" alt="오른쪽 이미지"/>
         </div>
     </div>
-
 </div>
 
-<script>
-    const texts = [
-        "자신과 비슷한 성향의 룸메이트를 찾아보세요",
-        "살며시는 당신의 새로운 동거를 응원합니다",
-        "당신의 라이프스타일에 맞는 사람을 매칭해보세요"
-    ];
+<%@ include file="includes/footer.jsp" %>
+<!-- 커스텀 알림창 -->
+<%@ include file="includes/customModal.jsp" %>
 
-    let idx = 0;
-    const textContainer = document.getElementById("textContainer");
-
-    function showText(index) {
-        textContainer.style.opacity = 0;
-        textContainer.style.transform = "translateY(10px)";
-        setTimeout(() => {
-            textContainer.innerText = texts[index];
-            textContainer.style.opacity = 1;
-            textContainer.style.transform = "translateY(0)";
-        }, 300);
+<%
+    String ssUserName = (String) session.getAttribute("SS_USER_NAME");
+    if (ssUserName == null) {
+        ssUserName = "";
     }
-
-    showText(idx);
-    const interval = setInterval(() => {
-        idx = (idx + 1) % texts.length;
-        showText(idx);
-    }, 4000);
-
-    // 오른쪽 영역 클릭 시 메인으로 이동
-    const rightPanel = document.getElementById("rightPanel");
-    rightPanel.addEventListener("click", () => {
-        window.location.href = "/user/main";
-    });
-
-    // 특정 시간 후(예: 12초) 자동 이동
-    setTimeout(() => {
-        window.location.href = "/user/main";
-    }, 12000);
+%>
+<script>
+    const userName = "<%= ssUserName %>";
 </script>
+
+<script src="${pageContext.request.contextPath}/js/navbar.js"></script>
+<%-- 모달창 js --%>
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>
+
 
 </body>
 </html>
+
+

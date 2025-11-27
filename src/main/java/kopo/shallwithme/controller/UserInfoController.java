@@ -528,7 +528,7 @@ public class UserInfoController {
         return rDTO;
     }
 
-    @GetMapping(value = "userTagSelect") // /WEB-INF/views/user/index.jsp 로 이동
+    @GetMapping(value = "userTagSelect")
     public String userTagSelect() {
 
         return "user/userTagSelect";

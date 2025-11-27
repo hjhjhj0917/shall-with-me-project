@@ -64,8 +64,8 @@
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none; /* IE 10+ */
 
-        display: flex; /* 추가: flex 컨테이너 */
-        flex-direction: column; /* 추가: 세로 정렬 */
+        display: flex;
+        flex-direction: column;
     }
 
 
@@ -79,18 +79,27 @@
         border-radius: 18px;
         max-width: 80%;
         word-wrap: break-word;
-        user-select: text; /* 복사 가능하게 명시 */
-        font-size: 15px; /* ✅ 원하는 사이즈로 설정 */
+        user-select: text;
+        font-size: 15px;
+    }
+
+    .chatbot-message a {
+        color: #3399ff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .chatbot-message a:hover {
+        color: #0056b3;
     }
 
     .user-message {
         background: #E1EBFB;
-        align-self: flex-end; /* 오른쪽 정렬 유지 */
+        align-self: flex-end;
         margin-left: auto;
-        display: inline-block; /* 텍스트 길이만큼 줄이기 */
+        display: inline-block;
         max-width: 80%;
         word-wrap: break-word;
-        text-align: left; /* 텍스트는 왼쪽 정렬 유지 */
+        text-align: left;
         margin-bottom: 16px;
     }
 
@@ -131,12 +140,10 @@
 
 </style>
 
-<!-- 챗봇 플로팅 버튼 -->
 <button class="chatbot-toggler">
     <img src="../images/chatbot.png">
 </button>
 
-<!-- 챗봇 창 -->
 <div class="chatbot-container">
     <div class="chatbot-header">청년 정책 챗봇 '살며시'</div>
     <div class="chatbot-messages" id="chatbotMessages">
@@ -168,6 +175,7 @@
         // 챗봇 창 열고 닫기
         toggler.on("click", () => container.toggleClass("active"));
 
+        // 텍스트 내 URL을 클릭 가능한 a 태그로 변환하는 함수
         function linkify(text) {
             const urlRegex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
             return text.replace(urlRegex, function (rawUrl) {
@@ -178,41 +186,67 @@
                     trailingChar = lastChar;
                     url = url.slice(0, -1);
                 }
+                // target="_blank"를 추가하여 새 탭에서 열리도록 설정
                 return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>' + trailingChar;
             });
         }
 
-        // --- 🎨 변경된 부분: HTML 태그를 인식하는 타이핑 함수 ---
+        // --- 🎨 수정된 typeWriter 함수: HTML 태그(특히 링크)를 깨뜨리지 않고 출력 ---
         function typeWriter(element, text) {
-            // 서버 응답에 포함된 \n을 <br>로, URL을 <a> 태그로 먼저 변환합니다.
-            // <strong> 같은 태그도 이 단계에서 그대로 유지됩니다.
+            // 1. URL을 링크 태그로 변환하고 줄바꿈 처리
             const processedHtml = linkify(text).replace(/\n/g, '<br>');
 
             let i = 0;
-            $(element).html(''); // '입력 중...' 메시지를 비웁니다.
+            $(element).html(''); // '입력 중...' 메시지 초기화
 
             function typing() {
                 if (i < processedHtml.length) {
-                    // 현재 문자가 '<' 이면 태그의 시작으로 간주합니다.
-                    if (processedHtml[i] === '<') {
-                        // '>' 문자를 찾아 태그 전체를 한 번에 추가합니다.
-                        const closingTagIndex = processedHtml.indexOf('>', i);
-                        const tag = processedHtml.substring(i, closingTagIndex + 1);
-                        $(element).append(tag);
-                        i = closingTagIndex; // 인덱스를 태그 끝으로 이동
+                    const char = processedHtml[i];
+
+                    // 2. 태그 시작 감지 ('<')
+                    if (char === '<') {
+                        // 3. 링크 태그인지 확인 ('<a')
+                        if (processedHtml.substring(i, i + 2).toLowerCase() === '<a') {
+                            // 링크의 닫는 태그(</a>) 위치를 찾음
+                            const closingTag = '</a>';
+                            const closingIndex = processedHtml.indexOf(closingTag, i);
+
+                            if (closingIndex !== -1) {
+                                // <a>부터 </a>까지 전체를 잘라서 한 번에 추가 (링크 깨짐 방지)
+                                const fullLinkTag = processedHtml.substring(i, closingIndex + closingTag.length);
+                                $(element).append(fullLinkTag);
+                                i = closingIndex + closingTag.length; // 인덱스를 </a> 뒤로 이동
+                            } else {
+                                // 닫는 태그 못 찾으면 일반 태그처럼 처리
+                                const closingTagIndex = processedHtml.indexOf('>', i);
+                                const tag = processedHtml.substring(i, closingTagIndex + 1);
+                                $(element).append(tag);
+                                i = closingTagIndex + 1;
+                            }
+                        } else {
+                            // 4. 링크가 아닌 다른 태그 (<br>, <strong> 등) 처리
+                            const closingTagIndex = processedHtml.indexOf('>', i);
+                            if (closingTagIndex !== -1) {
+                                const tag = processedHtml.substring(i, closingTagIndex + 1);
+                                $(element).append(tag);
+                                i = closingTagIndex + 1;
+                            } else {
+                                $(element).append(char);
+                                i++;
+                            }
+                        }
                     } else {
-                        // 일반 텍스트는 한 글자씩 추가합니다.
-                        $(element).append(processedHtml[i]);
+                        // 5. 일반 텍스트는 한 글자씩 타이핑
+                        $(element).append(char);
+                        i++;
                     }
 
-                    i++;
                     scrollToBottom();
                     setTimeout(typing, 30); // 타이핑 속도 (ms)
                 }
             }
             typing();
         }
-
 
         function sendMessage() {
             const question = inputEl.val().trim();
@@ -229,6 +263,7 @@
                 contentType: "application/json",
                 data: JSON.stringify({question: question}),
                 success: function (response) {
+                    // 응답이 오면 타이핑 효과 시작
                     typeWriter(typingIndicator, response.answer);
                 },
                 error: function () {
