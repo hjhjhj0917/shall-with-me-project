@@ -7,7 +7,6 @@ import kopo.shallwithme.service.IMailService;
 import kopo.shallwithme.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +22,6 @@ public class MailController {
 
     private final IMailService mailService;
 
-    @GetMapping(value = "mailForm")
-    public String mailForm() {
-
-        log.info("{}.mailForm() Start!", this.getClass().getName());
-
-        return "mail/mailForm";
-    }
 
     @ResponseBody
     @PostMapping(value = "sendMail")
@@ -67,6 +59,15 @@ public class MailController {
         log.info("{}.sendMail End!", this.getClass().getName());
 
         return dto;
+    }
+
+
+    @GetMapping(value = "mailForm")
+    public String mailForm() {
+
+        log.info("{}.mailForm() Start!", this.getClass().getName());
+
+        return "mail/mailForm";
     }
 }
 
