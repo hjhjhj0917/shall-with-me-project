@@ -1,19 +1,17 @@
 .main-container {
     display: flex;
-    align-items: flex-start; /* 콘텐츠 높이가 달라도 위쪽을 기준으로 정렬 */
+    align-items: flex-start;
 }
 
 footer {
     margin-top: 50px !important;
 }
 
-/* 사이드바 기본 스타일 */
 .sidebar {
-    position: sticky;       /* 👈 fixed 에서 sticky 로 변경 */
-    top: 20px;              /* 👈 화면 상단에서 20px 떨어진 곳에 붙도록 설정 */
-    height: calc(100vh - 130px); /* 👈 뷰포트 높이에 맞춰 조절 (상하 여백 고려) */
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 130px);
 
-    /* 아래는 기존 스타일 유지 */
     width: 260px;
     padding: 20px 14px;
     border-right: 1px solid #eee;
@@ -22,20 +20,19 @@ footer {
     flex-direction: column;
 }
 
-/* 헤더 (로고, 토글 버튼) */
 .sidebar-header {
     margin-top: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding-bottom: 50px;
-    flex-shrink: 0; /* 헤더 높이가 줄어들지 않도록 고정 */
+    flex-shrink: 0;
 }
 .sidebar-logo {
     display: flex;
-    flex-direction: column; /* ✅ 이미지와 이름을 세로로 정렬 */
-    align-items: center;   /* ✅ 가로 중앙 정렬 */
-    gap: 10px;             /* ✅ 이미지와 이름 사이 간격 */
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     text-decoration: none;
     color: #3399ff;
     font-weight: 500;
@@ -56,7 +53,7 @@ footer {
     font-size: 1rem;
 }
 .sidebar-toggle-btn {
-    position: absolute; /* 사이드바를 기준으로 위치 고정 */
+    position: absolute;
     top: 22px;
     left: 24px;
     background: none;
@@ -73,17 +70,15 @@ footer {
     background-color: #eee;
 }
 
-/* [추가] 메뉴 전체를 감싸는 래퍼 */
 .sidebar-menu-wrapper {
-    flex-grow: 1; /* 남은 공간을 모두 차지 */
-    overflow-y: auto; /* 내용이 길어지면 스크롤 생성 */
-    scrollbar-width: none; /* 스크롤바 숨기기 (Firefox) */
+    flex-grow: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
 }
 .sidebar-menu-wrapper::-webkit-scrollbar {
-    display: none; /* 스크롤바 숨기기 (Chrome, Safari) */
+    display: none;
 }
 
-/* 메뉴 컨테이너 */
 .sidebar-menu-container {
     height: 100%;
     display: flex;
@@ -91,7 +86,6 @@ footer {
     justify-content: space-between;
 }
 
-/* 메뉴 아이템 */
 .sidebar-menu-item {
     display: flex;
     align-items: center;
@@ -106,14 +100,11 @@ footer {
     cursor: pointer;
 }
 
-/* 메뉴 아이템 내부의 아이콘 */
 .sidebar-menu-item i {
     font-size: 1.2rem;
 
-    /* [핵심 수정 1] 아이콘의 공간 너비를 고정합니다. */
     width: 30px;
 
-    /* [핵심 수정 2] 아이콘 크기가 변해도 공간을 유지하도록 합니다. */
     flex-shrink: 0;
 
     text-align: center;
@@ -134,45 +125,34 @@ footer {
     font-weight: 500;
 }
 
-/* ============================
-   사이드바가 접혔을 때 (collapsed)
-   ============================ */
-
-/* 1. 사이드바 너비 축소 */
 .sidebar.collapsed {
     width: 88px;
-    /* ✅ 펼쳤을 때와 동일한 좌우 패딩을 유지하여 아이콘 위치를 고정합니다. */
     padding: 20px 14px;
 }
 
 .sidebar.collapsed .sidebar-header {
-    visibility: hidden; /* 요소를 보이지 않게 함 */
-    opacity: 0;         /* 투명도를 0으로 만들어 애니메이션 효과를 줌 */
-    pointer-events: none; /* 클릭되지 않도록 함 */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
-/* 3. 메뉴 아이템 내부의 간격(gap)을 제거하여 아이콘이 밀려나지 않도록 함 */
 .sidebar.collapsed .sidebar-menu-item {
     gap: 0;
 }
 
-/* 4. 메뉴 텍스트 숨기기 (기존과 동일) */
 .sidebar.collapsed .sidebar-menu-text {
     opacity: 0;
     pointer-events: none;
 }
 
 .sidebar-main-content {
-    flex-grow: 1; /* 👈 남은 공간을 모두 차지하도록 설정 */
-    /* margin-left: 260px; */ /* 👈 flex 레이아웃이 간격을 자동 조절하므로 제거! */
-    width: auto; /* 👈 너비도 flex가 알아서 계산하도록 변경 */
-    transition: width 0.3s ease; /* margin-left 전환 효과 제거 */
+    flex-grow: 1;
+    width: auto;
+    transition: width 0.3s ease;
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* 사이드바가 접혔을 때 메인 콘텐츠의 위치와 너비 조정 */
 .sidebar.collapsed ~ .sidebar-main-content {
-    /* margin-left: 88px; */ /* 👈 이 부분도 제거합니다. */
     width: auto;
 }

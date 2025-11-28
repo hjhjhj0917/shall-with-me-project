@@ -20,8 +20,8 @@ footer {
     clip-path: url(#wave-right);
     cursor: pointer;
     text-align: center;
-    align-items: center;      /* 수직 중앙 */
-    justify-content: center;  /* 수평 중앙 */
+    align-items: center;
+    justify-content: center;
     border-radius: 50px;
     font-size: 20px;
 }
@@ -44,8 +44,8 @@ footer {
     clip-path: url(#wave-left);
     cursor: pointer;
     text-align: center;
-    align-items: center;      /* 수직 중앙 */
-    justify-content: center;  /* 수평 중앙 */
+    align-items: center;
+    justify-content: center;
     border-radius: 50px;
     font-size: 20px;
 }
@@ -59,13 +59,13 @@ footer {
     width: 50%;
     height: 100vh;
     display: flex;
-    align-items: flex-end;  /* 아래 정렬 */
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    background-color: transparent; /* 배경 투명하게 */
+    align-items: flex-end;
+    justify-content: flex-start;
+    background-color: transparent;
 }
 
 .left-image {
-    width: 190%;     /* 비율 유지하며 확대 */
+    width: 190%;
     height: auto;
     z-index: 0;
     margin-bottom: 250px;
@@ -81,15 +81,15 @@ footer {
     width: 50%;
     height: 100vh;
     display: flex;
-    align-items: flex-start;  /* 아래 정렬 */
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    background-color: transparent; /* 배경 투명하게 */
+    align-items: flex-start;
+    justify-content: flex-start;
+    background-color: transparent;
 }
 
 .right-image {
     margin-left: 20px;
     margin-top: 300px;
-    width: 190%;     /* 비율 유지하며 확대 */
+    width: 190%;
     height: auto;
     z-index: 0;
     margin-bottom: 250px;

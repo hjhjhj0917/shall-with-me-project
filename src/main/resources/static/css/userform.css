@@ -11,14 +11,13 @@ body {
     border-radius: 12px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
-    box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1),  /* 왼쪽 위쪽 그림자 진하게 */
-    6px 5px 16px rgba(0, 0, 0, 0.27);  /* 기존 그림자 유지 */
+    box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1),
+    6px 5px 16px rgba(0, 0, 0, 0.27);
     position: relative;
     text-align: center;
     min-width: 300px;
 }
 
-/* 세로 login 탭 */
 .login-tab {
     position: absolute;
     top: 17%;
@@ -82,7 +81,6 @@ body {
     padding-top: 20px;
 }
 
-/* 입력 필드 */
 .login-input {
     width: 100%;
     padding: 12px;
@@ -99,7 +97,6 @@ body {
     box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
 }
 
-/* 자동 로그인 & 비밀번호 찾기 */
 .login-options {
     padding-top: 20px;
     display: flex;
@@ -119,7 +116,6 @@ body {
     color: #3399ff;
 }
 
-/* 로그인 버튼 */
 .login-btn {
     width: 100%;
     background-color: #3399ff;
@@ -138,7 +134,6 @@ body {
     background-color: #3399ff;
 }
 
-/* 회원가입 링크 */
 .signup-link {
     margin-top: 18px;
     font-size: 12px;
@@ -150,7 +145,6 @@ body {
     text-decoration: none;
 }
 
-/* 소셜 로그인 */
 .social-login {
     margin-top: 20px;
     display: flex;
@@ -183,43 +177,43 @@ a {
 #findIdErrorMessage1 {
     color: #3399ff;
     font-size: 14px;
-    text-align: left;          /* 왼쪽 정렬 */
-    height: 5px;              /* 고정 높이로 레이아웃 안정 */
+    text-align: left;
+    height: 5px;
     padding-left: 10px;
-    visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+    visibility: hidden;
     margin-bottom: 20px;
 }
 
 #findIdErrorMessage1.visible {
-    visibility: visible;       /* 메시지가 있을 때 표시 */
+    visibility: visible;
 }
 
 #findPwErrorMessage1 {
     color: #3399ff;
     font-size: 14px;
-    text-align: left;          /* 왼쪽 정렬 */
-    height: 5px;              /* 고정 높이로 레이아웃 안정 */
+    text-align: left;
+    height: 5px;
     padding-left: 10px;
-    visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+    visibility: hidden;
     margin-bottom: 20px;
 }
 
 #findPwErrorMessage1.visible {
-    visibility: visible;       /* 메시지가 있을 때 표시 */
+    visibility: visible;
 }
 
 #findPwErrorMessage2 {
     color: #3399ff;
     font-size: 14px;
-    text-align: left;          /* 왼쪽 정렬 */
-    height: 5px;              /* 고정 높이로 레이아웃 안정 */
+    text-align: left;
+    height: 5px;
     padding-left: 10px;
-    visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+    visibility: hidden;
     margin-bottom: 20px;
 }
 
 #findPwErrorMessage2.visible {
-    visibility: visible;       /* 메시지가 있을 때 표시 */
+    visibility: visible;
 }
 
 #notExists {
@@ -230,33 +224,31 @@ a {
 .error-message {
     color: #3399ff;
     font-size: 14px;
-    text-align: left;          /* 왼쪽 정렬 */
-    height: 5px;              /* 고정 높이로 레이아웃 안정 */
+    text-align: left;
+    height: 5px;
     padding-left: 10px;
-    visibility: hidden;        /* 기본은 숨김, 자리 차지는 유지 */
+    visibility: hidden;
 }
 
 .error-message.visible {
-    visibility: visible;       /* 메시지가 있을 때 표시 */
+    visibility: visible;
 }
 
-/* 공통 hover 효과 */
 .login-tab,
 .login-tab1,
 .login-tab2 {
     transition: transform 0.2s ease, background-color 0.3s;
-    transform-origin: left center; /* 왼쪽을 기준으로 확대 */
+    transform-origin: left center;
     will-change: transform;
 }
 
 .login-tab:hover,
 .login-tab1:hover,
 .login-tab2:hover {
-    transform: translateY(-50%) scaleX(1.1); /* 오른쪽으로만 커짐 */
+    transform: translateY(-50%) scaleX(1.1);
     cursor: pointer;
 }
 
-/* 현재 활성화된 탭 스타일 */
 .active-tab {
     right: -39px;
     font-size: 20px !important;
