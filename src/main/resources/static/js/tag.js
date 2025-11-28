@@ -1,5 +1,3 @@
-// /webapp/js/tag.js 또는 /src/main/webapp/js/tag.js 에 위치
-
 let currentSlide = 0;
 
 window.moveSlide = function (direction) {
@@ -18,7 +16,6 @@ window.selectButton = function (button) {
 };
 
 
-// 버튼 선택 토글 로직
 function selectButton(button) {
     const group = button.parentNode;
     const buttons = group.querySelectorAll("button");
@@ -26,8 +23,6 @@ function selectButton(button) {
     button.classList.add("selected");
 }
 
-
-// 태그 선택
 document.getElementById('saveButton').addEventListener('click', () => {
     const selectedTags = [];
     let firstMissingLegend = null;
@@ -49,13 +44,12 @@ document.getElementById('saveButton').addEventListener('click', () => {
         return;
     }
 
-    // tagType 제거됨
     fetch('/user/saveUserTags', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ userId, tagList: selectedTags })  // ✅ tagType 제거
+        body: JSON.stringify({ userId, tagList: selectedTags })
     })
         .then(res => res.json())
         .then(data => {
@@ -76,14 +70,12 @@ document.getElementById('saveButton').addEventListener('click', () => {
 });
 
 
-// 태그 선택되면 자동으로 넘어감
 window.selectButton = function (button) {
     const group = button.parentNode;
     const buttons = group.querySelectorAll("button");
     buttons.forEach(btn => btn.classList.remove("selected"));
     button.classList.add("selected");
 
-    // 현재 슬라이드 내 모든 fieldset이 선택됐는지 체크
     const slider = document.getElementById('slider');
     const slides = slider.children;
     const currentSlideDiv = slides[currentSlide];
@@ -97,7 +89,6 @@ window.selectButton = function (button) {
     });
 
     if (allSelected) {
-        // 다음 슬라이드로 이동, 마지막 슬라이드면 이동 안 함
         if (currentSlide < slides.length - 1) {
             moveSlide(1);
         }
@@ -141,7 +132,6 @@ function updateProgressIndicator() {
     });
 }
 
-// 해당 슬라이드에 있는 모든 fieldset에 선택된 버튼이 있는지 확인
 function isSlideComplete(slideIndex) {
     const slider = document.getElementById('slider');
     const slide = slider.children[slideIndex];

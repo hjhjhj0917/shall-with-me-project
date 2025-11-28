@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'ko',
         initialView: 'dayGridMonth',
-        noEventsText: '등록된 일정이 없습니다.',  // 이 부분만 추가!
+        noEventsText: '등록된 일정이 없습니다.',
         headerToolbar: {
             left: ' ',
             center: 'prev title next',
@@ -106,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     .hide();
             }
 
-            // 마지막 클릭한 이벤트 저장 (수정 시 사용)
             window.lastClickedEvent = info.event;
 
             $('#step2').hide();
@@ -116,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calendar.render();
 
-    // 새 일정 등록/수정 버튼 공통 이벤트 (클래스 구분)
     $(document).on('click', '.btn-add', function () {
         $('#step1').hide();
         $('#step2').show();
@@ -160,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#deleteEventBtn').show();
     });
 
-    // 등록 및 수정 구분해서 처리
     $eventForm.on('submit', function (e) {
         e.preventDefault();
 
@@ -197,9 +194,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        let startDate = $('#eventStartDate').val(); // 예: '2025-09-15'
+        let startDate = $('#eventStartDate').val();
         if (startDate && time) {
-            startDate += 'T' + time + ':00'; // => '2025-09-15T14:30:00'
+            startDate += 'T' + time + ':00';
         }
 
         const participantId = targetUserId;
@@ -217,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let method = 'POST';
 
         if (isUpdate) {
-            url += `/${$('#eventScheduleId').val()}`; // PUT 주소 예시
+            url += `/${$('#eventScheduleId').val()}`;
             method = 'POST';
             eventData.scheduleId = $('#eventScheduleId').val();
         }
