@@ -29,7 +29,7 @@
             sent_at,
             is_read,
             message_type,
-            schedule_id  -- [핵심] schedule_id 컬럼을 반드시 포함해야 ResultMap이 동작합니다.
+            schedule_id
         FROM
             CHAT_MESSAGE
         WHERE
@@ -63,7 +63,6 @@
         WHERE ROOM_ID = #{roomId}
     </select>
 
-    <!--메세지 주고받은 유저만 불러오기-->
     <select id="selectChatPartnersWithLastMsg"
             parameterType="UserInfoDTO"
             resultType="ChatPartnerDTO">

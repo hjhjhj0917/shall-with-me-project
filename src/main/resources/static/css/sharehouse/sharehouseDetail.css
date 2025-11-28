@@ -14,7 +14,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     padding: 0 20px;
 }
 
-/* Title bar */
 .shd-titlebar{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     margin-bottom: 14px;
@@ -27,7 +26,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
 }
 .action-btn i{ margin-right:6px; }
 
-/* Gallery */
 .shd-gallery{
     position:relative;
     display:grid;
@@ -53,7 +51,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
 }
 .see-all i{ margin-right:6px; }
 
-/* ✅ Body - 새 레이아웃 */
 .shd-body{
     margin-top: 26px;
 }
@@ -63,7 +60,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     border-radius:16px; box-shadow:var(--shadow); padding:20px;
 }
 
-/* ✅ 전체 너비 요약 카드 */
 .shd-summary-full {
     width: 100%;
     margin-bottom: 24px;
@@ -98,7 +94,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     font-size:13px;
 }
 
-/* ✅ 2단 레이아웃 */
 .shd-two-cols {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -106,7 +101,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     align-items: start;
 }
 
-/* ✅ 소개 카드 */
 .shd-desc {
     min-height: 300px;
 }
@@ -122,7 +116,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     white-space: pre-wrap;
 }
 
-/* ✅ 문의하기 카드 */
 .shd-contact {
     min-height: 300px;
     display: flex;
@@ -153,7 +146,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     background:#15338a;
 }
 
-/* 반응형: 모바일에서는 1단 */
 @media (max-width: 980px){
     .shd-two-cols {
         grid-template-columns: 1fr;
@@ -174,19 +166,15 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     .shd-two-cols {
         grid-template-columns: 1fr;
     }
-}/* ✅ 5번째 칸(g4 위치): 실제 거주 사진 안내 */
+}
 
-/* ✅ 5번째 칸(g4 위치): 실제 거주 사진 안내 - REG 스타일 적용 */
 .photo-notice-box {
-    /* 위치: grid의 4번 칸 (g4와 동일) */
     grid-row: 2;
     grid-column: 3;
 
-    /* 네모 칸 안에 꽉 차게 */
     width: 100%;
     height: 100%;
 
-    /* 레이아웃 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -194,19 +182,15 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     gap: 8px;
     padding: 16px 12px;
 
-    /* 배경 스타일 - REG와 동일한 세련된 그라데이션 */
     border: 2px solid #b3d9ff;
     border-radius: 0; /* 갤러리와 동일한 각진 모서리 */
     box-shadow: 0 4px 12px rgba(51, 153, 255, 0.15);
 
-
-    /* 효과 */
     position: relative;
     overflow: hidden;
     cursor: default;
 }
 
-/* 빛나는 배경 효과 - REG와 동일 */
 .photo-notice-box::before {
     content: '';
     position: absolute;
@@ -218,7 +202,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     pointer-events: none;
 }
 
-/* 카메라 아이콘 - REG와 동일한 애니메이션 */
 .photo-notice-box .notice-icon {
     font-size: 2.5rem;
     color: #3399ff;
@@ -238,7 +221,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     }
 }
 
-/* 메인 제목 - REG와 동일 */
 .photo-notice-box .notice-title {
     font-size: 0.95rem;
     font-weight: 700;
@@ -249,7 +231,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     z-index: 1;
 }
 
-/* 서브 제목 - REG와 동일 */
 .photo-notice-box .notice-subtitle {
     font-size: 0.75rem;
     color: #3399ff;
@@ -260,7 +241,6 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     z-index: 1;
 }
 
-/* 장식 요소 - REG와 동일 */
 .photo-notice-box::after {
     position: absolute;
     bottom: 8px;
@@ -269,10 +249,8 @@ html,body{ background:#f6f8fc; color:var(--shd-text); }
     opacity: 0.3;
 }
 
-/* 모바일 대응 (980px 이하) */
 @media (max-width: 980px) {
     .photo-notice-box {
-        /* 모바일에서도 g4 위치 유지 */
         grid-row: 3;
         grid-column: 2;
     }

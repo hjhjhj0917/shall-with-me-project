@@ -4,7 +4,6 @@ body {
 }
 
 
-/* 상단 버튼 전체를 감싸는 컨테이너 */
 .top-buttons {
     position: relative;
     width: 65px;
@@ -13,7 +12,6 @@ body {
     top: 70px;
 }
 
-/* 동그란 버튼 */
 .circle-btn {
     width: 55px;
     height: 55px;
@@ -27,22 +25,21 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     position: absolute;
-    left: 50%; /* 컨테이너의 중앙으로 이동 */
-    transform: translateX(-50%); /* 정확한 중앙 정렬 */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .btn-diary {
     position: absolute;
-    bottom: 0; /* 컨테이너의 맨 아래에 위치 */
-    left: 50%; /* 컨테이너의 중앙으로 이동 */
-    transform: translateX(-50%); /* 정확한 중앙 정렬 */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 
-    color: #3399ff; /* 눈에 잘 띄는 색으로 변경 */
+    color: #3399ff;
     font-size: 15px;
     font-weight: 500;
 }
 
-/* 채팅 박스 */
 #chatBox {
     max-width: 650px;
     margin: 20px auto;
@@ -59,19 +56,17 @@ body {
 }
 #chatBox::-webkit-scrollbar { display: none; }
 
-/* 날짜 구분선 스타일 (이 코드로 교체) */
 .date-separator {
-    display: block; /* 블록 요소로 확실히 지정 */
-    width: 100%;    /* 너비를 100%로 설정 */
+    display: block;
+    width: 100%;
     text-align: center;
-    margin: 20px 0; /* 위아래 여백 */
+    margin: 20px 0;
     padding: 0;
-    background: none; /* 부모 요소의 배경을 투명하게 */
+    background: none;
 }
 
-/* 날짜 텍스트를 감싸는 span 태그 스타일 */
 .date-separator span {
-    display: inline-block; /* span이 패딩과 배경색을 가질 수 있도록 설정 */
+    display: inline-block;
     background-color: #c2c2c2;
     color: #ffffff;
     font-size: 12px;
@@ -80,7 +75,6 @@ body {
     border-radius: 20px;
 }
 
-/* 메시지 래퍼 */
 .message-wrapper {
     display: flex;
     align-items: flex-start;
@@ -96,42 +90,40 @@ body {
     height: 42px;
     border-radius: 50%;
     background-color: #ccc;
-    overflow: hidden; /* 내부 이미지 둥글게 자르기 */
+    overflow: hidden;
     flex-shrink: 0;
 }
 
 .message-content {
     display: flex;
-    flex-direction: column;    /* [수정] 자식 요소(버블, 시간)를 세로(column)가 아닌 가로(row)로 정렬 */
-    align-items: flex-end;  /* [수정] 자식 요소들을 아래쪽 기준으로 정렬 */
-    gap: 8px;               /* [추가] 버블과 시간 사이의 간격 */
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
 }
 
 .message-wrapper.me .message-content {
-    align-items: flex-end;   /* 내 메시지는 오른쪽 정렬 */
+    align-items: flex-end;
 }
 .message-wrapper.other .message-content {
-    align-items: flex-start; /* 상대 메시지는 왼쪽 정렬 */
+    align-items: flex-start;
 }
 
 .bubble-wrapper {
     display: flex;
-    align-items: flex-end; /* 버블과 시간을 아래쪽 기준으로 정렬 */
+    align-items: flex-end;
     gap: 8px;
 }
 
 .message-wrapper.me .bubble-wrapper {
-    flex-direction: row; /* 내 메시지는 시간 순서 뒤집기 */
+    flex-direction: row;
 }
 
-/* 상대방 이름 스타일 */
 .sender-name {
     color: #1c407d;
     font-size: 0.85rem;
     font-weight: 500;
 }
 
-/* 말풍선 */
 .message-wrapper.me .message-bubble {
     padding: 10px 14px;
     border-radius: 18px;
@@ -156,11 +148,9 @@ body {
 }
 
 .message-wrapper.me .message-content {
-    /* 기존 align-items 속성은 위에서 공통으로 처리하므로 제거해도 됩니다. */
-    flex-direction: row-reverse; /* [추가] 내용물의 순서를 반대로 뒤집음 (시간이 왼쪽, 버블이 오른쪽) */
+    flex-direction: row-reverse;
 }
 
-/* 아이디 */
 .sender-id {
     font-size: 12px;
     color: black;
@@ -171,15 +161,12 @@ body {
 .message-wrapper.me .message-bubble { background-color: #e0f7fa; }
 .message-wrapper.other .message-bubble { background-color: white; }
 
-/* 시간 표시 */
 .message-time {
     font-size: 10px;
     color: #999;
-    /* margin-top은 더 이상 필요 없으므로 제거합니다. */
-    white-space: nowrap; /* 시간이 줄바꿈되지 않도록 설정 */
+    white-space: nowrap;
 }
 
-/* 입력 영역 */
 .input-area {
     max-width: 650px;
     margin: 10px auto 30px;
@@ -220,7 +207,6 @@ body {
     transform: scale(1.05);
 }
 
-/* 애니메이션 */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
@@ -230,7 +216,7 @@ body {
 .profile-img img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 이미지를 정사각형 원에 꽉 채우게 */
+    object-fit: cover;
 }
 
 #userIconToggle {
@@ -238,7 +224,6 @@ body {
 }
 
 
-/*일정 관련 채팅 전송*/
 .chat-message {
     margin-bottom: 12px;
     padding: 8px 12px;

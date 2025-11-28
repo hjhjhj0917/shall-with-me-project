@@ -8,12 +8,12 @@ body {
 
 .detail-wrapper {
     display: flex;
-    justify-content: space-evenly;  /* 👉 좌우 균등 간격 */
-    align-items: flex-start;        /* 위쪽 기준 정렬 */
+    justify-content: space-evenly;
+    align-items: flex-start;
     gap: 60px;
     max-width: 1000px;
     max-height: 900px;
-    margin: 60px auto 0;   /* 👉 위쪽 여백 60px */
+    margin: 60px auto 0;
     border-radius: 40px;
     padding: 60px 40px 40px;
     border: 2px solid #E5F2FF;
@@ -22,8 +22,8 @@ body {
 }
 
 .profile-photo {
-    width: 260px;   /* 기존 220px */
-    height: 260px;  /* 기존 220px */
+    width: 260px;
+    height: 260px;
     border-radius: 50%;
     border: 2px solid #E5F2FF;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -32,8 +32,8 @@ body {
 
 
 .self-intro {
-    width: 90%;          /* 👉 원래 100% → 줄여서 사진 밑에만 적당히 */
-    max-width: 350px;    /* 👉 너무 넓어지지 않도록 제한 */
+    width: 90%;
+    max-width: 350px;
     min-height: 100px;
     border-radius: 40px;
     padding: 20px;
@@ -43,8 +43,6 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-
-/* 왼쪽 */
 .detail-left {
     display: flex;
     flex-direction: column;
@@ -52,7 +50,6 @@ body {
     gap: 40px;
 }
 
-/* 오른쪽 */
 .detail-right {
     display: flex;
     flex-direction: column;
@@ -64,8 +61,8 @@ body {
 }
 
 .detail-left, .detail-right {
-    flex: 1;              /* 두 영역을 같은 비율로 */
-    min-width: 300px;     /* 최소 크기 보장 */
+    flex: 1;
+    min-width: 300px;
 }
 
 .user-name {
@@ -85,13 +82,12 @@ body {
     color: #555;
 }
 
-/* 태그 */
 .tag-box {
     display: flex;
-    flex-wrap: wrap;   /* ✅ 태그가 한 줄 넘치면 자동 줄바꿈 */
-    gap: 8px 12px;     /* ✅ 위아래 8px, 좌우 12px 간격 */
-    margin-top: 12px;  /* ✅ 태그 영역과 위 요소 사이 간격 */
-    max-width: 400px;  /* ✅ 한 줄 최대 길이 제한 */
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-top: 12px;
+    max-width: 400px;
 
 }
 
@@ -104,7 +100,7 @@ body {
     border: 2px solid #E5F2FF;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     color: #1c407d;
-    white-space: nowrap; /* ✅ 태그 안에서는 줄바꿈 안되게 */
+    white-space: nowrap;
 }
 
 #chatButtonContainer {
@@ -114,23 +110,23 @@ body {
 
 .detail-msg-btn {
     display: flex;
-    width: 150px;             /* 펼쳐진 크기 */
+    width: 150px;
     height: 40px;
-    border-radius: 40px;      /* 타원형 */
+    border-radius: 40px;
     border: 2px solid #E5F2FF;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     color: #3399ff;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease; /* 부드러운 확대 효과 */
+    transition: transform 0.2s ease;
     margin-right: 10px;
     margin-top: 30px;
     background-color: white;
 }
 
 .detail-msg-btn:hover {
-    transform: scale(1.05); /* 5% 확대 */
+    transform: scale(1.05);
 }
 
 footer {

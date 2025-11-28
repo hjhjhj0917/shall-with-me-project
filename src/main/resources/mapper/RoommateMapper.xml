@@ -3,10 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!-- 반드시 IRoommateMapper.java 와 일치 -->
 <mapper namespace="kopo.shallwithme.mapper.IRoommateMapper">
 
-    <!-- 유저 태그 조회 -->
     <select id="findByUserId" parameterType="string" resultType="kopo.shallwithme.dto.UserTagDTO">
         SELECT
             ut.user_id  AS userId,
@@ -18,7 +16,6 @@
         ORDER BY ut.tag_id DESC
     </select>
 
-    <!-- 룸메이트 카드 리스트 (페이징) -->
     <select id="getRoommateList" resultType="map">
         SELECT
             ui.user_id    AS userId,
@@ -34,7 +31,6 @@
             LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 성별, 기본정보 조회 -->
     <select id="getUserById" parameterType="string"
             resultType="kopo.shallwithme.dto.UserInfoDTO">
         SELECT USER_ID AS userId,
@@ -44,7 +40,6 @@
     </select>
 
 
-    <!-- 태그만 따로 조회 -->
     <select id="selectUserTags" parameterType="string" resultType="kopo.shallwithme.dto.UserTagDTO">
         SELECT
             ut.user_id  AS userId,
@@ -72,14 +67,12 @@
     </select>
 
 
-    <!-- 전체 유저 수 조회 : 양준모 태그를 통한 검색-->
     <select id="countAllUsers" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
         SELECT
             COUNT(user_id) AS count
         FROM USER_INFO
     </select>
 
-    <!-- 태그 필터링 유저 수 조회 -->
     <select id="countUsersByTags" parameterType="TagDTO" resultType="TagDTO" resultMap="TagDTOResultMap">
         SELECT
         COUNT(DISTINCT U.USER_ID) as count
@@ -105,7 +98,6 @@
         </where>
     </select>
 
-    <!-- resultMap 정의 -->
     <resultMap id="TagDTOResultMap" type="TagDTO">
         <result property="count" column="count"/>
     </resultMap>
@@ -114,7 +106,6 @@
         SELECT TAG_ID, TAG_NAME
         FROM TAG
     </select>
-
 
     <select id="selectUsersByPagination" parameterType="TagDTO" resultType="UserInfoDTO">
         SELECT
@@ -130,7 +121,6 @@
         ORDER BY ui.reg_dt DESC
             LIMIT #{pageSize} OFFSET #{offset}
     </select>
-
 
     <select id="selectUsersByTagsWithPagination" parameterType="TagDTO" resultType="UserInfoDTO">
         SELECT

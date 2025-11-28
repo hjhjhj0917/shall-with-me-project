@@ -1,7 +1,5 @@
 package kopo.shallwithme.util;
 
-import java.sql.SQLOutput;
-
 public class EncryTest {
 
     public static void main(String[] args) throws Exception {
