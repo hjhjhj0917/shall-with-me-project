@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface IChatMapper {
@@ -26,10 +25,8 @@ public interface IChatMapper {
 
     List<ChatMessageDTO> selectMessagesByRoomId(Integer roomId);
 
-    // 메세지 주고받은 유저만 불러오기
     List<ChatPartnerDTO> selectChatPartnersWithLastMsg(UserInfoDTO pDTO);
 
-    // 채팅방 상대 프로필 이미지 불러오기
     UserProfileDTO selectProfileImageUrlByUserId(ChatRoomDTO pDTO);
 
     void incrementUnreadCount(ChatMessageDTO pDTO) throws Exception;

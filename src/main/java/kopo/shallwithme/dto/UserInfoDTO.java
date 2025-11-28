@@ -3,7 +3,6 @@ package kopo.shallwithme.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_DEFAULT) // 데이터를 Json 형태로 변환함
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class UserInfoDTO {
 
     private String userId;
@@ -30,21 +29,17 @@ public class UserInfoDTO {
     private String status;
     private LocalDateTime deletedAt;
 
-    private String existsYn; // 중복 가입을 방지하기 위해 사용할 변수
-    private int authNumber; // 메일 중복체크를 위한 인증번호
+    private String existsYn;
+    private int authNumber;
 
-    // 룸메이트 태그 불러오가
     private String tagId;
-    private String tagType; // 'ME'
+    private String tagType;
 
-    // UserProfile 조인
     private String profileImageUrl;
     private String introduction;
 
-    // 룸메이트 태그 (여러 개 가능)
     private List<String> tags;
-    private String tag1;           // 직업 태그 등
-    private String tag2;           // 성격 태그 등
-    private String genderLabel;    // "남", "여", "기타"
-
+    private String tag1;
+    private String tag2;
+    private String genderLabel;
 }

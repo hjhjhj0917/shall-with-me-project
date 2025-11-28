@@ -7,10 +7,10 @@ import lombok.Setter;
 @Setter
 public class SharehouseImageDTO {
 
-    private Integer imgId;      // PK
-    private Integer houseId;    // FK (SHARE_HOUSE.house_id)
-    private String url;         // 파일 경로 또는 접근 URL
-    private Integer isMain;     // 대표 이미지 여부 (0=일반, 1=대표)
-    private Integer sortOrder;  // 정렬 순서 (0~4)
-    private String regDt;       // 등록일시
+    private Integer imgId;
+    private Integer houseId;
+    private String url;
+    private Integer isMain;
+    private Integer sortOrder;
+    private String regDt;
 }
