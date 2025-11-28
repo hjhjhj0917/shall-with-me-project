@@ -13,10 +13,7 @@ public class PolicyUpdateScheduler {
 
     private final YouthPolicyService youthPolicyService;
 
-    /**
-     * 매일 새벽 5시에 실행되어, 외부 API로부터 최신 청년 정책 데이터를 가져와 DB에 저장합니다.
-     */
-    @Scheduled(cron = "0 0 5 * * *") // 매일 새벽 5시 0분 0초
+    @Scheduled(cron = "0 0 5 * * *")
     public void updatePolicies() {
         log.info(this.getClass().getName() + ".updatePolicies Start!");
         try {

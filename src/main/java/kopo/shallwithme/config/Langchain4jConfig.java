@@ -26,7 +26,6 @@ public class Langchain4jConfig {
     @Value("${langchain4j.embedding.store.path:./shallwithme-embedding-store.json}")
     private String embeddingStorePath;
 
-    // 1. Chat Model (변경 없음)
     @Bean
     public ChatLanguageModel chatLanguageModel() {
         return OpenAiChatModel.builder()
@@ -38,7 +37,7 @@ public class Langchain4jConfig {
                 .build();
     }
 
-    // 2. Embedding Model
+    // Embedding Model
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()
@@ -49,7 +48,7 @@ public class Langchain4jConfig {
                 .build();
     }
 
-    // 3. Embedding Store
+    // Embedding Store
     @Bean
     public InMemoryEmbeddingStore<TextSegment> embeddingStore() {
         try {

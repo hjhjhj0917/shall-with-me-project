@@ -28,15 +28,16 @@ import java.util.Map;
 @Controller
 public class ChattingController {
 
+
     private final SimpMessagingTemplate messagingTemplate;
     private final IChatService chatService;
+
 
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatMessageDTO chatMessage) {
         log.info("{}.sendMessage Start!", this.getClass().getName());
 
         try {
-            // 서울(Asia/Seoul) 시간 기준으로 설정
             ZoneId seoulZone = ZoneId.of("Asia/Seoul");
             LocalDateTime seoulTime = LocalDateTime.now(seoulZone);
             chatMessage.setSentAt(seoulTime);
@@ -53,17 +54,6 @@ public class ChattingController {
     }
 
 
-    // 회원 메시지 보관 페이지
-    @GetMapping("userListPage")
-    public String userListPage() {
-
-        log.info("{}.userListPage Start!", this.getClass().getName());
-        log.info("{}.userListPage End!", this.getClass().getName());
-
-        return "chat/userList";
-    }
-
-
     @GetMapping("/messages")
     @ResponseBody
     public List<ChatMessageDTO> getMessages(HttpServletRequest request) {
@@ -72,7 +62,6 @@ public class ChattingController {
 
         String roomIdStr = request.getParameter("roomId");
 
-        // 룸아이디 확인 로그
         log.info("roomId : {}", roomIdStr);
 
         if (roomIdStr == null) {
@@ -85,6 +74,7 @@ public class ChattingController {
         return chatService.getMessagesByRoomId(roomId);
     }
 
+
     @PostMapping("createRoom")
     @ResponseBody
     public Map<String, Object> createChatRoom(@Valid @RequestBody ChatRoomDTO pDTO, BindingResult bindingResult) {
@@ -95,7 +85,7 @@ public class ChattingController {
 
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
-            response.put("result", 0); // 0: 실패
+            response.put("result", 0);
             response.put("msg", errorMessage);
             return response;
         }
@@ -105,12 +95,12 @@ public class ChattingController {
 
             log.info("새 룸 아이디 : {}", newRoomId);
 
-            response.put("result", 1); // 1: 성공
-            response.put("roomId", newRoomId); // 성공 시 생성된 roomId 추가
+            response.put("result", 1);
+            response.put("roomId", newRoomId);
 
         } catch (Exception e) {
             log.error("채팅방 생성 실패", e);
-            response.put("result", 0); // 0: 실패
+            response.put("result", 0);
             response.put("msg", "채팅방 생성 중 오류가 발생했습니다.");
         }
 
@@ -119,21 +109,9 @@ public class ChattingController {
         return response;
     }
 
-//    사용안하는 컨트롤러
-//    @GetMapping("rooms")
-//    @ResponseBody
-//    public List<ChatRoomDTO> getChatRooms(UserInfoDTO pDTO) {
-//
-//        // 컨트롤러에서 직접 null 또는 빈 값인지 검사
-//        if (pDTO.getUserId() == null || pDTO.getUserId().isBlank()) {
-//            return java.util.Collections.emptyList();
-//        }
-//
-//        return chatService.getRoomsByUserId(pDTO);
-//    }
 
     @GetMapping("chatRoom")
-    public String chatRoomPage(ChatRoomDTO pDTO, Model model, HttpSession session) throws Exception { // DTO로 파라미터 받기
+    public String chatRoomPage(ChatRoomDTO pDTO, Model model, HttpSession session) throws Exception {
 
         log.info("{}.chatRoomPage Start!", this.getClass().getName());
 
@@ -146,7 +124,6 @@ public class ChattingController {
         ChatRoomDTO rDTO = chatService.getOtherUserId(cDTO);
         rDTO.setMyUserId(session.getAttribute("SS_USER_ID").toString());
 
-        // 채팅 상대 정보 불러오기
         UserProfileDTO otherUser = chatService.getImageUrlByUserId(rDTO);
 
         log.info("myUserId : {}", rDTO.getMyUserId());
@@ -160,6 +137,7 @@ public class ChattingController {
         return "chat/chatRoom";
     }
 
+
     // 메세지 주고받은 유저만 불러오기
     @GetMapping("chatPartners")
     @ResponseBody
@@ -169,22 +147,20 @@ public class ChattingController {
 
         String userId = (String) session.getAttribute("SS_USER_ID");
 
-        if (userId == null) { // 로그인한 상태인지 확인 // 보안상 더 안전한 방법이라는데 공부가 필요함!
-            // HttpStatus.UNAUTHORIZED: 서버가 클라이언트에게 보내는 HTTP 응답 상태 코드를 401 Unauthorized 설정
+        if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(java.util.Collections.emptyList());
         }
 
-        // DTO 객체 생성 및 userId 설정
         UserInfoDTO pDTO = new UserInfoDTO();
         pDTO.setUserId(userId);
 
-        // DTO를 매개변수로 전달
         List<ChatPartnerDTO> rList = chatService.getChatPartners(pDTO);
 
         log.info(this.getClass().getName() + ".getChatPartners End!");
 
         return ResponseEntity.ok(rList);
     }
+
 
     // 상대방과의 채팅방 생성 또는 기존 방 조회
     @GetMapping("createOrGetRoom")
@@ -213,8 +189,6 @@ public class ChattingController {
         }
 
         try {
-            // 서비스에 전달할 ChatRoomDTO를 다시 채워서 전달
-            // (pDTO에는 user1Id가 비어있으므로 새로 만들어주는 것이 안전함)
             ChatRoomDTO cDTO = new ChatRoomDTO();
             cDTO.setUser1Id(currentUserId);
             cDTO.setUser2Id(otherUserId);
@@ -235,6 +209,7 @@ public class ChattingController {
         return response;
     }
 
+
     @MessageMapping("/chat.readMessage")
     public void readMessage(ChatMessageDTO readMessage) {
         log.info("{}.readMessage Start!", this.getClass().getName());
@@ -245,10 +220,8 @@ public class ChattingController {
         }
 
         try {
-            // 1. DB 업데이트: 서비스 로직을 호출
             chatService.updateReadStatus(readMessage.getRoomId(), readMessage.getReaderId());
 
-            // 2. 실시간 브로드캐스팅: 상대방에게 "메시지 읽음" 사실을 전송
             messagingTemplate.convertAndSend("/topic/read/" + readMessage.getRoomId(), readMessage);
 
         } catch (Exception e) {
@@ -264,7 +237,7 @@ public class ChattingController {
     public ResponseEntity<Map<String, Integer>> getTotalUnreadCount(HttpSession session) {
         String userId = (String) session.getAttribute("SS_USER_ID");
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 로그인 안했을 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Map<String, Integer> response = new HashMap<>();
@@ -276,6 +249,17 @@ public class ChattingController {
             log.error("Total unread count 조회 중 오류", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+
+    // 회원 메시지 보관 페이지
+    @GetMapping("userListPage")
+    public String userListPage() {
+
+        log.info("{}.userListPage Start!", this.getClass().getName());
+        log.info("{}.userListPage End!", this.getClass().getName());
+
+        return "chat/userList";
     }
 
 }
