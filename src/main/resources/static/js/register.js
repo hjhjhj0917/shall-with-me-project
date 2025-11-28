@@ -1,10 +1,7 @@
-// 아이디 중복체크여부 (중복 Y / 중복아님 : N)
 let userIdCheck = "Y";
 
-// 이메일 중복체크 인증번호 발송 값
 let emailAuthNumber = "";
 
-// HTML 로딩 완료 후 실행
 $(document).ready(function () {
 
     $.datepicker.setDefaults($.datepicker.regional['ko']);
@@ -64,7 +61,6 @@ $(document).ready(function () {
         }
     });
 
-    // 폼 외 클릭 시 오류 스타일 제거
     $(document).on("click", function (e) {
         const $target = $(e.target);
         if (!$target.closest("form").length) {
@@ -87,7 +83,6 @@ function showError(message, input) {
     }, 2000);
 }
 
-// 아이디 중복체크
 function userIdExists(f) {
     if (f.userId.value === "") {
         showError("아이디를 입력하세요.", f.userId);
@@ -115,7 +110,6 @@ function userIdExists(f) {
     });
 }
 
-// 이메일 중복 체크 및 인증번호 전송
 function emailExists(f) {
     if (f.email.value === "") {
         showError("이메일을 입력하세요.", f.email);
@@ -138,7 +132,6 @@ function emailExists(f) {
     });
 }
 
-// 인증번호 확인 처리
 function doAuthCheck(f) {
     if (f.authNumber.value === "") {
         showError("인증번호를 입력하세요", f.authNumber);
@@ -150,18 +143,17 @@ function doAuthCheck(f) {
         return;
     } else {
         showError("인증번호 확인");
-        f.email.readOnly = true;               // 이메일 input readonly
-        f.authNumber.readOnly = true;          // 인증번호 input readonly
+        f.email.readOnly = true;
+        f.authNumber.readOnly = true;
 
         const btnEmail = document.getElementById("btnEmail");
         const btnAuthCheck = document.getElementById("btnAuthCheck");
 
-        if (btnEmail) btnEmail.disabled = true;       // 이메일 요청 버튼 비활성화
-        if (btnAuthCheck) btnAuthCheck.disabled = true; // 인증 확인 버튼 비활성화
+        if (btnEmail) btnEmail.disabled = true;
+        if (btnAuthCheck) btnAuthCheck.disabled = true;
     }
 }
 
-// 카카오 우편번호 API
 function kakaoPost(f) {
     new daum.Postcode({
         oncomplete: function (data) {
@@ -172,7 +164,6 @@ function kakaoPost(f) {
     }).open();
 }
 
-// 회원가입 유효성 체크 및 전송
 function doSubmit(f) {
     $(".form-row input").removeClass("input-error");
     $("#errorMessage").removeClass("visible");
@@ -247,7 +238,6 @@ function doSubmit(f) {
         return;
     }
 
-    // 모든 유효성 통과 → 서버로 전송
     $.ajax({
         url: "/user/insertUserInfo",
         type: "post",
@@ -262,5 +252,5 @@ function doSubmit(f) {
                 showCustomAlert(json.msg);
             }
         }
-    }); // readonly 처리
+    });
 }
