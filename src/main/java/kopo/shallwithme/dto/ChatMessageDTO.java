@@ -16,8 +16,8 @@ public class ChatMessageDTO {
     private String message;
     private LocalDateTime sentAt;
 
-    private String messageType; // "TEXT", "SCHEDULE", 등
-    private ScheduleDTO schedule; // 일정 메시지인 경우 일정 정보 포함
+    private String messageType;
+    private ScheduleDTO schedule;
 
     private ScheduleDTO scheduleRequest;
     private String readerId;

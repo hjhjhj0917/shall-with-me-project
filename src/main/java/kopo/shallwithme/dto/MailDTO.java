@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString // 로그확인이 편리한 어노테이션
+@ToString
 public class MailDTO {
     String toMail;
     String title;
