@@ -12,8 +12,8 @@
 .modal {
     background: #fff;
     border-radius: 40px;
-    width: 400px;         /* ✅ 고정 너비 */
-    max-width: 90vw;      /* ✅ 화면보다 커지지 않게 제한 */
+    width: 400px;
+    max-width: 90vw;
     padding: 24px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     text-align: left;
@@ -44,11 +44,10 @@
 
 .modal-buttons {
     display: flex;
-    justify-content: flex-end; /* 버튼들을 오른쪽으로 정렬 */
-    gap: 8px; /* 버튼 사이 간격 */
+    justify-content: flex-end;
+    gap: 8px;
 }
 
-/* 취소 버튼 스타일 */
 .cancel-btn {
     background: #f1f1f1;
     color: #555;
@@ -63,7 +62,7 @@
 .modal-title {
     display: flex;
     align-items: center;
-    gap: 8px; /* 아이콘과 텍스트 사이 간격 */
+    gap: 8px;
     margin-bottom: 12px;
 }
 .modal-title h2 {
