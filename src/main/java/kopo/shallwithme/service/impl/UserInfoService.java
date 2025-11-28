@@ -68,7 +68,6 @@ public class UserInfoService implements IUserInfoService {
     public int newPasswordProc(UserInfoDTO pDTO) throws Exception {
         log.info("{}.newPasswordProc Start!", this.getClass().getName());
 
-        //비밀번호 재설정
         int success = userInfoMapper.updatePassword(pDTO);
 
         log.info("{}.newPasswordProc End", this.getClass().getName());
@@ -82,11 +81,9 @@ public class UserInfoService implements IUserInfoService {
 
         UserInfoDTO rDTO;
         if (pDTO.getUserId() != null && !pDTO.getUserId().trim().isEmpty()) {
-            // 비밀번호 찾기
             rDTO = Optional.ofNullable(userInfoMapper.getUserForPassword(pDTO))
                     .orElseGet(UserInfoDTO::new);
         } else {
-            // 아이디 찾기
             rDTO = Optional.ofNullable(userInfoMapper.getUserId(pDTO))
                     .orElseGet(UserInfoDTO::new);
         }
@@ -101,24 +98,18 @@ public class UserInfoService implements IUserInfoService {
 
         log.info("{}.getLogin Start", this.getClass().getName());
 
-        // 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 위한 mapper 호출하기
-        // userInfoMapper.getUserLoginCheck(pDTO) 함수 실행과 NUll 발생하면, UserInfoDTO 메모리에 올리기
         UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getLogin(pDTO)).orElseGet(UserInfoDTO::new);
 
         if (!CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {
 
             MailDTO mDTO = new MailDTO();
 
-            //아이디, 패스워드 일치하는지 쿼리에서 이메일 값 받아오기( 아직 암호화되어 넘어오기 때문에 복호화 수행함)
             mDTO.setToMail(EncryptUtil.decAES128BCBC(CmmUtil.nvl(rDTO.getEmail())));
-            //제목
             mDTO.setTitle("로그인 알람!");
 
-            //메일 내용에 가입자 이름넣어서 내용 발송
             mDTO.setContents(DateUtil.getDateTime("yyy.mm.dd.hh:ss") + "에 "
                         + CmmUtil.nvl(rDTO.getUserName()) + "님이 로그인하였습니다.");
 
-            //회원 가입이 성공했기 때문에 메일을 발송함
             mailService.doSendMail(mDTO);
         }
 
@@ -170,7 +161,6 @@ public class UserInfoService implements IUserInfoService {
         return rDTO;
     }
 
-    // 아이디 찾기 메일 전송
     @Override
     public UserInfoDTO emailAuthNumber(UserInfoDTO pDTO) throws Exception {
 
@@ -203,7 +193,6 @@ public class UserInfoService implements IUserInfoService {
         return rDTO;
     }
 
-    // 비밀번호 찾기 메일 전송
     @Override
     public UserInfoDTO emailAuthNumberPw(UserInfoDTO pDTO) throws Exception {
 
@@ -221,7 +210,7 @@ public class UserInfoService implements IUserInfoService {
 
             MailDTO dto = new MailDTO();
 
-            dto.setTitle("비밀번호 찾기 인증번호 안내"); // 문구만 약간 일반화
+            dto.setTitle("비밀번호 찾기 인증번호 안내");
             dto.setContents("인증번호는 " + authNumber + " 입니다.");
             dto.setToMail(CmmUtil.nvl(EncryptUtil.decAES128BCBC(pDTO.getEmail())));
 

@@ -70,12 +70,6 @@ public class SharehouseService implements ISharehouseService {
         log.info("sharehouse inserted. houseId={}", dto.getHouseId());
     }
 
-    /**
-     * ★★★ 새로운 메서드: 이미지 + 층수 포함 등록 ★★★
-     */
-    /**
-     * ✅ 수정: address 1개 → addr1, addr2 2개로 변경
-     */
     @Override
     @Transactional
     public Long registerHouseWithImages(String ownerId, String title, String subText,
@@ -84,30 +78,27 @@ public class SharehouseService implements ISharehouseService {
         log.info("=== 쉐어하우스 등록 시작 ===");
         log.info("ownerId: {}", ownerId);
         log.info("title: {}", title);
-        log.info("addr1 (기본주소): {}", addr1);     // ✅ 수정
-        log.info("addr2 (상세주소): {}", addr2);     // ✅ 추가
+        log.info("addr1 (기본주소): {}", addr1);
+        log.info("addr2 (상세주소): {}", addr2);
         log.info("floorNumber: {}", floorNumber);
         log.info("imageUrls 개수: {}", imageUrls != null ? imageUrls.size() : 0);
 
-        // 1. 기본 정보 저장
         SharehouseCardDTO dto = new SharehouseCardDTO();
         dto.setTitle(title);
         dto.setSubText(subText);
-        dto.setAddress(addr1);           // ✅ addr1 설정
-        dto.setDetailAddress(addr2);     // ✅ addr2 설정
+        dto.setAddress(addr1);
+        dto.setDetailAddress(addr2);
         dto.setRegId(ownerId);
 
-        // 층수 설정
         if (floorNumber != null && !floorNumber.isBlank()) {
             try {
                 dto.setFloorNumber(Integer.parseInt(floorNumber));
-                log.info("✅ 층수 설정: {}", floorNumber);
+                log.info("층수 설정: {}", floorNumber);
             } catch (NumberFormatException e) {
-                log.warn("⚠️ 층수 파싱 실패: {}", floorNumber);
+                log.warn("층수 파싱 실패: {}", floorNumber);
             }
         }
 
-        // 첫 번째 이미지를 coverUrl로 설정
         if (imageUrls != null && !imageUrls.isEmpty()) {
             dto.setCoverUrl(imageUrls.get(0));
             log.info("coverUrl 설정: {}", imageUrls.get(0));
@@ -122,7 +113,6 @@ public class SharehouseService implements ISharehouseService {
         Long houseId = dto.getHouseId();
         log.info("✅ 쉐어하우스 저장 완료. houseId={}", houseId);
 
-        // 2. 이미지 저장
         if (imageUrls != null && !imageUrls.isEmpty()) {
             int savedCount = attachImages(houseId, imageUrls);
             log.info("✅ 이미지 {}개 저장 완료", savedCount);
@@ -147,9 +137,6 @@ public class SharehouseService implements ISharehouseService {
         return (d != null) ? d : Collections.emptyMap();
     }
 
-    /**
-     * 이미지 URL 목록을 SHARE_HOUSE_IMAGE 테이블에 저장
-     */
     @Transactional
     public int attachImages(Long houseId, List<String> urls) {
         if (houseId == null || urls == null || urls.isEmpty()) {
@@ -168,7 +155,7 @@ public class SharehouseService implements ISharehouseService {
             SharehouseImageDTO img = new SharehouseImageDTO();
             img.setHouseId(houseId.intValue());
             img.setUrl(url);
-            img.setIsMain(i == 0 ? 1 : 0);  // 첫 번째만 대표 이미지
+            img.setIsMain(i == 0 ? 1 : 0);
             img.setSortOrder(i);
             list.add(img);
 
@@ -185,9 +172,6 @@ public class SharehouseService implements ISharehouseService {
         return result;
     }
 
-    /**
-     * ✅ 쉐어하우스 태그 조회 (룸메이트와 동일)
-     */
     @Override
     public List<UserTagDTO> selectSharehouseTags(Long houseId) {
         if (houseId == null) {
@@ -197,9 +181,6 @@ public class SharehouseService implements ISharehouseService {
         return sharehouseMapper.selectSharehouseTags(houseId);
     }
 
-    /**
-     * ✅ 쉐어하우스 이미지 목록 조회
-     */
     @Override
     public List<Map<String, Object>> selectSharehouseImages(Long houseId) {
         if (houseId == null) {
@@ -209,17 +190,11 @@ public class SharehouseService implements ISharehouseService {
         return sharehouseMapper.selectSharehouseImages(houseId);
     }
 
-    /**
-     * ✅ 전체 태그 목록 조회 (룸메이트와 동일)
-     */
     @Override
     public List<TagDTO> getAllTags() {
         return sharehouseMapper.getAllTags();
     }
 
-    /**
-     * ✅ 태그 저장 (룸메이트와 동일한 방식)
-     */
     @Override
     @Transactional
     public int saveSharehouseTags(Long houseId, List<Integer> tagList) {
@@ -230,11 +205,9 @@ public class SharehouseService implements ISharehouseService {
 
         log.info("태그 저장 시작: houseId={}, tagList={}", houseId, tagList);
 
-        // 1. 기존 태그 삭제
         sharehouseMapper.deleteSharehouseTags(houseId);
         log.info("기존 태그 삭제 완료");
 
-        // 2. 새 태그 저장
         Map<String, Object> params = new HashMap<>();
         params.put("houseId", houseId);
         params.put("tagList", tagList);
@@ -245,9 +218,6 @@ public class SharehouseService implements ISharehouseService {
         return result;
     }
 
-    /**
-     * ✅ 본인의 쉐어하우스 조회 (userId 기준) - 여러 개 조회
-     */
     @Override
     public List<SharehouseCardDTO> getSharehouseByUserId(String userId) {
         if (userId == null || userId.isBlank()) {
@@ -259,7 +229,6 @@ public class SharehouseService implements ISharehouseService {
         List<SharehouseCardDTO> houses = sharehouseMapper.getSharehouseByUserId(userId);
 
         if (houses != null && !houses.isEmpty()) {
-            // 각 쉐어하우스의 태그 정보도 함께 조회
             for (SharehouseCardDTO house : houses) {
                 List<UserTagDTO> tags = sharehouseMapper.selectSharehouseTags(house.getHouseId());
                 house.setTags(tags == null ? Collections.emptyList() : tags);
@@ -273,9 +242,6 @@ public class SharehouseService implements ISharehouseService {
         return houses;
     }
 
-    /**
-     * ✅ 쉐어하우스 삭제 (태그, 이미지 포함 - 트랜잭션 처리)
-     */
     @Override
     @Transactional
     public boolean deleteSharehouse(Long houseId) {
@@ -287,28 +253,25 @@ public class SharehouseService implements ISharehouseService {
         try {
             log.info("=== 쉐어하우스 삭제 시작: houseId={} ===", houseId);
 
-            // 1. 태그 삭제
             int deletedTags = sharehouseMapper.deleteSharehouseTags(houseId);
             log.info("태그 {}개 삭제됨", deletedTags);
 
-            // 2. 이미지 삭제
             int deletedImages = sharehouseMapper.deleteSharehouseImages(houseId);
             log.info("이미지 {}개 삭제됨", deletedImages);
 
-            // 3. 쉐어하우스 메인 정보 삭제
             int deletedHouse = sharehouseMapper.deleteSharehouse(houseId);
             log.info("쉐어하우스 삭제 결과: {}", deletedHouse);
 
             if (deletedHouse > 0) {
-                log.info("✅ 쉐어하우스 삭제 완료: houseId={}", houseId);
+                log.info("쉐어하우스 삭제 완료: houseId={}", houseId);
                 return true;
             } else {
-                log.warn("⚠️ 쉐어하우스 삭제 실패 (대상 없음): houseId={}", houseId);
+                log.warn("쉐어하우스 삭제 실패 (대상 없음): houseId={}", houseId);
                 return false;
             }
 
         } catch (Exception e) {
-            log.error("❌ 쉐어하우스 삭제 중 오류 발생: houseId={}", houseId, e);
+            log.error("쉐어하우스 삭제 중 오류 발생: houseId={}", houseId, e);
             throw new RuntimeException("쉐어하우스 삭제 실패", e);
         }
     }

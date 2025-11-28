@@ -36,19 +36,12 @@ public class RoommateService implements IRoommateService {
             return List.of();
         }
 
-        // DTO 생성해서 userId 세팅 후 매퍼로 전달 (XML: parameterType=UserInfoDTO와 일치)
         UserInfoDTO pDTO = new UserInfoDTO();
         pDTO.setUserId(userId);
 
         return mapper.findByUserId(pDTO);
     }
 
-    /**
-     * ✅ 룸메이트 카드에 표시할 태그/성별 가공
-     * - 태그1: tagId 5~7 중 첫 번째
-     * - 태그2: tagId 15~17 중 첫 번째
-     * - 성별: USER_INFO.GENDER → M=남, F=여
-     */
     public Map<String, Object> getDisplayInfo(String userId) {
         Map<String, Object> result = new HashMap<>();
 
@@ -57,16 +50,13 @@ public class RoommateService implements IRoommateService {
             return result;
         }
 
-        // 1. 태그 조회
         List<UserTagDTO> userTags = mapper.selectUserTags(userId);
 
-        // 태그1 → tagId 5~7 중 DB에 저장된 값
         UserTagDTO tag1 = userTags.stream()
                 .filter(t -> t.getTagId() >= 5 && t.getTagId() <= 7)
-                .findAny() // 아무거나 1개
+                .findAny()
                 .orElse(null);
 
-        // 태그2 → tagId 15~17 중 DB에 저장된 값
         UserTagDTO tag2 = userTags.stream()
                 .filter(t -> t.getTagId() >= 15 && t.getTagId() <= 16)
                 .findAny()
@@ -75,7 +65,6 @@ public class RoommateService implements IRoommateService {
         result.put("tag1", tag1);
         result.put("tag2", tag2);
 
-        // 2. 성별 조회
         UserInfoDTO user = mapper.getUserById(userId);
         String gender = "기타";
         if ("M".equalsIgnoreCase(user.getGender())) {
@@ -104,7 +93,6 @@ public class RoommateService implements IRoommateService {
 
     @Override
     public List<Map<String, Object>> getRoommateList(int page) {
-        // ✅ 첫 페이지는 12장, 그 이후는 4장씩
         int pageSize = (page == 1) ? 15 : 5;
         int offset = (page == 1) ? 0 : (15 + (page - 2) * 5);
 
@@ -113,7 +101,6 @@ public class RoommateService implements IRoommateService {
         for (Map<String, Object> item : baseList) {
             String userId = (String) item.get("userId");
 
-            // tag1, tag2, gender 조회
             Map<String, Object> displayInfo = getDisplayInfo(userId);
             UserTagDTO tag1 = (UserTagDTO) displayInfo.get("tag1");
             UserTagDTO tag2 = (UserTagDTO) displayInfo.get("tag2");
@@ -132,19 +119,15 @@ public class RoommateService implements IRoommateService {
             return null;
         }
 
-        // 1) 기본 프로필 정보 가져오기
         UserProfileDTO user = mapper.findUserProfileById(userId);
 
         if (user != null) {
-            // 2) 해당 유저의 태그 리스트 가져오기
             List<UserTagDTO> tagList = mapper.selectUserTags(userId);
 
-            // 3) 태그 이름만 추출해서 String 리스트로 변환
             List<String> tagNames = tagList.stream()
                     .map(UserTagDTO::getTagName)
                     .collect(Collectors.toList());
 
-            // 4) DTO에 태그 추가
             user.setTags(tagNames);
         }
 
@@ -155,17 +138,14 @@ public class RoommateService implements IRoommateService {
     public TagDTO searchUsersByTags(TagDTO pDTO) {
         log.info("{}.searchUsersByTags Start! Received DTO: {}", this.getClass().getName(), pDTO.toString());
 
-        // DTO에서 새로운 필드들을 가져옴
         Map<String, List<Integer>> tagGroupMap = pDTO.getTagGroupMap();
         String location = pDTO.getLocation();
         List<UserInfoDTO> users;
-        int totalCount; // long 타입으로 변경하여 더 큰 숫자를 안전하게 처리
+        int totalCount;
 
-        // 태그 또는 지역 조건이 있는지 확인
         boolean hasTags = tagGroupMap != null && !tagGroupMap.isEmpty();
         boolean hasLocation = location != null && !location.isEmpty();
 
-        // pDTO 객체는 offset과 pageSize 값을 이미 가지고 매퍼로 전달됩니다.
         if (hasTags || hasLocation) {
             users = mapper.selectUsersByTagsWithPagination(pDTO);
             totalCount = mapper.countUsersByTags(pDTO).getCount();
@@ -174,7 +154,6 @@ public class RoommateService implements IRoommateService {
             totalCount = mapper.countAllUsers(pDTO).getCount();
         }
 
-        // 사용자별 tag1/tag2/genderLabel 세팅 (이 로직은 그대로 유지)
         for (UserInfoDTO user : users) {
             List<UserTagDTO> tags = mapper.selectUserTags(user.getUserId());
 
@@ -205,11 +184,9 @@ public class RoommateService implements IRoommateService {
         pDTO.setUsers(users);
         pDTO.setTotalCount(totalCount);
 
-        // [수정] DTO에 담겨온 offset 값을 사용하여 isLast 계산
         boolean isLast = (pDTO.getOffset() + users.size()) >= totalCount;
         pDTO.setLastPage(isLast);
 
-        // [수정] DTO에 담겨온 값으로 로그 출력
         log.info("Pagination Info -> PageSize: {}, Offset: {}, UsersOnPage: {}, TotalCount: {}, IsLastPage: {}",
                 pDTO.getPageSize(), pDTO.getOffset(), users.size(), totalCount, isLast);
 

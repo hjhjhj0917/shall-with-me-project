@@ -38,11 +38,9 @@ public class ChatService implements IChatService {
         chatMapper.insertChatMessage(pDTO);
         chatMapper.incrementUnreadCount(pDTO);
 
-        // [수정] getOtherUserId가 필요로 하는 ChatRoomDTO를 새로 생성
         ChatRoomDTO roomDTOForQuery = new ChatRoomDTO();
-        roomDTOForQuery.setRoomId(Integer.parseInt(pDTO.getRoomId())); // pDTO에서 roomId를 꺼내 설정
+        roomDTOForQuery.setRoomId(Integer.parseInt(pDTO.getRoomId()));
 
-        // 새로 만든 DTO를 파라미터로 전달하여 roomInfo 조회
         ChatRoomDTO roomInfo = chatMapper.getOtherUserId(roomDTOForQuery);
         String recipientId;
 
@@ -133,11 +131,11 @@ public class ChatService implements IChatService {
             log.info("  <- STEP 2: FINISHED chatMapper.resetUnreadCount.");
 
         } catch (Exception e) {
-            log.error("❌ EXCEPTION occurred inside updateReadStatus!", e);
+            log.error("EXCEPTION occurred inside updateReadStatus!", e);
             throw e; // 예외를 다시 던져서 전체 트랜잭션을 롤백하고, 상위 호출자에게 알림
         }
 
-        log.info("✅ updateReadStatus Service: END.");
+        log.info("updateReadStatus Service: END.");
     }
 
     // 메세지 주고받은 유저만 불러오기
@@ -165,23 +163,19 @@ public class ChatService implements IChatService {
         return rList;
     }
 
-    // 채팅방을 새로 생성할지 기존 채팅방을 불러오는지 판단
     @Override
     public int createOrGetChatRoom(ChatRoomDTO pDTO) throws Exception {
 
         log.info("{}.createOrGetChatRoom Start!", this.getClass().getName());
 
-        // DTO에서 사용자 ID들을 가져옴
         String user1Id = pDTO.getUser1Id();
         String user2Id = pDTO.getUser2Id();
         log.info("user1Id={}, user2Id={}", user1Id, user2Id);
 
-        // 오름차순 정렬
         String firstUser = user1Id.compareTo(user2Id) < 0 ? user1Id : user2Id;
         String secondUser = user1Id.compareTo(user2Id) < 0 ? user2Id : user1Id;
         log.info("정렬된 유저 순서: {}, {}", firstUser, secondUser);
 
-        // 정렬된 ID를 Mapper에 전달할 DTO에 다시 설정
         ChatRoomDTO dtoForFind = new ChatRoomDTO();
         dtoForFind.setUser1Id(firstUser);
         dtoForFind.setUser2Id(secondUser);

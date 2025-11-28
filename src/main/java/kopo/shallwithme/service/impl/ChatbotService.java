@@ -28,14 +28,11 @@ public class ChatbotService {
 
     public String getAnswer(String userQuestion) throws Exception {
 
-        // 1. 사용자 질문을 임베딩(벡터화)
         Response<Embedding> embeddingResponse = embeddingModel.embed(userQuestion);
         Embedding queryEmbedding = embeddingResponse.content();
 
-        // 2. EmbeddingStore에서 유사한 벡터(TextSegment)를 직접 검색
         List<EmbeddingMatch<TextSegment>> relevantMatches = embeddingStore.findRelevant(queryEmbedding, 5, 0.65);
 
-        // 3. 검색된 조각을 프롬프트용 데이터로 포맷팅 (주소가 없으면 아예 줄 자체를 생성하지 않음)
         String policyDataForPrompt = relevantMatches.stream()
                 .map(match -> {
                     TextSegment segment = match.embedded();
@@ -43,11 +40,9 @@ public class ChatbotService {
                     String url = segment.metadata().getString("policy_url");
                     String relevantChunk = segment.text();
 
-                    // 기본 정보 구성
                     StringBuilder infoBuilder = new StringBuilder();
                     infoBuilder.append(String.format("- 정책명: %s\n  관련 내용: %s", name, relevantChunk));
 
-                    // URL이 유효할 때만 '신청 주소' 라인을 추가
                     if (url != null && !url.isBlank() && !url.equals("null")) {
                         infoBuilder.append(String.format("\n  신청 주소: %s", url));
                     }
@@ -60,7 +55,6 @@ public class ChatbotService {
             policyDataForPrompt = "현재 질문에 맞는 정책 데이터가 없습니다.";
         }
 
-        // 4. 시스템 프롬프트에 '조건부 출력'을 명확히 지시
         String systemPrompt = "너는 대한민국 청년 정책 전문 챗봇 '살며시'야. " +
                 "사용자가 궁금한 점에 대해 가장 관련 깊은 청년 정책 정보를 친절하고 알기 쉽게 알려줘. " +
                 "**오직 아래 제공된 [정책 목록]에 있는 정보만을 사용해서 답변해야 해.** 목록에 없는 내용은 모른다고 답해.\n\n" +
@@ -70,7 +64,6 @@ public class ChatbotService {
                 "2. 각 정책의 이름과 관련 내용을 먼저 설명해줘.\n" +
                 "3. **'신청 주소' 정보가 정책 목록에 있는 경우에만 포함하고, 없다면 절대 '신청주소'라는 단어나 URL을 언급하지 마.**";
 
-        // 5. LLM 호출
         try {
             SystemMessage systemMessage = SystemMessage.from(systemPrompt);
             UserMessage userMessage = UserMessage.from(userQuestion);

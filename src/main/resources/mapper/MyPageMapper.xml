@@ -35,7 +35,6 @@
         WHERE user_id = #{userId}
     </update>
 
-    <!-- 탈퇴한 지 30일 지난 회원 영구 삭제 -->
     <delete id="deleteOldDeactivatedUsers">
         DELETE FROM USER_INFO
         WHERE status = 'DEACTIVATED'
@@ -74,12 +73,6 @@
         WHERE USER_ID         = #{userId}
     </update>
 
-    <!-- ==========================================================
-         [ADD] tag_type 컬럼 없이 "그룹키"를 만드는 CASE 블록
-         - TAG 별칭이 t 인 쿼리에서 쓸 버전
-         - TAG 별칭이 t2 인 쿼리에서 쓸 버전
-         ※ tag_id 묶음은 실제 DB의 태그 id 구간에 맞게 조정 필요
-       ========================================================== -->
     <sql id="case_tag_type_t">
         CASE
             WHEN t.tag_id IN (1,2) THEN 'lifePattern'
@@ -127,9 +120,7 @@
             ELSE 'unknown'
         END
     </sql>
-    <!-- ========================================================== -->
 
-    <!-- [FIX] 태그 목록은 tagType이 필요한데 TagDTO에 필드가 없으므로 UserTagDTO로 매핑 -->
     <select id="selectAllTagsWithType" resultType="UserTagDTO">
         SELECT
         t.tag_id   AS tagId,
@@ -139,7 +130,6 @@
         ORDER BY tagType, t.tag_id
     </select>
 
-    <!-- [FIX] (2) 내 태그 선택 조회: USER_TAG.tag_type 사용 금지 → TAG 조인 + CASE -->
     <select id="selectMyTagSelectionsByUser" parameterType="UserInfoDTO"
             resultType="kopo.shallwithme.dto.UserTagDTO">
         SELECT
@@ -150,7 +140,6 @@
         WHERE ut.user_id = #{userId}
     </select>
 
-    <!-- [FIX] (3) 그룹 단위 삭제: 전달된 tag_id 들이 속한 "그룹(CASE tagType)"에 있는 기존 선택 전체 삭제 -->
     <delete id="deleteUserTagsByTagTypesOfTagIds" parameterType="kopo.shallwithme.dto.UserTagDTO">
         DELETE FROM USER_TAG
         WHERE user_id = #{userId}
@@ -168,7 +157,6 @@
         )
     </delete>
 
-    <!-- [FIX] (4) 삽입: USER_TAG(tag_type) 컬럼 없이 (user_id, tag_id)만 저장 -->
     <insert id="insertUserTagsFromIds" parameterType="kopo.shallwithme.dto.UserTagDTO">
         INSERT INTO USER_TAG (user_id, tag_id)
         SELECT
@@ -181,7 +169,6 @@
         </foreach>
     </insert>
 
-    <!-- [FIX] (5) 칩 표시용 정렬: t.tag_type 대신 CASE 결과로 정렬 -->
     <select id="selectMyTagNames" parameterType="UserInfoDTO" resultType="TagDTO">
         SELECT
         t.tag_id   AS tagId,
@@ -192,7 +179,6 @@
         ORDER BY <include refid="case_tag_type_t"/>, t.tag_id
     </select>
 
-    <!-- 로그인 사용자의 PASSWORD 해시만 반환 -->
     <select id="getPasswordHashByUserId" parameterType="UserInfoDTO"
             resultType="UserInfoDTO">
         SELECT
@@ -204,7 +190,6 @@
             LIMIT 1
     </select>
 
-    <!-- 필요 컬럼만 최소 업데이트 (스키마에 맞춰 필드명 조정) -->
     <update id="updateAddress" parameterType="UserProfileDTO">
         UPDATE USER_INFO
         SET
