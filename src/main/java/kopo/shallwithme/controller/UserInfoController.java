@@ -14,7 +14,6 @@ import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,7 +32,10 @@ import java.util.stream.Collectors;
 @Controller
 public class UserInfoController {
 
-    private final SqlSession sqlSession;
+
+    private final IUserInfoService userInfoService;
+    private final RoommateService roommateService;
+
 
     private int calculateAge(String birthYear, String birthMonth, String birthDay) {
         int year = Integer.parseInt(birthYear);
@@ -52,15 +54,11 @@ public class UserInfoController {
         return age;
     }
 
-    private final IUserInfoService userInfoService;
-    private final RoommateService roommateService;
 
     @GetMapping(value = "searchPassword")
     public String searchPassword(HttpSession session) {
         log.info("{}.searchPassword Start!", this.getClass().getName());
 
-        //강제 URL 입력 등 오는 경우가 있어 세션 삭제
-        //비밀번호 재생성하는 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
         session.setAttribute("NEW_PASSWORD", "");
         session.removeAttribute("NEW_PASSWORD");
 
@@ -68,6 +66,7 @@ public class UserInfoController {
 
         return "user/searchPassword";
     }
+
 
     @ResponseBody
     @PostMapping(value = "searchPasswordProc")
@@ -87,7 +86,7 @@ public class UserInfoController {
         pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
 
         UserInfoDTO rDTO = Optional.ofNullable(
-                userInfoService.searchUserIdOrPasswordProc(pDTO) // 내부에서 userId+email 일치 확인
+                userInfoService.searchUserIdOrPasswordProc(pDTO)
         ).orElseGet(UserInfoDTO::new);
 
         MsgDTO dto = new MsgDTO();
@@ -105,24 +104,21 @@ public class UserInfoController {
         return dto;
     }
 
+
     @PostMapping(value = "newPasswordProc")
-    @ResponseBody // JSON 객체 반환을 명시적으로 지정
+    @ResponseBody
     public MsgDTO newPasswordProc(HttpServletRequest request, HttpSession session) throws Exception {
 
         log.info("{}.user/newPasswordProc Start!", this.getClass().getName());
 
-        //비밀번호 변경 결과 담을 변수
         MsgDTO dto = new MsgDTO();
 
-        //정상적인 접근인지 체크
         String newPassword = CmmUtil.nvl((String) session.getAttribute("NEW_PASSWORD"));
 
-        //정상접근
         if (!newPassword.isEmpty()) {
 
             log.info("정상접근 비밀번호 변경 실행!");
 
-            //신규 비밀번호
             String userPw = CmmUtil.nvl(request.getParameter("userPw"));
             log.info("password : {}", userPw);
 
@@ -132,18 +128,16 @@ public class UserInfoController {
 
             userInfoService.newPasswordProc(pDTO);
 
-            //비밀번호 재생성하는 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
             session.setAttribute("NEW_PASSWORD", "");
             session.removeAttribute("NEW_PASSWORD");
 
-            dto.setResult(1); // MsgDTO의 result 필드에 1을 설정
+            dto.setResult(1);
             dto.setMsg("비밀번호 변경이 완료되었습니다.");
 
         }else {
-            //비정상접근
             log.info("비정상적인 접근입니다.");
 
-            dto.setResult(0); // MsgDTO의 result 필드에 0을 설정
+            dto.setResult(0);
             dto.setMsg("비정상적인 접근입니다.");
         }
 
@@ -152,23 +146,6 @@ public class UserInfoController {
         return dto;
     }
 
-    @GetMapping(value = "login")
-    public String login() {
-        log.info("{}.login Start!", this.getClass().getName());
-
-        log.info("{}.login End!", this.getClass().getName());
-
-        return "user/login";
-    }
-
-    @GetMapping(value = "searchUserId")
-    public String searchUserId() {
-        log.info("{}.user/searchUserId Start!", this.getClass().getName());
-
-        log.info("{}.user/searchUserId End!", this.getClass().getName());
-
-        return "user/searchUserId";
-    }
 
     @ResponseBody
     @PostMapping(value = "searchUserIdProc")
@@ -205,6 +182,7 @@ public class UserInfoController {
         return dto;
     }
 
+
     @ResponseBody
     @PostMapping(value = "loginProc")
     public MsgDTO loginProc(HttpServletRequest request, HttpSession session) {
@@ -227,13 +205,11 @@ public class UserInfoController {
 
             pDTO.setUserId(userId);
 
-            //비밀번호는 절대!!!!!!!!!!!로 복호화되지 않도록 해시 알고리즘으로 암호화함!!!!!!!
             pDTO.setPassword(EncryptUtil.encHashSHA256(password));
 
-            //로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 위한 userIngoService 호출하기
             UserInfoDTO rDTO = userInfoService.getLogin(pDTO);
 
-            if (!CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {// 로그인 성공
+            if (!CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {
 
                 UserTagDTO tagDTO = new UserTagDTO();
                 tagDTO.setUserId(userId);
@@ -264,12 +240,10 @@ public class UserInfoController {
             }
 
             } catch (Exception e) {
-                //저장이 실패하면 사용자에세 보여줄 메세지
                 msg = "시스템 문제로 로그인이 실패했습니다.";
                 res = 2;
                 log.info(e.toString());
             } finally {
-                // 결과 메시지 전달하기
                 dto = new MsgDTO();
                 dto.setResult(res);
                 dto.setMsg(msg);
@@ -279,6 +253,7 @@ public class UserInfoController {
 
             return dto;
     }
+
 
     @GetMapping(value = "loginCheck")
     @ResponseBody
@@ -294,18 +269,6 @@ public class UserInfoController {
     }
 
 
-    @GetMapping("/roommateMain")
-    public String roommateMain() {
-        return "user/roommateMain"; // 세션 체크는 인터셉터에서 이미 처리
-    }
-
-    @GetMapping(value = "userRegForm")
-    public String userRegForm() {
-        log.info(this.getClass().getName() + ".user/userRegForm");
-
-        return "user/userRegForm";
-    }
-
     @GetMapping("/userProfile")
     public String userProfile() {
 
@@ -319,17 +282,14 @@ public class UserInfoController {
         String userId   = (session != null) ? (String) session.getAttribute("SS_USER_ID")   : "";
         String userName = (session != null) ? (String) session.getAttribute("SS_USER_NAME") : "";
 
-        // 태그 조회 (DTO에 tagName 포함)
         List<UserTagDTO> userTags = roommateService.getUserTagsByUserId(userId);
-        if (userTags == null) userTags = List.of(); // NPE 방지
+        if (userTags == null) userTags = List.of();
 
-        // ✅ tag_name만 추출 (중복 제거 원하면 .distinct() 추가)
         List<String> userTagNames = userTags.stream()
-                .map(UserTagDTO::getTagName)   // <-- 여기 수정!
+                .map(UserTagDTO::getTagName)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        // JSP에서 사용할 값
         req.setAttribute("userTags", userTags);
         req.setAttribute("userTagNames", userTagNames);
         req.setAttribute("SS_USER_NAME", userName);
@@ -352,13 +312,13 @@ public class UserInfoController {
         UserInfoDTO pDTO = new UserInfoDTO();
         pDTO.setUserId(userId);
 
-        // 회원아이디를 통해 중복된 아이디인지 조회하는 코드
         UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO)).orElseGet(UserInfoDTO::new);
 
         log.info(this.getClass().getName() + ".getUserIdExists End!");
 
         return rDTO;
     }
+
 
     @ResponseBody
     @PostMapping(value = "getEmailExists")
@@ -380,6 +340,7 @@ public class UserInfoController {
         return rDTO;
     }
 
+
     @ResponseBody
     @PostMapping(value = "insertUserInfo")
     public MsgDTO insertUserInfo(HttpServletRequest request, HttpSession session) throws Exception {
@@ -388,9 +349,9 @@ public class UserInfoController {
 
         int res = 0;
         String msg = "";
-        MsgDTO dto; // 결과 메시지 구조 이거 깃에는 dto = null; 이였음
+        MsgDTO dto;
 
-        UserInfoDTO pDTO; // 이것도 깃에는 dto = null; 이였음!
+        UserInfoDTO pDTO;
 
         try {
 
@@ -424,12 +385,7 @@ public class UserInfoController {
 
             pDTO.setUserId(userId);
             pDTO.setUserName(userName);
-
-            // 비밀번호는 절대로 복호화??/ 되지 않도록 해서
-            // 해시 알고리즘으로 암호화한다고 함
             pDTO.setPassword(EncryptUtil.encHashSHA256(password));
-
-            //민감 정보인 이메일은 aes128-CBC로 암호화한다고함
             pDTO.setEmail(EncryptUtil.encAES128BCBC(email));
             pDTO.setAddr1(addr1);
             pDTO.setAddr2(addr2);
@@ -463,7 +419,6 @@ public class UserInfoController {
 
             msg = "실패하였습니다. : " + e;
             log.info(e.toString());
-//            e.printStackTrace(); // 깃에만 있었음
 
         } finally {
             dto = new MsgDTO();
@@ -475,6 +430,7 @@ public class UserInfoController {
 
         return dto;
     }
+
 
     // 아이디 찾기 인증번호 전송
     @ResponseBody
@@ -502,6 +458,7 @@ public class UserInfoController {
         return rDTO;
     }
 
+
     // 비밀번호 찾기 인증번호 전송
     @ResponseBody
     @PostMapping(value = "emailAuthNumberPw")
@@ -528,38 +485,13 @@ public class UserInfoController {
         return rDTO;
     }
 
-    @GetMapping(value = "userTagSelect")
-    public String userTagSelect() {
 
-        return "user/userTagSelect";
-    }
-
-    @GetMapping(value = "main") //
-    public String mainPage() {
-
-        return "user/main";
-    }
-
-    @GetMapping(value = "sample") //
-    public String sample() {
-
-        return "includes/sample";
-    }
-
-    @GetMapping("/") // /WEB-INF/views/index.jsp 로 이동
-    public String index() {
-
-        return "index";
-    }
-
-    // POST /saveUserTags 핸들러 예시 (Spring MVC)
     @PostMapping("/saveUserTags")
     @ResponseBody
     public Map<String, Object> saveUserTags(@RequestBody UserTagDTO dto, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // 여기 추가! 세션에서 userId 꺼내서 dto에 넣기
             String userId = (String) session.getAttribute("SS_USER_ID");
 
             if (userId == null || userId.isEmpty()) {
@@ -590,11 +522,12 @@ public class UserInfoController {
         return response;
     }
 
+
     // 로그아웃
     @PostMapping("/logout")
     @ResponseBody
     public MsgDTO logout(HttpSession session) {
-        int res = 1; // 기본 성공
+        int res = 1;
         String msg = "";
 
         MsgDTO dto = new MsgDTO();
@@ -613,24 +546,9 @@ public class UserInfoController {
         return dto;
     }
 
-//    회원 프로필 이미지 불러오기
-//    @GetMapping("/profile-image/{userId}")
-//    public ResponseEntity<Map<String, String>> getProfileImage(@PathVariable String userId) {
-//
-//        log.info("getProfileImage start!");
-//
-//        String imageUrl = userInfoService.getImageUrlByUserId(userId);
-//        Map<String, String> result = new HashMap<>();
-//        result.put("imageUrl", imageUrl != null ? imageUrl : "/images/noimg.png");
-//
-//        log.info("getProfileImage end!");
-//
-//        return ResponseEntity.ok(result);
-//    }
 
     @GetMapping(value = "userInfo")
     public String userInfo() {
-        // 현재 요청/세션 얻기 (메서드 시그니처 안 바꿈)
         ServletRequestAttributes attrs =
                 (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = attrs.getRequest();
@@ -641,10 +559,9 @@ public class UserInfoController {
 
         if (userId == null || userId.isBlank()) {
             log.info("not logged in → redirect:/user/login");
-            return "redirect:/user/login"; // @RequestMapping("/user") 기준
+            return "redirect:/user/login";
         }
 
-        // ✅ DB에서 프로필(소개글/이미지) 조회 → JSP로 전달
         UserProfileDTO pDTO = new UserProfileDTO();
         pDTO.setUserId(userId);
 
@@ -660,6 +577,89 @@ public class UserInfoController {
         log.info("userTags size={}", userTags.size());
 
         return "user/userInfo";
+    }
+
+
+    @GetMapping("/roommateMain")
+    public String roommateMain() {
+
+        log.info("{}.roommateMain Start!", this.getClass().getName());
+
+        log.info("{}.roommateMain End!", this.getClass().getName());
+
+        return "user/roommateMain";
+    }
+
+
+    @GetMapping(value = "userRegForm")
+    public String userRegForm() {
+        log.info(this.getClass().getName() + ".user/userRegForm");
+
+        return "user/userRegForm";
+    }
+
+
+    @GetMapping(value = "userTagSelect")
+    public String userTagSelect() {
+
+        log.info("{}.userTagSelect Start!", this.getClass().getName());
+
+        log.info("{}.userTagSelect End!", this.getClass().getName());
+
+        return "user/userTagSelect";
+    }
+
+
+    @GetMapping(value = "main") //
+    public String mainPage() {
+
+        log.info("{}.mainPage Start!", this.getClass().getName());
+
+        log.info("{}.mainPage End!", this.getClass().getName());
+
+        return "user/main";
+    }
+
+
+    @GetMapping(value = "sample") //
+    public String sample() {
+
+        log.info("{}.sample Start!", this.getClass().getName());
+
+        log.info("{}.sample End!", this.getClass().getName());
+
+        return "includes/sample";
+    }
+
+
+    @GetMapping("/")
+    public String index() {
+
+        log.info("{}.index Start!", this.getClass().getName());
+
+        log.info("{}.index End!", this.getClass().getName());
+
+        return "index";
+    }
+
+
+    @GetMapping(value = "login")
+    public String login() {
+        log.info("{}.login Start!", this.getClass().getName());
+
+        log.info("{}.login End!", this.getClass().getName());
+
+        return "user/login";
+    }
+
+
+    @GetMapping(value = "searchUserId")
+    public String searchUserId() {
+        log.info("{}.user/searchUserId Start!", this.getClass().getName());
+
+        log.info("{}.user/searchUserId End!", this.getClass().getName());
+
+        return "user/searchUserId";
     }
 
 }

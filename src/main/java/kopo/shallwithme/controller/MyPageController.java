@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.shallwithme.dto.*;
 import kopo.shallwithme.service.IMyPageService;
-import kopo.shallwithme.service.impl.AwsS3Service; // ✅ AWS 서비스 import 추가
+import kopo.shallwithme.service.impl.AwsS3Service;
 import kopo.shallwithme.util.CmmUtil;
 import kopo.shallwithme.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,24 +24,15 @@ import java.util.*;
 @Controller
 public class MyPageController {
 
+
     private final IMyPageService myPageService;
-    private final AwsS3Service awsS3Service; // ✅ AWS 서비스 주입 추가
+    private final AwsS3Service awsS3Service;
 
-    // ❌ [삭제됨] NCP 관련 @Value 설정들 모두 제거
-    // @Value("${ncp.object-storage.endpoint}") private String endpoint;
-    // @Value("${ncp.object-storage.region}") private String region;
-    // @Value("${ncp.object-storage.access-key}") private String accessKey;
-    // @Value("${ncp.object-storage.secret-key}") private String secretKey;
-    // @Value("${ncp.object-storage.bucket-name}") private String bucketName;
-    // @Value("${ncp.object-storage.folder}") private String folder;
 
-    // content-type 화이트리스트 (보안 검증용)
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"
     );
 
-    // ❌ [삭제됨] private String uploadToNcpObjectStorage(MultipartFile file) throws IOException { ... }
-    // AWS S3 서비스가 이 역할을 대신합니다.
 
     @GetMapping("userModify")
     public String userModify(HttpSession session, ModelMap model) throws Exception {
@@ -71,41 +62,6 @@ public class MyPageController {
         return "mypage/userModify";
     }
 
-    @GetMapping("sharehouseModify")
-    public String sharehouseModify() {
-
-        log.info("{}.sharehouseModify Start!", this.getClass().getName());
-        log.info("{}.sharehouseModify End!", this.getClass().getName());
-
-        return "mypage/sharehouseModify";
-    }
-
-    @GetMapping("scheduleCheck")
-    public String scheduleCheck() {
-
-        log.info("{}.scheduleCheck Start!", this.getClass().getName());
-        log.info("{}.scheduleCheck End!", this.getClass().getName());
-
-        return "mypage/scheduleCheck";
-    }
-
-    @GetMapping("withdraw")
-    public String withdraw() {
-
-        log.info("{}.withdraw Start!", this.getClass().getName());
-        log.info("{}.withdraw End!", this.getClass().getName());
-
-        return "mypage/withdraw";
-    }
-
-    @GetMapping("myPagePwCheck")
-    public String myPagePwCheck() {
-
-        log.info("{}.myPagePwCheck Start!", this.getClass().getName());
-        log.info("{}.myPagePwCheck End!", this.getClass().getName());
-
-        return "mypage/myPagePwCheck";
-    }
 
     @ResponseBody
     @PostMapping(value = "pwCheckProc")
@@ -145,11 +101,9 @@ public class MyPageController {
             }
 
         } catch (Exception e) {
-            //저장이 실패하면 사용자에세 보여줄 메세지
             msg = "시스템 문제로 비밀번호 확인 처리가 실패하였습니다.";
             log.info(e.toString());
         } finally {
-            // 결과 메시지 전달하기
             dto = new MsgDTO();
             dto.setResult(res);
             dto.setMsg(msg);
@@ -159,6 +113,7 @@ public class MyPageController {
         return dto;
 
     }
+
 
     // 회원 탈퇴 이메일 확인
     @ResponseBody
@@ -185,6 +140,7 @@ public class MyPageController {
         return rDTO;
     }
 
+
     @ResponseBody
     @PostMapping(value = "withdrawProc")
     public MsgDTO withdrawProc(HttpServletRequest request, HttpSession session) {
@@ -195,23 +151,20 @@ public class MyPageController {
         String msg;
 
         try {
-            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")); // 현재 로그인 유저
+            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
             String password = CmmUtil.nvl(request.getParameter("password"));
 
             if (userId.isEmpty() || password.isEmpty()) {
                 msg = "잘못된 요청입니다.";
             } else {
-                // 로그인과 동일한 방식으로 비번 검증
                 UserInfoDTO pDTO = new UserInfoDTO();
                 pDTO.setUserId(userId);
 
-                // 로그인에서 해시쓰면 아래로 교체
                 pDTO.setPassword(EncryptUtil.encHashSHA256(password));
 
                 UserInfoDTO rDTO = myPageService.pwCheck(pDTO);
 
                 if (rDTO != null && !CmmUtil.nvl(rDTO.getUserId()).isEmpty()) {
-                    // 비밀번호 일치 → 삭제
                     UserInfoDTO dDTO = new UserInfoDTO();
                     UserProfileDTO fDTO = new UserProfileDTO();
 
@@ -229,7 +182,6 @@ public class MyPageController {
                     if (i > 0 && j > 0) {
                         res = 1;
                         msg = "회원 탈퇴가 완료되었습니다.";
-                        // 세션 종료
                         session.invalidate();
                     } else {
                         msg = "회원 탈퇴에 실패했습니다.";
@@ -252,6 +204,7 @@ public class MyPageController {
 
         return dto;
     }
+
 
     @PostMapping("/introductionUpdate")
     @ResponseBody
@@ -281,7 +234,7 @@ public class MyPageController {
         return msg;
     }
 
-    // ✅ [변경] 프로필 이미지 업로드: AWS S3 사용
+
     @PostMapping("/profileImageUpdate")
     @ResponseBody
     public ResponseEntity<?> profileImageUpdate(MultipartFile file, HttpSession session) throws IOException {
@@ -300,24 +253,19 @@ public class MyPageController {
             return ResponseEntity.badRequest().body("{\"error\":\"최대 5MB까지 업로드 가능합니다.\"}");
         }
 
-        // ✅ [변경] AWS S3 서비스 사용
         String urlPath = awsS3Service.uploadFile(file);
 
-        // DB 업데이트
         UserProfileDTO p = new UserProfileDTO();
         p.setUserId(userId);
         p.setProfileImageUrl(urlPath);
         myPageService.updateProfileImage(p);
 
-        // 세션 갱신 (화면 즉시 반영)
         session.setAttribute("SS_USER_PROFILE_IMG_URL", urlPath);
 
-        // 프론트에 URL 반환
         return ResponseEntity.ok("{\"url\":\"" + urlPath + "\"}");
     }
 
 
-    // 전체 태그: [ { tagId, tagName, tagType } ]
     @GetMapping("tags/all")
     @ResponseBody
     public ResponseEntity<List<UserTagDTO>> tagsAll(){
@@ -325,26 +273,27 @@ public class MyPageController {
         return ResponseEntity.ok(list);
     }
 
-    // 내 태그(그룹별 1개): [ { tagId, tagType } ]
+
     @GetMapping("tags/my")
     @ResponseBody
     public ResponseEntity<List<UserTagDTO>> tagsMy(HttpSession session){
         UserInfoDTO p = new UserInfoDTO();
         p.setUserId((String) session.getAttribute("SS_USER_ID"));
-        List<UserTagDTO> list = myPageService.getMyTagSelections(p); // DTO만
+        List<UserTagDTO> list = myPageService.getMyTagSelections(p);
         return ResponseEntity.ok(list);
     }
 
-    // 저장: 본문 = UserTagDTO { tagList: [...] }  (DTO 단일만 받음)
+
     @PostMapping("tags/update")
     @ResponseBody
     public ResponseEntity<?> tagsUpdate(@RequestBody UserTagDTO p, HttpSession session){
         p.setUserId((String) session.getAttribute("SS_USER_ID"));
-        int res = myPageService.updateMyTagsByGroup(p); // DTO만
+        int res = myPageService.updateMyTagsByGroup(p);
         UserInfoDTO q = new UserInfoDTO(); q.setUserId(p.getUserId());
-        List<TagDTO> chips = myPageService.getMyTagChips(q); // 칩 표시용
+        List<TagDTO> chips = myPageService.getMyTagChips(q);
         return ResponseEntity.ok(java.util.Map.of("res", res, "tags", chips));
     }
+
 
     @PostMapping(value = "/passwordVerify")
     @ResponseBody
@@ -353,7 +302,6 @@ public class MyPageController {
 
         MsgDTO dto = new MsgDTO();
 
-        // 로그인 세션에서 사용자 ID 확보 (프로젝트 세션 키에 맞춰 사용)
         String ssUserId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
         String currentPw = CmmUtil.nvl(request.getParameter("currentPw"));
 
@@ -364,19 +312,15 @@ public class MyPageController {
             return dto;
         }
 
-        // 입력 비번 해시
         String encPw = EncryptUtil.encHashSHA256(currentPw);
 
-        // DTO 규칙 준수
         UserInfoDTO pDTO = new UserInfoDTO();
         pDTO.setUserId(ssUserId);
         pDTO.setPassword(encPw);
 
-        boolean ok = myPageService.verifyPassword(pDTO); // 서비스에서 DB와 비교
+        boolean ok = myPageService.verifyPassword(pDTO);
 
         if (ok) {
-            // ★★ 핵심: /user/newPasswordProc가 요구하는 세션값 세팅
-            // 기존 newPasswordProc은 NEW_PASSWORD 세션에 "userId"를 담아 사용 중
             session.setAttribute("NEW_PASSWORD", ssUserId);
 
             dto.setResult(1);
@@ -389,6 +333,7 @@ public class MyPageController {
         log.info("{}.mypage/passwordVerify End!", this.getClass().getName());
         return dto;
     }
+
 
     @PostMapping("/addressUpdate")
     @ResponseBody
@@ -403,9 +348,7 @@ public class MyPageController {
             return ResponseEntity.status(401).body(res);
         }
 
-        // JSP의 name과 DTO 필드명이 매칭되어 자동 바인딩됨
         pDTO.setUserId(userId);
-        // addr1: 표시용 한 줄 주소, addr2: 상세주소(동/호)
         int r = myPageService.updateAddress(pDTO);
 
         res.put("result", r > 0 ? 1 : 0);
@@ -413,4 +356,43 @@ public class MyPageController {
         return ResponseEntity.ok(res);
     }
 
+
+    @GetMapping("sharehouseModify")
+    public String sharehouseModify() {
+
+        log.info("{}.sharehouseModify Start!", this.getClass().getName());
+        log.info("{}.sharehouseModify End!", this.getClass().getName());
+
+        return "mypage/sharehouseModify";
+    }
+
+
+    @GetMapping("scheduleCheck")
+    public String scheduleCheck() {
+
+        log.info("{}.scheduleCheck Start!", this.getClass().getName());
+        log.info("{}.scheduleCheck End!", this.getClass().getName());
+
+        return "mypage/scheduleCheck";
+    }
+
+
+    @GetMapping("withdraw")
+    public String withdraw() {
+
+        log.info("{}.withdraw Start!", this.getClass().getName());
+        log.info("{}.withdraw End!", this.getClass().getName());
+
+        return "mypage/withdraw";
+    }
+
+
+    @GetMapping("myPagePwCheck")
+    public String myPagePwCheck() {
+
+        log.info("{}.myPagePwCheck Start!", this.getClass().getName());
+        log.info("{}.myPagePwCheck End!", this.getClass().getName());
+
+        return "mypage/myPagePwCheck";
+    }
 }

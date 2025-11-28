@@ -7,8 +7,8 @@ import kopo.shallwithme.dto.TagDTO;
 import kopo.shallwithme.dto.UserProfileDTO;
 import kopo.shallwithme.dto.UserTagDTO;
 import kopo.shallwithme.service.ISharehouseService;
+import kopo.shallwithme.service.impl.AwsS3Service;
 import kopo.shallwithme.service.impl.UserInfoService;
-import kopo.shallwithme.service.impl.AwsS3Service; // ✅ AWS 서비스 import 추가
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,17 +29,11 @@ import java.util.stream.Collectors;
 @Controller
 public class SharehouseController {
 
+
     private final ISharehouseService sharehouseService;
     private final UserInfoService userInfoService;
-    private final AwsS3Service awsS3Service; // ✅ AWS 서비스 주입 추가
+    private final AwsS3Service awsS3Service;
 
-    // ❌ [삭제됨] NCP 관련 @Value 설정들 모두 제거
-    // @Value("${ncp.object-storage.endpoint}") private String endpoint;
-    // @Value("${ncp.object-storage.region}") private String region;
-    // @Value("${ncp.object-storage.access-key}") private String accessKey;
-    // @Value("${ncp.object-storage.secret-key}") private String secretKey;
-    // @Value("${ncp.object-storage.bucket-name}") private String bucketName;
-    // @Value("${ncp.object-storage.folder}") private String folder;
 
     // 등록 페이지
     @GetMapping("/sharehouseReg")
@@ -53,13 +46,13 @@ public class SharehouseController {
         String userId   = (session != null) ? (String) session.getAttribute("SS_USER_ID")   : "";
         String userName = (session != null) ? (String) session.getAttribute("SS_USER_NAME") : "";
 
-        // 룸메이트와 동일 구조: JSP에서 사용할 값 셋업
         req.setAttribute("userTags", List.of());
         req.setAttribute("userTagNames", List.of());
         req.setAttribute("SS_USER_NAME", userName);
 
         return "sharehouse/sharehouseReg";
     }
+
 
     @PostMapping(
             value = "/register",
@@ -79,9 +72,7 @@ public class SharehouseController {
             @RequestParam(value = "addr2", required = false) String addr2,
             HttpSession session
     ){
-        // ========================================
-        // ✅ 요청 받음 로그
-        // ========================================
+
         log.info("========================================");
         log.info("POST /sharehouse/register 요청 받음!");
         log.info("========================================");
@@ -99,7 +90,7 @@ public class SharehouseController {
         log.info("추가 이미지 개수: {}", images != null ? images.size() : 0);
 
         if (userId == null || userId.isBlank()) {
-            log.error("❌ 로그인 필요 - userId가 null 또는 비어있음");
+            log.error("로그인 필요 - userId가 null 또는 비어있음");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("result", 0, "msg", "로그인이 필요합니다."));
         }
@@ -107,9 +98,6 @@ public class SharehouseController {
         try {
             log.info("=== 쉐어하우스 등록 처리 시작 ===");
 
-            // ========================================
-            // ✅ 1. 파일 개수 검증 (최대 5개: 썸네일 1개 + 추가이미지 4개)
-            // ========================================
             int totalFiles = 0;
 
             // 썸네일 카운트
@@ -117,36 +105,33 @@ public class SharehouseController {
                 totalFiles++;
             }
 
-            // 추가 이미지 카운트 (빈 파일 제외)
+            // 추가 이미지 카운트
             if (images != null && !images.isEmpty()) {
                 totalFiles += (int) images.stream()
                         .filter(file -> file != null && !file.isEmpty())
                         .count();
             }
 
-            log.info("✅ 파일 개수 검증: 총 {}개", totalFiles);
+            log.info("파일 개수 검증: 총 {}개", totalFiles);
 
             if (totalFiles > 5) {
-                log.error("❌ 파일 개수 초과: {}개 (최대 5개)", totalFiles);
+                log.error("파일 개수 초과: {}개 (최대 5개)", totalFiles);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("result", 0, "msg", "최대 5개 파일만 업로드 가능합니다."));
             }
 
             if (totalFiles == 0) {
-                log.error("❌ 업로드된 파일이 없음");
+                log.error("업로드된 파일이 없음");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("result", 0, "msg", "최소 1개 이상의 이미지를 업로드해주세요."));
             }
 
-            // ========================================
-            // ✅ 2. 개별 파일 크기 검증 (최대 10MB)
-            // ========================================
             long maxSize = 10 * 1024 * 1024; // 10MB
 
             // 썸네일 크기 체크
             if (thumbnail != null && !thumbnail.isEmpty() && thumbnail.getSize() > maxSize) {
                 long sizeMB = thumbnail.getSize() / 1024 / 1024;
-                log.error("❌ 썸네일 크기 초과: {}MB (최대 10MB)", sizeMB);
+                log.error("썸네일 크기 초과: {}MB (최대 10MB)", sizeMB);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("result", 0, "msg", "썸네일은 10MB 이하여야 합니다. (현재: " + sizeMB + "MB)"));
             }
@@ -157,27 +142,23 @@ public class SharehouseController {
                     MultipartFile image = images.get(i);
                     if (image != null && !image.isEmpty() && image.getSize() > maxSize) {
                         long sizeMB = image.getSize() / 1024 / 1024;
-                        log.error("❌ 이미지 {}번 크기 초과: {}MB (최대 10MB)", i + 1, sizeMB);
+                        log.error("이미지 {}번 크기 초과: {}MB (최대 10MB)", i + 1, sizeMB);
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                 .body(Map.of("result", 0, "msg", (i + 1) + "번 이미지는 10MB 이하여야 합니다. (현재: " + sizeMB + "MB)"));
                     }
                 }
             }
 
-            log.info("✅ 파일 크기 검증 통과");
-
-            // ========================================
-            // ✅ 3. 이미지 업로드 시작 (AWS S3 사용)
-            // ========================================
+            log.info("파일 크기 검증 통과");
             log.info("=== 이미지 업로드 시작 ===");
             List<String> imageUrls = new ArrayList<>();
 
             // 썸네일 업로드
             if (thumbnail != null && !thumbnail.isEmpty()) {
                 log.info("썸네일 업로드 중...");
-                String thumbnailUrl = awsS3Service.uploadFile(thumbnail); // ✅ 변경
+                String thumbnailUrl = awsS3Service.uploadFile(thumbnail);
                 imageUrls.add(thumbnailUrl);
-                log.info("✅ 썸네일 업로드 완료: {}", thumbnailUrl);
+                log.info("썸네일 업로드 완료: {}", thumbnailUrl);
             }
 
             // 추가 이미지 업로드
@@ -186,18 +167,14 @@ public class SharehouseController {
                     MultipartFile image = images.get(i);
                     if (image != null && !image.isEmpty()) {
                         log.info("이미지 {}번 업로드 중...", i + 1);
-                        String imageUrl = awsS3Service.uploadFile(image); // ✅ 변경
+                        String imageUrl = awsS3Service.uploadFile(image);
                         imageUrls.add(imageUrl);
-                        log.info("✅ 이미지 {}번 업로드 완료: {}", i + 1, imageUrl);
+                        log.info("이미지 {}번 업로드 완료: {}", i + 1, imageUrl);
                     }
                 }
             }
 
-            log.info("✅ 이미지 업로드 완료! 총 {}개", imageUrls.size());
-
-            // ========================================
-            // ✅ 4. DB 저장
-            // ========================================
+            log.info("이미지 업로드 완료! 총 {}개", imageUrls.size());
             log.info("=== DB 저장 시작 ===");
             Long houseId = sharehouseService.registerHouseWithImages(
                     userId,
@@ -209,11 +186,8 @@ public class SharehouseController {
                     floorNumber
             );
 
-            log.info("✅ DB 저장 완료! houseId={}", houseId);
+            log.info("DB 저장 완료! houseId={}", houseId);
 
-            // ========================================
-            // ✅ 5. 태그 저장
-            // ========================================
             if (tagListJson != null && !tagListJson.isBlank()) {
                 log.info("=== 태그 저장 시작 ===");
                 try {
@@ -224,15 +198,15 @@ public class SharehouseController {
                     );
                     if (!tagList.isEmpty()) {
                         sharehouseService.saveSharehouseTags(houseId, tagList);
-                        log.info("✅ 태그 {}개 저장 완료", tagList.size());
+                        log.info("태그 {}개 저장 완료", tagList.size());
                     }
                 } catch (Exception e) {
-                    log.error("❌ 태그 저장 중 오류", e);
+                    log.error("태그 저장 중 오류", e);
                 }
             }
 
             log.info("========================================");
-            log.info("✅ 쉐어하우스 등록 완전 완료! houseId={}", houseId);
+            log.info("쉐어하우스 등록 완전 완료! houseId={}", houseId);
             log.info("========================================");
 
             return ResponseEntity.ok(Map.of(
@@ -242,7 +216,7 @@ public class SharehouseController {
 
         } catch (Exception e) {
             log.error("========================================");
-            log.error("❌ 쉐어하우스 등록 중 오류 발생!");
+            log.error("쉐어하우스 등록 중 오류 발생!");
             log.error("에러 타입: {}", e.getClass().getName());
             log.error("에러 메시지: {}", e.getMessage());
 
@@ -266,15 +240,8 @@ public class SharehouseController {
         }
     }
 
-    // ❌ [삭제됨] private String saveProfileImage(MultipartFile file) throws IOException { ... }
-    // AWS S3 서비스가 이 역할을 대신합니다.
 
-    @GetMapping("/sharehouseMain")
-    public String sharehouseMain() {
-        return "sharehouse/sharehouseMain";
-    }
-
-    // 메인 페이지 리스트(룸메이트의 /userList 동일 구조)
+    // 메인 페이지 리스트
     @GetMapping(value = "/userList", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Map<String, Object>> getUserList(@RequestParam(defaultValue = "1") int page) {
@@ -311,6 +278,7 @@ public class SharehouseController {
         return rList;
     }
 
+
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
@@ -339,6 +307,7 @@ public class SharehouseController {
         boolean lastPage = items.isEmpty();
         return Map.of("items", items, "lastPage", lastPage);
     }
+
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -385,6 +354,7 @@ public class SharehouseController {
         );
     }
 
+
     @GetMapping("/{houseId}/info")
     @ResponseBody
     public Map<String, Object> getSharehouseInfo(@PathVariable("houseId") Long houseId) {
@@ -413,6 +383,7 @@ public class SharehouseController {
         return result;
     }
 
+
     @GetMapping("/sharehouseDetail")
     public String sharehouseDetail(UserProfileDTO pDTO, org.springframework.ui.Model model) {
         String userId = pDTO.getUserId();
@@ -427,7 +398,6 @@ public class SharehouseController {
             return "error/notFound";
         }
 
-        // 1단계: 기본 정보 조회
         Map<String, Object> detail = sharehouseService.getDetail(houseId);
         log.info("=== DB 조회 결과 ===");
         log.info("detail 전체: {}", detail);
@@ -438,7 +408,6 @@ public class SharehouseController {
         detail.put("images", images);
         detail.put("tags", tags);
 
-        // 2단계: regId 처리
         Object regIdObj = detail.get("regId");
         log.info("=== regId 처리 ===");
         log.info("DB에서 가져온 regIdObj: {}", regIdObj);
@@ -457,7 +426,6 @@ public class SharehouseController {
         detail.put("regId", regId);
         log.info("detail에 설정된 최종 regId: '{}'", regId);
 
-        // 3단계: 작성자 프로필 조회
         if (regId != null && !regId.isEmpty()) {
             log.info("=== 작성자 프로필 조회 시작 ===");
             log.info("조회할 regId: '{}'", regId);
@@ -476,23 +444,23 @@ public class SharehouseController {
                     String profileUrl = hostProfile.getProfileImageUrl();
                     if (profileUrl != null && !profileUrl.isBlank()) {
                         detail.put("hostProfileUrl", profileUrl);
-                        log.info("✅ 프로필 URL 설정 성공: {}", profileUrl);
+                        log.info("프로필 URL 설정 성공: {}", profileUrl);
                     } else {
-                        log.warn("⚠️ 프로필 URL이 비어있음");
+                        log.warn("프로필 URL이 비어있음");
                         detail.put("hostProfileUrl", null);
                     }
 
                     detail.put("hostName", hostProfile.getUserName());
                 } else {
-                    log.warn("❌ hostProfile이 null입니다");
+                    log.warn("hostProfile이 null입니다");
                     detail.put("hostName", "작성자");
                 }
             } catch (Exception e) {
-                log.error("❌ 작성자 정보 조회 중 오류", e);
+                log.error("작성자 정보 조회 중 오류", e);
                 detail.put("hostName", "작성자");
             }
         } else {
-            log.warn("❌ regId가 null이거나 비어있어서 프로필 조회 불가");
+            log.warn("regId가 null이거나 비어있어서 프로필 조회 불가");
             detail.put("hostName", "작성자");
         }
 
@@ -507,7 +475,7 @@ public class SharehouseController {
         return "sharehouse/sharehouseDetail";
     }
 
-    // ✅ 전체 태그 목록 조회 (룸메이트와 완전 동일)
+
     @GetMapping("/tagAll")
     @ResponseBody
     public List<TagDTO> tagAll() throws Exception {
@@ -520,7 +488,7 @@ public class SharehouseController {
         return rList;
     }
 
-    // ✅ 태그 저장 API (룸메이트와 완전 동일)
+
     @PostMapping("/saveSharehouseTags")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> saveSharehouseTags(
@@ -560,20 +528,7 @@ public class SharehouseController {
         }
     }
 
-    @GetMapping("/tagSelect")
-    public String tagSelect() {
-        return "sharehouse/sharehouseTagSelect";
-    }
 
-    @GetMapping("/test")
-    @ResponseBody
-    public String test() {
-        return "SharehouseController is working!";
-    }
-
-    /**
-     * ✅ 쉐어하우스 정보 수정 페이지 이동
-     */
     @GetMapping("/mypage/sharehouseModify")
     public String sharehouseModifyPage(HttpSession session, org.springframework.ui.Model model) {
         String userId = (String) session.getAttribute("SS_USER_ID");
@@ -587,9 +542,7 @@ public class SharehouseController {
         return "mypage/sharehouseModify";
     }
 
-    /**
-     * ✅ 본인의 쉐어하우스 정보 조회 API - 여러 개 조회
-     */
+
     @GetMapping("/getMySharehouse")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getMySharehouse(HttpSession session) {
@@ -641,9 +594,7 @@ public class SharehouseController {
         }
     }
 
-    /**
-     * ✅ 쉐어하우스 삭제 API
-     */
+
     @PostMapping("/delete")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteSharehouse(
@@ -680,26 +631,54 @@ public class SharehouseController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(result);
             }
 
-            // 삭제 실행
             boolean deleted = sharehouseService.deleteSharehouse(houseId);
 
             if (deleted) {
-                log.info("✅ 쉐어하우스 삭제 성공: houseId={}", houseId);
+                log.info("쉐어하우스 삭제 성공: houseId={}", houseId);
                 result.put("success", true);
                 result.put("message", "삭제되었습니다.");
             } else {
-                log.warn("⚠️ 쉐어하우스 삭제 실패: houseId={}", houseId);
+                log.warn("쉐어하우스 삭제 실패: houseId={}", houseId);
                 result.put("success", false);
                 result.put("message", "삭제에 실패했습니다.");
             }
 
         } catch (Exception e) {
-            log.error("❌ 쉐어하우스 삭제 중 오류 발생", e);
+            log.error("쉐어하우스 삭제 중 오류 발생", e);
             result.put("success", false);
             result.put("message", "삭제 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
 
         return ResponseEntity.ok(result);
+    }
+
+
+    @GetMapping("/tagSelect")
+    public String tagSelect() {
+
+        log.info("{}.tagSelect Start!", this.getClass().getName());
+        log.info("{}.tagSelect End!", this.getClass().getName());
+
+        return "sharehouse/sharehouseTagSelect";
+    }
+
+    @GetMapping("/test")
+    @ResponseBody
+    public String test() {
+
+        log.info("{}.test Start!", this.getClass().getName());
+        log.info("{}.test End!", this.getClass().getName());
+
+        return "SharehouseController is working!";
+    }
+
+    @GetMapping("/sharehouseMain")
+    public String sharehouseMain() {
+
+        log.info("{}.sharehouseMain Start!", this.getClass().getName());
+        log.info("{}.sharehouseMain End!", this.getClass().getName());
+
+        return "sharehouse/sharehouseMain";
     }
 }

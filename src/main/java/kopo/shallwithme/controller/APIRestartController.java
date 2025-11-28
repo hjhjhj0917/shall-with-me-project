@@ -13,14 +13,22 @@ public class APIRestartController {
 
     private final YouthPolicyService youthPolicyService;
 
-    // 수동 실행용 정책 저장 API
+    // 정책 정보 수동으로 캐싱하는 controller
     @GetMapping("/fetch-policies")
     public String fetchPoliciesGet() {
+
+        log.info("{}.fetchPoliciesGet Start!", this.getClass().getName());
+
         try {
             youthPolicyService.fetchAndSavePolicies();
+
+            log.info("{}.fetchPoliciesGet End!", this.getClass().getName());
+
             return "정책 데이터를 성공적으로 갱신했습니다.";
         } catch (Exception e) {
             log.error("정책 갱신 중 오류 발생", e);
+            log.info("{}.fetchPoliciesGet End!", this.getClass().getName());
+
             return "정책 갱신 중 오류: " + e.getMessage();
         }
     }
