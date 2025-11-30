@@ -43,5 +43,5 @@ public interface IMyPageMapper {
 
     int updateAddress(UserProfileDTO pDTO);
 
-
+    void updateUserStatus(UserInfoDTO pDTO) throws Exception;
 }

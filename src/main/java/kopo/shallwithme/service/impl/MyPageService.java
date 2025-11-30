@@ -38,6 +38,18 @@ public class MyPageService implements IMyPageService {
         return res;
     }
 
+
+    @Override
+    @Transactional
+    public void updateUserStatus(UserInfoDTO pDTO) throws Exception {
+        log.info("MyPageService.updateUserStatus Start!");
+
+        myPageMapper.updateUserStatus(pDTO);
+
+        log.info("MyPageService.updateUserStatus End!");
+    }
+
+
     @Override
     public UserInfoDTO pwCheck(UserInfoDTO pDTO) throws Exception {
 

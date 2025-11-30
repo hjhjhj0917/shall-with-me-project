@@ -199,4 +199,11 @@
         WHERE USER_ID = #{userId}
     </update>
 
+    <update id="updateUserStatus" parameterType="UserInfoDTO">
+        UPDATE USER_INFO
+        SET status = #{status},
+            CHG_ID = #{userId},
+            CHG_DT = NOW()
+        WHERE USER_ID = #{userId}
+    </update>
 </mapper>

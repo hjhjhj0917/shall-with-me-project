@@ -16,7 +16,6 @@
             background: linear-gradient(to right, white, #f9f9f9);
         }
 
-        /* 전체 메인 콘텐츠 영역 */
         .sidebar-main-content {
             padding: 40px;
         }
@@ -66,7 +65,6 @@
             gap: 10px;
         }
 
-
         .card-header-left {
             display: flex;
             align-items: center;
@@ -80,14 +78,12 @@
             white-space: nowrap;
         }
 
-
         .header-inline-value {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             flex: 1 1 auto;
         }
-
 
         .card-action-btn {
             flex: 0 0 auto;
@@ -105,7 +101,6 @@
             padding: 16px;
             flex-grow: 1;
         }
-
 
         .card-action-btn {
             display: inline-flex;
@@ -204,7 +199,6 @@
         .tag-chip i {
             font-size: .8rem
         }
-
 
         .intro-area {
             padding: 12px;
@@ -346,7 +340,6 @@
             }
         }
 
-        /* --- [START] NEW TAG MODAL STYLE (Applied to #mypageTagModal) --- */
         #mypageTagModal .search-tag-group {
             display: flex;
             align-items: center;
@@ -377,7 +370,7 @@
         #mypageTagModal .search-tag-group__content-wrapper {
             flex-grow: 1;
             padding-left: 24px;
-            min-width: 0; /* 텍스트 오버플로우 방지 */
+            min-width: 0;
         }
 
         #mypageTagModal .search-tag-group__title {
@@ -472,7 +465,7 @@
         }
 
 
-        #btnVerifyPw{
+        #btnVerifyPw {
             text-decoration: none !important;
             background-color: white !important;
             color: #3399ff !important;
@@ -482,7 +475,7 @@
             cursor: pointer;
         }
 
-        #btnUpdatePw{
+        #btnUpdatePw {
             text-decoration: none !important;
             background-color: white !important;
             color: #3399ff !important;
@@ -492,7 +485,7 @@
             cursor: pointer;
         }
 
-        #btnFindPost{
+        #btnFindPost {
             text-decoration: none !important;
             background-color: white !important;
             color: #3399ff !important;
@@ -502,7 +495,7 @@
             cursor: pointer;
         }
 
-        #btnAddrSave{
+        #btnAddrSave {
             text-decoration: none !important;
             background-color: white !important;
             color: #3399ff !important;
@@ -511,7 +504,6 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
             cursor: pointer;
         }
-
 
         #pwChangeModal .login-input {
             width: 100%;
@@ -530,12 +522,10 @@
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
         }
 
-
         #pwChangeModal .login-input.input-error {
             border-color: #e03131;
             box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
         }
-
 
 
         #addrEditModal .login-input {
@@ -556,7 +546,6 @@
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
         }
 
-
         #addrEditModal .login-input.input-error {
             border-color: #e03131;
             box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
@@ -568,14 +557,67 @@
             margin-left: auto;
         }
 
+        /* 헤더 버튼 클릭 보장 */
+        .card-header {
+            position: relative;
+        }
 
+        /* 쌓임 맥락 생성 */
+        .card-action-btn {
+            position: relative;
+            z-index: 2;
+        }
 
+        .header-inline-value {
+            pointer-events: none;
+        }
 
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            vertical-align: middle;
+        }
 
-        .card-header { position: relative; }
-        .card-action-btn { position: relative; z-index: 2; }
-        .header-inline-value { pointer-events: none; }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #3399ff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
 
     </style>
 
@@ -627,8 +669,18 @@
                                                 value="${not empty rDTO.birthDate ? rDTO.birthDate : sessionScope.SS_USER_BIRTH}"/></span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="profile-info">
+
+                                <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 0.85rem; color: #445268;">
+                                        <i class="fa-solid fa-user"></i> &nbsp;
+                                        계정 활성화
+                                    </span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="accountActiveToggle" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -660,9 +712,13 @@
                                 </div>
                                 <div style="display:flex;gap:8px;">
                                     <button type="button" id="btnTagCancel"
-                                            style="padding:8px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">취소</button>
+                                            style="padding:8px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">
+                                        취소
+                                    </button>
                                     <button type="button" id="btnTagSave"
-                                            style="padding:8px 16px;border:none;border-radius:8px;background:#3399ff;color:#fff;font-weight:600;cursor:pointer;font-size:0.9rem;">선택 완료</button>
+                                            style="padding:8px 16px;border:none;border-radius:8px;background:#3399ff;color:#fff;font-weight:600;cursor:pointer;font-size:0.9rem;">
+                                        선택 완료
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -682,13 +738,16 @@
                             </div>
 
                             <div class="modal-body" style="padding:20px;">
-                                <div id="findPwErrorMessage2" class="error-message" style="color:#e03131; font-size:13px; min-height:18px;"></div>
+                                <div id="findPwErrorMessage2" class="error-message"
+                                     style="color:#e03131; font-size:13px; min-height:18px;"></div>
 
                                 <form id="pwVerifyForm" style="margin-bottom:12px;">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <div style="display:flex; flex-direction:column; gap:10px;">
-                                        <input type="password" name="currentPw" id="currentPw" class="login-input" placeholder="현재 비밀번호"/>
-                                        <button id="btnVerifyPw" type="button" class="card-action-btn active" style="justify-content:center;">
+                                        <input type="password" name="currentPw" id="currentPw" class="login-input"
+                                               placeholder="현재 비밀번호"/>
+                                        <button id="btnVerifyPw" type="button" class="card-action-btn active"
+                                                style="justify-content:center;">
                                             현재 비밀번호 확인
                                         </button>
                                     </div>
@@ -697,9 +756,12 @@
                                 <form id="f3" style="display:none;">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <div style="display:flex; flex-direction:column; gap:10px;">
-                                        <input type="password" name="userPw" id="userPw" class="login-input" placeholder="새 비밀번호"/>
-                                        <input type="password" name="pwCheck" id="pwCheck" class="login-input" placeholder="새 비밀번호 확인"/>
-                                        <button id="btnUpdatePw" type="button" class="card-action-btn active" style="justify-content:center;">
+                                        <input type="password" name="userPw" id="userPw" class="login-input"
+                                               placeholder="새 비밀번호"/>
+                                        <input type="password" name="pwCheck" id="pwCheck" class="login-input"
+                                               placeholder="새 비밀번호 확인"/>
+                                        <button id="btnUpdatePw" type="button" class="card-action-btn active"
+                                                style="justify-content:center;">
                                             비밀번호 변경
                                         </button>
                                     </div>
@@ -786,7 +848,8 @@
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
                         <div style="display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center;">
-                            <input type="text" id="addr1" name="addr1" class="login-input" placeholder="(우편번호) 도로명 주소" readonly>
+                            <input type="text" id="addr1" name="addr1" class="login-input" placeholder="(우편번호) 도로명 주소"
+                                   readonly>
                             <button type="button" id="btnFindPost" class="card-action-btn active">주소 찾기</button>
                         </div>
 
@@ -808,7 +871,6 @@
 <%@ include file="../includes/footer.jsp" %>
 
 <script>
-    // ★추가: CSRF 안전 추출 + fallback
     function getCsrf() {
         let header = ('${_csrf.headerName}' || '').trim();
         let token = ('${_csrf.token}' || '').trim();
@@ -850,6 +912,7 @@
                 map.relayout();
                 map.setCenter(marker.getPosition());
             }
+
             window.addEventListener('resize', relayoutAndCenter);
             setTimeout(relayoutAndCenter, 0);
 
@@ -1011,6 +1074,45 @@
             });
         });
     });
+
+    $(function() {
+        const currentStatus = "<c:out value='${rDTO.status}'/>";
+
+        if (currentStatus === 'HIDE') {
+            $('#accountActiveToggle').prop('checked', false);
+        } else {
+            $('#accountActiveToggle').prop('checked', true);
+        }
+
+        $('#accountActiveToggle').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            const newStatus = isChecked ? 'ACTIVE' : 'HIDE';
+
+            $.ajax({
+                url: '/mypage/updateStatus',
+                type: 'POST',
+                data: { status: newStatus },
+                dataType: 'json',
+                beforeSend: (xhr) => {
+                    const {header, token} = getCsrf();
+                    if (header && token) xhr.setRequestHeader(header, token);
+                },
+                success: function(res) {
+                    if (res.result === 1) {
+                        console.log('상태 변경 성공: ' + newStatus);
+                    } else {
+                        showCustomAlert(res.msg || '상태 변경에 실패했습니다.');
+                        $('#accountActiveToggle').prop('checked', !isChecked);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Status update failed', xhr);
+                    showCustomAlert('서버 통신 오류가 발생했습니다.');
+                    $('#accountActiveToggle').prop('checked', !isChecked);
+                }
+            });
+        });
+    });
 </script>
 
 <script>
@@ -1062,7 +1164,9 @@
                     $.getJSON(TAG_MY_URL)
                 ]);
                 const myMap = {};
-                (myTags || []).forEach(s => { myMap[s.tagType] = s.tagId; });
+                (myTags || []).forEach(s => {
+                    myMap[s.tagType] = s.tagId;
+                });
                 renderGroups(allTags, myMap);
                 updateTagCountDisplay();
                 $modal.css('display', 'flex');
@@ -1073,7 +1177,9 @@
         });
 
         $modalClose.on('click', () => $modal.hide());
-        $modal.on('click', (e) => { if (e.target === e.currentTarget) $modal.hide(); });
+        $modal.on('click', (e) => {
+            if (e.target === e.currentTarget) $modal.hide();
+        });
 
         $btnCancel.on('click', () => {
             $modal.hide();
@@ -1134,8 +1240,8 @@
                 const $groupDiv = $('<div>').addClass('search-tag-group');
 
                 const $iconWrapper = $('<div>')
-                        .addClass('search-tag-group__icon-wrapper')
-                        .append($('<i>').addClass(g.icon));
+                    .addClass('search-tag-group__icon-wrapper')
+                    .append($('<i>').addClass(g.icon));
 
                 const $contentWrapper = $('<div>').addClass('search-tag-group__content-wrapper');
                 const $groupTitle = $('<div>').addClass('search-tag-group__title').text(g.title);
@@ -1143,9 +1249,9 @@
 
                 list.forEach(tag => {
                     const $btn = $('<button type="button" class="tag-btn">')
-                            .text(tag.tagName)
-                            .attr('data-id', tag.tagId)
-                            .attr('data-group', g.key);
+                        .text(tag.tagName)
+                        .attr('data-id', tag.tagId)
+                        .attr('data-group', g.key);
 
                     if (myMap[g.key] && Number(myMap[g.key]) === Number(tag.tagId)) {
                         $btn.addClass('selected');
@@ -1156,7 +1262,7 @@
                         $groupList.find('.tag-btn').removeClass('selected');
                         $(this).addClass('selected');
                         selectedByGroup.set(g.key, {tagId: tag.tagId, tagName: tag.tagName});
-                        updateTagCountDisplay(); // 클릭 시 카운트 업데이트
+                        updateTagCountDisplay();
                     });
 
                     $groupList.append($btn);
@@ -1168,7 +1274,7 @@
             });
         }
 
-        function updateTagCountDisplay() { // 태그 개수 업데이트 함수
+        function updateTagCountDisplay() {
             $tagCount.text(selectedByGroup.size);
         }
     });
@@ -1217,15 +1323,15 @@
             },
             success: function (json) {
                 const $pwModal = $('#pwChangeModal'); // 모달 선택자
-                const goLogin = function(){ location.href = "<c:url value='/user/login'/>"; };
+                const goLogin = function () {
+                    location.href = "<c:url value='/user/login'/>";
+                };
 
                 if (json.result === "1" || json.result === 1) {
-
                     $pwModal.hide();
 
                     showCustomAlert(json.msg || '비밀번호가 변경되었어요!', goLogin);
                 } else {
-
                     showCustomAlert(json.msg || '비밀번호 변경에 실패했어요.');
                 }
             },
@@ -1236,13 +1342,12 @@
         });
     }
 
-    $(function(){
+    $(function () {
         const $modal = $('#pwChangeModal');
-        const $open  = $('#btnPwChange');
+        const $open = $('#btnPwChange');
         const $close = $('#pwChangeModalClose');
 
-        // 열기: STEP1 보이기 / STEP2 숨기기
-        $open.on('click', function(e){
+        $open.on('click', function (e) {
             e.preventDefault();
             $('#f3')[0].reset();
             $('#pwVerifyForm')[0].reset();
@@ -1252,16 +1357,16 @@
             $('#pwVerifyForm').show();
             $('#f3').hide();
 
-            $modal.css('display','flex');
-            setTimeout(()=> $('#currentPw').focus(), 0);
+            $modal.css('display', 'flex');
+            setTimeout(() => $('#currentPw').focus(), 0);
         });
 
+        $close.on('click', () => $modal.hide());
+        $modal.on('click', (e) => {
+            if (e.target === e.currentTarget) $modal.hide();
+        });
 
-        $close.on('click', ()=> $modal.hide());
-        $modal.on('click', (e)=> { if (e.target === e.currentTarget) $modal.hide(); });
-
-
-        $('#btnVerifyPw').on('click', function(){
+        $('#btnVerifyPw').on('click', function () {
             const cur = ($('#currentPw').val() || '').trim();
             if (!cur) {
                 $("#currentPw").addClass("input-error");
@@ -1280,39 +1385,50 @@
                     const {header, token} = getCsrf();
                     if (header && token) xhr.setRequestHeader(header, token);
                 },
-                success: function(res){
-                    if (typeof res === 'string') { try { res = JSON.parse(res); } catch(e) {} }
+                success: function (res) {
+                    if (typeof res === 'string') {
+                        try {
+                            res = JSON.parse(res);
+                        } catch (e) {
+                        }
+                    }
                     if (res && (res.result === 1 || res.result === "1")) {
-                        // STEP2로 전환
                         $('#pwVerifyForm').hide();
                         $('#f3').show();
                         $('#findPwErrorMessage2').removeClass('visible').text('');
-                        setTimeout(()=> $('#userPw').focus(), 0);
+                        setTimeout(() => $('#userPw').focus(), 0);
                     } else {
                         const msg = (res && res.msg) ? res.msg : "현재 비밀번호가 일치하지 않습니다.";
                         $("#findPwErrorMessage2").text(msg).addClass('visible');
                         setTimeout(() => $("#findPwErrorMessage2").removeClass('visible'), 2000);
                     }
                 },
-                error: function(xhr){
+                error: function (xhr) {
                     console.error('[pw] verify 실패', xhr.status, xhr.responseText);
                     showCustomAlert('확인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
                 }
             });
         });
 
+        $('#btnUpdatePw').on('click', () => pwUpdate(document.getElementById('f3')));
 
-        $('#btnUpdatePw').on('click', ()=> pwUpdate(document.getElementById('f3')));
-
-
-        $('#pwVerifyForm').on('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('#btnVerifyPw').click(); }});
-        $('#f3').on('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('#btnUpdatePw').click(); }});
+        $('#pwVerifyForm').on('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#btnVerifyPw').click();
+            }
+        });
+        $('#f3').on('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#btnUpdatePw').click();
+            }
+        });
     });
 </script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script>
-
     function kakaoPost(f) {
         new daum.Postcode({
             oncomplete: function (data) {
@@ -1322,7 +1438,6 @@
             }
         }).open();
     }
-
 
     function validateAddressForm() {
         const addr1 = ($('#addr1').val() || '').trim();
@@ -1339,8 +1454,6 @@
         }
         return true;
     }
-
-
 
 
     function refreshAddressUI(fullLineAddress) {
@@ -1365,11 +1478,9 @@
         });
     }
 
-
     $(function () {
         const $modal = $('#addrEditModal');
         const $close = $('#addrEditModalClose');
-
 
         $(document).on('click', '#btnAddrEdit', function (e) {
             e.preventDefault();
@@ -1383,16 +1494,15 @@
 
 
         $close.on('click', () => $modal.hide());
-        $modal.on('click', (e) => { if (e.target === e.currentTarget) $modal.hide(); });
+        $modal.on('click', (e) => {
+            if (e.target === e.currentTarget) $modal.hide();
+        });
 
-        // 주소 찾기
-        $('#btnFindPost').on('click', function() {
+        $('#btnFindPost').on('click', function () {
             kakaoPost(document.getElementById('addrForm'));
         });
-        // 저장
         $('#btnAddrSave').on('click', function () {
             if (!validateAddressForm()) return;
-
 
             $('#addr2').val($('#detailAddress').val());
 
@@ -1437,8 +1547,6 @@
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
 <script src="${pageContext.request.contextPath}/js/navbar.js"></script>
-
-
 
 </body>
 </html>

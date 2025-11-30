@@ -717,7 +717,7 @@
             e.preventDefault();
 
             const title = $('#eventTitleInput').val().trim();
-            const time = $('#timePicker').val().trim();
+            let time = $('#timePicker').val().trim();
             const participantId = targetUserId;
             const location = $('#eventLocationInput').val().trim();
 

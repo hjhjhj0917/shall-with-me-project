@@ -28,13 +28,16 @@ public interface IMyPageService {
     int updateProfileImage(UserProfileDTO pDTO);
 
     List<UserTagDTO> getAllTagsWithType();
+
     List<UserTagDTO> getMyTagSelections(UserInfoDTO p);
+
     int updateMyTagsByGroup(UserTagDTO p);
+
     List<TagDTO> getMyTagChips(UserInfoDTO p);
 
     boolean verifyPassword(UserInfoDTO pDTO) throws Exception;
 
     int updateAddress(UserProfileDTO pDTO);
 
-
+    void updateUserStatus(UserInfoDTO pDTO) throws Exception;
 }
