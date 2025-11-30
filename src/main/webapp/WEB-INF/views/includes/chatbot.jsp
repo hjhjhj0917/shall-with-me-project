@@ -191,40 +191,37 @@
             });
         }
 
-        // --- 🎨 수정된 typeWriter 함수: HTML 태그(특히 링크)를 깨뜨리지 않고 출력 ---
         function typeWriter(element, text) {
-            // 1. URL을 링크 태그로 변환하고 줄바꿈 처리
             const processedHtml = linkify(text).replace(/\n/g, '<br>');
 
             let i = 0;
-            $(element).html(''); // '입력 중...' 메시지 초기화
+            $(element).html('');
 
             function typing() {
                 if (i < processedHtml.length) {
                     const char = processedHtml[i];
 
-                    // 2. 태그 시작 감지 ('<')
                     if (char === '<') {
-                        // 3. 링크 태그인지 확인 ('<a')
+
                         if (processedHtml.substring(i, i + 2).toLowerCase() === '<a') {
-                            // 링크의 닫는 태그(</a>) 위치를 찾음
+
                             const closingTag = '</a>';
                             const closingIndex = processedHtml.indexOf(closingTag, i);
 
                             if (closingIndex !== -1) {
-                                // <a>부터 </a>까지 전체를 잘라서 한 번에 추가 (링크 깨짐 방지)
+
                                 const fullLinkTag = processedHtml.substring(i, closingIndex + closingTag.length);
                                 $(element).append(fullLinkTag);
                                 i = closingIndex + closingTag.length; // 인덱스를 </a> 뒤로 이동
                             } else {
-                                // 닫는 태그 못 찾으면 일반 태그처럼 처리
+
                                 const closingTagIndex = processedHtml.indexOf('>', i);
                                 const tag = processedHtml.substring(i, closingTagIndex + 1);
                                 $(element).append(tag);
                                 i = closingTagIndex + 1;
                             }
                         } else {
-                            // 4. 링크가 아닌 다른 태그 (<br>, <strong> 등) 처리
+
                             const closingTagIndex = processedHtml.indexOf('>', i);
                             if (closingTagIndex !== -1) {
                                 const tag = processedHtml.substring(i, closingTagIndex + 1);
@@ -236,13 +233,13 @@
                             }
                         }
                     } else {
-                        // 5. 일반 텍스트는 한 글자씩 타이핑
+
                         $(element).append(char);
                         i++;
                     }
 
                     scrollToBottom();
-                    setTimeout(typing, 30); // 타이핑 속도 (ms)
+                    setTimeout(typing, 30);
                 }
             }
             typing();
@@ -263,7 +260,6 @@
                 contentType: "application/json",
                 data: JSON.stringify({question: question}),
                 success: function (response) {
-                    // 응답이 오면 타이핑 효과 시작
                     typeWriter(typingIndicator, response.answer);
                 },
                 error: function () {

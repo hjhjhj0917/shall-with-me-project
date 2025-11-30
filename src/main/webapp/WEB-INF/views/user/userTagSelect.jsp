@@ -16,7 +16,6 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
-        /* userRegForm의 폼 Wrapper 디자인 적용 */
         .register-form-wrapper {
             width: 1100px;
             margin: 0 auto;
@@ -32,7 +31,6 @@
             overflow: visible;
         }
 
-        /* 탭 디자인 */
         .register-tab, .prefer-tab, .profile-tab {
             margin-bottom: 12px;
         }

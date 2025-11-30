@@ -168,22 +168,20 @@
             overflow-wrap: anywhere; word-break: break-word;
         }
 
-        /* -------------------------------
-           성향 태그 박스: 플렉스 + 내부 스크롤
-           ------------------------------- */
-        #tagBlock{                          /* [ADD] 카드 자체를 세로 플렉스로 */
+
+        #tagBlock{
             display: flex;
             flex-direction: column;
-            overflow: hidden;              /* 밖으로 삐져나옴 방지 */
+            overflow: hidden;
         }
-        #tagBlock .tag-scroll-area{        /* [ADD] 가운데 영역(태그 목록 컨테이너) */
+        #tagBlock .tag-scroll-area{
             flex: 1 1 auto;
-            min-height: calc(              /* ★ 최소 2줄 보이게 */
+            min-height: calc(
                     (var(--chip-h) * var(--tag-min-rows)) + var(--chip-row-gap)
             );
         }
 
-        .tag-chip-wrap {                   /* 내부 스크롤 */
+        .tag-chip-wrap {
             display: flex;
             flex-wrap: wrap;
             align-content: flex-start;
@@ -212,7 +210,6 @@
         .tag-chip-wrap::-webkit-scrollbar-thumb { background: #c7dcff; border-radius: 8px; border: 2px solid #eef4ff }
         .tag-chip-wrap { scrollbar-width: thin; scrollbar-color: #c7dcff #eef4ff }
 
-        /* ===== Floating '수정하기' 버튼 ===== */
         .fab-edit {
             position: fixed;
             right: clamp(16px, 3vw, 28px);
@@ -240,14 +237,14 @@
             .fab-edit{ padding: 10px 14px; font-size: .95rem; gap: 8px; }
         }
 
-        /* 반응형: 모바일 1열에서는 고정 해제 */
+
         @media (max-width: 1100px) {
             #profileView { grid-template-columns: 1fr }
             .roommate-left, .roommate-right { height: auto; min-height: unset }
             .roommate-left { --upload-size: 240px; }
             .form-block.intro-block { padding-top: 56px; }
             .form-block.intro-block > .block-title { top: 12px; left: 16px; }
-            #tagBlock{ height: auto !important; }        /* 모바일 해제 */
+            #tagBlock{ height: auto !important; }
         }
 
         @media (prefers-reduced-motion: reduce) { .avatar-circle { transition: none } }
@@ -288,13 +285,13 @@
 
         <!-- Right -->
         <div class="roommate-right">
-            <div class="form-block" id="tagBlock"><!-- [ADD] id -->
+            <div class="form-block" id="tagBlock">
                 <div class="block-title">
                     <span class="title-badge"><i class="fa-solid fa-hashtag"></i></span>
                     <span>성향 태그</span>
                 </div>
 
-                <!-- [ADD] 가운데 스크롤 영역 래퍼 -->
+
                 <div class="tag-scroll-area">
                     <c:choose>
                         <c:when test="${not empty userTags}">
@@ -358,7 +355,7 @@
         }
     })();
 
-    /* 아바타 크기 동기화 (기존 유지) */
+
     function calcAvatarSize() {
         const leftCard = document.querySelector('.roommate-left');
         const avatar = document.getElementById('profileAvatar');
@@ -380,8 +377,7 @@
         leftCard.style.setProperty('--upload-size', target + 'px');
     }
 
-    /* [CHANGED] 태그 카드 높이 = 기본정보 카드 높이 + 여유(bump)
-       → 기본정보가 낮아도 태그가 2줄은 보이게 */
+
     function syncTagBoxHeight() {
         const basic = document.getElementById('basicInfoBlock');
         const tagBlock = document.getElementById('tagBlock');

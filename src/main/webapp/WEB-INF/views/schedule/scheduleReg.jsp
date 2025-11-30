@@ -24,18 +24,15 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
-        /* 페이지 전체 배경 */
         body {
-            /*background-image: url("../images/test1.png");*/
             overflow: hidden;
             background: linear-gradient(to right, #f9f9f9, #E5F2FF);
         }
 
-        /* 메인 컨테이너 */
+
         .schedule-container {
             display: flex;
             max-width: 1200px;
-            /*margin: -30px auto;*/
             margin: 40px auto;
             background-color: #ffffff;
             border-radius: 16px;
@@ -44,7 +41,6 @@
             min-height: 700px;
         }
 
-        /* 왼쪽: 일정 정보 패널 */
         .schedule-info {
             width: 350px;
             padding: 32px;
@@ -124,14 +120,12 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* 오른쪽: 날짜 선택 */
         .schedule-picker {
             flex: 1;
             padding: 32px;
             display: flex;
         }
 
-        /* FullCalendar 스타일 */
         #calendar {
             flex-grow: 1;
             --fc-border-color: #eef2f6;
@@ -144,51 +138,50 @@
             cursor: pointer;
         }
 
-        /* FullCalendar 툴바 수평 정렬을 위한 스타일 */
         .fc .fc-toolbar.fc-header-toolbar {
             display: flex;
-            align-items: center; /* 세로 중앙 정렬 */
-            gap: 1em; /* 각 영역(left, center, right) 사이의 최소 간격 */
+            align-items: center;
+            gap: 1em;
         }
 
         .fc .fc-toolbar-chunk {
             display: flex;
             align-items: center;
-            gap: 0.5em; /* 버튼들 사이의 간격 */
+            gap: 0.5em;
         }
 
-        /* 중앙 영역(제목, 화살표)이 남은 공간을 모두 차지하도록 설정 */
+
         .fc .fc-toolbar-chunk:nth-child(2) {
-            flex-grow: 1; /* 남은 공간을 모두 차지 */
-            justify-content: center; /* 내부 요소들을 중앙에 배치 */
+            flex-grow: 1;
+            justify-content: center;
 
         }
 
-        /* 캘린더의 날짜 숫자 크기를 줄입니다. */
+
         .fc .fc-daygrid-day-number {
-            font-size: 0.8em; /* 기본 크기(1em)보다 작게 설정 */
+            font-size: 0.8em;
             padding: 4px;
         }
 
-        /* 토요일(sat) 헤더 및 날짜 색상을 파란색으로 변경 */
+
         .fc .fc-col-header-cell.fc-day-sat a,
         .fc .fc-day-sat .fc-daygrid-day-number {
             color: #3399ff !important;
         }
 
-        /* 일요일(sun) 헤더 및 날짜 색상을 빨간색으로 변경 */
+
         .fc .fc-col-header-cell.fc-day-sun a,
         .fc .fc-day-sun .fc-daygrid-day-number {
             color: #dc3545 !important;
         }
 
-        /* 이전/다음 화살표 버튼 스타일 초기화 */
+
         .fc .fc-prev-button,
         .fc .fc-next-button {
             background: none !important;
             border: none !important;
             box-shadow: none !important;
-            color: #333 !important; /* 화살표 아이콘 색상 */
+            color: #333 !important;
         }
 
         .fc .fc-toolbar-chunk:first-child .fc-button-primary {
@@ -580,9 +573,8 @@
 <%@ include file="../includes/customModal.jsp" %>
 
 <script>
-    let stompClient = null; // ✅ stompClient 전역 선언
+    let stompClient = null;
 
-    // ✅ WebSocket 연결 함수
     function connectWebSocket() {
         const socket = new SockJS('/ws'); //
         stompClient = Stomp.over(socket);
@@ -600,7 +592,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // ✅ WebSocket 연결
         connectWebSocket();
 
         const calendarEl = document.getElementById('calendar');
@@ -613,7 +604,7 @@
         const calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'ko',
             initialView: 'dayGridMonth',
-            noEventsText: '등록된 일정이 없습니다.',  // 이 부분만 추가!
+            noEventsText: '등록된 일정이 없습니다.',
             headerToolbar: {
                 left: ' ',
                 center: 'prev title next',
@@ -759,7 +750,6 @@
 
             let startDate = $('#eventStartDate').val();
             if (startDate && time) {
-                // ⭐ 시간 형식 정규화: "5:00" → "05:00"
                 const timeParts = time.split(':');
                 if (timeParts[0].length === 1) {
                     time = '0' + time; // 한자리 시간 앞에 0 추가
@@ -783,16 +773,11 @@
                     contentType: 'application/json',
                     data: JSON.stringify(eventData),
                     success: function(savedEvent) {
-                        console.log("✅ 서버 응답:", savedEvent);
+                        console.log("서버 응답:", savedEvent);
                         $('#step2').hide();
                         $('#step1').show();
                         calendar.refetchEvents();
 
-                        // ⭐ 수정: 일정 보낸 사람도 자신의 채팅방에 메시지 표시
-                        // 서버는 WebSocket으로 상대방에게 전송 (브로드캐스트)
-                        // 클라이언트는 자신의 채팅방에만 로컬로 추가 (WebSocket 사용 안 함)
-
-                        // 방법 1: localStorage에 임시 저장 (채팅방 돌아갈 때 표시)
                         const tempScheduleMessage = {
                             messageId: 'local-schedule-' + savedEvent.scheduleId,
                             roomId: roomId,
@@ -802,7 +787,6 @@
                             sentAt: new Date().toISOString()
                         };
 
-                        // localStorage에 저장 (채팅방으로 돌아갈 때 표시하기 위함)
                         try {
                             const pendingMessages = JSON.parse(localStorage.getItem('pendingScheduleMessages') || '[]');
                             pendingMessages.push(tempScheduleMessage);
@@ -842,9 +826,9 @@
     flatpickr("#timePicker", {
         enableTime: true,
         noCalendar: true,
-        dateFormat: "H:i",   // ⭐ 24시간제 (HH:MM 형식)
-        time_24hr: true,     // ⭐ true로 변경 (24시간제)
-        minuteIncrement: 5   // 분 단위 간격
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 5
     });
 
 </script>

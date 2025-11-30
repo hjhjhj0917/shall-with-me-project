@@ -133,15 +133,12 @@
             margin-inline: auto
         }
 
-        /* ===============================
-           ✅ 업로더 크기 & 내부 요소 동시 스케일
-           - JS가 --upload-size를 바꾸면 원형/테두리/아이콘/텍스트까지 함께 커짐
-           =============================== */
+
         .roommate-left {
-            --upload-size: 240px; /* JS가 동적으로 변경 */
-            --upload-icon-ratio: 0.18; /* 아이콘 크기 비율 */
-            --upload-text-ratio: 0.06; /* 안내문 텍스트 비율 */
-            --upload-border-ratio: 0.012; /* 테두리 두께 비율 */
+            --upload-size: 240px;
+            --upload-icon-ratio: 0.18;
+            --upload-text-ratio: 0.06;
+            --upload-border-ratio: 0.012;
         }
 
         .upload-box {
@@ -152,8 +149,8 @@
             justify-content: center;
             width: var(--upload-size);
             height: var(--upload-size);
-            border: 2px dashed #bbb; /* 기본값 */
-            border-width: clamp(2px, calc(var(--upload-size) * var(--upload-border-ratio)), 8px); /* ★ 스케일 */
+            border: 2px dashed #bbb;
+            border-width: clamp(2px, calc(var(--upload-size) * var(--upload-border-ratio)), 8px);
             border-radius: 100%;
             overflow: hidden;
             cursor: pointer;
@@ -170,7 +167,7 @@
         }
 
         .upload-box i {
-            /* fa-2x 대신 동적 크기 */
+
             font-size: clamp(18px, calc(var(--upload-size) * var(--upload-icon-ratio)), 56px);
             color: #8a8a8a;
             margin-bottom: clamp(8px, calc(var(--upload-size) * 0.04), 18px);
@@ -645,11 +642,8 @@
         });
     });
 
-    /* 커스텀 검증: 첫 에러만 강조(사진 → 소개글) */
-    /* 커스텀 검증: 첫 에러만 강조(사진 → 소개글) */
+
     document.getElementById('roommateForm').addEventListener('submit', function (e) {
-        // [수정] 이 부분을 함수의 가장 위로 옮겨야 합니다.
-        // 이렇게 하면 유효성 검사를 통과하더라도 페이지가 새로고침되지 않습니다.
         e.preventDefault();
 
         const isFirst = document.getElementById('isFirstFlag').value === 'true';
@@ -664,17 +658,14 @@
         uploadBox.classList.remove('is-error-photo');
         introEl.classList.remove('is-error-intro');
 
-        // 유효성 검사 실패 시 return하는 로직은 그대로 유지합니다.
         if (isFirst) {
             if (!hasFile) {
-                // e.preventDefault(); // 이미 위에서 처리했으므로 여기서 또 호출할 필요는 없습니다.
                 showCustomAlert('프로필 사진을 업로드해주세요.');
                 uploadBox.classList.add('is-error-photo');
                 uploadBox.scrollIntoView({behavior: 'smooth', block: 'center'});
                 return;
             }
-            if (intro.length < 10) { // 최소 글자 수 검사 추가
-                // e.preventDefault();
+            if (intro.length < 10) {
                 showCustomAlert('자기소개를 10자 이상 입력해주세요.');
                 introEl.classList.add('is-error-intro');
                 introEl.focus();
@@ -683,7 +674,6 @@
         } else {
             const originalUrl = document.getElementById('originalUrl').value;
             if (!hasFile && intro === origIntro && originalUrl === (uploadBox.querySelector('img.preview')?.src || '')) {
-                // e.preventDefault();
                 showCustomAlert('변경된 내용이 없습니다.');
                 introEl.classList.add('is-error-intro');
                 introEl.focus();
@@ -691,7 +681,6 @@
             }
         }
 
-        // 유효성 검사를 통과하면 이 코드가 실행됩니다.
         const formData = new FormData(this);
 
         $.ajax({
@@ -715,7 +704,6 @@
         });
     });
 
-    /* 태그 영역: 자동 클램프 + 더보기/접기 + 많을 때 dense */
     (function () {
         const wrap = document.getElementById('tagWrap');
         const btn = document.getElementById('chipToggle');
@@ -742,15 +730,12 @@
             btn.innerHTML = expanded ? '<i class="fa-solid fa-angles-up"></i> 접기' : '<i class="fa-solid fa-angles-down"></i> 더보기';
             wrap.classList.toggle('is-clamped', !expanded && needsClamp);
 
-            deferCalcUploadSize(); /* 펼침/접힘 후 업로더 크기 재계산 */
+            deferCalcUploadSize();
         });
 
-        calcUploadSize(); /* 초기 계산 */
+        calcUploadSize();
     })();
 
-    /* ============================
-       ✅ 업로드 박스 크기 = '소개글 영역 높이'에 맞춤
-       ============================ */
     function calcUploadSize() {
         const leftCard = document.querySelector('.roommate-left');
         const uploadBox = document.getElementById('profileUploadBox');
@@ -773,14 +758,13 @@
         leftCard.style.setProperty('--upload-size', target + 'px');
     }
 
-    // 레이아웃 변경 직후 안전 계산
+
     function deferCalcUploadSize() {
         requestAnimationFrame(() => {
             requestAnimationFrame(calcUploadSize);
         });
     }
 
-    // 초기/리사이즈 시 갱신
     window.addEventListener('load', calcUploadSize);
     window.addEventListener('resize', calcUploadSize);
 </script>

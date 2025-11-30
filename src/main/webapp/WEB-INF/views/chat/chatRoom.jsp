@@ -177,7 +177,7 @@
     // 중복 연결 방지를 위한 잠금 플래그
     let isConnecting = false;
 
-    // ⭐ 추가: 이미 렌더링된 메시지 ID를 추적하는 Set
+    // 이미 렌더링된 메시지 ID를 추적하는 Set
     const renderedMessageIds = new Set();
 
     // Enter 키로 메시지 전송
@@ -188,51 +188,49 @@
         }
     });
 
-    // ⭐ 최종 수정: 서버가 보내는 시간 형식 처리
+    // 서버가 보내는 시간 형식 처리
     function parseDate(dateStr) {
         if (!dateStr) return new Date(0);
 
-        console.log("📅 원본 시간:", dateStr); // 디버깅용
+        console.log("원본 시간:", dateStr);
 
         // 1. 이미 'Z'가 있으면 UTC로 해석 후 자동 변환
         if (dateStr.endsWith('Z')) {
             const date = new Date(dateStr);
-            console.log("✅ UTC → KST 변환:", date.toLocaleString('ko-KR'));
+            console.log("UTC → KST 변환:", date.toLocaleString('ko-KR'));
             return date;
         }
 
         // 2. '+09:00' 같은 타임존 정보가 있으면 그대로 사용
         if (dateStr.includes('+') || (dateStr.includes('T') && dateStr.split('T')[1] && dateStr.split('T')[1].includes('-'))) {
             const date = new Date(dateStr);
-            console.log("✅ 타임존 포함:", date.toLocaleString('ko-KR'));
+            console.log("타임존 포함:", date.toLocaleString('ko-KR'));
             return date;
         }
 
-        // 3. ⭐ 타임존 정보 없음 → KST로 가정
+        // 타임존 정보 없음 → KST로 가정
         // "2025-11-03T15:30:00" 또는 "2025-11-03 15:30:00" 또는 "2025-11-07T5:00:00"
 
         // 공백을 T로 변환
         let isoString = dateStr.replace(' ', 'T');
 
-        // ⭐ 시간 형식 정규화: "T5:00:00" → "T05:00:00"
-        // 정규표현식: T 다음에 한자리 숫자가 오면 앞에 0을 추가
         isoString = isoString.replace(/T(\d):/, 'T0$1:');
 
-        console.log("🔧 정규화된 시간:", isoString); // 디버깅용
+        console.log("정규화된 시간:", isoString); // 디버깅용
 
         // Date 생성 (로컬 시간으로 해석 = 브라우저의 타임존)
         const localDate = new Date(isoString);
 
         if (isNaN(localDate.getTime())) {
-            console.warn("⚠️ 잘못된 날짜 형식:", dateStr, "→", isoString);
+            console.warn("잘못된 날짜 형식:", dateStr, "→", isoString);
             return new Date(0);
         }
 
-        console.log("✅ KST 그대로 사용:", localDate.toLocaleString('ko-KR'));
+        console.log("KST 그대로 사용:", localDate.toLocaleString('ko-KR'));
         return localDate;
     }
 
-    // ⭐ 최종 수정: connect 함수
+    // connect 함수
     function connect() {
         if (stompClient || isConnecting) {
             console.warn("STOMP connection already exists or is in progress.");
@@ -253,12 +251,12 @@
         stompClient.connect({}, function () {
             isConnecting = false;
 
-            // ⭐ 수정: 1. 이전 메시지 불러오기 (새로고침 시)
+            // 이전 메시지 불러오기
             fetch(`/chat/messages?roomId=${roomId}`)
                 .then(res => res.json())
                 .then(messages => {
                     messages.forEach(msg => {
-                        // ⭐ messageId가 없으면 임시 ID 생성 (DB에 messageId 컬럼이 없는 경우)
+                        // messageId가 없으면 임시 ID 생성 (DB에 messageId 컬럼이 없는 경우)
                         if (!msg.messageId) {
                             // scheduleId나 다른 고유 값으로 임시 ID 생성
                             if (msg.messageType === 'SCHEDULE_REQUEST' && msg.scheduleRequest?.scheduleId) {
@@ -266,12 +264,12 @@
                             } else {
                                 msg.messageId = 'db-msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
                             }
-                            console.log("⚙️ DB 메시지에 임시 ID 부여:", msg.messageId);
+                            console.log("DB 메시지에 임시 ID 부여:", msg.messageId);
                         }
 
-                        // ⭐ 추가: 메시지 ID를 Set에 저장하여 중복 렌더링 방지
+                        // 메시지 ID를 Set에 저장하여 중복 렌더링 방지
                         if (msg.messageId && renderedMessageIds.has(msg.messageId)) {
-                            console.log("🔄 이미 렌더링된 DB 메시지 스킵:", msg.messageId);
+                            console.log("이미 렌더링된 DB 메시지 스킵:", msg.messageId);
                             return; // 이미 렌더링된 메시지는 스킵
                         }
                         if (msg.messageId) {
@@ -295,44 +293,44 @@
                     }
                 });
 
-            // ⭐ 수정: 2. 실시간 메시지 구독 (올바른 경로로 수정)
+            //실시간 메시지 구독 (올바른 경로로 수정)
             stompClient.subscribe('/topic/chatroom/' + roomId, function (message) {
                 const msg = JSON.parse(message.body);
 
-                // 🔍 상세 디버깅 로그
+                //상세 디버깅 로그
                 console.log("====================================");
-                console.log("📨 메시지 수신");
+                console.log("메시지 수신");
                 console.log("메시지 ID:", msg.messageId);
                 console.log("메시지 타입:", msg.messageType);
                 console.log("발신자:", msg.senderId);
 
                 if (msg.messageType === 'SCHEDULE_REQUEST') {
-                    console.log("📅 일정 요청 정보:");
+                    console.log(" 일정 요청 정보:");
                     console.log("  scheduleId:", msg.scheduleRequest?.scheduleId);
                     console.log("  title:", msg.scheduleRequest?.title);
                 }
 
-                console.log("🔍 중복 체크:");
+                console.log("중복 체크:");
                 console.log("  messageId 존재?", !!msg.messageId);
                 console.log("  이미 렌더링됨?", msg.messageId ? renderedMessageIds.has(msg.messageId) : 'N/A');
                 console.log("  저장된 ID 개수:", renderedMessageIds.size);
                 console.log("====================================");
 
-                // ⭐ 추가: 중복 메시지 방지 - 이미 렌더링된 메시지 ID인지 확인
+                //중복 메시지 방지 - 이미 렌더링된 메시지 ID인지 확인
                 if (msg.messageId && renderedMessageIds.has(msg.messageId)) {
-                    console.error("❌ 중복 메시지 발견! 렌더링 건너뜀");
+                    console.error("중복 메시지 발견! 렌더링 건너뜀");
                     return;
                 }
 
                 if (msg.messageId) {
                     renderedMessageIds.add(msg.messageId);
-                    console.log("✅ 메시지 ID 저장 완료:", msg.messageId);
+                    console.log(" 메시지 ID 저장 완료:", msg.messageId);
                 } else {
-                    console.warn("⚠️ 경고: messageId가 없습니다! 중복 체크 불가능");
+                    console.warn(" 경고: messageId가 없습니다! 중복 체크 불가능");
                 }
 
                 if (msg.messageType === 'SCHEDULE_REQUEST') {
-                    console.log("📅 일정 요청 렌더링 시작");
+                    console.log("일정 요청 렌더링 시작");
                     renderScheduleRequest(msg);
                 } else if (msg.messageType === 'SCHEDULE_CONFIRMED' || msg.messageType === 'SCHEDULE_REJECTED') {
                     renderSystemMessage(msg.message);
@@ -360,11 +358,11 @@
                 }
             });
 
-            // ⭐ 4. localStorage에서 대기 중인 일정 메시지 확인 및 표시
+            // localStorage에서 대기 중인 일정 메시지 확인 및 표시
             setTimeout(function() {
                 try {
                     const pendingMessages = JSON.parse(localStorage.getItem('pendingScheduleMessages') || '[]');
-                    console.log("📦 대기 중인 메시지:", pendingMessages.length + "개");
+                    console.log("대기 중인 메시지:", pendingMessages.length + "개");
 
                     // 현재 roomId에 해당하는 메시지만 필터링
                     const currentRoomMessages = pendingMessages.filter(msg => msg.roomId === roomId);
@@ -372,11 +370,11 @@
 
                     // 현재 방의 메시지 렌더링
                     currentRoomMessages.forEach(msg => {
-                        console.log("📅 대기 메시지 표시:", msg);
+                        console.log("대기 메시지 표시:", msg);
 
                         // 중복 체크
                         if (msg.messageId && renderedMessageIds.has(msg.messageId)) {
-                            console.log("🔄 이미 렌더링된 메시지 스킵");
+                            console.log("이미 렌더링된 메시지 스킵");
                             return;
                         }
                         if (msg.messageId) {
@@ -388,11 +386,11 @@
 
                     // 현재 방 메시지 제거, 다른 방 메시지 유지
                     localStorage.setItem('pendingScheduleMessages', JSON.stringify(otherRoomMessages));
-                    console.log("✅ 대기 메시지 처리 완료");
+                    console.log("대기 메시지 처리 완료");
                 } catch (e) {
                     console.error("localStorage 읽기 실패:", e);
                 }
-            }, 500); // 0.5초 대기 후 실행 (DB 메시지 로딩 후)
+            }, 500);
 
         }, function (error) {
             isConnecting = false;
@@ -422,11 +420,11 @@
         messageInput.value = '';
     }
 
-    // ⭐ 최종 수정: appendMessage 함수
+    // appendMessage 함수
     function appendMessage(msg) {
         const msgId = msg.messageId ? msg.messageId : 'temp-' + new Date().getTime() + Math.random();
 
-        // ⭐ 추가: DOM에 이미 존재하는지 확인 (이중 안전장치)
+        // DOM에 이미 존재하는지 확인 (이중 안전장치)
         if (document.getElementById('message-' + msgId)) {
             return;
         }
@@ -440,12 +438,12 @@
         const senderId = msg.senderId;
         const text = msg.message;
 
-        // ⭐ 수정: 시간 처리 로직 - UTC를 KST로 변환
+        //시간 처리 로직 - UTC를 KST로 변환
         const msgDate = parseDate(msg.sentAt);
 
         const dateStr = msgDate.getFullYear() + "년 " + (msgDate.getMonth() + 1) + "월 " + msgDate.getDate() + "일";
 
-        // ⭐ 수정: 시간이 유효한 경우에만 표시
+        //시간이 유효한 경우에만 표시
         const timeStr = msgDate.getTime() === 0 ? "" : msgDate.toLocaleTimeString('ko-KR', {
             hour: '2-digit',
             minute: '2-digit',
@@ -510,11 +508,11 @@
         }
     }
 
-    // ⭐ 최종 수정: renderScheduleRequest 함수
+    // renderScheduleRequest 함수
     function renderScheduleRequest(msg) {
         const msgId = msg.messageId ? msg.messageId : 'temp-' + new Date().getTime() + Math.random();
 
-        // ⭐ 추가: DOM에 이미 존재하는지 확인 (이중 안전장치)
+        // DOM에 이미 존재하는지 확인 (이중 안전장치)
         if (document.getElementById('message-' + msgId)) {
             return;
         }
@@ -545,7 +543,7 @@
         const bubble = document.createElement("div");
         bubble.className = "message-bubble schedule-request";
 
-        // ⭐ 수정: 시간 처리 로직
+        //시간 처리 로직
         const scheduleDateObj = parseDate(request.scheduleDt);
         const scheduleDate = scheduleDateObj.toLocaleString('ko-KR', {
             year: 'numeric',

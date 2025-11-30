@@ -92,7 +92,6 @@
     const rawJson = '<%= request.getAttribute("policyJson") %>';
     const policy = JSON.parse(rawJson || '{}');
 
-    // ✅ 유효하지 않은 값 확인
     const isInvalid = (value) => {
         return (
             value === undefined ||
@@ -109,7 +108,6 @@
         document.title = titleText;
     })();
 
-    // ✅ 텍스트 영역 처리: 유효하지 않으면 섹션 제거
     const setOrRemove = (id, value) => {
         const element = document.getElementById(id);
         const section = element?.closest('.detail-section');
@@ -122,7 +120,6 @@
         }
     };
 
-    // ✅ 제목은 항상 표시 (내용 없으면 기본 텍스트)
     const titleElement = document.getElementById("title");
     if (titleElement) {
         const titleValue = isInvalid(policy.plcyNm) ? '제목 없음' : policy.plcyNm;
@@ -139,7 +136,7 @@
     setOrRemove("operator", policy.operInstCdNm);
     setOrRemove("supervisor", policy.sprvsnInstCdNm);
 
-    // ✅ 연령 섹션: 둘 다 유효할 때만 출력
+
     (function handleAgeRange() {
         const element = document.getElementById("ageRange");
         const section = element?.closest('.detail-section');
@@ -158,7 +155,6 @@
         }
     })();
 
-    // ✅ 소득 조건 처리
     (function handleIncome() {
         const element = document.getElementById("income");
         const section = element?.closest('.detail-section');
@@ -183,7 +179,6 @@
         }
     })();
 
-    // ✅ 사업 기간 처리
     (function handlePeriod() {
         const element = document.getElementById("period");
         const section = element?.closest('.detail-section');
@@ -214,7 +209,6 @@
         }
     })();
 
-    // ✅ 외부 링크 처리
     const linksContainer = document.getElementById('links');
     const displayedUrls = new Set();
 

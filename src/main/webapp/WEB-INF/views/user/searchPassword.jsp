@@ -32,8 +32,8 @@
         }
 
         .completion-icon {
-            font-size: 50px; /* 아이콘 크기 */
-            color: #4da3ff; /* 아이콘 색상 */
+            font-size: 50px;
+            color: #4da3ff;
         }
 
         .completion-message {
@@ -341,7 +341,7 @@
     </form>
 </div>
 
-<!-- 비밀번호 찾기 폼 영역3 -->
+
 <div id="step3" class="login-form-wrapper">
     <div class="login-tab">LOGIN</div>
     <div class="login-tab1">FIND ID</div>

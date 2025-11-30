@@ -5,11 +5,9 @@
 <head>
     <title>sample</title>
 
-    <!-- Vendor -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
-    <!-- Project CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
 
@@ -20,8 +18,7 @@
             --border:#ddd;
             --muted:#666;
             --header-h:0px;
-            --tag-collapsed-max:140px; /* 접힘 높이 (이제 사용하지 않지만 하위호환 위해 남김) */
-            /* [MOD] 스크롤 높이 변수 추가 */
+            --tag-collapsed-max:140px;
             --tag-scroll-h: clamp(140px, 24vh, 260px);
         }
 
@@ -32,21 +29,18 @@
         }
         @media (min-width:1200px){ body{font-size:18px} }
 
-        /* 중앙 배치 컨테이너 */
         .roommate-container{
             flex:1 0 auto; display:flex; align-items:center; justify-content:center;
             width:100%; min-height:calc(100svh - var(--header-h));
             padding:32px 20px; box-sizing:border-box;
         }
 
-        /* grid로 좌/우 높이 동기화 */
         #roommateForm{
             width:92%; max-width:1400px; margin:0 auto;
             display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
             align-items:stretch; gap:56px;
         }
 
-        /* 좌/우 카드 */
         .roommate-left,.roommate-right{
             background:#fff; border:1px solid var(--border); border-radius:14px;
             padding:32px; display:flex; flex-direction:column;
@@ -55,7 +49,6 @@
             gap:20px; overflow:visible;
         }
 
-        /* 섹션 카드 */
         .form-block{
             background:linear-gradient(180deg,#fff 0%,#f4f9ff 100%);
             border:1px solid #e1ecff; border-radius:16px;
@@ -83,14 +76,12 @@
         .image-upload-grid{ display:flex; justify-content:center; align-items:center }
         .form-block .upload-box{ margin-inline:auto }
 
-        /* ===============================
-           ✅ 업로더 크기 & 내부 요소 동시 스케일
-           =============================== */
+
         .roommate-left{
-            --upload-size: 240px;        /* JS가 동적으로 변경 */
-            --upload-icon-ratio: 0.18;   /* 아이콘 크기 비율 */
-            --upload-text-ratio: 0.06;   /* 안내문 텍스트 비율 */
-            --upload-border-ratio: 0.012;/* 테두리 두께 비율 */
+            --upload-size: 240px;
+            --upload-icon-ratio: 0.18;
+            --upload-text-ratio: 0.06;
+            --upload-border-ratio: 0.012;
         }
         .upload-box{
             position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -135,11 +126,11 @@
         }
         .is-error-intro{ border:2px solid var(--primary)!important; box-shadow:0 0 0 5px rgba(51,153,255,.22) }
 
-        /* [MOD] 태그 칩 영역: 스크롤 가능하도록 수정 */
+
         .tag-chip-wrap{
             display:flex; flex-wrap:wrap; row-gap:10px; column-gap:10px;
-            max-height: var(--tag-scroll-h);   /* 고정 높이 */
-            overflow: auto;                    /* 스크롤 허용 */
+            max-height: var(--tag-scroll-h);
+            overflow: auto;
             padding-right: 6px;
             scrollbar-gutter: stable both-edges;
             scroll-behavior: smooth;
@@ -156,24 +147,24 @@
         .tag-chip:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(28,64,125,.1) }
         .tag-chip-wrap.dense .tag-chip{ padding:6px 10px; font-size:.95rem } /* 칩 많으면 컴팩트 */
 
-        /* [MOD] 접근성: 키보드 포커스 표시 */
+
         .tag-chip-wrap:focus-visible{
             outline: 3px solid rgba(51,153,255,.35);
             border-radius: 12px;
         }
 
-        /* [MOD] 스크롤바 미세 커스텀 */
+
         .tag-chip-wrap::-webkit-scrollbar{ width:10px }
         .tag-chip-wrap::-webkit-scrollbar-track{ background:#eef4ff; border-radius:8px }
         .tag-chip-wrap::-webkit-scrollbar-thumb{ background:#c7dcff; border-radius:8px; border:2px solid #eef4ff }
         .tag-chip-wrap{ scrollbar-width: thin; scrollbar-color: #c7dcff #eef4ff }
 
-        /* [MOD] 더보기/접기 관련 스타일 비활성화 */
+
         .tag-chip-wrap.expanded{ max-height: var(--tag-scroll-h) !important }
         .tag-chip-wrap.is-clamped::after{ display:none !important }
         .chip-toggle{ display:none !important }
 
-        /* 저장 버튼 */
+
         .floating-save{
             position:fixed; right:28px; bottom:28px; z-index:999;
             display:inline-flex; align-items:center; gap:10px;
@@ -182,7 +173,7 @@
             box-shadow:0 12px 28px rgba(0,0,0,.16);
         }
 
-        /* 반응형 */
+
         @media (max-width:1100px){
             #roommateForm{ grid-template-columns:1fr }
             .roommate-left,.roommate-right{ height:auto; min-height:unset }
@@ -239,7 +230,6 @@
                 <div>
                     <c:choose>
                         <c:when test="${not empty userTags}">
-                            <!-- [MOD] 스크롤 가능하도록 tabindex/aria-label 추가, 더보기 버튼 제거 -->
                             <div class="tag-chip-wrap" id="tagWrap" tabindex="0" aria-label="사용자 태그 목록 (스크롤 가능)">
                                 <c:forEach var="t" items="${userTags}">
                                     <span class="tag-chip"><i class="fa-solid fa-tag"></i>
@@ -247,7 +237,6 @@
                                     </span>
                                 </c:forEach>
                             </div>
-                            <!-- [REMOVED] chip-toggle 버튼 (더보기/접기) -->
                         </c:when>
                         <c:otherwise>
                             <span style="color:#6e7b8b; background:#f7faff; border:1px dashed #dbe9ff; border-radius:10px; padding:10px 14px; display:inline-block">
@@ -298,7 +287,6 @@
     function showCustomAlert(msg){ const ov=document.getElementById('customAlertOverlay'); document.getElementById('customAlertMessage').textContent=msg; ov.style.display='flex'; }
     function closeCustomAlert(){ document.getElementById('customAlertOverlay').style.display='none'; }
 
-    /* 저장 → 제출 */
     (function(){
         const form=document.getElementById('roommateForm');
         const btn=document.getElementById('floatingSaveBtn');
@@ -309,7 +297,6 @@
         });
     })();
 
-    /* 파일 미리보기 + 사진 에러 강조 단독 적용 */
     document.querySelectorAll('.upload-box input[type="file"]').forEach((input)=>{
         const box=input.closest('.upload-box');
         input.addEventListener('change',(e)=>{
@@ -322,11 +309,9 @@
             reader.onload=()=>{ box.classList.add('has-image'); let img=box.querySelector('img.preview'); if(!img){ img=document.createElement('img'); img.className='preview'; box.appendChild(img); } img.src=reader.result; };
             reader.readAsDataURL(file);
 
-            deferCalcUploadSize(); /* 업로드 후 크기 재계산 */
-        });
+            deferCalcUploadSize();
     });
 
-    /* 커스텀 검증: 첫 에러만 강조(사진 → 소개글) */
     document.getElementById('roommateForm').addEventListener('submit',function(e){
         const isFirst=document.getElementById('isFirstFlag').value==='true';
         const fileInput=document.querySelector('input[name="profileImage"]');
@@ -348,7 +333,7 @@
         }
     });
 
-    /* [MOD] 태그 영역: 스크롤 방식 (dense만 유지, 클램프/토글 제거) */
+
     (function(){
         const wrap=document.getElementById('tagWrap');
         if(!wrap){ calcUploadSize(); return; }
@@ -356,20 +341,17 @@
         const chips=wrap.querySelectorAll('.tag-chip');
         if(chips.length>12){ wrap.classList.add('dense'); }
 
-        /* 스크롤 방식은 펼침으로 높이가 바뀌지 않으니 업로더 리사이즈는 1회만 */
+
         calcUploadSize();
     })();
 
-    /* ============================
-       ✅ 업로드 박스 크기 = '소개글 영역 높이'에 맞춤
-       ============================ */
+
     function calcUploadSize(){
         const leftCard   = document.querySelector('.roommate-left');
         const uploadBox  = document.getElementById('profileUploadBox');
         const introBody  = document.querySelector('.roommate-right .intro-block .block-body');
         if (!leftCard || !uploadBox || !introBody) return;
 
-        // 모바일(1열)은 동기화 대신 기본값 유지
         const isNarrow = window.matchMedia('(max-width:1100px)').matches;
         if (isNarrow) {
             leftCard.style.setProperty('--upload-size', '240px');
@@ -385,12 +367,11 @@
         leftCard.style.setProperty('--upload-size', target + 'px');
     }
 
-    // 레이아웃 변경 직후 안전 계산
     function deferCalcUploadSize(){
         requestAnimationFrame(()=>{ requestAnimationFrame(calcUploadSize); });
     }
 
-    // 초기/리사이즈 시 갱신
+
     window.addEventListener('load',  calcUploadSize);
     window.addEventListener('resize', calcUploadSize);
 </script>

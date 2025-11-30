@@ -59,7 +59,7 @@
   #tagSelectModalOverlay .search-tag-group__content-wrapper {
     flex-grow: 1;
     padding-left: 24px;
-    min-width: 0; /* 추가: 텍스트 오버플로우 방지 */
+    min-width: 0;
   }
 
   #tagSelectModalOverlay .search-tag-group__title {
@@ -73,7 +73,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    width: 100%; /* 추가 */
+    width: 100%;
   }
 
   #tagSelectModalOverlay .tag-btn {
@@ -107,13 +107,13 @@
 
 <script>
   (function(){
-    const MAX = 6; // 6개 필수 선택으로 변경
+    const MAX = 6;
     const $overlay = $('#tagSelectModalOverlay');
     const $list = $('#all-tag-list');
     const $count = $('#tagCount');
     const selectedTags = new Map();
 
-    // 쉐어하우스 전용 태그 그룹 (DB에 실제 존재하는 ID 사용)
+
     const sharehouseTagGroups = [
       {key: "bathroom", title: "화장실", icon: "fa-solid fa-bath", tags: [1, 2]},
       {key: "fridge", title: "냉장고 공유", icon: "fa-solid fa-temperature-low", tags: [3, 4]},
@@ -129,7 +129,7 @@
       loadAllTags().then(tags => {
         renderSharehouseTagsGrouped(tags);
 
-        // 초기 선택 활성화
+
         initialSelectedIds.map(Number).forEach(id=>{
           const btn = $list.find(`.tag-btn[data-id="${id}"]`);
           if (btn.length) {
@@ -141,7 +141,7 @@
         updateCount();
         $overlay.show();
 
-        // 이벤트 바인딩
+
         $('#tagSelectOkBtn').off('click').on('click', function(){
           const ids = Array.from(selectedTags.keys());
           if (onDone) onDone(ids);

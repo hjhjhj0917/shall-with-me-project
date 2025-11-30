@@ -32,9 +32,9 @@
 
         /* 상단 헤더 (제목, 설명) */
         .confirm-header {
-            display: flex; /* ✅ Flexbox 레이아웃 적용 */
-            flex-direction: column; /* ✅ 자식 요소(h1, p)를 세로로 쌓기 */
-            align-items: center; /* ✅ 왼쪽 정렬 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: left;
             border-bottom: 1px solid #e9ecef;
             margin-bottom: 30px;
@@ -51,7 +51,7 @@
             color: #666;
         }
 
-        /* 폼 행 (라벨 + 값/입력) */
+
         .form-row {
             display: flex;
             align-items: center;
@@ -64,7 +64,7 @@
         }
 
         .form-row label {
-            width: 150px; /* 라벨 너비 고정 */
+            width: 150px;
             flex-shrink: 0;
             font-weight: 500;
             color: #444;
@@ -76,7 +76,7 @@
         }
 
         .form-row input {
-            flex-grow: 1; /* 남은 공간을 모두 차지 */
+            flex-grow: 1;
             padding: 10px 12px;
             border: 1px solid #ccc;
             border-radius: 3px;
@@ -114,22 +114,21 @@
             border: none;
         }
 
-        /*에러 메시지*/
         .error-message {
             color: #3399ff;
             font-size: 14px;
-            text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
+            text-align: left;
+            height: 5px;
             padding-left: 150px;
             padding-top: 10px;
-            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
+            visibility: hidden;
         }
 
         .error-message.visible {
-            visibility: visible; /* 메시지가 있을 때 표시 */
+            visibility: visible;
         }
 
-        /*input 디자인*/
+
         .login-input {
             width: 100%;
             padding: 12px;
