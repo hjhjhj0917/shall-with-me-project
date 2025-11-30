@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sharehouse/sharehouseDetail.css"/>
-    <!-- ✅ 카카오맵 API 추가 (여기에 팀원의 실제 API 키를 입력하세요) -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=218d70914021664c1d8e3dc194489251&libraries=services"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <style>
@@ -70,7 +69,6 @@
             font-size: 1.2rem;
         }
 
-        /* ✅ 카카오맵 스타일 */
         .map-section {
             margin-top: 30px;
         }
@@ -108,16 +106,16 @@
             font-size: 0.9rem;
         }
 
-        /* 2단 레이아웃 높이 맞추기 */
+
         .shd-two-cols {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            align-items: start; /* 상단 정렬 */
+            align-items: start;
         }
 
         .shd-two-cols > .card {
-            height: 100%; /* 양쪽 높이 동일 */
+            height: 100%;
         }
 
         /* 소개 섹션 */
@@ -127,16 +125,16 @@
         }
 
         .shd-desc p {
-            flex: 1; /* 남은 공간 채우기 */
+            flex: 1;
         }
 
-        /* 위치 섹션과 지도 사이 간격 */
+
         .map-section {
-            margin-top: 40px; /* 간격 추가 */
+            margin-top: 40px;
         }
 
         .address-info {
-            margin-bottom: 24px; /* 주소와 지도 사이 간격 */
+            margin-bottom: 24px;
         }
     </style>
 </head>
@@ -152,7 +150,6 @@
     <section class="shd-gallery">
         <c:choose>
             <c:when test="${not empty user.images}">
-                <!-- ✅ 4장만 표시 (인덱스 0~3) -->
                 <c:forEach var="img" items="${user.images}" varStatus="status" end="3">
                     <img id="g${status.index}"
                          src="${img.url}"
@@ -160,7 +157,6 @@
                          onerror="this.src='${pageContext.request.contextPath}/images/noimg.png'">
                 </c:forEach>
 
-                <!-- 4개 미만일 경우 noimg로 채우기 -->
                 <c:forEach begin="${fn:length(user.images)}" end="3" var="i">
                     <img id="g${i}"
                          src="${pageContext.request.contextPath}/images/noimg.png"
@@ -168,7 +164,6 @@
                 </c:forEach>
             </c:when>
             <c:otherwise>
-                <!-- 이미지가 없을 경우 (4장만) -->
                 <c:forEach begin="0" end="3" var="i">
                     <img id="g${i}"
                          src="${pageContext.request.contextPath}/images/noimg.png"
@@ -177,7 +172,6 @@
             </c:otherwise>
         </c:choose>
 
-        <!-- ✅ 5번째 칸: 실제 거주 사진 안내 박스 -->
         <div class="photo-notice-box">
             <div class="notice-icon">
                 <i class="fa-solid fa-camera"></i>
@@ -195,30 +189,24 @@
                 <span id="meta-guest">설명 태그</span>
             </div>
 
-            <!-- 태그 6개 + 층수 = 이 7개 표시 -->
             <div class="tag-row" id="tagRow">
                 <c:forEach var="tag" items="${user.tags}">
                     <span class="chip"># ${tag.tagName}</span>
                 </c:forEach>
 
-                <!-- 층수 추가 (일반 태그와 동일한 스타일) -->
                 <c:if test="${not empty user.floorNumber}">
                     <span class="chip"># ${user.floorNumber}층</span>
                 </c:if>
             </div>
         </div>
 
-        <!-- 하단: 2단 레이아웃 -->
         <div class="shd-two-cols">
-            <!-- 왼쪽: 소개 -->
             <div class="shd-desc card">
                 <h2 class="sec-title"><i class="fa-regular fa-file-lines"></i> 소개</h2>
                 <p>${user.subText}</p>
             </div>
 
-            <!-- 오른쪽: 작성자 프로필 + 문의하기 -->
             <div class="shd-contact card">
-                <!-- 작성자 프로필 이미지 추가 -->
                 <div class="host-profile">
                     <div class="host-avatar">
                         <c:choose>
@@ -246,11 +234,9 @@
             </div>
         </div>
 
-        <!-- ✅ 카카오맵 섹션 추가 -->
         <div class="shd-desc card map-section">
             <h2 class="sec-title"><i class="fa-solid fa-map-location-dot"></i> 위치</h2>
 
-            <!-- 주소 정보 표시 -->
             <div class="address-info">
                 <p>
                     <i class="fa-solid fa-location-dot"></i>
@@ -286,7 +272,6 @@
 
         console.log('채팅 열기:', hostId, hostName);
 
-        // 기존 채팅 시스템 활용: createOrGetRoom API 사용
         fetch('/chat/createOrGetRoom?user2Id=' + encodeURIComponent(hostId))
             .then(res => {
                 if (!res.ok) throw new Error('HTTP error! status: ' + res.status);
@@ -305,7 +290,6 @@
             });
     }
 
-    // ✅ 카카오맵 초기화 (addr1만 사용)
     document.addEventListener('DOMContentLoaded', function() {
         const address = '${user.address}';
 
@@ -315,7 +299,6 @@
             return;
         }
 
-        // 카카오맵 API 로드 확인
         if (typeof kakao === 'undefined' || !kakao.maps) {
             console.error('카카오맵 API가 로드되지 않았습니다.');
             return;
@@ -323,14 +306,13 @@
 
         const mapContainer = document.getElementById('map');
         const mapOption = {
-            center: new kakao.maps.LatLng(37.5665, 126.9780), // 기본 중심좌표 (서울)
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
             level: 3
         };
 
         const map = new kakao.maps.Map(mapContainer, mapOption);
         const geocoder = new kakao.maps.services.Geocoder();
 
-        // ✅ addr1(기본 주소)만 사용하여 좌표 검색 - 상세주소 제외로 검색 성공률 향상
         geocoder.addressSearch(address, function(result, status) {
             if (status === kakao.maps.services.Status.OK) {
                 const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
@@ -356,19 +338,19 @@
         });
     });
 
-    // 이미지 로드 오류 방지 - 한 번만 실행되도록 개선
+
     document.addEventListener('DOMContentLoaded', function() {
         const profileImg = document.querySelector('.host-avatar img');
         if (profileImg) {
-            // 이미 에러 핸들러가 설정되어 있으면 중복 방지
+
             if (!profileImg.dataset.errorHandled) {
                 profileImg.dataset.errorHandled = 'true';
                 profileImg.addEventListener('error', function(e) {
-                    // 한 번만 실행되도록 이벤트 리스너 제거
+
                     e.target.removeEventListener('error', arguments.callee);
                     console.log('프로필 이미지 로드 실패, 기본 이미지로 대체');
 
-                    // 사용자 이름을 포함한 기본 이미지로 대체 (크기 140)
+
                     const hostName = '${fn:escapeXml(not empty user.hostName ? user.hostName : "User")}';
                     this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(hostName) + '&background=3399ff&color=fff&size=140';
                 }, {once: true}); // once 옵션으로 한 번만 실행

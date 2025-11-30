@@ -54,7 +54,7 @@
             font-size: 1.75rem;
             font-weight: 600;
             color: #333;
-            margin: -20px 0 15px 0; /* 404 숫자 위로 살짝 겹치게 */
+            margin: -20px 0 15px 0;
         }
 
         .error-description {
@@ -86,7 +86,6 @@
 
 <div class="error-container">
     <div class="error-content">
-        <!-- SVG 일러스트레이션 -->
         <svg class="error-illustration" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <path fill="#E0F7FA" d="M48.2,-64.1C62.1,-52.3,72.9,-36.5,76.5,-19.4C80.1,-2.3,76.5,16.2,67.6,31.2C58.7,46.2,44.4,57.7,28.8,65.8C13.3,73.9,-3.6,78.6,-20.1,75.1C-36.6,71.6,-52.7,59.9,-63.3,45.4C-73.9,30.9,-79,13.6,-78.3,-3.9C-77.6,-21.4,-71.1,-39.1,-59,-50.9C-47,-62.7,-29.3,-68.6,-13.2,-70.7C2.9,-72.8,17.4,-71,32,-69.5C46.6,-68,61.1,-72.1,60.8,-71.1" transform="translate(100 100) scale(1.1)" />
             <g transform="translate(65, 65) scale(0.7)">

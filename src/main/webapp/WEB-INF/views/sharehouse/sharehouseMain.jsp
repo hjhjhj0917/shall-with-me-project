@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/sharehouse/sharehouseMain.css"/>
 
     <style>
-        /* (검색창 및 다른 부분 스타일은 이전과 동일) */
+
         .sh-searchbar {
             display: flex;
             align-items: center;
@@ -170,7 +170,6 @@
             font-weight: 600;
         }
 
-        /* ✅ [수정] 태그 모달 그룹 UI 전체 변경 */
         .search-tag-group {
             display: flex;
             align-items: center;
@@ -367,20 +366,19 @@
         $('#tag-search-trigger').on('click', openTagModal);
 
         $('#sh-search-btn').on('click', function () {
-            offset = 0; // 오프셋 초기화
+            offset = 0;
             lastPage = false;
             $grid.empty();
-            loadInitialData(); // 3. 검색 버튼 클릭 시에도 새로 15개 요청
+            loadInitialData();
         });
 
-        // --- API 호출 함수 ---
 
         function loadInitialData() {
-            loadData(0, 15); // offset: 0, pageSize: 15
+            loadData(0, 15);
         }
 
         function loadMoreData() {
-            loadData(offset, 5); // 현재 offset에서 5개 추가
+            loadData(offset, 5);
         }
 
         function loadData(currentOffset, size) {
@@ -396,7 +394,7 @@
             console.log("tagIds:", tagIds);
 
             $.ajax({
-                url: ctx + "/sharehouse/list",  // ← 이 부분이 정확한지 확인!
+                url: ctx + "/sharehouse/list",
                 type: "GET",
                 data: {
                     offset: currentOffset,
@@ -447,7 +445,6 @@
         }
 
         function renderLocations() {
-            // ✅ [수정] locations를 객체 배열로 변경 (display: 표시용, value: 전송용)
             const locations = [
                 { display: '서울특별시', value: '서울특별시' },
                 { display: '부산광역시', value: '부산광역시' },
@@ -459,33 +456,32 @@
                 { display: '세종특별자치시', value: '세종특별자치시' },
                 { display: '경기도', value: '경기도' },
                 { display: '강원특별자치도', value: '강원특별자치도' },
-                { display: '충청북도', value: '충북' }, // ✅ 요청 사항
-                { display: '충청남도', value: '충남' }, // ✅ 요청 사항
+                { display: '충청북도', value: '충북' },
+                { display: '충청남도', value: '충남' },
                 { display: '전북특별자치도', value: '전북특별자치도' },
-                { display: '전라남도', value: '전남' }, // ✅ 요청 사항
-                { display: '경상북도', value: '경북' }, // ✅ 요청 사항
-                { display: '경상남도', value: '경남' }, // ✅ 요청 사항
+                { display: '전라남도', value: '전남' },
+                { display: '경상북도', value: '경북' },
+                { display: '경상남도', value: '경남' },
                 { display: '제주특별자치도', value: '제주특별자치도' }
             ];
 
             const $container = $('#location-grid-container').empty();
 
             locations.forEach(loc => {
-                // ✅ [수정] loc.display로 텍스트 설정
+
                 const $item = $('<div>').addClass('location-item').text(loc.display);
 
-                // ✅ [수정] selectedLocation (value)와 loc.value 비교
+
                 if (loc.value === selectedLocation) {
                     $item.addClass('selected');
                 }
 
                 $item.on('click', function () {
-                    // ✅ [수정] loc.value와 비교
+
                     if (selectedLocation === loc.value) {
                         selectedLocation = ""; // 선택 해제
                         $('#location-selection-text').text('지역 선택').css('color', '');
                     } else {
-                        // ✅ [수정] selectedLocation에는 value, 텍스트에는 display 저장
                         selectedLocation = loc.value;
                         $('#location-selection-text').text(loc.display).css('color', '#222');
                     }
@@ -496,7 +492,7 @@
             });
         }
 
-        // --- 태그 모달 ---
+
         function openTagModal() {
             loadAllTags();
             $('#tagSelectModalOverlay').css('display', 'flex');
@@ -601,18 +597,16 @@
 
                 const $tagBox = $("<div>").addClass("tag-box");
 
-                // ✅ 태그 3개 표시
                 if (house.tag1) $tagBox.append($("<span>").addClass("tag").text(house.tag1));
                 if (house.tag2) $tagBox.append($("<span>").addClass("tag").text(house.tag2));
                 if (house.tag3) $tagBox.append($("<span>").addClass("tag").text(house.tag3));
 
-                // ✅ 층수 표시 (null 체크 강화)
                 if (house.floorNumber != null && house.floorNumber !== '' && house.floorNumber !== 'null') {
                     const floorTag = $("<span>").addClass("tag floor-tag").text(house.floorNumber + "층");
                     $tagBox.append(floorTag);
-                    console.log("✅ 층수 태그 추가:", house.floorNumber + "층");
+                    console.log("층수 태그 추가:", house.floorNumber + "층");
                 } else {
-                    console.log("⚠️ 층수 없음:", house.floorNumber);
+                    console.log("층수 없음:", house.floorNumber);
                 }
 
                 $info.append($tagBox);
@@ -693,12 +687,10 @@
 </script>
 
 <script>
-    // 저장 완료(postMessage) 받으면 목록 초기화 후 재조회
     window.addEventListener('message', (e) => {
         if (e?.data?.type === 'SH_SAVED') {
             if (typeof closeSharehouseRegModal === 'function') closeSharehouseRegModal();
 
-            /* ✅ 변경: 한 줄로 리로드 */
             if (typeof window.loadSharehouseFirstPage === 'function') {
                 window.loadSharehouseFirstPage();
             } else {
@@ -708,13 +700,11 @@
     });
 </script>
 
-<!-- 왼쪽 하단 + 버튼 -->
 <button type="button" class="sh-fab-left" id="sharehouseAddBtn" aria-label="쉐어하우스 등록">
     <i class="fa-solid fa-plus icon-plus"></i>
 </button>
 <div class="sh-tooltip">쉐어하우스 등록</div>
 
-<!-- 쉐어하우스 등록 모달(iframe) -->
 <div class="modal-overlay" id="sharehouseRegOverlay" style="display:none; z-index:10000;">
     <div class="modal-sheet">
         <div class="modal-header" style="justify-content:space-between;">

@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <style>
-    /* ----- Footer Styles ----- */
     footer {
         background-color: #f8f9fa;
         color: #6c757d;

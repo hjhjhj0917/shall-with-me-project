@@ -55,24 +55,24 @@
         }
 
         .card-header {
-            display: flex; /* 한 줄 정렬 */
-            justify-content: space-between; /* 좌/우 배치 */
-            align-items: center; /* 세로 중앙 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 12px 16px;
             border-bottom: 1px solid #e9ecef;
             min-height: 56px;
-            height: 56px; /* 필요 시 유지 */
-            flex-wrap: nowrap; /* 줄바꿈 금지 */
-            gap: 10px; /* 살짝 여백 */
+            height: 56px;
+            flex-wrap: nowrap;
+            gap: 10px;
         }
 
-        /* 왼쪽 영역은 남는 공간을 차지하고, 말줄임 처리 */
+
         .card-header-left {
             display: flex;
             align-items: center;
             gap: 10px;
-            flex: 1 1 auto; /* 가변 */
-            min-width: 0; /* ellipsis 작동 */
+            flex: 1 1 auto;
+            min-width: 0;
         }
 
         .card-header h3 {
@@ -80,7 +80,7 @@
             white-space: nowrap;
         }
 
-        /* 긴 주소는 … 처리 */
+
         .header-inline-value {
             white-space: nowrap;
             overflow: hidden;
@@ -88,11 +88,11 @@
             flex: 1 1 auto;
         }
 
-        /* 버튼은 줄어들지 않게 + 한 줄 유지 */
+
         .card-action-btn {
-            flex: 0 0 auto; /* 줄어들지 않음 */
-            align-self: center; /* 세로 중앙 */
-            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+            flex: 0 0 auto;
+            align-self: center;
+            white-space: nowrap;
         }
 
         .card-header h3 {
@@ -106,12 +106,12 @@
             flex-grow: 1;
         }
 
-        /* === 버튼 공통 & 활성 스타일 (수정됨) === */
+
         .card-action-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            text-decoration: none !important; /* 밑줄 제거 */
+            text-decoration: none !important;
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 0.9rem;
@@ -121,20 +121,20 @@
         }
 
         .card-action-btn.active {
-            background: transparent;      /* 배경 제거 */
-            color: #3399ff;          /* 텍스트 색상 */
-            border-color: transparent;  /* 테두리 제거 */
-            text-decoration: underline !important; /* 밑줄 추가 */
-            box-shadow: none;             /* 그림자 제거 */
+            background: transparent;
+            color: #3399ff;
+            border-color: transparent;
+            text-decoration: underline !important;
+            box-shadow: none;
         }
 
         .card-action-btn.active:hover,
         .card-action-btn.active:focus-visible {
-            background: transparent;      /* 배경 없음 */
-            border-color: transparent;  /* 테두리 없음 */
-            color: #1c407d;          /* 텍스트 색상 (진하게) */
-            box-shadow: none;             /* 그림자 제거 */
-            text-decoration: underline !important; /* 밑줄 유지 */
+            background: transparent;
+            border-color: transparent;
+            color: #1c407d;
+            box-shadow: none;
+            text-decoration: underline !important;
         }
 
         .profile-section {
@@ -205,7 +205,7 @@
             font-size: .8rem
         }
 
-        /* [FIX] 소개글: 가운데 정렬 상속 차단 + 위·왼쪽 정렬 */
+
         .intro-area {
             padding: 12px;
             border: 1px solid #c7d3e6;
@@ -417,14 +417,14 @@
         }
 
         #mypageTagModal .modal-body {
-            max-height: 560px; /* profile.jsp의 기존 높이 유지 */
+            max-height: 560px;
             overflow-y: auto;
             padding: 20px;
         }
 
         #mypageTagModal .modal-footer {
             display: flex;
-            justify-content: space-between; /* 이미지와 동일하게 양쪽 정렬 */
+            justify-content: space-between;
             align-items: center;
             gap: 8px;
             padding: 12px 16px;
@@ -432,22 +432,22 @@
             background: #fff;
         }
 
-        #mypageTagModal .modal-footer > div:first-child { /* 0/6 선택 텍스트 */
+        #mypageTagModal .modal-footer > div:first-child {
             font-size: 0.95rem;
             color: #495057;
         }
 
-        #mypageTagModal #tagCount { /* 0/6 선택의 '0' 부분 */
+        #mypageTagModal #tagCount {
             font-weight: 600;
             color: #3399ff;
         }
 
-        #mypageTagModal .modal-footer > div:last-child { /* 버튼 그룹 */
+        #mypageTagModal .modal-footer > div:last-child {
             display: flex;
             gap: 8px;
         }
 
-        #mypageTagModal .modal-footer #btnTagCancel { /* 취소 버튼 */
+        #mypageTagModal .modal-footer #btnTagCancel {
             padding: 8px 16px !important;
             cursor: pointer !important;
             font-size: 0.9rem !important;
@@ -458,12 +458,11 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
         }
 
-        #mypageTagModal .modal-footer #btnTagSave { /* 선택 완료 버튼 (저장 버튼) */
+        #mypageTagModal .modal-footer #btnTagSave {
             padding: 8px 16px;
             font-weight: 600;
             cursor: pointer;
             font-size: 0.9rem;
-            /* 기존 card-action-btn.active 스타일 오버라이드 */
             text-decoration: none !important;
             background-color: white !important;
             color: #3399ff !important;
@@ -471,7 +470,7 @@
             border: 2px solid #E5F2FF !important;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
         }
-        /* --- [END] NEW TAG MODAL STYLE --- */
+
 
         #btnVerifyPw{
             text-decoration: none !important;
@@ -513,7 +512,7 @@
             cursor: pointer;
         }
 
-        /* ===== [비밀번호 수정 입력창 리디자인] ===== */
+
         #pwChangeModal .login-input {
             width: 100%;
             padding: 12px;
@@ -531,14 +530,14 @@
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
         }
 
-        /* 오류 시 강조 표시 유지 */
+
         #pwChangeModal .login-input.input-error {
             border-color: #e03131;
             box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
         }
 
 
-        /* ===== [주소 수정 모달 입력창 리디자인] ===== */
+
         #addrEditModal .login-input {
             width: 100%;
             padding: 12px;
@@ -557,7 +556,7 @@
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
         }
 
-        /* 오류나 강조 표시용 (선택적으로 사용 가능) */
+
         #addrEditModal .login-input.input-error {
             border-color: #e03131;
             box-shadow: 0 0 0 2px rgba(224, 49, 49, 0.2);
@@ -572,10 +571,10 @@
 
 
 
-        /* 헤더 버튼 클릭 보장 */
-        .card-header { position: relative; }               /* 쌓임 맥락 생성 */
-        .card-action-btn { position: relative; z-index: 2; }/* 버튼을 항상 위에 */
-        .header-inline-value { pointer-events: none; }     /* 긴 주소 텍스트가 클릭 못 가로채게 */
+
+        .card-header { position: relative; }
+        .card-action-btn { position: relative; z-index: 2; }
+        .header-inline-value { pointer-events: none; }
 
 
     </style>
@@ -1047,10 +1046,10 @@
         const $modal = $('#mypageTagModal');
         const $modalClose = $('#mypageTagModalClose');
         const $btnEdit = $('#btnTagEdit');
-        const $btnSave = $('#btnTagSave'); // 기존 '저장' 버튼
-        const $btnCancel = $('#btnTagCancel'); // 추가: '취소' 버튼
+        const $btnSave = $('#btnTagSave');
+        const $btnCancel = $('#btnTagCancel');
         const $wrap = $('#mypageTagGroupContainer');
-        const $tagCount = $('#tagCount'); // 태그 개수 표시
+        const $tagCount = $('#tagCount');
 
         const selectedByGroup = new Map();
 
@@ -1065,7 +1064,7 @@
                 const myMap = {};
                 (myTags || []).forEach(s => { myMap[s.tagType] = s.tagId; });
                 renderGroups(allTags, myMap);
-                updateTagCountDisplay(); // 모달 열 때 카운트 초기화
+                updateTagCountDisplay();
                 $modal.css('display', 'flex');
             } catch (e) {
                 console.error('태그 로드 실패', e);
@@ -1076,7 +1075,7 @@
         $modalClose.on('click', () => $modal.hide());
         $modal.on('click', (e) => { if (e.target === e.currentTarget) $modal.hide(); });
 
-        $btnCancel.on('click', () => { // 취소 버튼 클릭 시 모달 닫기
+        $btnCancel.on('click', () => {
             $modal.hide();
         });
 
@@ -1176,7 +1175,6 @@
 </script>
 
 <script>
-    // 기존 pwUpdate 로직 유지 (NEW_PASSWORD 세션이 있는 상태에서 동작)
     function pwUpdate(f3) {
         let userPw = f3.userPw.value.trim();
         let pwCheck = f3.pwCheck.value.trim();
@@ -1222,13 +1220,12 @@
                 const goLogin = function(){ location.href = "<c:url value='/user/login'/>"; };
 
                 if (json.result === "1" || json.result === 1) {
-                    // ✅ 1) 성공 시 모달 닫기
+
                     $pwModal.hide();
 
-                    // ✅ 2) 커스텀 알림 띄우기 (확인 누르면 로그인 이동)
                     showCustomAlert(json.msg || '비밀번호가 변경되었어요!', goLogin);
                 } else {
-                    // 실패 시 모달은 유지하고 메시지만 출력
+
                     showCustomAlert(json.msg || '비밀번호 변경에 실패했어요.');
                 }
             },
@@ -1259,11 +1256,11 @@
             setTimeout(()=> $('#currentPw').focus(), 0);
         });
 
-        // 닫기
+
         $close.on('click', ()=> $modal.hide());
         $modal.on('click', (e)=> { if (e.target === e.currentTarget) $modal.hide(); });
 
-        // STEP1: 현재 비밀번호 확인 → 서버에서 NEW_PASSWORD 세션 세팅
+
         $('#btnVerifyPw').on('click', function(){
             const cur = ($('#currentPw').val() || '').trim();
             if (!cur) {
@@ -1304,10 +1301,10 @@
             });
         });
 
-        // STEP2: 새 비밀번호 제출
+
         $('#btnUpdatePw').on('click', ()=> pwUpdate(document.getElementById('f3')));
 
-        // 엔터키 UX
+
         $('#pwVerifyForm').on('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('#btnVerifyPw').click(); }});
         $('#f3').on('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('#btnUpdatePw').click(); }});
     });
@@ -1315,7 +1312,7 @@
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script>
-    // ★추가: 카카오 우편번호 → 분리 필드 채우기
+
     function kakaoPost(f) {
         new daum.Postcode({
             oncomplete: function (data) {
@@ -1326,10 +1323,10 @@
         }).open();
     }
 
-    // ★추가: 주소 저장 전 검증
+
     function validateAddressForm() {
-        const addr1 = ($('#addr1').val() || '').trim(); // 한 줄 주소
-        const addr2 = ($('#addr2').val() || '').trim(); // 상세주소
+        const addr1 = ($('#addr1').val() || '').trim();
+        const addr2 = ($('#addr2').val() || '').trim();
 
         if (!addr1) {
             showCustomAlert('주소 찾기 버튼으로 주소를 선택해주세요.');
@@ -1345,13 +1342,11 @@
 
 
 
-    // ★추가: 헤더의 인라인 표시 및 지도 재배치 갱신
+
     function refreshAddressUI(fullLineAddress) {
-        // 1) 카드 헤더의 인라인 텍스트 갱신
         const $inline = $('.card-header-left .header-inline-value').first();
         if ($inline.length) $inline.text(fullLineAddress || '등록된 주소가 없습니다.');
 
-        // 2) 지도 리로케이션 (기존 코드 재활용)
         const container = document.getElementById('kakaoMap');
         if (!container || !window.kakao || !kakao.maps) return;
 
@@ -1361,7 +1356,6 @@
                 const item = result[0];
                 const pos = new kakao.maps.LatLng(item.y, item.x);
 
-                // 기존 맵/마커 재사용이 어렵다면 새로 그려도 됨
                 const map = new kakao.maps.Map(container, {center: pos, level: 3});
                 const marker = new kakao.maps.Marker({position: pos});
                 marker.setMap(map);
@@ -1371,12 +1365,12 @@
         });
     }
 
-    // ★추가: 모달 오픈/저장 이벤트 바인딩
+
     $(function () {
         const $modal = $('#addrEditModal');
-        const $close = $('#addrEditModalClose'); // $open 제거
+        const $close = $('#addrEditModalClose');
 
-// 위임 바인딩: 레이아웃 변동/겹침에도 안정적으로 동작
+
         $(document).on('click', '#btnAddrEdit', function (e) {
             e.preventDefault();
             const currentLine = $('.card-header-left .header-inline-value').first().text().trim();
@@ -1399,13 +1393,12 @@
         $('#btnAddrSave').on('click', function () {
             if (!validateAddressForm()) return;
 
-            // addr2(detail) 동기화(선택)
+
             $('#addr2').val($('#detailAddress').val());
 
             const payload = $('#addrForm').serialize();
 
             $.ajax({
-                // ★중요: 프로젝트 규칙에 맞춘 경로
                 url: '/mypage/addressUpdate',
                 type: 'post',
                 dataType: 'json',
@@ -1418,21 +1411,17 @@
                     const success = (res && (res.result === 1 || res.result === "1"));
                     const msg = (res && res.msg) ? res.msg : (success ? '주소가 저장되었어요!' : '저장에 실패했어요.');
 
-                    // 한 줄 주소를 서버에서 다시 만들어 내려줄 수도 있으나,
-                    // 여기서는 클라이언트 조합값 사용
                     const line = $('#addr1').val();
 
                     if (success) {
-                        // ✅ 1) 먼저 모달 닫기
                         $modal.hide();
 
                         showCustomAlert(msg, function () {
                             setTimeout(() => {
                                 location.reload();
                             }, 500);
-                        }); // 저장 성공 시 커스텀 알림 띄우기
+                        });
 
-                        // ✅ 확인 버튼 누르고 모달 닫힌 // 1초 후 새로고침 (커스텀 모달 닫히는 타이밍 고려)
                     } else {
                         showCustomAlert('저장에 실패했어요.');
                     }

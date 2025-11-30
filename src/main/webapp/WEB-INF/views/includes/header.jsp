@@ -3,7 +3,6 @@
     <%--    메인으로 가는 사이트 로고--%>
     <div class="home-logo" onclick="location.href='/user/main'">
         <div class="header-icon-stack">
-            <%-- ✅ loading="lazy" 추가 --%>
             <img src="../images/logo.png" loading="lazy">
         </div>
         <div class="header-logo">살며시</div>
@@ -37,7 +36,6 @@
 
                     if (profileImgUrl != null && !profileImgUrl.isEmpty()) {
                 %>
-                <%-- ✅ loading="lazy" 추가 --%>
                 <img src="<%= profileImgUrl %>" alt="프로필 사진" class="user-profile-img" loading="lazy">
                 <%
                 } else {
@@ -85,7 +83,6 @@
 </div>
 
 <script>
-    // ✅ 배지 업데이트 함수
     function updateTotalUnreadBadge(count) {
         const badge = document.getElementById('totalUnreadBadge');
         if (!badge) return;
@@ -105,7 +102,7 @@
         let lastFetchTime = 0;
         const FETCH_COOLDOWN = 5000; // 5초 쿨다운 (과도한 요청 방지)
 
-        // ✅ 안 읽은 메시지 개수 조회 함수 (쿨다운 적용)
+
         function fetchUnreadCount() {
             const now = Date.now();
 
@@ -136,13 +133,13 @@
                 });
         }
 
-        // ✅ 1. 페이지 로드 즉시 실행
+
         fetchUnreadCount();
 
-        // ✅ 2. 15초마다 자동 갱신
+
         pollingInterval = setInterval(fetchUnreadCount, 15000);
 
-        // ✅ 3. 메시지 아이콘 클릭 시 즉시 갱신 (쿨다운 적용)
+
         const messageIcon = document.getElementById('messageIconToggle');
         if (messageIcon) {
             messageIcon.addEventListener('click', function() {
@@ -150,14 +147,14 @@
             });
         }
 
-        // ✅ 4. 페이지 포커스 시 갱신 (다른 탭에서 돌아올 때)
+
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 fetchUnreadCount();
             }
         });
 
-        // ✅ 5. 페이지 이탈 시 interval 정리
+
         window.addEventListener('beforeunload', function() {
             if (pollingInterval) {
                 clearInterval(pollingInterval);

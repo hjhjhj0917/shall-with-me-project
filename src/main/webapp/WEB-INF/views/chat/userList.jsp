@@ -55,7 +55,6 @@
         .info {
             flex: 1;
             overflow: hidden;
-            /* [추가] min-width는 flex 아이템의 ellipsis 효과를 위해 필요합니다 */
             min-width: 0;
         }
         .title {
@@ -75,7 +74,7 @@
             font-size: 11px;
             color: #888;
             white-space: nowrap;
-            margin-top: 4px; /* 뱃지 아래 약간의 간격 */
+            margin-top: 4px;
         }
 
         .chat-list-container.is-empty {
@@ -109,14 +108,14 @@
             align-items: center;
             justify-content: center;
 
-            /* 기존 margin-left 제거 */
+
             margin-left: 0;
         }
 
         .right-info {
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* 우측 정렬 */
+            align-items: flex-end;
             justify-content: center;
             margin-left: 10px;
             margin-top: 10px;
@@ -159,7 +158,7 @@
     function parseListDate(dateString) {
         if (!dateString) return new Date(0); // 1970년 (정렬 시 맨 뒤)
 
-        // [수정] 서버가 UTC 시간("...T04:39:00")을 'Z' 없이 보내는 문제 해결
+        // 서버가 UTC 시간("...T04:39:00")을 'Z' 없이 보내는 문제 해결
         // 'Z'를 강제로 붙여 UTC임을 명시해야 브라우저가 KST로 올바르게 변환합니다.
         let isoDateString = dateString;
 
@@ -167,7 +166,6 @@
         if (isoDateString.includes(' ') && !isoDateString.includes('T')) {
             isoDateString = isoDateString.replace(' ', 'T') + 'Z';
         }
-        // "YYYY-MM-DDTHH:MM:SS" (Z가 없는) 형식을 "YYYY-MM-DDTHH:MM:SSZ"로 변경
         else if (isoDateString.includes('T') && !isoDateString.endsWith('Z')) {
             isoDateString += 'Z';
         }
@@ -181,18 +179,18 @@
         return messageDate; // KST로 변환된 Date 객체
     }
 
-    // [수정] formatTimeAgo는 이제 parseListDate를 사용
+    // formatTimeAgo는 이제 parseListDate를 사용
     function formatTimeAgo(dateString) {
-        // [수정] parseListDate를 호출하여 KST Date 객체를 받음
+        // parseListDate를 호출하여 KST Date 객체를 받음
         const messageDate = parseListDate(dateString);
 
-        // [수정] 시간이 유효하지 않으면(1970년) 빈 문자열 반환
+        // 시간이 유효하지 않으면(1970년) 빈 문자열 반환
         if (messageDate.getTime() === 0) return "";
 
         const now = new Date(); // 브라우저의 현재 시간 (KST)
         const secondsAgo = Math.round((now.getTime() - messageDate.getTime()) / 1000);
 
-        // 5. 조건에 따라 정확한 상대 시간으로 변환
+        // 조건에 따라 정확한 상대 시간으로 변환
         if (secondsAgo < 60) {
             return '방금 전';
         }
@@ -212,7 +210,6 @@
 
     // 채팅방으로 이동하는 함수
     function openChat(otherUserId) {
-        // ... (기존과 동일)
         fetch("/chat/createOrGetRoom?user2Id=" + encodeURIComponent(otherUserId))
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -262,10 +259,10 @@
             } else {
                 badge.textContent = user.unreadCount;
             }
-            badge.style.visibility = 'visible'; // ✅ 내용이 있을 때는 보임
+            badge.style.visibility = 'visible';
         } else {
-            badge.textContent = '';              // ✅ 내용 제거
-            badge.style.visibility = 'hidden';  // ✅ 공간은 유지, 안 보이게
+            badge.textContent = '';
+            badge.style.visibility = 'hidden';
         }
 
         return clone.firstElementChild;
@@ -288,17 +285,17 @@
                 } else {
                     // [수정] 정렬 문제 해결:
 
-                    // 1. userList를 KST Date 객체와 함께 변환
+                    //userList를 KST Date 객체와 함께 변환
                     const sortedUserList = userList.map(user => {
-                        // [수정] parseListDate 함수를 사용하여 KST Date 객체 생성
+                        // parseListDate 함수를 사용하여 KST Date 객체 생성
                         const kstDate = parseListDate(user.lastMessageTimestamp);
                         return { ...user, kstDate: kstDate };
                     });
 
-                    // 2. KST Date 기준으로 내림차순 정렬 (최신순)
+                    //KST Date 기준으로 내림차순 정렬 (최신순)
                     sortedUserList.sort((a, b) => b.kstDate.getTime() - a.kstDate.getTime());
 
-                    // 3. 정렬된 목록을 화면에 .append()
+                    //정렬된 목록을 화면에 .append()
                     $.each(sortedUserList, function (index, user) {
                         var chatItem = createChatItem(user);
                         container.append(chatItem);
@@ -337,19 +334,15 @@
     function updateChatList(user) {
         var container = $("#chatList");
 
-        // [수정] 정렬 문제 해결:
-        // 실시간 갱신은 .prepend() (무조건 맨 위로) 방식을 유지합니다.
-        // (실시간 갱신 시 전체 목록을 다시 정렬하는 것은 복잡도가 높습니다)
-        // 새로고침 시에는 .ready()의 정렬 로직이 정확한 순서를 보장합니다.
 
-        // 1. 기존 항목 제거
+
         container.find('.chat-partner-item[data-userid="' + user.userId + '"]').remove();
 
-        // 2. 새 항목을 맨 위에 추가
+
         var newChatItem = createChatItem(user);
         container.prepend(newChatItem);
 
-        // 3. 목록이 비어있다가 첫 대화가 생기는 경우 "대화 상대가 없습니다" 메시지 제거
+
         if(container.hasClass('is-empty')) {
             container.removeClass('is-empty');
             container.find('p').remove();

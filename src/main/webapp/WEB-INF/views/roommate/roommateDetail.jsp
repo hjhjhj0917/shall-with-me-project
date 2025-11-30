@@ -13,32 +13,26 @@
 <body>
 <%@ include file="../includes/header.jsp" %>
 
-<%--여기에 코드 작성--%>
 <main class="detail-wrapper">
-    <!-- 왼쪽 영역 -->
     <div class="detail-left">
         <div class="profile-photo"
              style="background-image:url('${user.profileImageUrl}')">
         </div>
 
-        <!-- ⬇⬇ 자기소개도 DB 값으로 교체 -->
         <div class="self-intro">
             <h3>자기소개</h3>
             <p>${user.introduction}</p>
         </div>
     </div>
 
-    <!-- 오른쪽 영역 -->
+
     <div class="detail-right">
-        <!-- ⬇⬇ 이름 + 나이 -->
         <h2 class="user-name">${user.userName} (${user.age}세)</h2>
 
-        <!-- ⬇⬇ 성별 / 주소 / 생일-->
         <p class="user-info" id="genderArea"></p>
         <p class="user-info" id="regionArea"></p>
         <p class="user-info" id="birthArea"></p>
 
-        <!-- ⬇⬇ 태그 목록 -->
         <div class="tag-box">
             <c:forEach var="tag" items="${user.tags}">
                 <span class="tag"><i class="fa-solid fa-tag"></i> ${tag}</span>
@@ -79,7 +73,7 @@
                 console.log("서버에서 받은 데이터:", data);
                 if (data.roomId) {
                     const cleanedRoomId = Number(data.roomId);
-                    console.log("➡️ 이동할 채팅방 ID:", cleanedRoomId);
+                    console.log("이동할 채팅방 ID:", cleanedRoomId);
                     const targetUrl = "/chat/chatRoom?roomId=" + cleanedRoomId;
                     console.log("이동할 URL:", targetUrl);
                     window.location.href = targetUrl;
@@ -96,10 +90,8 @@
     window.onload = function() {
         const fullAddr = "${user.addr1}";
         const gender = "${user.gender}";
-        const birthDate = "${user.birthDate}"; // "2001-09-12"
-        // 괄호 안 우편번호 제거
+        const birthDate = "${user.birthDate}";
         const noZip = fullAddr.replace(/\(.*?\)/, "").trim();
-        // 공백 기준으로 분리하여 첫번째 요소만 추출
         const bigRegion = noZip.split(" ")[0];
 
         let genderName = ""
@@ -110,7 +102,7 @@
             genderName = "여성"
         }
 
-        // ⬇ 생일 포맷 변경
+
         let formattedBirthDate = birthDate;
         if (birthDate.includes('-')) {
             const parts = birthDate.split("-");

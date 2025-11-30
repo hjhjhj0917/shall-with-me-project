@@ -358,7 +358,6 @@
                             <span>이미지 업로드</span>
                             <img class="preview" alt="" hidden>
                         </label>
-                        <!-- ✅ 안내 영역 (업로드 불가) -->
                         <div class="upload-notice-box">
                             <div class="notice-icon">
                                 <i class="fa-solid fa-images"></i>
@@ -411,13 +410,13 @@
     </div>
 </div>
 
-<!-- ✅ 1. jQuery (가장 먼저!) -->
+
 <script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>
 
-<!-- ✅ 2. customModal 포함 (jQuery 다음) -->
+
 <%@ include file="../includes/customModal.jsp" %>
 
-<!-- ✅ 3. 다음 우편번호 서비스 스크립트 -->
+
 <script>
     function execDaumPostcode() {
         new daum.Postcode({
@@ -445,7 +444,6 @@
     });
 </script>
 
-<!-- ✅ 4. 취소 버튼 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const cancelBtn = document.getElementById('shRegCancelBtn');
@@ -466,7 +464,7 @@
     });
 </script>
 
-<!-- ✅ 5. 업로더 미리보기 및 태그/층수 표시 -->
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.sh-uploader-5 .uploader input[type="file"]').forEach(input => {
@@ -560,7 +558,7 @@
     }
 </script>
 
-<!-- ✅ 6. 층수 입력 모달 스크립트 -->
+
 <script>
     function openFloorModal() {
         const modal = document.getElementById('floorModal');
@@ -596,7 +594,7 @@
     });
 </script>
 
-<!-- ✅ 7. 저장 제출 -->
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('roommateForm');
@@ -663,15 +661,15 @@
                 fd.append('thumbnail', thumbnailFile);
             }
 
-            // ✅ 추가 이미지 (파일이 있을 때만!)
+
             const imageInputs = form.querySelectorAll('input[name="images"]');
             imageInputs.forEach(input => {
-                if (input.files && input.files[0]) {  // ✅ 파일 있을 때만!
+                if (input.files && input.files[0]) {
                     fd.append('images', input.files[0]);
                 }
             });
 
-            // ✅ 나머지 필드들
+
             fd.append('houseName', document.getElementById('houseName').value);
             fd.append('introduction', document.getElementById('introTextarea').value || '');
             fd.append('tagListJson', document.getElementById('selectedTagIds').value);
@@ -723,10 +721,10 @@
     });
 </script>
 
-<!-- ✅ 8. 태그 선택 모달 포함 -->
+
 <jsp:include page="/WEB-INF/views/sharehouse/sharehouseTagSelect.jsp"/>
 
-<!-- ✅ 9. 페이지 전용 바인딩 -->
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const tagBtn = document.getElementById('btnTagSelect');

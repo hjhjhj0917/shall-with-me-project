@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <title>살며시: 아이디 찾기</title>
 
-    <!-- CSS -->
+
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/modal.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/userform.css"/> <!-- 로그인과 같은 스타일 적용 -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/loginNavBar.css"/>
 
-    <!-- Font Awesome -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-    <!-- jQuery -->
+
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 
     <style>
@@ -26,15 +26,15 @@
             height: 454px;
         }
 
-        /* 아이디 찾기 완료 페이지 전용 CSS */
+
         .completion-icon-wrapper {
             margin-top: 20px;
             margin-bottom: 10px;
         }
 
         .completion-icon {
-            font-size: 50px; /* 아이콘 크기 */
-            color: #4da3ff; /* 아이콘 색상 */
+            font-size: 50px;
+            color: #4da3ff;
         }
 
         .completion-message {
@@ -47,7 +47,7 @@
         .user-info-display {
             text-align: left;
             margin-bottom: 30px;
-            border-top: 1px solid #eee; /* 이미지 상단 라인 */
+            border-top: 1px solid #eee;
             padding-top: 20px;
         }
 
@@ -61,32 +61,31 @@
         .info-label {
             font-weight: bold;
             color: #555;
-            width: 60px; /* 라벨 너비 고정 */
+            width: 60px;
             flex-shrink: 0;
         }
 
         .info-value {
             color: #333;
             text-align: right;
-            flex-grow: 1; /* 남은 공간을 채움 */
+            flex-grow: 1;
         }
 
         .userid-value {
-            color: #3399ff; /* 아이디 색상 */
+            color: #3399ff;
             font-weight: bold;
         }
 
-        /* 기존 버튼 및 링크 관련 CSS는 유지 */
+
     </style>
 
     <script type="text/javascript">
         $(document).ready(function () {
 
-            // 생성된 에러창을 다른 곳을 누르면 즉시 사라지는 코드
             $(document).on("click", function (e) {
                 const $target = $(e.target);
 
-                if ( // 제외 대상
+                if (
                     !$target.is("#userName") &&
                     !$target.is("#email") &&
                     !$target.is("#btnSearchUserId") &&
