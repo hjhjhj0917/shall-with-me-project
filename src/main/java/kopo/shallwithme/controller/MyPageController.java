@@ -64,6 +64,46 @@ public class MyPageController {
 
 
     @ResponseBody
+    @PostMapping("/updateStatus")
+    public Map<String, Object> updateStatus(HttpSession session,
+                                            @RequestParam(value = "status") String status) {
+
+        log.info("MyPageController.updateStatus Start!");
+        log.info("Request Status : " + status);
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try {
+            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+            if (userId.isEmpty()) {
+                resultMap.put("result", 0);
+                resultMap.put("msg", "로그인이 필요합니다.");
+                return resultMap;
+            }
+
+            UserInfoDTO pDTO = new UserInfoDTO();
+            pDTO.setUserId(userId);
+            pDTO.setStatus(status);
+            pDTO.setChgId(userId);
+
+            myPageService.updateUserStatus(pDTO);
+
+            resultMap.put("result", 1);
+            resultMap.put("msg", "계정 상태가 변경되었습니다.");
+
+        } catch (Exception e) {
+            log.error("Error updating user status", e);
+            resultMap.put("result", 0);
+            resultMap.put("msg", "상태 변경 중 오류가 발생했습니다.");
+        }
+
+        log.info("MyPageController.updateStatus End!");
+        return resultMap;
+    }
+
+
+    @ResponseBody
     @PostMapping(value = "pwCheckProc")
     public MsgDTO pwCheckProc(HttpServletRequest request, HttpSession session) {
         log.info("{}.pwCheckProc Start!", this.getClass().getName());
