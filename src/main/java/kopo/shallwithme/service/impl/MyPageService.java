@@ -158,7 +158,6 @@ public class MyPageService implements IMyPageService {
             log.info("{}.updateProfileImage End! res=0 (userId blank)", this.getClass().getName());
             return 0;
         }
-        // URL은 로그에 직접 노출해도 되는 퍼블릭 경로지만, 길면 줄여 찍자
         String shortUrl = Optional.ofNullable(pDTO.getProfileImageUrl())
                 .map(u -> u.length() > 120 ? u.substring(0,120) + "..." : u)
                 .orElse(null);
@@ -195,10 +194,8 @@ public class MyPageService implements IMyPageService {
             log.warn("updateMyTagsByGroup invalid param");
             return 0;
         }
-        // 1) 전달된 tag_id들의 소속 tag_type만 추출해 해당 그룹만 삭제
         myPageMapper.deleteUserTagsByTagTypesOfTagIds(p); // DTO만 사용
 
-        // 2) INSERT ... SELECT 로 태그타입까지 조인해 일괄 삽입
         int inserted = myPageMapper.insertUserTagsFromIds(p); // DTO만 사용
         log.info("{}.updateMyTagsByGroup End! inserted={}", this.getClass().getName(), inserted);
         return inserted;
@@ -215,11 +212,10 @@ public class MyPageService implements IMyPageService {
     @Override
     public boolean verifyPassword(UserInfoDTO pDTO) throws Exception {
         // DB의 해시값을 가져와 비교
-        UserInfoDTO rDTO = myPageMapper.getPasswordHashByUserId(pDTO); // PASSWORD 컬럼만 세팅해서 리턴
+        UserInfoDTO rDTO = myPageMapper.getPasswordHashByUserId(pDTO);
         if (rDTO == null || rDTO.getPassword() == null) {
             return false;
         }
-        // pDTO.password 는 이미 EncryptUtil로 해시된 값
         return rDTO.getPassword().equals(pDTO.getPassword());
     }
 

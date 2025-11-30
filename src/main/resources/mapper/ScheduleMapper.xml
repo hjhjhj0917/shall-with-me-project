@@ -4,7 +4,6 @@
 
 <mapper namespace="kopo.shallwithme.mapper.IScheduleMapper">
 
-    <!-- 일정 목록 불러오기-->
     <select id="getScheduleList" parameterType="UserInfoDTO" resultType="ScheduleDTO">
         SELECT
             schedule_id, title, DATE_FORMAT(schedule_dt, '%Y-%m-%dT%H:%i:%s') AS schedule_dt,
@@ -15,7 +14,6 @@
             (creator_id = #{userId} OR participant_id = #{userId}) AND status = 'CONFIRMED'
     </select>
 
-    <!-- 일정 등록-->
     <insert id="insertSchedule" parameterType="ScheduleDTO">
         INSERT INTO SCHEDULE (
             title, schedule_dt, location, memo, creator_id, participant_id, status
@@ -24,14 +22,12 @@
                  )
     </insert>
 
-    <!-- 일정 수정-->
     <update id="updateSchedule" parameterType="ScheduleDTO">
         UPDATE SCHEDULE
         SET title = #{title}, schedule_dt = #{scheduleDt}, location = #{location}, memo = #{memo}
         WHERE schedule_id = #{scheduleId}
     </update>
 
-    <!-- 일정 삭제-->
     <delete id="deleteSchedule" parameterType="ScheduleDTO">
         DELETE FROM SCHEDULE
         WHERE schedule_id = #{scheduleId}
@@ -46,7 +42,6 @@
             SCHEDULE_ID = #{scheduleId}
     </update>
 
-    <!-- 일정 ID로 메시지 조회 -->
     <select id="selectMessageByScheduleId" parameterType="string" resultType="ChatMessageDTO">
         SELECT
             message_id,

@@ -2,7 +2,6 @@ package kopo.shallwithme.service;
 
 import kopo.shallwithme.dto.SharehouseImageDTO;
 import kopo.shallwithme.mapper.ISharehouseImageMapper;
-import kopo.shallwithme.service.ISharehouseImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

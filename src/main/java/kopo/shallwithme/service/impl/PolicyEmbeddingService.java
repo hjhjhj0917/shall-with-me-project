@@ -41,7 +41,6 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
     @Value("${langchain4j.embedding.store.path:./shallwithme-embedding-store.json}")
     private String embeddingStorePath;
 
-    // Splitter를 필드로 선언하여 재사용
     private final DocumentSplitter documentSplitter = DocumentSplitters.recursive(300, 50);
 
     public PolicyEmbeddingService(@Lazy IYouthPolicyService youthPolicyService,
@@ -67,19 +66,16 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
                 storePath = Paths.get(embeddingStorePath);
             }
 
-            // 🔹 1) 외부 경로 우선
             if (!embeddingStorePath.startsWith("classpath:") && Files.exists(Paths.get(embeddingStorePath))) {
                 log.info("Embedding store file ({}) found in filesystem.", embeddingStorePath);
                 return;
             }
 
-            // 🔹 2) classpath 리소스 확인
             if (classpathResource != null && classpathResource.exists()) {
                 log.info("Embedding store found in classpath: {}", classpathResource.getFilename());
                 return;
             }
 
-            // 🔹 3) 파일이 없을 경우 초기화
             log.info("Embedding store not found. Generating from database...");
             List<YouthPolicyDTO> allPolicies = youthPolicyService.getPolicies();
             if (allPolicies == null || allPolicies.isEmpty()) {
@@ -99,14 +95,13 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
     }
 
     public void embedNewPolicies(List<YouthPolicyDTO> policiesToEmbed) {
-        // (embedNewPolicies 메서드 내용은 이전과 거의 동일, 호출 메서드 이름 변경)
         if (policiesToEmbed == null || policiesToEmbed.isEmpty()) {
             log.info("No new policies to embed.");
             return;
         }
         log.info("Starting embedding for {} new policies...", policiesToEmbed.size());
         try {
-            int embeddedCount = this.embedAndStorePolicies(policiesToEmbed); // 메서드 이름 변경
+            int embeddedCount = this.embedAndStorePolicies(policiesToEmbed);
             log.info("Successfully embedded {} segments from {} new policies.", embeddedCount, policiesToEmbed.size());
             if (embeddedCount > 0) {
                 saveStoreToFile();
@@ -116,23 +111,16 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
         }
     }
 
-    /**
-     * ✅ [로직 변경] DTO 리스트를 Document로 변환하고, 직접 분할 및 필터링 후,
-     * EmbeddingModel과 EmbeddingStore를 직접 사용하여 임베딩하고 저장합니다.
-     * @param policies 임베딩할 정책 DTO 리스트
-     * @return 실제로 저장된 TextSegment의 개수
-     */
+
     private int embedAndStorePolicies(List<YouthPolicyDTO> policies) {
         if (policies == null || policies.isEmpty()) {
             return 0;
         }
 
-        // 1. DTO -> Document 변환
         List<Document> documents = policies.stream()
                 .map(this::dtoToDocument)
                 .collect(Collectors.toList());
 
-        // 2. 내용이 비어있지 않은 Document만 필터링
         List<Document> validDocuments = documents.stream()
                 .filter(doc -> doc.text() != null && !doc.text().isBlank())
                 .collect(Collectors.toList());
@@ -147,15 +135,12 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
             return 0;
         }
 
-        // 3. 유효한 문서를 TextSegment로 직접 분할
         List<TextSegment> allSegments = new ArrayList<>();
         for (Document doc : validDocuments) {
             allSegments.addAll(documentSplitter.split(doc));
         }
         log.debug("Split {} documents into {} segments.", validDocuments.size(), allSegments.size());
 
-
-        // 4. 분할된 세그먼트 중 텍스트가 비어있지 않은 것만 필터링 (OpenAI 오류 방지)
         List<TextSegment> validSegments = allSegments.stream()
                 .filter(segment -> segment.text() != null && !segment.text().isBlank())
                 .collect(Collectors.toList());
@@ -170,11 +155,9 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
             return 0;
         }
 
-        // --- [디버깅 로그] ---
         log.info("Sending {} text segments to OpenAI embedding API...", validSegments.size());
 
-        // --- 배치 단위로 나누어 임베딩 ---
-        int BATCH_SIZE = 500; // 한 번에 보낼 세그먼트 수 (조정 가능)
+        int BATCH_SIZE = 500;
         List<Embedding> allEmbeddings = new ArrayList<>();
         List<TextSegment> allValidSegments = new ArrayList<>();
 
@@ -190,7 +173,6 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
             allValidSegments.addAll(batch);
         }
 
-        // --- 임베딩 저장 ---
         try {
             embeddingStore.addAll(allEmbeddings, allValidSegments);
             log.info("Successfully added {} embeddings to the store.", allEmbeddings.size());
@@ -215,7 +197,6 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
     }
 
     private Document dtoToDocument(YouthPolicyDTO dto) {
-        // (dtoToDocument 메서드 내용은 이전과 동일)
         String content = dto.getPlcyExplnCn();
         if (content == null || content.isBlank()) {
             content = dto.getPlcyNm() != null ? dto.getPlcyNm() : "";
@@ -237,7 +218,6 @@ public class PolicyEmbeddingService implements ApplicationListener<ContextRefres
             String json = embeddingStore.serializeToJson();
 
             if (embeddingStorePath.startsWith("classpath:")) {
-                // ⚠️ classpath 안의 리소스는 수정 불가능 (read-only)
                 log.warn("Cannot save to classpath resource ({}). Skipping save.", embeddingStorePath);
                 return;
             }

@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 숨겨야 할 페이지들 처리
     const path = window.location.pathname;
     let pageName = path.split('/').pop();
 
@@ -49,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 초기화 (접힘 상태 유지)
     const ids = ['menuBox', 'headerDropdownToggle'];
     ids.forEach(id => {
         const el = document.getElementById(id);
@@ -66,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // toggle 대상 요소만 클릭 시 pinned 토글
     ['switchToggle', 'userIconToggle', 'headerDropdownToggle'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -76,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 로그인 안 돼 있으면 이름 박스 및 메뉴 수정
     if (!userName || userName.trim() === "") {
         const userNameBox = document.getElementById("userNameBox");
         const messageBox = document.getElementById("messageBox");
@@ -115,58 +111,40 @@ document.addEventListener('DOMContentLoaded', function () {
         const hideBoxes = hideBoxByPage[pageName] || [];
 
         ['menuBox'].forEach(id => {
-            if (hideBoxes.includes(id)) return;  // 숨겨야 할 박스는 무시
+            if (hideBoxes.includes(id)) return;
 
             const el = document.getElementById(id);
             if (el) {
                 el.classList.add('pinned');
-                el.style.display = '';  // 보이게
+                el.style.display = '';
             }
         });
     }
 
-    // 메세지 리스트 보기 ================================================== //
-
-    /**
-     * ===================================================================
-     * 메시지 모달 제어 스크립트
-     * ===================================================================
-     */
-
-        // 모달을 열었던 버튼(트리거) 요소를 저장하기 위한 변수
     let messageModalTrigger = null;
 
-    // [수정] #messageBox 버튼 클릭 시 모달 열기
     const messageBox = document.getElementById('messageBox');
     if (messageBox) {
         messageBox.addEventListener('click', function(e) {
             e.stopPropagation();
 
             const ov = document.getElementById('messageModalOverlay');
-            if (!ov) return; // 모달이 없으면 중단
+            if (!ov) return;
 
-            // 모달이 현재 열려있는지 상태를 확인
             const isModalOpen = ov.style.display === 'flex';
 
             if (isModalOpen) {
-                // 모달이 열려있으면 닫는 함수를 호출
                 closeMessageModal();
             } else {
-                // 모달이 닫혀있으면 여는 함수를 호출
-                messageModalTrigger = this; // 포커스 관리를 위해 현재 버튼을 트리거로 저장
-                this.classList.add('pinned'); // 버튼을 활성화 상태로 만듦
+                messageModalTrigger = this;
+                this.classList.add('pinned');
                 openMessageModal('/chat/userListPage');
             }
         });
     }
 
-    // [추가] 닫기 버튼(#messageModalClose)에 클릭 이벤트 연결
     document.getElementById('messageModalClose')?.addEventListener('click', closeMessageModal);
 
-    /**
-     * 메시지 모달을 여는 함수
-     * @param {string} url - iframe에 로드할 페이지 주소
-     */
     function openMessageModal(url) {
         const ov = document.getElementById('messageModalOverlay');
         const frame = document.getElementById('messageModalFrame');
@@ -188,9 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('messageModalClose')?.focus();
     }
 
-    /**
-     * 메시지 모달을 닫는 함수
-     */
     function closeMessageModal() {
         const ov = document.getElementById('messageModalOverlay');
         const frame = document.getElementById('messageModalFrame');
@@ -213,12 +188,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (messageModalTrigger) {
             messageModalTrigger.focus();
 
-            // [추가] 모달을 닫을 때 버튼의 활성화(.pinned) 상태도 함께 제거
             messageModalTrigger.classList.remove('pinned');
         }
     }
 
-    // 배경 클릭 시 모달 닫기 (이 기능은 사용자 편의성을 높여주므로 유지하는 것이 좋습니다)
     document.addEventListener('click', (e) => {
         const ov = document.getElementById('messageModalOverlay');
         if (ov && e.target === ov) {
@@ -226,7 +199,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ESC 키 입력 시 모달 닫기 (이 기능은 접근성을 위해 필수적이므로 유지하는 것이 좋습니다)
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const ov = document.getElementById('messageModalOverlay');
@@ -236,5 +208,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // =================================================================== //
 });

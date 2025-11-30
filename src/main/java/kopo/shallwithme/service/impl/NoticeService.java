@@ -1,7 +1,6 @@
 package kopo.shallwithme.service.impl;
 
 import kopo.shallwithme.dto.YouthPolicyDTO;
-import kopo.shallwithme.mapper.IMyPageMapper;
 import kopo.shallwithme.mapper.INoticeMapper;
 import kopo.shallwithme.service.INoticeService;
 import lombok.RequiredArgsConstructor;

@@ -29,7 +29,7 @@
             sent_at,
             is_read,
             message_type,
-            schedule_id  -- [핵심] schedule_id 컬럼을 반드시 포함해야 ResultMap이 동작합니다.
+            schedule_id
         FROM
             CHAT_MESSAGE
         WHERE
@@ -63,7 +63,6 @@
         WHERE ROOM_ID = #{roomId}
     </select>
 
-    <!--메세지 주고받은 유저만 불러오기-->
     <select id="selectChatPartnersWithLastMsg"
             parameterType="UserInfoDTO"
             resultType="ChatPartnerDTO">
@@ -113,7 +112,6 @@
         ORDER BY USER_NAME
     </select>
 
-    <!-- 방 조회 : user1_id, user2_id 로 방 검색 -->
     <select id="findRoomIdByUsers" parameterType="ChatRoomDTO" resultType="ChatRoomDTO">
         SELECT room_id
         FROM CHAT_ROOM
@@ -121,14 +119,12 @@
             LIMIT 1
     </select>
 
-    <!-- 방 생성 -->
     <insert id="insertChatRoom" parameterType="ChatRoomDTO"
             useGeneratedKeys="true" keyProperty="roomId">
         INSERT INTO CHAT_ROOM (user1_id, user2_id)
         VALUES (#{user1Id}, #{user2Id})
     </insert>
 
-    <!--    회원 프로필 이미지 불러오기-->
     <select id="selectProfileImageUrlByUserId" resultType="UserProfileDTO" parameterType="ChatRoomDTO">
         SELECT
             U.USER_ID AS userId,

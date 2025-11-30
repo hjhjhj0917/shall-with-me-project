@@ -9,7 +9,6 @@ const tableBody = document.getElementById('policyTableBody');
 const paginationDiv = document.getElementById('pagination');
 const searchInput = document.getElementById('searchInput');
 
-// ▶️ JSON 파싱
 const policyJson = document.getElementById('policyJsonData').dataset.json;
 if (policyJson) {
     try {
@@ -19,7 +18,6 @@ if (policyJson) {
     }
 }
 
-// ✅ 페이지 로드 시 URL에 따라 초기 페이지 설정
 const params = new URLSearchParams(window.location.search);
 currentPage = parseInt(params.get("page")) || 1;
 
@@ -29,7 +27,6 @@ window.addEventListener("popstate", () => {
     render(currentPage);
 });
 
-// ▶️ 메인 렌더링 함수
 function render(page) {
     currentPage = page;
     const data = filteredPolicies.length ? filteredPolicies : allPolicies;
@@ -40,7 +37,6 @@ function render(page) {
     renderPagination(data.length);
 }
 
-// ▶️ 테이블 렌더링
 function renderTable(policies) {
     tableBody.innerHTML = '';
 
@@ -82,7 +78,6 @@ function renderTable(policies) {
     });
 }
 
-// ▶️ 페이지네이션 렌더링
 function renderPagination(totalItems) {
     paginationDiv.innerHTML = '';
 
@@ -116,7 +111,6 @@ function renderPagination(totalItems) {
     makeBtn('>>', totalPages, currentPage === totalPages);
 }
 
-// ▶️ 페이지 변경 시 URL 반영
 function changePage(page) {
     const url = new URL(window.location);
     url.searchParams.set('page', page);
@@ -124,7 +118,6 @@ function changePage(page) {
     render(page);
 }
 
-// ▶️ 검색 처리
 function handleSearch() {
     const keyword = searchInput.value.trim().toLowerCase();
     filteredPolicies = allPolicies.filter(policy =>
@@ -134,10 +127,8 @@ function handleSearch() {
     changePage(1);
 }
 
-// ▶️ 초기 렌더링
 render(currentPage);
 
-// ▶️ Enter 검색
 searchInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
         handleSearch();

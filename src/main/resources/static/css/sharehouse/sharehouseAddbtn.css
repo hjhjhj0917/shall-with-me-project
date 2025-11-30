@@ -1,8 +1,7 @@
-/* 왼쪽 하단 + 버튼 */
 .sh-fab-left {
     position: fixed;
-    left: 80px;                 /* 👉 기존 16px → 오른쪽으로 이동 */
-    bottom: 40px;               /* 바닥 여백 */
+    left: 80px;
+    bottom: 40px;
     width: 55px;
     height: 55px;
     border-radius: 50%;
@@ -20,7 +19,6 @@
 .sh-fab-left:hover { transform: scale(1.06); background-color: #f8fbff; }
 .sh-fab-left:active { transform: scale(0.98); }
 
-/* + 아이콘 */
 .sh-fab-left .icon-plus {
     font-size: 26px;
     font-weight: 800;
@@ -29,11 +27,10 @@
     transform: translateY(-1px);
 }
 
-/* 버튼 라벨 */
 .sh-fab-label {
     position: fixed;
-    left: 80px;                    /* 버튼과 같은 위치 */
-    bottom: 100px;                 /* 버튼 위쪽에 배치 */
+    left: 80px;
+    bottom: 100px;
     font-size: 14px;
     font-weight: 600;
     color: #1c407d;
@@ -45,11 +42,10 @@
     z-index: 9000;
 }
 
-/* 툴팁 컨테이너 */
 .sh-tooltip {
     position: fixed;
-    left: 60px;                 /* 버튼과 같은 X축 */
-    bottom: 110px;              /* 버튼 바로 위 */
+    left: 60px;
+    bottom: 110px;
     background: #1c407d;
     color: #fff;
     font-size: 13px;
@@ -63,7 +59,6 @@
     z-index: 9000;
 }
 
-/* 꼬리 */
 .sh-tooltip::after {
     content: "";
     position: absolute;
@@ -75,7 +70,6 @@
     border-color: #1c407d transparent transparent transparent;
 }
 
-/* hover 시 툴팁 표시 */
 .sh-fab-left:hover + .sh-tooltip {
     opacity: 1;
 }
