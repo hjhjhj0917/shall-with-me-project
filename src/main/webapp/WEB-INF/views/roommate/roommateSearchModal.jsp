@@ -10,7 +10,6 @@
         </div>
         <div class="modal-body">
             <div id="all-tag-list" class="all-tag-list">
-                <!-- 모든 태그 버튼 또는 span으로 들어감 -->
             </div>
         </div>
     </div>
@@ -29,15 +28,11 @@
 
         $('#sh-search-btn').on('click', function () {
             const selected = getSelectedTagIds();
-            currentPage = 1; // 검색 버튼 클릭 시 페이지 초기화
+            currentPage = 1;
             doSearchWithTags(selected, currentPage, pageSize);
         });
 
-        // 페이징 버튼 예시 (필요하면 UI에 페이징 버튼 추가 후 바인딩)
-        // $('#next-page-btn').on('click', function() {
-        //     currentPage++;
-        //     doSearchWithTags(getSelectedTagIds(), currentPage, pageSize);
-        // });
+
     });
 
     function openTagModal() {
@@ -116,7 +111,7 @@
     }
 
     function doSearchWithTags(tagIdArray, page, pageSize) {
-        // 빈 배열일 때도 전송해서 백엔드에서 처리하도록
+
         const reqData = {
             tagIds: tagIdArray || [],
             page: page,
@@ -130,13 +125,11 @@
             data: JSON.stringify(reqData),
             dataType: 'json',
             success: function (data) {
-                console.log("✅ AJAX 응답 데이터: ", data);
-                // data는 TagDTO 구조. users 리스트는 data.users 또는 data.items 이름 확인 필요
+                console.log("AJAX 응답 데이터: ", data);
                 $('.sh-grid').empty();
                 renderUserCards(data.users || data.items || []);
 
-                // 페이징 UI 있으면 여기서 totalCount, pageSize, page 정보로 갱신 가능
-                // ex) updatePagination(data.totalCount, data.page, data.pageSize);
+
             },
             error: function (err) {
                 console.error('검색 실패', err);

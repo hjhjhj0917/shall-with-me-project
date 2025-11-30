@@ -38,8 +38,6 @@
             padding: 24px;
             background-color: #ffffff;
             border-radius: 12px;
-            /*box-shadow: -3px -3px 16px rgba(0, 0, 0, 0.1),  !* 왼쪽 위쪽 그림자 진하게 *!*/
-            /*6px 5px 16px rgba(0, 0, 0, 0.27);  !* 기존 그림자 유지 *!*/
             position: relative;
             text-align: center;
             min-width: 300px;
@@ -49,7 +47,6 @@
             padding-top: 20px;
         }
 
-        /* 입력 필드 */
         .login-input {
             width: 100%;
             padding: 12px;
@@ -66,7 +63,6 @@
             box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
         }
 
-        /* 자동 로그인 & 비밀번호 찾기 */
         .login-options {
             padding-top: 20px;
             display: flex;
@@ -86,7 +82,6 @@
             color: #3399ff;
         }
 
-        /* 로그인 버튼 */
         .login-btn {
             width: 100%;
             background-color: #3399ff;
@@ -105,7 +100,6 @@
             background-color: #3399ff;
         }
 
-        /* 회원가입 링크 */
         .signup-link {
             margin-top: 18px;
             font-size: 12px;
@@ -117,7 +111,6 @@
             text-decoration: none;
         }
 
-        /* 소셜 로그인 */
         .social-login {
             margin-top: 20px;
             display: flex;
@@ -150,15 +143,15 @@
         #withdrawErrorMessage1 {
             color: #3399ff;
             font-size: 14px;
-            text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
+            text-align: left;
+            height: 5px;
             padding-left: 5px;
-            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
+            visibility: hidden;
             margin-bottom: 20px;
         }
 
         #withdrawErrorMessage1.visible {
-            visibility: visible; /* 메시지가 있을 때 표시 */
+            visibility: visible;
         }
 
         #notExists {
@@ -169,14 +162,14 @@
         .error-message {
             color: #3399ff;
             font-size: 14px;
-            text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
+            text-align: left;
+            height: 5px;
             padding-left: 5px;
-            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
+            visibility: hidden;
         }
 
         .error-message.visible {
-            visibility: visible; /* 메시지가 있을 때 표시 */
+            visibility: visible;
         }
 
         #step2, #step3 {
@@ -193,8 +186,8 @@
         }
 
         .completion-icon {
-            font-size: 50px; /* 아이콘 크기 */
-            color: #4da3ff; /* 아이콘 색상 */
+            font-size: 50px;
+            color: #4da3ff;
         }
 
         .completion-message {
@@ -208,7 +201,6 @@
     <script>
         $(document).ready(function () {
 
-            // 에러 스타일 제거
             $(document).on("click", function (e) {
                 const $target = $(e.target);
 
@@ -231,7 +223,6 @@
             let f = document.getElementById("f");
             let f2 = document.getElementById("f2");
 
-            // 회원 탈퇴 진행시 이메일 확인 후 다음 이동
             $("#withdrawNextBtn").on("click", function () {
                 emailExists(f)
             });
@@ -268,7 +259,6 @@
                             step1.style.display = 'none';
                             step2.style.display = 'block';
 
-                            // document.getElementById("hiddenEmail").value = f.email.value;
 
                         } else {
                             $("#email").addClass("input-error");

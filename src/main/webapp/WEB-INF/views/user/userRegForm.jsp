@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/logo.css"/>
     <script>
         $(document).ready(function () {
-            // ✅ birth-input 필드의 placeholder를 현재 날짜로 동적 업데이트
             function updateBirthPlaceholders() {
                 const currentDate = new Date();
                 const year = currentDate.getFullYear();
@@ -29,10 +28,10 @@
                 $('[name="birthDay"]').attr('placeholder', day);
             }
 
-            // 페이지 로드 시 placeholder 업데이트 함수 호출
+
             updateBirthPlaceholders();
 
-            // ✅ Datepicker 설정
+
             $.datepicker.regional['ko'] = {
                 closeText: '닫기',
                 prevText: '이전달',
@@ -89,7 +88,7 @@
             background-image: url("../images/background.png");
         }
 
-        /* ✅ 등록 폼 컨테이너 */
+
         .register-form-wrapper {
             width: 1100px;
             margin: 0 auto;
@@ -105,8 +104,6 @@
             overflow: visible; /* 중요 */
         }
 
-        /*/////////////////////////////////////////*/
-        /* form-row 내부의 input과 버튼들을 유연하게 배치 */
         .form-row {
             display: flex;
             margin-top: 8px;
@@ -116,13 +113,13 @@
             height: 40px;
         }
 
-        /* input이 버튼이 있을 때와 없을 때 모두 최대한 공간 활용하도록 */
+
         .form-row input[type="text"],
         .form-row input[type="email"],
         .form-row input[type="password"],
         .form-row input[type="number"] {
-            flex: 1 1 auto; /* flex-grow:1, flex-shrink:1, flex-basis:auto */
-            min-width: 0; /* 오버플로우 방지 */
+            flex: 1 1 auto;
+            min-width: 0;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
@@ -130,9 +127,9 @@
             box-sizing: border-box;
         }
 
-        /* 버튼은 내용 크기만큼만 */
+
         .form-row button.form-button {
-            flex: 0 0 auto; /* 크기 고정, 늘어나거나 줄어들지 않음 */
+            flex: 0 0 auto;
             height: 40px;
             padding: 0 12px;
             font-size: 14px;
@@ -144,25 +141,24 @@
             white-space: nowrap;
         }
 
-        /* birth-row 의 input들도 flex 사용 */
+
         .birth-row input {
             flex: 1 1 auto;
             min-width: 0;
-            width: auto; /* width 고정하지 않음 */
+            width: auto;
             text-align: center;
         }
 
-        /* input-container 너비는 그대로 유지 */
+
         .input-container {
-            width: 500px; /* 필요한 너비 유지 */
+            width: 500px;
             margin: 0 auto;
             box-sizing: border-box;
         }
 
-        /*///////////////////////////////////*/
 
 
-        /* ✅ 버튼 스타일 고정 */
+
         .form-button {
             height: 40px;
             padding: 8px 12px;
@@ -176,12 +172,12 @@
             white-space: nowrap;
         }
 
-        /* ✅ 버튼 hover 효과 */
+
         .form-button:hover {
             background-color: #2a80d4;
         }
 
-        /* ✅ 생년월일 입력 줄 */
+
         .birth-row {
             display: flex;
             justify-content: center;
@@ -189,7 +185,7 @@
             margin-top: 12px;
         }
 
-        /* ✅ 성별 선택 영역 */
+
         .gender-select {
             display: flex;
             justify-content: center;
@@ -197,13 +193,13 @@
             margin: 16px 0;
         }
 
-        /* ✅ 회원가입 버튼 */
+
         .submit-button {
             width: 100%; /* 부모(.input-container) 너비에 맞게 꽉 채우기 */
             margin-top: 16px;
         }
 
-        /* ✅ 탭이나 제목 여백 조절 */
+
         .register-tab, .prefer-tab, .profile-tab {
             margin-bottom: 12px;
         }
@@ -267,14 +263,14 @@
             box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.25);
         }
 
-        /* 현재 활성화된 탭 스타일 */
+
         .active-tab {
             right: -39px;
             font-size: 20px !important;
             z-index: 3 !important;
         }
 
-        /* 로그인 링크 */
+
         .signup-link {
             margin-top: 18px;
             font-size: 13px;
@@ -289,15 +285,15 @@
         .error-message {
             color: #3399ff;
             font-size: 14px;
-            text-align: left; /* 왼쪽 정렬 */
-            height: 5px; /* 고정 높이로 레이아웃 안정 */
+            text-align: left;
+            height: 5px;
             padding-left: 275px;
             padding-bottom: 15px;
-            visibility: hidden; /* 기본은 숨김, 자리 차지는 유지 */
+            visibility: hidden;
         }
 
         .error-message.visible {
-            visibility: visible; /* 메시지가 있을 때 표시 */
+            visibility: visible;
         }
 
         .form-row input:focus {
@@ -307,8 +303,6 @@
         }
 
 
-        /* ======================= */
-        /* 달력 전체 박스 */
         .ui-datepicker {
             width: 320px;
             padding: 10px;
@@ -327,8 +321,6 @@
 
         }
 
-        /* ======================= */
-        /* 헤더 (연/월 표시 부분) */
         .ui-datepicker-header {
             display: flex;
             justify-content: center;
@@ -359,12 +351,11 @@
             color: #333;
             padding: 2px 4px;
             cursor: pointer;
-            overflow: hidden; /* ✅ 스크롤 제거 */
-            max-height: 30px; /* ✅ 높이 제한 */
+            overflow: hidden;
+            max-height: 30px;
         }
 
-        /* ======================= */
-        /* 이전/다음 버튼 - 동그란 스타일 */
+
         .ui-datepicker-prev,
         .ui-datepicker-next {
             cursor: pointer;
@@ -457,26 +448,25 @@
             border-radius: 50%;
         }
 
-        /* 연도 / 월 드롭다운 공통 스타일 */
         .flatpickr-calendar select.flatpickr-monthDropdown-months,
         .flatpickr-calendar select.numInput {
-            appearance: none; /* 브라우저 기본 화살표 제거 */
+            appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
             border: 1px solid #ddd;
-            border-radius: 6px; /* 둥글게 */
+            border-radius: 6px;
             padding: 2px 6px;
             background-color: #fff;
             font-size: 14px;
             text-align: center;
             outline: none;
-            overflow: hidden; /* 스크롤 제거 */
+            overflow: hidden;
         }
 
-        /* 드롭다운 펼쳤을 때 옵션 스타일 */
+
         .flatpickr-calendar select.flatpickr-monthDropdown-months option,
         .flatpickr-calendar select.numInput option {
-            border-radius: 10px; /* 옵션에도 살짝 둥근 느낌 */
+            border-radius: 10px;
             padding: 4px;
         }
 
@@ -555,7 +545,7 @@
     <input type="text" id="birth-datepicker" style="position:absolute; left:-9999px; top:-9999px;">
 </div>
 
-<!-- 커스텀 알림창 -->
+
 <%@ include file="../includes/customModal.jsp" %>
 
 <%

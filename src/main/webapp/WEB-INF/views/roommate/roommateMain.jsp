@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/css/roommate/roommateMain.css"/>
 
     <style>
-        /* (검색창 및 다른 부분 스타일은 이전과 동일) */
         .sh-searchbar {
             display: flex;
             align-items: center;
@@ -170,7 +169,6 @@
             font-weight: 600;
         }
 
-        /* ✅ [수정] 태그 모달 그룹 UI 전체 변경 */
         .search-tag-group {
             display: flex;
             align-items: center;
@@ -334,7 +332,7 @@
 
 <script>
     $(document).ready(function () {
-        // --- 전역 변수: page 대신 offset 사용 ---
+
         let offset = 0, loading = false, lastPage = false;
         let selectedLocation = "";
         const selectedTagGroups = new Map();
@@ -362,8 +360,8 @@
             {key: "dishWash", title: "설거지", icon: "fa-solid fa-sink", tags: [42, 43]}
         ];
 
-        // --- 초기화 및 이벤트 핸들러 ---
-        loadInitialData(); // 1. 페이지 첫 로드 시 15개 요청
+
+        loadInitialData();
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
@@ -371,7 +369,7 @@
             let innerHeight = $scrollArea.innerHeight();
             let scrollHeight = $scrollArea[0].scrollHeight;
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
-                loadMoreData(); // 2. 스크롤 시 5개 요청
+                loadMoreData();
             }
         });
 
@@ -379,23 +377,21 @@
         $('#tag-search-trigger').on('click', openTagModal);
 
         $('#sh-search-btn').on('click', function () {
-            offset = 0; // 오프셋 초기화
+            offset = 0;
             lastPage = false;
             $grid.empty();
-            loadInitialData(); // 3. 검색 버튼 클릭 시에도 새로 15개 요청
+            loadInitialData();
         });
 
-        // --- API 호출 함수 ---
 
         function loadInitialData() {
-            loadData(0, 15); // offset: 0, pageSize: 15
+            loadData(0, 15);
         }
 
         function loadMoreData() {
-            loadData(offset, 5); // 현재 offset에서 5개 추가
+            loadData(offset, 5);
         }
 
-        // 모든 API 호출을 처리하는 통합 함수
         function loadData(currentOffset, size) {
             loading = true;
 
@@ -404,7 +400,7 @@
                 tagGroupMap[groupKey] = Array.from(tagMap.keys());
             });
 
-            // pageSize와 offset을 동적으로 전달
+
             const reqData = {
                 location: selectedLocation,
                 tagGroupMap: tagGroupMap,
@@ -422,7 +418,7 @@
                     const users = data.users || [];
                     if (users.length > 0) {
                         renderUserCards(users);
-                        offset += users.length; // 불러온 만큼 offset 증가
+                        offset += users.length;
                     }
                     if (data.lastPage) {
                         lastPage = true;
@@ -444,7 +440,6 @@
         }
 
         function renderLocations() {
-            // ✅ [수정] locations를 객체 배열로 변경 (display: 표시용, value: 전송용)
             const locations = [
                 { display: '서울특별시', value: '서울특별시' },
                 { display: '부산광역시', value: '부산광역시' },
@@ -456,33 +451,31 @@
                 { display: '세종특별자치시', value: '세종특별자치시' },
                 { display: '경기도', value: '경기도' },
                 { display: '강원특별자치도', value: '강원특별자치도' },
-                { display: '충청북도', value: '충북' }, // ✅ 요청 사항
-                { display: '충청남도', value: '충남' }, // ✅ 요청 사항
+                { display: '충청북도', value: '충북' },
+                { display: '충청남도', value: '충남' },
                 { display: '전북특별자치도', value: '전북특별자치도' },
-                { display: '전라남도', value: '전남' }, // ✅ 요청 사항
-                { display: '경상북도', value: '경북' }, // ✅ 요청 사항
-                { display: '경상남도', value: '경남' }, // ✅ 요청 사항
+                { display: '전라남도', value: '전남' },
+                { display: '경상북도', value: '경북' },
+                { display: '경상남도', value: '경남' },
                 { display: '제주특별자치도', value: '제주특별자치도' }
             ];
 
             const $container = $('#location-grid-container').empty();
 
             locations.forEach(loc => {
-                // ✅ [수정] loc.display로 텍스트 설정
                 const $item = $('<div>').addClass('location-item').text(loc.display);
 
-                // ✅ [수정] selectedLocation (value)와 loc.value 비교
                 if (loc.value === selectedLocation) {
                     $item.addClass('selected');
                 }
 
                 $item.on('click', function () {
-                    // ✅ [수정] loc.value와 비교
+
                     if (selectedLocation === loc.value) {
                         selectedLocation = ""; // 선택 해제
                         $('#location-selection-text').text('지역 선택').css('color', '');
                     } else {
-                        // ✅ [수정] selectedLocation에는 value, 텍스트에는 display 저장
+
                         selectedLocation = loc.value;
                         $('#location-selection-text').text(loc.display).css('color', '#222');
                     }
