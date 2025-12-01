@@ -35,7 +35,6 @@ public class SharehouseController {
     private final AwsS3Service awsS3Service;
 
 
-    // 등록 페이지
     @GetMapping("/sharehouseReg")
     public String sharehouseReg() {
         ServletRequestAttributes attrs =
@@ -161,6 +160,7 @@ public class SharehouseController {
                 log.info("썸네일 업로드 완료: {}", thumbnailUrl);
             }
 
+            // 추가 이미지 업로드
             if (images != null) {
                 for (int i = 0; i < images.size(); i++) {
                     MultipartFile image = images.get(i);
@@ -238,6 +238,7 @@ public class SharehouseController {
     }
 
 
+    // 메인 페이지 리스트
     @GetMapping(value = "/userList", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Map<String, Object>> getUserList(@RequestParam(defaultValue = "1") int page) {
@@ -446,9 +447,11 @@ public class SharehouseController {
         log.info("=== 최종 detail 객체 ===");
         log.info("hostName: {}", detail.get("hostName"));
         log.info("hostProfileUrl: {}", detail.get("hostProfileUrl"));
+        log.info("이미지 개수: {}", images != null ? images.size() : 0);
+        log.info("태그 개수: {}", tags != null ? tags.size() : 0);
         log.info("=== sharehouseDetail 종료 ===");
 
-        model.addAttribute("house", detail);
+        model.addAttribute("user", detail);
 
         return "sharehouse/sharehouseDetail";
     }
