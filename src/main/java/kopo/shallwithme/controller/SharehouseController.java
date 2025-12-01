@@ -161,7 +161,6 @@ public class SharehouseController {
                 log.info("썸네일 업로드 완료: {}", thumbnailUrl);
             }
 
-            // 추가 이미지 업로드
             if (images != null) {
                 for (int i = 0; i < images.size(); i++) {
                     MultipartFile image = images.get(i);
@@ -196,22 +195,20 @@ public class SharehouseController {
                             tagListJson,
                             mapper.getTypeFactory().constructCollectionType(List.class, Integer.class)
                     );
-                    if (!tagList.isEmpty()) {
-                        sharehouseService.saveSharehouseTags(houseId, tagList);
-                        log.info("태그 {}개 저장 완료", tagList.size());
-                    }
-                } catch (Exception e) {
-                    log.error("태그 저장 중 오류", e);
+
+                    log.info("파싱된 태그 리스트: {}", tagList);
+
+                    int saved = sharehouseService.saveSharehouseTags(houseId, tagList);
+                    log.info("태그 {}개 저장 완료", saved);
+                } catch (Exception tagEx) {
+                    log.error("태그 저장 실패 (계속 진행)", tagEx);
                 }
             }
 
-            log.info("========================================");
-            log.info("쉐어하우스 등록 완전 완료! houseId={}", houseId);
-            log.info("========================================");
-
             return ResponseEntity.ok(Map.of(
                     "result", 1,
-                    "data", Map.of("shId", houseId)
+                    "msg", "쉐어하우스가 등록되었습니다.",
+                    "houseId", houseId
             ));
 
         } catch (Exception e) {
@@ -241,7 +238,6 @@ public class SharehouseController {
     }
 
 
-    // 메인 페이지 리스트
     @GetMapping(value = "/userList", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Map<String, Object>> getUserList(@RequestParam(defaultValue = "1") int page) {
@@ -281,51 +277,35 @@ public class SharehouseController {
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> list(@RequestParam(defaultValue = "1") int page) {
-        int safePage = Math.max(page, 1);
-        int pageSize = 12;
-        int offset = (safePage - 1) * pageSize;
-
-        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, pageSize, null, null, null);
-
-        List<Map<String, Object>> items = cards.stream().map(c -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("userId", c.getHouseId());
-            m.put("houseId", c.getHouseId());
-            m.put("name", c.getTitle());
-            m.put("profileImgUrl", c.getCoverUrl());
-
-            List<UserTagDTO> tags = c.getTags();
-            if (tags != null && !tags.isEmpty()) {
-                m.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
-                m.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
-            }
-            m.put("gender", "");
-            return m;
-        }).collect(Collectors.toList());
-
-        boolean lastPage = items.isEmpty();
-        return Map.of("items", items, "lastPage", lastPage);
-    }
-
-
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> search(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pageSize", defaultValue = "12") int pageSize,
-            @RequestParam(value = "location", required = false) String location,
-            @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
-            @RequestParam(value = "maxRent", required = false) Integer maxRent
+    public Map<String, Object> list(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "12") int pageSize,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) List<Integer> tagIds
     ) {
-        log.info("Sharehouse search - page={}, pageSize={}, location={}, tagIds={}, maxRent={}",
-                page, pageSize, location, tagIds, maxRent);
+        log.info("=== /sharehouse/list API 호출 ===");
+        log.info("offset: {}", offset);
+        log.info("pageSize: {}", pageSize);
+        log.info("location: {}", location);
+        log.info("tagIds: {}", tagIds);
 
-        int safePage = Math.max(page, 1);
-        int safePageSize = (pageSize <= 0) ? 12 : pageSize;
-        int offset = (safePage - 1) * safePageSize;
+        // location이 빈 문자열이면 null로 변경
+        if (location != null && location.trim().isEmpty()) {
+            location = null;
+        }
 
-        List<SharehouseCardDTO> cards = sharehouseService.listCards(offset, safePageSize, location, tagIds, maxRent);
+        // tagIds가 비어있으면 null로 변경
+        if (tagIds != null && tagIds.isEmpty()) {
+            tagIds = null;
+        }
+
+        List<SharehouseCardDTO> cards = sharehouseService.listCards(
+                offset,
+                pageSize,
+                location,
+                tagIds,
+                null  // maxRent는 현재 사용 안 함
+        );
 
         List<Map<String, Object>> items = cards.stream().map(c -> {
             Map<String, Object> m = new HashMap<>();
@@ -333,36 +313,38 @@ public class SharehouseController {
             m.put("houseId", c.getHouseId());
             m.put("name", c.getTitle());
             m.put("profileImgUrl", c.getCoverUrl());
-            m.put("address", c.getAddress());
-            m.put("detailAddress", c.getDetailAddress());
             m.put("floorNumber", c.getFloorNumber());
 
             List<UserTagDTO> tags = c.getTags();
             if (tags != null && !tags.isEmpty()) {
                 m.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
                 m.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+                m.put("tag3", tags.size() > 2 ? tags.get(2).getTagName() : null);
+            } else {
+                m.put("tag1", null);
+                m.put("tag2", null);
+                m.put("tag3", null);
             }
+            m.put("gender", "");
             return m;
         }).collect(Collectors.toList());
 
-        boolean lastPage = items.size() < safePageSize;
-        return Map.of(
-                "items", items,
-                "lastPage", lastPage,
-                "page", safePage,
-                "pageSize", safePageSize
-        );
+        boolean lastPage = items.size() < pageSize;
+
+        log.info("검색 결과: {}개, lastPage: {}", items.size(), lastPage);
+
+        return Map.of("items", items, "lastPage", lastPage);
     }
 
 
     @GetMapping("/{houseId}/info")
     @ResponseBody
-    public Map<String, Object> getSharehouseInfo(@PathVariable("houseId") Long houseId) {
+    public Map<String, Object> getSharehouseInfo(@PathVariable Long houseId) {
         log.info("getSharehouseInfo called for houseId={}", houseId);
 
         SharehouseCardDTO card = sharehouseService.getCardById(houseId);
         if (card == null) {
-            return Collections.emptyMap();
+            return Map.of();
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -370,14 +352,11 @@ public class SharehouseController {
         result.put("title", card.getTitle());
         result.put("subText", card.getSubText());
         result.put("coverUrl", card.getCoverUrl());
-        result.put("address", card.getAddress());
-        result.put("detailAddress", card.getDetailAddress());
-        result.put("floorNumber", card.getFloorNumber());
 
-        List<UserTagDTO> tags = card.getTags();
+        List<UserTagDTO> tags = sharehouseService.selectSharehouseTags(houseId);
         if (tags != null && !tags.isEmpty()) {
-            result.put("tag1", tags.size() > 0 ? tags.get(0).getTagName() : null);
-            result.put("tag2", tags.size() > 1 ? tags.get(1).getTagName() : null);
+            result.put("tag1", tags.get(0).getTagName());
+            if (tags.size() > 1) result.put("tag2", tags.get(1).getTagName());
         }
 
         return result;
@@ -460,17 +439,16 @@ public class SharehouseController {
                 detail.put("hostName", "작성자");
             }
         } else {
-            log.warn("regId가 null이거나 비어있어서 프로필 조회 불가");
+            log.warn("regId가 null 또는 비어있어 작성자 정보를 조회하지 않음");
             detail.put("hostName", "작성자");
         }
 
-        log.info("=== 최종 detail 내용 ===");
-        log.info("regId: '{}'", detail.get("regId"));
-        log.info("hostName: '{}'", detail.get("hostName"));
-        log.info("이미지 개수: {}", images != null ? images.size() : 0);
-        log.info("태그 개수: {}", tags != null ? tags.size() : 0);
+        log.info("=== 최종 detail 객체 ===");
+        log.info("hostName: {}", detail.get("hostName"));
+        log.info("hostProfileUrl: {}", detail.get("hostProfileUrl"));
+        log.info("=== sharehouseDetail 종료 ===");
 
-        model.addAttribute("user", detail);
+        model.addAttribute("house", detail);
 
         return "sharehouse/sharehouseDetail";
     }
