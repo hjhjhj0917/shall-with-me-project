@@ -111,13 +111,13 @@ public class SharehouseService implements ISharehouseService {
         }
 
         Long houseId = dto.getHouseId();
-        log.info("✅ 쉐어하우스 저장 완료. houseId={}", houseId);
+        log.info("쉐어하우스 저장 완료. houseId={}", houseId);
 
         if (imageUrls != null && !imageUrls.isEmpty()) {
             int savedCount = attachImages(houseId, imageUrls);
-            log.info("✅ 이미지 {}개 저장 완료", savedCount);
+            log.info("이미지 {}개 저장 완료", savedCount);
         } else {
-            log.warn("⚠️ 저장할 이미지가 없습니다");
+            log.warn("저장할 이미지가 없습니다");
         }
 
         log.info("=== 쉐어하우스 등록 완료 ===");

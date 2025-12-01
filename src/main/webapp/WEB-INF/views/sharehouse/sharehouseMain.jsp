@@ -333,7 +333,6 @@
 
 <script>
     $(document).ready(function () {
-        // --- 전역 변수: page 대신 offset 사용 ---
         let offset = 0, loading = false, lastPage = false;
         let selectedLocation = "";
         const selectedTags = new Map();
@@ -349,16 +348,16 @@
             {key: "parking", title: "주차공간", icon: "fa-solid fa-square-parking", tags: [12, 13]}
         ];
 
-        // --- 초기화 및 이벤트 핸들러 ---
-        loadInitialData(); // 1. 페이지 첫 로드 시 15개 요청
+        loadInitialData();
 
         $scrollArea.on("scroll", function () {
             if (loading || lastPage) return;
             let scrollTop = $scrollArea.scrollTop();
             let innerHeight = $scrollArea.innerHeight();
             let scrollHeight = $scrollArea[0].scrollHeight;
+
             if (scrollTop + innerHeight + 100 >= scrollHeight) {
-                loadMoreData(); // 2. 스크롤 시 5개 요청
+                loadMoreData();
             }
         });
 
@@ -371,7 +370,6 @@
             $grid.empty();
             loadInitialData();
         });
-
 
         function loadInitialData() {
             loadData(0, 15);
@@ -387,54 +385,41 @@
             const tagIds = Array.from(selectedTags.keys());
 
             console.log("=== API 호출 정보 ===");
-            console.log("URL:", ctx + "/sharehouse/list");
-            console.log("offset:", currentOffset);
-            console.log("pageSize:", size);
-            console.log("location:", selectedLocation || null);
+            console.log("location:", selectedLocation);
             console.log("tagIds:", tagIds);
 
             $.ajax({
                 url: ctx + "/sharehouse/list",
                 type: "GET",
+                traditional: true,
                 data: {
                     offset: currentOffset,
                     pageSize: size,
-                    location: selectedLocation || null,
+                    location: selectedLocation ? selectedLocation : "",
                     tagIds: tagIds
                 },
                 dataType: "json",
                 success: function (data) {
-                    console.log("=== API 응답 ===");
-                    console.log("전체 응답:", data);
+                    console.log("=== API 응답 ===", data);
 
                     const items = data.items || data.list || data || [];
 
-                    if (items.length) {
-                        console.log("첫번째 카드 태그:", items[0].tag1, items[0].tag2, items[0].tag3);
-                    }
-
                     if (items.length > 0) {
-                        console.log("첫 번째 아이템:", items[0]);
-                        console.log("tag1:", items[0].tag1);
-                        console.log("tag2:", items[0].tag2);
-                        console.log("tag3:", items[0].tag3);
-
                         renderHouseCards(items);
                         offset += items.length;
                     }
+
                     if (items.length < size || data.lastPage) {
                         lastPage = true;
                     }
                 },
                 error: (err) => {
                     console.error('데이터 로드 실패', err);
-                    console.log("에러 상세:", err.responseText);
                 },
                 complete: () => loading = false
             });
         }
 
-        // --- 지역 모달 ---
         function openLocationModal() {
             renderLocations();
             $('#locationSelectModalOverlay').css('display', 'flex');
@@ -468,30 +453,26 @@
             const $container = $('#location-grid-container').empty();
 
             locations.forEach(loc => {
-
                 const $item = $('<div>').addClass('location-item').text(loc.display);
-
 
                 if (loc.value === selectedLocation) {
                     $item.addClass('selected');
                 }
 
                 $item.on('click', function () {
-
                     if (selectedLocation === loc.value) {
-                        selectedLocation = ""; // 선택 해제
+                        selectedLocation = "";
                         $('#location-selection-text').text('지역 선택').css('color', '');
                     } else {
                         selectedLocation = loc.value;
                         $('#location-selection-text').text(loc.display).css('color', '#222');
                     }
-                    renderLocations(); // 'selected' 클래스 업데이트를 위해 다시 렌더링
+                    renderLocations();
                     closeLocationModal();
                 });
                 $container.append($item);
             });
         }
-
 
         function openTagModal() {
             loadAllTags();
@@ -574,14 +555,6 @@
             const loginUserId = "${sessionScope.SS_USER_ID}";
 
             $.each(items, function (i, house) {
-                console.log("=== 카드 렌더링 ===");
-                console.log("house 객체:", house);
-                console.log("houseId:", house.houseId || house.userId);
-                console.log("floorNumber:", house.floorNumber);
-                console.log("tag1:", house.tag1);
-                console.log("tag2:", house.tag2);
-                console.log("tag3:", house.tag3);
-
                 const houseId = house.houseId || house.userId;
                 if (houseId === loginUserId) return true;
 
@@ -602,11 +575,7 @@
                 if (house.tag3) $tagBox.append($("<span>").addClass("tag").text(house.tag3));
 
                 if (house.floorNumber != null && house.floorNumber !== '' && house.floorNumber !== 'null') {
-                    const floorTag = $("<span>").addClass("tag floor-tag").text(house.floorNumber + "층");
-                    $tagBox.append(floorTag);
-                    console.log("층수 태그 추가:", house.floorNumber + "층");
-                } else {
-                    console.log("층수 없음:", house.floorNumber);
+                    $tagBox.append($("<span>").addClass("tag floor-tag").text(house.floorNumber + "층"));
                 }
 
                 $info.append($tagBox);
